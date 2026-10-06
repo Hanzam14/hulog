@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#fff6d8"/><circle cx="268" cy="268" r="150" fill="#2a2320"/><circle cx="250" cy="250" r="150" fill="#ff7aa2" stroke="#2a2320" stroke-width="20"/><path d="M190 255l45 45 90-95" fill="none" stroke="#2a2320" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#fff6d8"/>
+  <circle cx="270" cy="222" r="100" fill="#2a2320"/>
+  <circle cx="256" cy="208" r="100" fill="#ff7aa2" stroke="#2a2320" stroke-width="18"/>
+  <!-- Peso drawn as paths: icons never depend on fonts. -->
+  <path d="M232 254V158H261C305 158 305 215 261 215H232M216 178H301M216 195H301" fill="none" stroke="#2a2320" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="110" y="300" width="320" height="150" rx="44" fill="#2a2320"/>
+  <rect x="96" y="286" width="320" height="150" rx="44" fill="#6ec6ff" stroke="#2a2320" stroke-width="18"/>
+  <rect x="176" y="276" width="160" height="22" rx="11" fill="#2a2320"/>
+</svg>
