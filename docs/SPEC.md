@@ -22,7 +22,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 
 ## 3. Data model
 
-- `profiles(id = auth.users.id, display_name, avatar_url, email)`
+- `profiles(id = auth.users.id, display_name, avatar_url, email, nickname nullable, avatar_kind default 'initial', avatar_emoji nullable, color default 'auto')`. Nickname is trimmed, 1..24 characters; blank resets to the Google name. Avatar kind is `initial|emoji|photo`; photo needs a Google `avatar_url`. Emoji is one of 🐷 🐱 🐶 🐰 🐻 🐼 🐸 🐵 🦊 🐥 🌻 🌸 🍓 🥭 ⭐ 🌙. Color is `auto|pink|blue|green|orange|purple`.
 - `groups(id, name, owner_id, pot_location text, created_at)`
 - `memberships(group_id, user_id unique, status: pending|active|denied|removed, last_seen_history_at, created_at)` — owner is `active` on group creation. `user_id` unique ⇒ one group per user (a denied/removed row must be deleted or reused before joining elsewhere; v1: denied users can't join another group without the row being removed by its owner — acceptable).
 - `invites(id, group_id, token_hash unique, created_by, created_at, expires_at = created_at + 24h, used_by, used_at, revoked_at)`.
@@ -49,6 +49,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 ## 4. Rules
 
 ### Security (applies to everything)
+
 - RLS on every table. Members can `select` only rows of the group where they are `active`. No direct insert/update/delete from clients; all writes go through `security definer` RPCs with `set search_path = public, pg_temp`, `revoke execute ... from public, anon`, and `grant execute ... to authenticated` only for the RPCs listed below.
 - Every RPC derives the actor from `auth.uid()` and loads the target cycle/payment/repayment/invite **by id joined to the actor's own active group**; anything not in that group → error. Never trust ids/roles from the client.
 - Derived views use `security_invoker = true`.
@@ -56,6 +57,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 - Invite token: 32 random bytes, base64url, shown once; only SHA-256 stored.
 
 ### Rules
+
 1. **Create group**: signed-in user with no membership row creates a group; becomes owner + active member.
 2. **Invite**: owner creates invite → app shows `https://<host>/join/<token>` and a QR code. Owner can revoke. Expires after 24h. Creating a new invite revokes older unused ones.
 3. **Join**: open link → Google sign-in → `claim_invite(token)` does, in one statement/transaction, `update invites set used_by, used_at where token_hash = sha256(token) and used_at is null and revoked_at is null and expires_at > now()`; 0 rows → "Invite invalid or used". Success creates a `pending` membership. Owner sees "Join request from <name> (<email>)" → **Accept** (`active`) or **Deny** (`denied`). Accept locks the group row and fails if there are already 2 active members. Pending/denied users see a waiting/denied screen only.
@@ -67,6 +69,9 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 9. **Repay debt**: debtor or creditor records a repayment against a closed cycle. Cap: new amount ≤ expected − confirmed paid − (pending + confirmed non-deleted repayments) for that cycle/debtor. Creditor confirms (any time). Repayments are outside any pot. Edit/delete like rule 7: changing amount resets a confirmed repayment to pending; creditor reconfirms; same cap applies to edits. Repayment create/edit takes the same cycle-row lock as rule 5.
 10. **Caps on edits** (rules 5, 7, 9): when editing, exclude the edited row's current value from the sum before adding the new value.
 11. **Export CSV**: client-side download of cycles, payments, repayments for the group.
+12. **Profile**: `update_profile(p_nickname, p_avatar_kind, p_avatar_emoji, p_color)` updates only `id = auth.uid()`, validates preferences, and is granted only to authenticated users. Profiles stay select-only for clients. Google sync refreshes name/photo/email without touching preferences. Display uses nickname, then Google name; failed photos show the initial. Auto colors are owner pink / partner blue. If colors collide, owner keeps theirs and partner uses the first different color in pink, blue, green, orange, purple order.
+13. **Device appearance/install**: theme is `system|light|dark` in device `localStorage` (`hulog-theme`, failure tolerated), applied before first paint; Auto follows OS changes and theme-color follows paper. Light uses dotted paper; dark uses a night planner palette with contrasting text and unchanged member fills. PWA is named **Hulog**, with portrait, maskable/touch icons, and `/hulog` + `/history` shortcuts. Android Settings offers the captured install prompt; iOS Safari shows “Share → Add to Home Screen.” Installed standalone apps hide install hints.
+14. **Rename**: owner can rename the group with `update_group`, preserving the current pot location.
 
 ## 5. Screens
 
@@ -77,7 +82,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 - Propose cycle form; pending proposal card with Accept / Decline / Cancel.
 - Cycle detail: payments list with edit/delete and status chips.
 - History: past cycles with receiver, pot, payout state, debts ("Owes ₱X") + Record repayment.
-- Group settings: members, invite (link + QR + revoke), join requests (Accept/Deny), pot location text, Export CSV, sign out.
+- Group settings: members (tap your own avatar to open **Ikaw**), owner group-name and pot-location forms, invite (link + QR + revoke), join requests (Accept/Deny), **Itsura** (Auto / Light / Dark), install hint, Export CSV, sign out. Ikaw has a live preview, nickname (Google-name placeholder), Initial / Emoji / Photo choices (Photo hidden without Google avatar), 4×4 emoji grid, Auto + five color swatches, partner-color marker (still selectable), and Save through `update_profile`. Controls fit 360px and use large tap targets.
 - v1.1 Settings: enable notifications, reminder time.
 
 ## 6. v1.1 Push notifications (build after v1 passes acceptance)
@@ -96,6 +101,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 Owner **A**, member **B**.
 
 **Cycle 1**: ₱50/day, 15 days, start 2026-11-01, end 2026-11-15, receiver B.
+
 - A pays 15 days on 11-01 → confirmed (₱750).
 - B pays 1 day on each of 11-01..11-13 (13 payments), A confirms each → B confirmed ₱650.
 - 11-15 22:00: B pays 1 day (P14) → pending. 11-15 23:00: B pays 1 day (P15) → pending.
@@ -105,6 +111,7 @@ Owner **A**, member **B**.
 - 11-17: A tries to confirm P15 → rejected (past settling day, never confirmed). P15 shows "Unconfirmed — not counted".
 
 **Cycle 2**: B proposes on 11-16 (allowed: cycle 1 no longer live). ₱100/day, 10 days, start 11-20, end 11-29. Default receiver = A. A accepts on 11-17.
+
 - A pays 10 days → ₱1,000 confirmed. B pays 4 days, then 3 days; A confirms both → B ₱700.
 - 11-30: closed. Pot ₱1,700. Receiver A = owner → auto Received.
 - Debt: B owes A 1,000 − 700 = ₱300 for Cycle 2.
