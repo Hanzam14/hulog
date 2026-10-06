@@ -1,15 +1,28 @@
 import { useState } from "react";
+import {
+  IconCheck,
+  IconCopy,
+  IconDownload,
+  IconMapPin,
+  IconQrcode,
+  IconShare,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { load, rpc } from "../data";
 import { csv } from "../helpers";
 import NotificationSettings from "../components/NotificationSettings";
+import Avatar from "../components/Avatar";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
   const owner = group.owner_id === user;
   const [invite, setInvite] = useState("");
   const [qr, setQr] = useState("");
+  const active = data.memberships.filter((m) => m.status === "active");
+  const pending = data.memberships.filter((m) => m.status === "pending");
   const exportCsv = async () => {
     const fresh = await load();
     for (const [file, rows] of [
@@ -18,10 +31,9 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
       ["repayments", fresh.repayments],
     ] as const) {
       const url = URL.createObjectURL(
-        new Blob(
-          ["\ufeff", csv(rows as unknown as Record<string, unknown>[])],
-          { type: "text/csv;charset=utf-8" },
-        ),
+        new Blob(["﻿", csv(rows as unknown as Record<string, unknown>[])], {
+          type: "text/csv;charset=utf-8",
+        }),
       );
       const a = document.createElement("a");
       a.href = url;
@@ -30,108 +42,162 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
   };
+  const share = () =>
+    run(async () => {
+      if (navigator.share)
+        await navigator.share({ title: "Join our hulog", url: invite });
+      else await navigator.clipboard.writeText(invite);
+    });
   return (
     <>
-      <h1>Our group</h1>
-      <section>
-        <h2>{group.name}</h2>
-        <p>Pot held at: {group.pot_location || "Not set yet"}</p>
-        {data.memberships
-          .filter((m) => m.status === "active")
-          .map((m) => (
-            <p key={m.user_id}>
-              <strong>{name(data, m.user_id)}</strong> ·{" "}
-              {m.user_id === group.owner_id ? "Owner / holder" : "Member"}
-            </p>
-          ))}
-        {owner && (
-          <form
-            key={group.pot_location}
-            onSubmit={(e) => {
-              e.preventDefault();
-              const f = new FormData(e.currentTarget);
-              void run(() =>
-                rpc("update_group", {
-                  p_name: group.name,
-                  p_pot_location: f.get("pot"),
-                }),
-              );
-            }}
-          >
-            <label>
-              Pot held at
-              <input name="pot" defaultValue={group.pot_location} />
-            </label>
-            <button disabled={busy}>Save pot location</button>
-          </form>
-        )}
-      </section>
+      <h1 className="sr-only">{group.name}</h1>
+      <div className="duo">
+        {active.map((m) => (
+          <figure key={m.user_id}>
+            <Avatar data={data} id={m.user_id} size="lg" />
+            <figcaption>{name(data, m.user_id)}</figcaption>
+          </figure>
+        ))}
+      </div>
+      {owner ? (
+        <form
+          className="pot-place"
+          key={group.pot_location}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const f = new FormData(e.currentTarget);
+            void run(() =>
+              rpc("update_group", {
+                p_name: group.name,
+                p_pot_location: f.get("pot"),
+              }),
+            );
+          }}
+        >
+          <IconMapPin aria-hidden="true" />
+          <input
+            name="pot"
+            aria-label="Pot held at"
+            placeholder="where's the pot?"
+            defaultValue={group.pot_location}
+          />
+          <button className="round" aria-label="Save" disabled={busy}>
+            <IconCheck />
+          </button>
+        </form>
+      ) : (
+        group.pot_location && (
+          <p className="muted center">
+            <IconMapPin size={14} aria-label="Pot held at" />{" "}
+            {group.pot_location}
+          </p>
+        )
+      )}
       {owner && (
         <>
-          <section>
-            <h2>Invite your partner</h2>
-            <p>
-              One use, valid for 24 hours. A new link revokes older unused
-              links.
-            </p>
-            <button
-              disabled={busy}
-              onClick={() =>
-                run(async () => {
-                  const token = (await rpc("create_invite")) as string;
-                  const link = `${window.location.origin}/join/${token}`;
-                  setInvite(link);
-                  const { default: QRCode } = await import("qrcode");
-                  setQr(
-                    await QRCode.toDataURL(link, { width: 240, margin: 2 }),
-                  );
-                })
-              }
-            >
-              Create invite
-            </button>
-            {invite && (
-              <div className="invite">
-                {qr && (
-                  <img
-                    src={qr}
-                    alt="Scan to join this Hulog group"
-                    width="240"
-                    height="240"
-                  />
-                )}
-                <label>
-                  Invite link
-                  <input
-                    readOnly
-                    value={invite}
-                    onFocus={(e) => e.target.select()}
-                  />
-                </label>
+          {pending.map((m) => (
+            <div className="sticker confirm" key={m.user_id}>
+              <Avatar data={data} id={m.user_id} />
+              <div>
+                <strong>{name(data, m.user_id)}</strong>
+                <small>
+                  {data.profiles.find((p) => p.id === m.user_id)?.email}
+                </small>
+              </div>
+              <button
+                className="round no"
+                aria-label={`Deny ${name(data, m.user_id)}`}
+                disabled={busy}
+                onClick={() =>
+                  run(() =>
+                    rpc("review_member", {
+                      p_user_id: m.user_id,
+                      p_accept: false,
+                    }),
+                  )
+                }
+              >
+                <IconX />
+              </button>
+              <button
+                className="round ok"
+                aria-label={`Let ${name(data, m.user_id)} in`}
+                disabled={busy}
+                onClick={() =>
+                  run(() =>
+                    rpc("review_member", {
+                      p_user_id: m.user_id,
+                      p_accept: true,
+                    }),
+                  )
+                }
+              >
+                <IconCheck />
+              </button>
+            </div>
+          ))}
+          {active.length < 2 && pending.length === 0 && (
+            <div className="invite">
+              {invite ? (
+                <>
+                  {qr && (
+                    <img
+                      className="qr"
+                      src={qr}
+                      alt="Scan to join this Hulog group"
+                      width="220"
+                      height="220"
+                    />
+                  )}
+                  <div className="answer">
+                    <button
+                      className="round"
+                      aria-label="Share invite link"
+                      disabled={busy}
+                      onClick={share}
+                    >
+                      <IconShare />
+                    </button>
+                    <button
+                      className="round secondary"
+                      aria-label="Copy invite link"
+                      disabled={busy}
+                      onClick={() =>
+                        run(async () => navigator.clipboard.writeText(invite))
+                      }
+                    >
+                      <IconCopy />
+                    </button>
+                  </div>
+                  <span className="muted center">one use · 24 hours</span>
+                </>
+              ) : (
                 <button
-                  className="secondary"
+                  className="big"
                   disabled={busy}
                   onClick={() =>
-                    run(async () => navigator.clipboard.writeText(invite))
+                    run(async () => {
+                      const token = (await rpc("create_invite")) as string;
+                      const link = `${window.location.origin}/join/${token}`;
+                      setInvite(link);
+                      const { default: QRCode } = await import("qrcode");
+                      setQr(
+                        await QRCode.toDataURL(link, {
+                          width: 440,
+                          margin: 1,
+                        }),
+                      );
+                    })
                   }
                 >
-                  Copy link
+                  <IconQrcode aria-hidden="true" /> invite
                 </button>
-              </div>
-            )}
-            {data.invites
-              .filter((i) => !i.used_at && !i.revoked_at)
-              .map((i) => (
-                <div className="list-row" key={i.id}>
-                  <p>
-                    Expires{" "}
-                    {new Intl.DateTimeFormat("en-PH", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                      timeZone: "Asia/Manila",
-                    }).format(new Date(i.expires_at))}
-                  </p>
+              )}
+              {data.invites
+                .filter((i) => !i.used_at && !i.revoked_at)
+                .map((i) => (
                   <button
+                    key={i.id}
                     className="quiet danger"
                     disabled={busy}
                     onClick={() =>
@@ -142,73 +208,21 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                       })
                     }
                   >
-                    Revoke
+                    <IconTrash size={14} aria-hidden="true" /> revoke link
                   </button>
-                </div>
-              ))}
-          </section>
-          <section>
-            <h2>Join requests</h2>
-            {!data.memberships.some((m) => m.status === "pending") && (
-              <p>No requests right now.</p>
-            )}
-            {data.memberships
-              .filter((m) => m.status === "pending")
-              .map((m) => (
-                <div className="entry" key={m.user_id}>
-                  <p>
-                    Join request from <strong>{name(data, m.user_id)}</strong> (
-                    {data.profiles.find((p) => p.id === m.user_id)?.email})
-                  </p>
-                  <div className="actions">
-                    <button
-                      disabled={busy}
-                      onClick={() =>
-                        run(() =>
-                          rpc("review_member", {
-                            p_user_id: m.user_id,
-                            p_accept: true,
-                          }),
-                        )
-                      }
-                    >
-                      Accept
-                    </button>
-                    <button
-                      className="secondary"
-                      disabled={busy}
-                      onClick={() =>
-                        run(() =>
-                          rpc("review_member", {
-                            p_user_id: m.user_id,
-                            p_accept: false,
-                          }),
-                        )
-                      }
-                    >
-                      Deny
-                    </button>
-                  </div>
-                </div>
-              ))}
-          </section>
+                ))}
+            </div>
+          )}
         </>
       )}
-      <section>
-        <h2>Keep a copy</h2>
-        <p>
-          Download cycles, payments and repayments as three CSV files. Amounts
-          are in centavos.
-        </p>
-        <button
-          className="secondary"
-          disabled={busy}
-          onClick={() => run(exportCsv)}
-        >
-          Export CSV
-        </button>
-      </section>
       <NotificationSettings />
+      <button
+        className="secondary export"
+        disabled={busy}
+        onClick={() => run(exportCsv)}
+      >
+        <IconDownload size={18} aria-hidden="true" /> CSV
+      </button>
     </>
   );
 }

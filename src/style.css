@@ -103,11 +103,14 @@ nav {
   border-top: 2px solid var(--ink);
 }
 nav a {
+  position: relative;
+  display: grid;
+  place-items: center;
   color: var(--soft);
   font-family: var(--display);
   font-size: 15px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 6px 18px;
   border: 2px solid transparent;
   border-radius: 999px;
   text-decoration: none;
@@ -235,26 +238,48 @@ select:focus {
 /* The pot is the one sticker that sits a little crooked. */
 .pot {
   display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 2px 14px;
   margin: 4px 0 6px;
   padding: 14px 16px;
   background: var(--card);
   border: 2px solid var(--ink);
   border-radius: 18px;
   box-shadow: 3px 3px 0 var(--ink);
+  color: var(--ink);
+  font-weight: inherit;
+  text-decoration: none;
   transform: rotate(-1.2deg);
+}
+.pot:hover {
+  color: var(--ink);
 }
 section .pot {
   margin-top: 0;
 }
-.pot strong {
-  font-family: var(--display);
-  font-size: 46px;
-  font-weight: 600;
-  line-height: 1.1;
+.pot .pig {
+  color: var(--pink-deep);
 }
-.pot > span {
+.pot strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.05;
+}
+.pot-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--soft);
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 800;
+}
+.pot small {
+  grid-column: 1 / -1;
+  color: var(--soft);
+  font-size: 12px;
   font-weight: 700;
 }
 section:has(.pot) {
@@ -439,6 +464,378 @@ progress {
   width: 100%;
   height: 8px;
   accent-color: var(--pink);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.center {
+  text-align: center;
+}
+nav .badge {
+  position: absolute;
+  top: -4px;
+  right: 4px;
+}
+button svg,
+.button svg {
+  vertical-align: -4px;
+}
+.big {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 18px 0 8px;
+  padding: 14px;
+  font-size: 22px;
+}
+.round {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+}
+.round.ok {
+  background: #9be08a;
+}
+.round.no {
+  background: var(--card);
+  color: #b3261e;
+}
+.back {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+}
+/* People are round stickers with an initial, one color each. */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+.avatar.pink {
+  background: var(--pink);
+}
+.avatar.blue {
+  background: var(--blue);
+}
+.avatar.sm {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  border-width: 1.5px;
+}
+.avatar.lg {
+  width: 72px;
+  height: 72px;
+  font-size: 34px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.member {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+.member .tally {
+  margin: 0;
+}
+.empty {
+  display: grid;
+  justify-items: center;
+  padding: 40px 12px 8px;
+  color: var(--pink-deep);
+  text-align: center;
+}
+.empty p {
+  color: var(--soft);
+  font-weight: 700;
+}
+/* Small stickers in a list: who, how much, and a round button. */
+.confirm-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+}
+.sticker {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 12px 14px;
+}
+.confirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.confirm > div {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.confirm strong {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+}
+.confirm small {
+  color: var(--soft);
+  font-size: 12px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.tally.mini {
+  grid-template-columns: repeat(auto-fill, 12px);
+  gap: 3px;
+  margin-top: 2px;
+}
+/* Record: big avatar, a stepper, the stickers, one big button. */
+.record {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding-top: 4px;
+}
+.record .back {
+  justify-self: start;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.stepper output {
+  min-width: 2ch;
+  font-family: var(--display);
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+.tally.preview {
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, 26px);
+  justify-content: center;
+  gap: 6px;
+  min-height: 26px;
+}
+.amount {
+  font-family: var(--display);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+}
+.record .big {
+  margin-top: 4px;
+}
+/* Propose: tap-to-pick chips instead of a long form. */
+.propose {
+  gap: 18px;
+  margin: 0;
+}
+.propose fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.propose legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--soft);
+  font-family: var(--display);
+  font-weight: 500;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.chips input {
+  width: 84px;
+  text-align: center;
+}
+.pick {
+  background: var(--card);
+  min-width: 64px;
+  border-radius: 999px;
+}
+.pick.on {
+  background: #fff1b8;
+}
+.who {
+  padding: 4px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  border-radius: 50%;
+}
+.who:hover:not(:disabled) {
+  background: transparent;
+}
+.who:not(.on) .avatar {
+  opacity: 0.45;
+  box-shadow: none;
+}
+.who.on {
+  border-color: var(--ink);
+  border-style: dashed;
+}
+.start {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--soft);
+  font-family: var(--display);
+  font-weight: 500;
+}
+.start input {
+  width: auto;
+  flex: 1;
+}
+.preview-pot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--card);
+  border: 2px dashed var(--ink);
+  border-radius: 18px;
+}
+.preview-pot strong {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 600;
+}
+.answer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 18px 0;
+}
+.answer .round {
+  width: 60px;
+  height: 60px;
+}
+.waiting {
+  color: var(--soft);
+  font-family: var(--display);
+  font-weight: 500;
+}
+/* Payout: the receiver's sticker with stars around it. */
+.celebrate {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 20px 0;
+  padding: 24px 16px 20px;
+  background: #fff1b8;
+  border: 2px solid var(--ink);
+  border-radius: 22px;
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: rotate(1deg);
+}
+.celebrate strong {
+  font-family: var(--display);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.celebrate .spark {
+  position: absolute;
+  color: var(--pink);
+}
+.celebrate .s1 {
+  top: 14px;
+  left: 18%;
+  color: #f5b301;
+}
+.celebrate .s2 {
+  top: 34px;
+  right: 18%;
+}
+.celebrate .s3 {
+  bottom: 60px;
+  left: 12%;
+  color: var(--blue);
+}
+.celebrate.done {
+  background: var(--card);
+}
+/* Group: the two of us, where the pot is, and the invite QR sticker. */
+.duo {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin: 18px 0;
+}
+.duo figure {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 0;
+}
+.duo figcaption {
+  font-family: var(--display);
+  font-weight: 500;
+}
+.pot-place {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+}
+.pot-place .round {
+  width: 44px;
+  height: 44px;
+}
+.invite {
+  justify-items: center;
+}
+.invite .qr {
+  width: 220px;
+  height: 220px;
+  padding: 8px;
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 3px 3px 0 var(--ink);
+  transform: rotate(-2deg);
+}
+.export {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 18px auto 0;
 }
 @media (prefers-reduced-motion: reduce) {
   button,
