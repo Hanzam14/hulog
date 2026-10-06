@@ -53,16 +53,16 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `3`
-- Updated: `2026-10-06T09:05:00Z`
+- Revision: `4`
+- Updated: `2026-10-06T08:59:50Z`
 - Status: `HELD`
-- Persistence: `commit_pending`
-- Summary: Completed the Hulog model-neutral v2 entry layer, initialized continuity, and verified local lint, tests, and build; owner-hosted setup and phone smoke checks remain pending.
+- Persistence: `committed`
+- Summary: The Hulog root entry layer and continuity initialization are committed; owner-hosted setup and phone smoke checks remain pending.
 - Authority: Owner authorization in chat 2026-10-06: register Hulog and document the owner-operated setup next action.
 
 ### Decisions
 
-- Owner authorization 2026-10-06 covers local Hulog registration and preserves owner-operated cloud setup.
+- Hulog onboarding documentation and continuity artifacts persisted in commit 16f63dac29b41c4affd73f2207896ef198dd6ca0.
 
 ### Blockers
 
@@ -76,17 +76,12 @@ or the current owner decision changes.
 
 ### Evidence and checks
 
-- AGENTS.md
-- CONTEXT.md
 - HANDOFF.md
-- README.md
-- SETUP.md
-- .continuity/workstreams/hulog-onboarding.json
-- npm run lint: PASS
-- npm test: PASS (17/17)
-- npm run build: PASS
-- continuity verify: PASS
-- selective resume: PASS
+- .continuity/state.json
+- .continuity/checkpoints/checkpoint-000003-20261006T085628Z-001f816404c9.json
+- Hulog commit: 16f63dac29b41c4affd73f2207896ef198dd6ca0
+- npm lint/test/build: PASS
+- continuity verify/audit: PASS
 
 ### Governed artifact correlations
 
