@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { IconArrowRight, IconPigMoney } from "@tabler/icons-react";
 import type { Cycle, Snapshot } from "../data";
-import { money, phaseDisplay } from "../helpers";
+import { money, phaseDisplay, shortDate } from "../helpers";
 import Avatar from "./Avatar";
 
 /** The pot sticker: how much is in, the target, and who gets it. */
@@ -19,7 +19,7 @@ export default function CycleCard({ c, data }: { c: Cycle; data: Snapshot }) {
       </div>
       <small>
         {phaseDisplay(c.phase, c.days_left)} · {money(c.daily_amount_centavos)}{" "}
-        × {c.num_days}
+        × {c.num_days} · {shortDate(c.start_date)} → {shortDate(c.end_date)}
       </small>
     </Link>
   );

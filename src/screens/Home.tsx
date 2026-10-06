@@ -8,7 +8,7 @@ import {
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
 import { rpc } from "../data";
-import { money } from "../helpers";
+import { money, shortDate } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
@@ -89,6 +89,10 @@ export default function Home(props: ViewProps) {
                       <span key={i} className="pending" />
                     ))}
                   </div>
+                  <Link to={`/cycles/${cycle.id}`} className="muted">
+                    round {shortDate(cycle.start_date)} →{" "}
+                    {shortDate(cycle.end_date)}
+                  </Link>
                   {!allowed && <small>not counted</small>}
                 </div>
                 {allowed && (

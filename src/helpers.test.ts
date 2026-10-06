@@ -1,5 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { addDays, csv, money, parsePesos, phaseDisplay } from "./helpers";
+import {
+  addDays,
+  csv,
+  money,
+  parsePesos,
+  phaseDisplay,
+  shortDate,
+} from "./helpers";
+
+describe("shortDate", () => {
+  it("shows a cycle date as month and day", () => {
+    expect(shortDate("2026-10-07")).toBe("Oct 7");
+    expect(shortDate("2026-12-31")).toBe("Dec 31");
+  });
+});
 
 describe("integer centavo helpers", () => {
   it("formats money in pesos", () => {
