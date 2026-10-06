@@ -2,8 +2,18 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { execFileSync } from "node:child_process";
+import packageInfo from "./package.json" with { type: "json" };
+
+let appVersion = packageInfo.version;
+try {
+  appVersion += `+${execFileSync("git", ["rev-parse", "--short", "HEAD"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim()}`;
+} catch {
+  /* Source archives may not have Git. */
+}
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(appVersion) },
   plugins: [
     react(),
     tailwind(),
@@ -11,7 +21,7 @@ export default defineConfig({
       strategies: "injectManifest",
       srcDir: "src",
       filename: "sw.ts",
-      registerType: "autoUpdate",
+      registerType: "prompt",
       manifest: {
         name: "Hulog",
         short_name: "Hulog",
