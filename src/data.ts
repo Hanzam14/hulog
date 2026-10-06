@@ -43,6 +43,7 @@ export interface Cycle {
   pot_centavos: number;
   target_centavos: number;
   payout_state: string | null;
+  received_at: string | null;
   days_left: number;
   created_at: string;
 }
