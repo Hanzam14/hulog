@@ -15,7 +15,7 @@ import Settings from "./screens/Settings";
 import Record from "./screens/Record";
 import Tally from "./components/Tally";
 import { UpdateBanner } from "./components/AppUpdates";
-import { celebratePayout } from "./components/confetti";
+import { celebratePayout, recentlyReceived } from "./components/confetti";
 import { closed } from "./components/shared";
 import {
   IconBell,
@@ -45,6 +45,7 @@ export default function App() {
       if (
         closed(cycle) &&
         cycle.payout_state === "Received" &&
+        recentlyReceived(cycle.received_at) &&
         cycle.receiver_id !== session.user.id
       ) {
         celebratePayout(cycle.id, data);

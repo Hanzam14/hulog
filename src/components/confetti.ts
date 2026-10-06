@@ -20,6 +20,10 @@ export function parseSeenIds(value: string | null): string[] {
   }
 }
 
+/** Only payouts received in the last week celebrate, so old rounds never burst after an update. */
+export const recentlyReceived = (receivedAt: string | null, now = Date.now()) =>
+  !!receivedAt && now - Date.parse(receivedAt) <= 7 * 24 * 60 * 60 * 1000;
+
 export function claimCelebration(
   id: string,
   storage: StorageLike,
