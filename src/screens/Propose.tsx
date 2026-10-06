@@ -32,7 +32,8 @@ export default function Propose({ data, run, busy }: ViewProps) {
   );
   let total: string;
   try {
-    total = money(parsePesos(amount) * Number(days) * members.length);
+    // A round always has two people paying, even before the partner joins.
+    total = money(parsePesos(amount) * Number(days) * 2);
   } catch {
     total = "";
   }
