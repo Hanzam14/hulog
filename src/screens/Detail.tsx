@@ -122,7 +122,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
             </article>
           ))}
       </section>
-      <Payout c={c} user={user} run={run} busy={busy} />
+      <Payout c={c} data={data} user={user} run={run} busy={busy} />
     </>
   );
 }

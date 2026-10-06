@@ -12,7 +12,14 @@ import Detail from "./screens/Detail";
 import History from "./screens/History";
 import Changes from "./screens/Changes";
 import Settings from "./screens/Settings";
+import Record from "./screens/Record";
 import Tally from "./components/Tally";
+import {
+  IconBell,
+  IconCalendar,
+  IconHome,
+  IconUsers,
+} from "@tabler/icons-react";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -209,18 +216,26 @@ export default function App() {
         <>
           <nav>
             <NavLink to="/" end>
-              Home
+              <IconHome aria-hidden="true" />
+              <span className="sr-only">Home</span>
             </NavLink>
-            <NavLink to="/history">History</NavLink>
+            <NavLink to="/history">
+              <IconCalendar aria-hidden="true" />
+              <span className="sr-only">History</span>
+            </NavLink>
             <NavLink to="/changes">
-              Changes{" "}
+              <IconBell aria-hidden="true" />
+              <span className="sr-only">Changes</span>
               {data.changes.some((h) => h.unread) && (
                 <span className="badge">
                   {data.changes.filter((h) => h.unread).length}
                 </span>
               )}
             </NavLink>
-            <NavLink to="/settings">Group</NavLink>
+            <NavLink to="/settings">
+              <IconUsers aria-hidden="true" />
+              <span className="sr-only">Group</span>
+            </NavLink>
           </nav>
           <main>
             <Routes>
@@ -228,6 +243,17 @@ export default function App() {
                 path="/"
                 element={
                   <Home
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/hulog"
+                element={
+                  <Record
                     data={data}
                     user={session.user.id}
                     run={run}
