@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#fff6d8"/>
+  <rect width="512" height="512" fill="#fff6d8"/>
+  <g transform="translate(71.68 71.68) scale(.72)">
   <circle cx="270" cy="222" r="100" fill="#2a2320"/>
   <circle cx="256" cy="208" r="100" fill="#ff7aa2" stroke="#2a2320" stroke-width="18"/>
   <!-- Peso drawn as paths: icons never depend on fonts. -->
@@ -7,4 +8,5 @@
   <rect x="110" y="300" width="320" height="150" rx="44" fill="#2a2320"/>
   <rect x="96" y="286" width="320" height="150" rx="44" fill="#6ec6ff" stroke="#2a2320" stroke-width="18"/>
   <rect x="176" y="276" width="160" height="22" rx="11" fill="#2a2320"/>
+  </g>
 </svg>
