@@ -53,49 +53,48 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `5`
-- Updated: `2026-10-06T22:40:43Z`
+- Revision: `6`
+- Updated: `2026-10-06T22:52:31Z`
 - Status: `HELD`
 - Persistence: `committed`
-- Summary: Hulog personalization is committed on feat/personalize with passing local checks; independent Claude security review is pending. Main and hosted onboarding remain unchanged.
-- Authority: Owner implementation brief 2026-10-07: work only in Hulog-personalize, commit on feat/personalize with Claude co-author; no push, merge or hosted writes.
+- Summary: Round 2 implementation e823cf0 is committed on feat/personalize with builder checks and real update-flow evidence passing; independent Claude review is pending.
+- Authority: Owner round-2 implementation brief 2026-10-07: work only in this worktree, commit on feat/personalize with Claude co-author; one agent, no push/deploy/merge.
 
 ### Decisions
 
-- Implemented the final Claude-led spec within the existing worktree without runtime dependencies.
-- Darkened light green/orange text shades to #2b8046/#ad5b19 to meet 4.5:1 contrast.
-- Workstream hulog-personalize is HELD for the required Claude security review.
+- Implemented payout confetti and prompt update flow in the existing worktree without runtime dependencies.
+- Added controller-change reload handling after the real first-visit update test initially timed out.
+- Retained HELD status pending the required independent Claude review.
 
 ### Blockers
 
-- Fresh independent Claude review is required before completion.
+- Fresh independent Claude review remains required before completion.
 
 ### Risks and unresolved items
 
-- Security claims have builder-run tests but no independent Claude PASS.
-- Browser UI uses synthetic local data and install/standalone UA simulations; physical Android/iOS installation and Google OAuth were not tested.
-- Owner must apply the new migration before using the updated client against hosted data.
-- Independent Claude security review.
+- Builder evidence has no fresh independent Claude PASS yet.
+- Browser tests use real built workers with synthetic local backend; no physical installed-phone, hosted OAuth or push delivery test.
+- Legacy auto-update clients need old tabs/apps closed before the first prompt-capable version takes control.
+- Storage blocked: no-repeat is limited to this page session. Seen ids are per device, as requested.
+- Screenshots/review claims/report are ignored local evidence; they are not in Git.
+- Independent Claude review.
 - Existing owner-operated hosted setup and two-phone smoke checks remain pending.
 
 ### Evidence and checks
 
 - docs/SPEC.md
-- supabase/migrations/20261007000100_profile_personalization.sql
-- supabase/tests/database/profile.test.sql
-- src/components/shared.test.ts
-- src/theme.test.ts
-- src/palette.test.ts
-- .shots/ui-checks.json
-- .shots/artifact-checks.json
-- .shots/claude-review-claims.md
-- Baseline npm run lint PASS; npm test/build sandbox cache write failure, configLoader runner reruns PASS (18 tests/build).
-- Nickname/color regression baseline: 9 fail / 3 pass; final 12 pass.
-- Final exact npm run lint PASS; npm test PASS (40); npm run build PASS.
-- Disposable local npx supabase test db PASS (145, 33 profile); initial invalid SQL test statement corrected without changing assertions; instance stopped and config restored.
-- Headless local fixtures: Home, Settings and profile at 360px in light/dark PASS; all six screenshots visually inspected.
-- PNG dimensions/opaque touch icon/maskable safe zone and built manifest PASS; 32px/512px icons visually inspected.
-- git diff --check PASS; no hosted actions, merge or push.
+- src/components/confetti.test.ts
+- src/update.test.ts
+- .shots/round2-browser-checks.json
+- .shots/round2-review-claims.md
+- .shots/round2-report.md
+- Baseline lint PASS; exact tests/build failed on junction config-cache EPERM; cache-free configLoader runner baseline PASS (40 tests/build).
+- New seen-id regression initially failed because module was absent; final three storage tests PASS.
+- Real first-visit A-to-B update reload initially timed out; final browser run PASS for waiting worker, unchanged version before apply, dismissal, Settings/banner apply and changed-version reload.
+- Final exact npm run lint PASS; npm test PASS (47); npm run build PASS. Interim build TS narrowing failure corrected.
+- Browser fixture receipt failure/success, other-member persisted seen id, DPR-aware canvas cleanup and reduced-motion status sticker PASS.
+- Six 360px light/dark screenshots captured and visually inspected; no horizontal overflow. Dev support explanation and 30-minute foreground throttle covered by unit tests.
+- git diff --check PASS; temporary package version restored, no dependencies/database changes, no hosted writes, push, merge or deploy.
 
 ### Governed artifact correlations
 
@@ -103,5 +102,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews feat/personalize against 34293a8 using .shots/claude-review-claims.md and records the verdict; no merge or publication is authorized.
+Claude lead reviews round 2 against f771f1a using .shots/round2-review-claims.md and the prior personalization claims against 34293a8, then records its verdict. No merge, push or deployment authorized.
 <!-- CONTINUITY_CHECKPOINT_END -->
