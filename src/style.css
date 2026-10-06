@@ -831,6 +831,22 @@ button svg,
   box-shadow: 3px 3px 0 var(--ink);
   transform: rotate(-2deg);
 }
+.notify {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+.notify h2,
+.notify p {
+  margin: 0;
+}
+.notify label {
+  margin-top: 4px;
+}
+.notify button {
+  width: 100%;
+  padding: 12px 18px;
+}
 .export {
   display: flex;
   align-items: center;
