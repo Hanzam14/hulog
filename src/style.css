@@ -690,11 +690,15 @@ button svg,
   background: #fff1b8;
 }
 .who {
-  padding: 4px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: 14px;
+  padding: 6px 10px;
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  border-radius: 50%;
+  border-radius: 18px;
 }
 .who:hover:not(:disabled) {
   background: transparent;
