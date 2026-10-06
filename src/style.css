@@ -835,6 +835,25 @@ button svg,
   box-shadow: 3px 3px 0 var(--ink);
   transform: rotate(-2deg);
 }
+/* Where the pot is kept: one small chip under everything. */
+.place {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin: 22px auto 0;
+  padding: 6px 14px;
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 500;
+}
+.place svg {
+  color: var(--pink-deep);
+}
 .notify {
   display: grid;
   gap: 14px;

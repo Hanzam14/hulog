@@ -89,8 +89,8 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
         </form>
       ) : (
         group.pot_location && (
-          <p className="muted center">
-            <IconMapPin size={14} aria-label="Pot held at" />{" "}
+          <p className="place">
+            <IconMapPin size={16} aria-label="Pot held at" />{" "}
             {group.pot_location}
           </p>
         )
