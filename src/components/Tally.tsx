@@ -1,3 +1,5 @@
+import type { Tone } from "./shared";
+
 /** One row of the planner: a sticker per paid day, dashed while waiting. */
 export default function Tally({
   label,
@@ -10,7 +12,7 @@ export default function Tally({
   paid: number;
   pending: number;
   total: number;
-  tone: "pink" | "blue";
+  tone: Tone;
 }) {
   const marks = Array.from({ length: total }, (_, i) =>
     i < paid ? "paid" : i < paid + pending ? "pending" : "open",

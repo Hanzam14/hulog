@@ -9,10 +9,42 @@ export interface ViewProps {
 }
 export const closed = (c: Cycle) =>
   c.phase === "settling" || c.phase === "ended";
-export const name = (d: Snapshot, id: string) =>
-  d.profiles.find((p) => p.id === id)?.display_name ?? "Member";
-/** Each member keeps one sticker color: the group owner pink, the partner blue. */
-export const tone = (d: Snapshot, id: string) =>
-  id === d.groups[0]?.owner_id ? "pink" : "blue";
+export const palette = ["pink", "blue", "green", "orange", "purple"] as const;
+export type Tone = (typeof palette)[number];
+export const emojis = [
+  "🐷",
+  "🐱",
+  "🐶",
+  "🐰",
+  "🐻",
+  "🐼",
+  "🐸",
+  "🐵",
+  "🦊",
+  "🐥",
+  "🌻",
+  "🌸",
+  "🍓",
+  "🥭",
+  "⭐",
+  "🌙",
+] as const;
+export const name = (d: Snapshot, id: string) => {
+  const profile = d.profiles.find((p) => p.id === id);
+  return profile?.nickname ?? profile?.display_name ?? "Member";
+};
+/** Owner keeps a colliding color; partner gets the first unused palette color. */
+export const tone = (d: Snapshot, id: string): Tone => {
+  const owner = d.groups[0]?.owner_id;
+  const chosen = (who: string | undefined): Tone => {
+    const color = d.profiles.find((p) => p.id === who)?.color;
+    return color && color !== "auto" ? color : who === owner ? "pink" : "blue";
+  };
+  const ownerColor = chosen(owner);
+  const color = chosen(id);
+  return id !== owner && color === ownerColor
+    ? palette.find((value) => value !== ownerColor)!
+    : color;
+};
 export const byNewest = (a: Cycle, b: Cycle) =>
   b.created_at.localeCompare(a.created_at);
