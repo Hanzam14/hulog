@@ -1,23 +1,9 @@
 import { useEffect, useState } from "react";
 import { rpc, supabase } from "../data";
+import { isIosSafariOutsideHomeScreen } from "../install";
 
 type Preferences = { reminder_time: string; enabled: boolean };
 const defaults: Preferences = { reminder_time: "20:00", enabled: false };
-
-function isIosSafariOutsideHomeScreen() {
-  const ios =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  const standalone =
-    window.matchMedia("(display-mode: standalone)").matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  return (
-    ios &&
-    !standalone &&
-    /Safari/.test(navigator.userAgent) &&
-    !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent)
-  );
-}
 
 function decodeVapidKey(value: string) {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
