@@ -10,8 +10,8 @@ write deadlines use the database's Manila calendar date.
 See [SETUP.md](SETUP.md) for local development, Google sign-in, and deployment.
 The authoritative requirements are in [docs/SPEC.md](docs/SPEC.md).
 
-v1 is implemented. v1.1 push notifications are deferred; there are no push
-subscriptions, notification permissions, cron jobs, or Edge Functions in v1.
+v1 plus v1.1 web push notifications are implemented. Hosted Edge Function
+and cron setup remains an owner-operated step documented in SETUP.md.
 
 Run `npm ci`, configure `.env` using `.env.example`, and run `npm run dev`.
 Checks: `npm run build`, `npm run lint`, `npm test`, `npx supabase test db`
