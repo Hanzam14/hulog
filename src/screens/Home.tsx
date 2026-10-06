@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { ViewProps } from "../components/shared";
-import { byNewest, closed, name } from "../components/shared";
+import { byNewest, closed, name, tone } from "../components/shared";
 import { rpc } from "../data";
 import { money } from "../helpers";
 import CycleCard from "../components/CycleCard";
@@ -19,7 +19,7 @@ export default function Home(props: ViewProps) {
   return (
     <>
       <h1>{group.name}</h1>
-      <p className="meta">Today is {data.today} (Manila)</p>
+      <p className="meta">{data.today} · Manila time</p>
       {!live && (
         <Link className="button" to="/propose">
           Propose next cycle
@@ -59,6 +59,7 @@ export default function Home(props: ViewProps) {
                           paid={p.confirmed_days}
                           pending={p.pending_days}
                           total={c.num_days}
+                          tone={tone(data, p.member_id)}
                         />
                       </div>
                     ))}
