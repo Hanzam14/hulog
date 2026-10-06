@@ -17,9 +17,10 @@ export default function CycleCard({ c, data }: { c: Cycle; data: Snapshot }) {
           <Avatar data={data} id={c.receiver_id} size="sm" />
         </span>
       </div>
+      <small>{phaseDisplay(c.phase, c.days_left)}</small>
       <small>
-        {phaseDisplay(c.phase, c.days_left)} · {money(c.daily_amount_centavos)}{" "}
-        × {c.num_days} · {shortDate(c.start_date)} → {shortDate(c.end_date)}
+        {money(c.daily_amount_centavos)} × {c.num_days} ·{" "}
+        {shortDate(c.start_date)} → {shortDate(c.end_date)}
       </small>
     </Link>
   );
