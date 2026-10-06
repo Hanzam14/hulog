@@ -23,6 +23,8 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
   const [qr, setQr] = useState("");
   const active = data.memberships.filter((m) => m.status === "active");
   const pending = data.memberships.filter((m) => m.status === "pending");
+  // A used or revoked token must not keep showing its QR code.
+  const openInvite = data.invites.some((i) => !i.used_at && !i.revoked_at);
   const exportCsv = async () => {
     const fresh = await load();
     for (const [file, rows] of [
@@ -138,7 +140,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
           ))}
           {active.length < 2 && pending.length === 0 && (
             <div className="invite">
-              {invite ? (
+              {invite && openInvite ? (
                 <>
                   {qr && (
                     <img
