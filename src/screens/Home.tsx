@@ -45,6 +45,9 @@ export default function Home(props: ViewProps) {
                     .map((p) => (
                       <div key={p.member_id}>
                         <strong>
+                          <span className="avatar">
+                            {name(data, p.member_id).charAt(0).toUpperCase()}
+                          </span>
                           {name(data, p.member_id)}
                           {p.member_id === user && " (you)"}
                         </strong>

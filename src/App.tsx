@@ -12,6 +12,15 @@ import Detail from "./screens/Detail";
 import History from "./screens/History";
 import Changes from "./screens/Changes";
 import Settings from "./screens/Settings";
+import {
+  ChangesIcon,
+  GoogleMark,
+  GroupIcon,
+  HistoryIcon,
+  HomeIcon,
+  JarArt,
+  Logo,
+} from "./components/icons";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -117,7 +126,10 @@ export default function App() {
     <div className="app">
       <header>
         <Link to="/" className="brand">
-          hulog<span>our daily promise</span>
+          <Logo />
+          <div>
+            hulog<span>our daily promise</span>
+          </div>
         </Link>
         {session && (
           <button className="quiet" disabled={busy} onClick={signOut}>
@@ -127,7 +139,7 @@ export default function App() {
       </header>
       {error && (
         <div role="alert" className="notice error">
-          {error}
+          <span>{error}</span>
           <button className="quiet" onClick={() => setError("")}>
             Dismiss
           </button>
@@ -144,23 +156,44 @@ export default function App() {
         </main>
       ) : !session ? (
         <main className="welcome">
+          <JarArt />
           <span className="eyebrow">Para sa ating dalawa</span>
           <h1>
             Little by little.
             <br />
-            Together.
+            <em>Together.</em>
           </h1>
           <p>
-            Keep track of your two-person paluwagan.
-            <br />
-            You hold the money. Hulog keeps the record.
+            Your two-person paluwagan, tracked day by day. You hold the money;
+            Hulog keeps the record.
           </p>
-          <button disabled={busy} onClick={signIn}>
+          {location.pathname.startsWith("/join/") && (
+            <p className="notice">Your invite will be here after sign-in.</p>
+          )}
+          <button className="google" disabled={busy} onClick={signIn}>
+            <GoogleMark />
             Continue with Google
           </button>
-          {location.pathname.startsWith("/join/") && (
-            <p>Your invite will be here after sign-in.</p>
-          )}
+          <ol className="steps">
+            <li>
+              <span className="num">1</span>
+              <span>
+                <b>Agree on the hulog</b>Like ₱50 a day for 15 days.
+              </span>
+            </li>
+            <li>
+              <span className="num">2</span>
+              <span>
+                <b>Hulog every day</b>Log it, and the holder confirms.
+              </span>
+            </li>
+            <li>
+              <span className="num">3</span>
+              <span>
+                <b>Take turns</b>One of you gets the pot, then switch.
+              </span>
+            </li>
+          </ol>
         </main>
       ) : !data ? (
         <main>
@@ -197,18 +230,26 @@ export default function App() {
         <>
           <nav>
             <NavLink to="/" end>
+              <HomeIcon />
               Home
             </NavLink>
-            <NavLink to="/history">History</NavLink>
+            <NavLink to="/history">
+              <HistoryIcon />
+              History
+            </NavLink>
             <NavLink to="/changes">
-              Changes{" "}
+              <ChangesIcon />
+              Changes
               {data.changes.some((h) => h.unread) && (
                 <span className="badge">
                   {data.changes.filter((h) => h.unread).length}
                 </span>
               )}
             </NavLink>
-            <NavLink to="/settings">Group</NavLink>
+            <NavLink to="/settings">
+              <GroupIcon />
+              Group
+            </NavLink>
           </nav>
           <main>
             <Routes>

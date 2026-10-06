@@ -21,13 +21,13 @@ export default function CycleCard({ c, data }: { c: Cycle; data: Snapshot }) {
       <div className="pot">
         <span>Our pot</span>
         <strong>{money(c.pot_centavos)}</strong>
-        <span>Target {money(c.target_centavos)}</span>
+        <span>of {money(c.target_centavos)} target</span>
+        <progress
+          aria-label="Pot progress"
+          value={c.pot_centavos}
+          max={c.target_centavos}
+        />
       </div>
-      <progress
-        aria-label="Pot progress"
-        value={c.pot_centavos}
-        max={c.target_centavos}
-      />
     </>
   );
 }
