@@ -53,35 +53,48 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `4`
-- Updated: `2026-10-06T08:59:50Z`
+- Revision: `6`
+- Updated: `2026-10-06T22:52:31Z`
 - Status: `HELD`
 - Persistence: `committed`
-- Summary: The Hulog root entry layer and continuity initialization are committed; owner-hosted setup and phone smoke checks remain pending.
-- Authority: Owner authorization in chat 2026-10-06: register Hulog and document the owner-operated setup next action.
+- Summary: Round 2 implementation e823cf0 is committed on feat/personalize with builder checks and real update-flow evidence passing; independent Claude review is pending.
+- Authority: Owner round-2 implementation brief 2026-10-07: work only in this worktree, commit on feat/personalize with Claude co-author; one agent, no push/deploy/merge.
 
 ### Decisions
 
-- Hulog onboarding documentation and continuity artifacts persisted in commit 16f63dac29b41c4affd73f2207896ef198dd6ca0.
+- Implemented payout confetti and prompt update flow in the existing worktree without runtime dependencies.
+- Added controller-change reload handling after the real first-visit update test initially timed out.
+- Retained HELD status pending the required independent Claude review.
 
 ### Blockers
 
-- Owner must configure Supabase, Google OAuth, and Vercel.
-- Owner must complete the two-phone smoke test with distinct accounts.
+- Fresh independent Claude review remains required before completion.
 
 ### Risks and unresolved items
 
-- Hosted configuration and two-phone behavior are not verified.
-- Route must remain held until the owner completes hosted setup and smoke testing.
+- Builder evidence has no fresh independent Claude PASS yet.
+- Browser tests use real built workers with synthetic local backend; no physical installed-phone, hosted OAuth or push delivery test.
+- Legacy auto-update clients need old tabs/apps closed before the first prompt-capable version takes control.
+- Storage blocked: no-repeat is limited to this page session. Seen ids are per device, as requested.
+- Screenshots/review claims/report are ignored local evidence; they are not in Git.
+- Independent Claude review.
+- Existing owner-operated hosted setup and two-phone smoke checks remain pending.
 
 ### Evidence and checks
 
-- HANDOFF.md
-- .continuity/state.json
-- .continuity/checkpoints/checkpoint-000003-20261006T085628Z-001f816404c9.json
-- Hulog commit: 16f63dac29b41c4affd73f2207896ef198dd6ca0
-- npm lint/test/build: PASS
-- continuity verify/audit: PASS
+- docs/SPEC.md
+- src/components/confetti.test.ts
+- src/update.test.ts
+- .shots/round2-browser-checks.json
+- .shots/round2-review-claims.md
+- .shots/round2-report.md
+- Baseline lint PASS; exact tests/build failed on junction config-cache EPERM; cache-free configLoader runner baseline PASS (40 tests/build).
+- New seen-id regression initially failed because module was absent; final three storage tests PASS.
+- Real first-visit A-to-B update reload initially timed out; final browser run PASS for waiting worker, unchanged version before apply, dismissal, Settings/banner apply and changed-version reload.
+- Final exact npm run lint PASS; npm test PASS (47); npm run build PASS. Interim build TS narrowing failure corrected.
+- Browser fixture receipt failure/success, other-member persisted seen id, DPR-aware canvas cleanup and reduced-motion status sticker PASS.
+- Six 360px light/dark screenshots captured and visually inspected; no horizontal overflow. Dev support explanation and 30-minute foreground throttle covered by unit tests.
+- git diff --check PASS; temporary package version restored, no dependencies/database changes, no hosted writes, push, merge or deploy.
 
 ### Governed artifact correlations
 
@@ -89,5 +102,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Owner follows SETUP.md for hosted setup, then records two-phone smoke results in HANDOFF.md.
+Claude lead reviews round 2 against f771f1a using .shots/round2-review-claims.md and the prior personalization claims against 34293a8, then records its verdict. No merge, push or deployment authorized.
 <!-- CONTINUITY_CHECKPOINT_END -->

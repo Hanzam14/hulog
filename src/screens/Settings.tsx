@@ -15,12 +15,17 @@ import { load, rpc } from "../data";
 import { csv } from "../helpers";
 import NotificationSettings from "../components/NotificationSettings";
 import Avatar from "../components/Avatar";
+import ProfileEditor from "../components/ProfileEditor";
+import ThemeSettings from "../components/ThemeSettings";
+import InstallSettings from "../components/InstallSettings";
+import AppUpdates from "../components/AppUpdates";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
   const owner = group.owner_id === user;
   const [invite, setInvite] = useState("");
   const [qr, setQr] = useState("");
+  const [editingProfile, setEditingProfile] = useState(false);
   const active = data.memberships.filter((m) => m.status === "active");
   const pending = data.memberships.filter((m) => m.status === "pending");
   // A used or revoked token must not keep showing its QR code.
@@ -56,11 +61,61 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
       <div className="duo">
         {active.map((m) => (
           <figure key={m.user_id}>
-            <Avatar data={data} id={m.user_id} size="lg" />
+            {m.user_id === user ? (
+              <button
+                type="button"
+                className="avatar-edit"
+                aria-label="I-edit ang profile mo"
+                aria-expanded={editingProfile}
+                disabled={busy}
+                onClick={() => setEditingProfile(!editingProfile)}
+              >
+                <Avatar data={data} id={m.user_id} size="lg" />
+              </button>
+            ) : (
+              <Avatar data={data} id={m.user_id} size="lg" />
+            )}
             <figcaption>{name(data, m.user_id)}</figcaption>
           </figure>
         ))}
       </div>
+      {editingProfile && (
+        <ProfileEditor
+          data={data}
+          user={user}
+          run={run}
+          busy={busy}
+          close={() => setEditingProfile(false)}
+        />
+      )}
+      {owner && (
+        <form
+          className="group-name"
+          key={group.name}
+          onSubmit={(event) => {
+            event.preventDefault();
+            const fields = new FormData(event.currentTarget);
+            void run(() =>
+              rpc("update_group", {
+                p_name: fields.get("group-name"),
+                p_pot_location: group.pot_location,
+              }),
+            );
+          }}
+        >
+          <label>
+            Pangalan ng grupo
+            <input name="group-name" defaultValue={group.name} required />
+          </label>
+          <button
+            className="round"
+            aria-label="Save group name"
+            disabled={busy}
+          >
+            <IconCheck />
+          </button>
+        </form>
+      )}
       {owner ? (
         <form
           className="pot-place"
@@ -217,6 +272,9 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
           )}
         </>
       )}
+      <ThemeSettings />
+      <InstallSettings />
+      <AppUpdates />
       <NotificationSettings />
       <button
         className="secondary export"

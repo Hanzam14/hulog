@@ -12,6 +12,10 @@ export interface Profile {
   display_name: string;
   email: string;
   avatar_url: string | null;
+  nickname: string | null;
+  avatar_kind: "initial" | "emoji" | "photo";
+  avatar_emoji: string | null;
+  color: "auto" | "pink" | "blue" | "green" | "orange" | "purple";
 }
 export interface Group {
   id: string;
@@ -39,6 +43,7 @@ export interface Cycle {
   pot_centavos: number;
   target_centavos: number;
   payout_state: string | null;
+  received_at: string | null;
   days_left: number;
   created_at: string;
 }
@@ -109,13 +114,17 @@ export async function rpc(
   if (error) throw new Error(error.message);
   return data;
 }
-async function rows<T>(table: string, order: string): Promise<T[]> {
+async function rows<T>(
+  table: string,
+  order: string,
+  columns = "*",
+): Promise<T[]> {
   if (!supabase) throw new Error("Supabase is not configured.");
   const all: T[] = [];
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await supabase
       .from(table)
-      .select("*")
+      .select(columns)
       .order(order)
       .range(offset, offset + 999);
     if (error) throw new Error(error.message);
@@ -136,7 +145,11 @@ export async function load(): Promise<Snapshot> {
     invites,
     today,
   ] = await Promise.all([
-    rows<Profile>("profiles", "id"),
+    rows<Profile>(
+      "profiles",
+      "id",
+      "id,display_name,email,avatar_url,nickname,avatar_kind,avatar_emoji,color",
+    ),
     rows<Group>("groups", "id"),
     rows<Membership>("memberships", "user_id"),
     rows<Cycle>("cycle_summary", "id"),

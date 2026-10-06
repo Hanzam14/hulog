@@ -3,6 +3,13 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./style.css";
+import { initializeTheme } from "./theme";
+import { initializeInstall } from "./install";
+import { initializeUpdates } from "./update";
+
+initializeTheme();
+initializeInstall();
+initializeUpdates();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

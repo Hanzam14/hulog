@@ -6,7 +6,8 @@ import {
 import type { Cycle, Snapshot } from "../data";
 import { rpc } from "../data";
 import { money } from "../helpers";
-import { closed, type Run } from "./shared";
+import { closed, name, type Run } from "./shared";
+import { celebratePayout } from "./confetti";
 import Avatar from "./Avatar";
 
 /** When a round ends: a celebration sticker for whoever gets the pot. */
@@ -33,10 +34,20 @@ export default function Payout({
       <Avatar data={data} id={c.receiver_id} size="lg" />
       <strong>{money(c.pot_centavos)}</strong>
       <span className="meta">{c.payout_state}</span>
+      {done && (
+        <p className="payout-congrats">
+          Congrats, {name(data, c.receiver_id)}! Nasa'yo na ang hulog.
+        </p>
+      )}
       {!done && c.receiver_id === user && (
         <button
           disabled={busy}
-          onClick={() => run(() => rpc("receive_payout", { p_id: c.id }))}
+          onClick={() =>
+            run(async () => {
+              await rpc("receive_payout", { p_id: c.id });
+              celebratePayout(c.id, data);
+            })
+          }
         >
           got it <IconCheck size={18} aria-hidden="true" />
         </button>
