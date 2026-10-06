@@ -12,6 +12,7 @@ import Detail from "./screens/Detail";
 import History from "./screens/History";
 import Changes from "./screens/Changes";
 import Settings from "./screens/Settings";
+import Tally from "./components/Tally";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -144,17 +145,24 @@ export default function App() {
         </main>
       ) : !session ? (
         <main className="welcome">
-          <span className="eyebrow">Para sa ating dalawa</span>
-          <h1>
-            Little by little.
-            <br />
-            Together.
-          </h1>
+          <h1>Ang paluwagan nating dalawa, sa isang pahina.</h1>
           <p>
-            Keep track of your two-person paluwagan.
-            <br />
-            You hold the money. Hulog keeps the record.
+            Same tally you'd draw in a notebook: one box per day, crossed off
+            when the hulog is in. You hold the money. Hulog keeps the record.
           </p>
+          <figure>
+            <div className="row">
+              <strong>Ikaw</strong>
+              <span className="meta">6/15</span>
+            </div>
+            <Tally label="Ikaw" paid={6} pending={1} total={15} />
+            <div className="row">
+              <strong>Siya</strong>
+              <span className="meta">5/15</span>
+            </div>
+            <Tally label="Siya" paid={5} pending={0} total={15} />
+            <figcaption>Example: ₱50 a day for 15 days.</figcaption>
+          </figure>
           <button disabled={busy} onClick={signIn}>
             Continue with Google
           </button>

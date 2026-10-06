@@ -6,6 +6,7 @@ import { money } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
+import Tally from "../components/Tally";
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
@@ -17,10 +18,8 @@ export default function Home(props: ViewProps) {
   const c = live ?? cycles.find((c) => c.status === "accepted");
   return (
     <>
-      <span className="eyebrow">
-        {group.name} · {data.today} Manila
-      </span>
-      <h1>Hulog today.</h1>
+      <h1>{group.name}</h1>
+      <p className="meta">Today is {data.today} (Manila)</p>
       {!live && (
         <Link className="button" to="/propose">
           Propose next cycle
@@ -44,19 +43,22 @@ export default function Home(props: ViewProps) {
                     .filter((p) => p.cycle_id === c.id)
                     .map((p) => (
                       <div key={p.member_id}>
-                        <strong>
-                          {name(data, p.member_id)}
-                          {p.member_id === user && " (you)"}
-                        </strong>
-                        <p>
-                          {p.confirmed_days} / {c.num_days} days paid
-                          <br />
-                          {p.pending_count} pending ({p.pending_days} days)
-                        </p>
-                        <progress
-                          aria-label={`${name(data, p.member_id)} days paid`}
-                          value={p.confirmed_days}
-                          max={c.num_days}
+                        <div className="row">
+                          <strong>
+                            {name(data, p.member_id)}
+                            {p.member_id === user && " (you)"}
+                          </strong>
+                          <span className="meta">
+                            {p.confirmed_days}/{c.num_days}
+                            {p.pending_days > 0 &&
+                              ` · ${p.pending_days} waiting`}
+                          </span>
+                        </div>
+                        <Tally
+                          label={name(data, p.member_id)}
+                          paid={p.confirmed_days}
+                          pending={p.pending_days}
+                          total={c.num_days}
                         />
                       </div>
                     ))}

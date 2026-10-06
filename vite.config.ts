@@ -16,8 +16,8 @@ export default defineConfig({
         name: "Hulog — our paluwagan",
         short_name: "Hulog",
         description: "Your two-person paluwagan, one day at a time.",
-        theme_color: "#176b52",
-        background_color: "#f7f7f0",
+        theme_color: "#fcfcfa",
+        background_color: "#fcfcfa",
         display: "standalone",
         start_url: "/",
         icons: [
