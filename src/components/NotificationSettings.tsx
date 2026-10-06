@@ -136,7 +136,7 @@ export default function NotificationSettings() {
   };
 
   return (
-    <section>
+    <section className="notify">
       <h2>Notifications</h2>
       <p>Get a gentle reminder and updates about payments and cycle dates.</p>
       <label>
