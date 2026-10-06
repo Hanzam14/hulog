@@ -18,6 +18,7 @@ import Avatar from "../components/Avatar";
 import ProfileEditor from "../components/ProfileEditor";
 import ThemeSettings from "../components/ThemeSettings";
 import InstallSettings from "../components/InstallSettings";
+import AppUpdates from "../components/AppUpdates";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
@@ -273,6 +274,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
       )}
       <ThemeSettings />
       <InstallSettings />
+      <AppUpdates />
       <NotificationSettings />
       <button
         className="secondary export"

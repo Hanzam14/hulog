@@ -14,6 +14,9 @@ import Changes from "./screens/Changes";
 import Settings from "./screens/Settings";
 import Record from "./screens/Record";
 import Tally from "./components/Tally";
+import { UpdateBanner } from "./components/AppUpdates";
+import { celebratePayout } from "./components/confetti";
+import { closed } from "./components/shared";
 import {
   IconBell,
   IconCalendar,
@@ -29,6 +32,25 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState("");
   const location = useLocation();
+  useEffect(() => {
+    if (
+      !data ||
+      !session ||
+      !data.memberships.some(
+        (m) => m.user_id === session.user.id && m.status === "active",
+      )
+    )
+      return;
+    for (const cycle of data.cycles) {
+      if (
+        closed(cycle) &&
+        cycle.payout_state === "Received" &&
+        cycle.receiver_id !== session.user.id
+      ) {
+        celebratePayout(cycle.id, data);
+      }
+    }
+  }, [data, session]);
   const refresh = useCallback(async () => {
     const next = await load();
     setData(next);
@@ -110,6 +132,7 @@ export default function App() {
   if (!supabase)
     return (
       <main className="welcome">
+        <UpdateBanner />
         <h1>Hulog</h1>
         <p>Our pot, one day at a time.</p>
         <section>
@@ -133,6 +156,7 @@ export default function App() {
           </button>
         )}
       </header>
+      <UpdateBanner />
       {error && (
         <div role="alert" className="notice error">
           {error}
