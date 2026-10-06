@@ -1,0 +1,7 @@
+AGENTS.md text eol=lf
+CONTEXT.md text eol=lf
+HANDOFF.md text eol=lf
+README.md text eol=lf
+CLAUDE.md text eol=lf
+.agents/** text eol=lf
+.continuity/** text eol=lf
