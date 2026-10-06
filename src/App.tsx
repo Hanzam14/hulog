@@ -118,7 +118,7 @@ export default function App() {
     <div className="app">
       <header>
         <Link to="/" className="brand">
-          hulog<span>our daily promise</span>
+          hulog<span className="dot">.</span>
         </Link>
         {session && (
           <button className="quiet" disabled={busy} onClick={signOut}>
@@ -145,22 +145,26 @@ export default function App() {
         </main>
       ) : !session ? (
         <main className="welcome">
-          <h1>Ang paluwagan nating dalawa, sa isang pahina.</h1>
+          <h1>
+            Paluwagan para sa
+            <br />
+            ating dalawa<span className="dot">.</span>
+          </h1>
           <p>
-            Same tally you'd draw in a notebook: one box per day, crossed off
-            when the hulog is in. You hold the money. Hulog keeps the record.
+            One sticker for every day you hulog. Fill your row, take turns
+            getting the pot. You hold the money; Hulog keeps the record.
           </p>
           <figure>
             <div className="row">
-              <strong>Ikaw</strong>
-              <span className="meta">6/15</span>
+              <strong>Angelo</strong>
+              <span className="meta">9/15</span>
             </div>
-            <Tally label="Ikaw" paid={6} pending={1} total={15} />
+            <Tally label="Angelo" paid={9} pending={0} total={15} tone="pink" />
             <div className="row">
-              <strong>Siya</strong>
-              <span className="meta">5/15</span>
+              <strong>Vinice</strong>
+              <span className="meta">7/15</span>
             </div>
-            <Tally label="Siya" paid={5} pending={0} total={15} />
+            <Tally label="Vinice" paid={7} pending={2} total={15} tone="blue" />
             <figcaption>Example: ₱50 a day for 15 days.</figcaption>
           </figure>
           <button disabled={busy} onClick={signIn}>
