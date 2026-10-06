@@ -3,6 +3,7 @@ import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { load, rpc } from "../data";
 import { csv } from "../helpers";
+import NotificationSettings from "../components/NotificationSettings";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
@@ -207,6 +208,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
           Export CSV
         </button>
       </section>
+      <NotificationSettings />
     </>
   );
 }

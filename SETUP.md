@@ -1,7 +1,7 @@
-# Set up Hulog v1
+# Set up Hulog
 
 Hulog records money. It does not hold, transfer, or pay out money. v1 includes
-the installable PWA; v1.1 push notifications are not included.
+the installable PWA and v1.1 web push notifications.
 
 ## Local development
 
@@ -83,16 +83,73 @@ Use two different Google accounts / browser profiles at a 360px viewport:
 8. Try a used/revoked invite and a third account; verify errors and no data access.
    Install the PWA, reload a nested route, and verify it loads. Offline writes
    require reconnection and show an error rather than queueing money records.
+9. On a supported HTTPS browser, open Group -> Notifications, set and save a
+   Manila reminder time, tap Enable notifications, and allow the browser prompt.
+   Verify the control changes to Disable notifications, then disable it. Hosted
+   delivery also requires the Edge Function secrets and cron setup below.
 
-## v1.1 / iOS
+## Web Push / v1.1
 
-Push is deferred cleanly: no push tables, cron jobs, Edge Function, subscriptions,
-notification controls, VAPID keys, or notification permissions are installed.
-When v1.1 is implemented, generate a VAPID keypair (for example with
-`npx web-push generate-vapid-keys`), put the private key and contact subject in
-Edge Function secrets, and expose only the public key to the frontend. That
-future implementation must include SPEC §6's dedupe and Manila scheduling.
-Do not install a notification cron for this v1 build.
+1. Generate a VAPID keypair with `npx web-push generate-vapid-keys`. Copy the
+   public key to `VITE_VAPID_PUBLIC_KEY` in the frontend environment. Keep the
+   private key server-side only; never add it to `.env`, source files, or any
+   `VITE_` variable. Set the matching Edge Function secrets:
 
-On iOS Safari, use Share → Add to Home Screen to install Hulog. Web Push on iOS
-requires a compatible iOS version and a Home Screen installation when v1.1 exists.
+   ```sh
+   npx supabase secrets set NOTIFY_CRON_SECRET='replace-with-a-random-long-secret' VAPID_SUBJECT='mailto:contact@example.com' VAPID_PUBLIC_KEY='replace-with-vapid-public-key' VAPID_PRIVATE_KEY='replace-with-vapid-private-key'
+   ```
+
+   `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to Edge Functions
+   by Supabase. Do not expose or put the service role key in the frontend.
+
+2. Apply the notification migration after the base migration. It creates the
+   push subscription, preference, and private delivery log tables and scoped
+   RPCs. Client table grants are revoked; each user's preferences and
+   subscriptions are read or changed through RPCs that derive `auth.uid()`.
+3. In the hosted project's SQL Editor, enable `pg_cron`, `pg_net`, and Vault,
+   then schedule the function. Replace placeholders in the SQL editor; do not
+   commit real values:
+
+   ```sql
+   create extension if not exists supabase_vault with schema vault;
+   create extension if not exists pg_cron with schema extensions;
+   create extension if not exists pg_net with schema extensions;
+   select vault.create_secret('<project-url>', 'hulog_project_url');
+   select vault.create_secret('<same random-long-secret as NOTIFY_CRON_SECRET>', 'hulog_notify_cron_secret');
+
+   select cron.schedule(
+     'hulog-notify-every-15-minutes',
+     '*/15 * * * *',
+     $$
+       select net.http_post(
+         url := (select decrypted_secret from vault.decrypted_secrets where name = 'hulog_project_url') || '/functions/v1/notify',
+         headers := jsonb_build_object(
+           'Content-Type', 'application/json',
+           'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'hulog_notify_cron_secret')
+         ),
+         body := '{}'::jsonb
+       );
+     $$
+   );
+   ```
+
+   The function authenticates this bearer secret itself; `verify_jwt` is off for
+   this endpoint. Keep the cron secret in Supabase Function secrets and Vault.
+   The schedule sends reminders at each user's Manila reminder time, asks the
+   owner to confirm recent member payments, and sends cycle-end and payout-day
+   notices at 09:00 Manila. `notification_log` prevents repeat sends for the
+   same user, notice, reference, and Manila calendar date. Notifications never
+   change Hulog records. The local SQL tests verify preference/subscription
+   isolation, and the pure schedule tests use fixed Manila dates.
+
+4. On iOS Safari, install Hulog with Share -> Add to Home Screen, then open the
+   Home Screen app before enabling push. The app shows these instructions in
+   Safari instead of requesting permission there.
+
+The owner must manually deploy the `notify` Edge Function and configure the
+hosted cron. This repository workflow does not run those hosted steps.
+
+See Supabase's [Edge Function scheduling](https://supabase.com/docs/guides/functions/schedule-functions),
+[function secrets](https://supabase.com/docs/guides/functions/secrets), and
+[function configuration](https://supabase.com/docs/guides/functions/function-configuration)
+guides for the hosted controls used above.
