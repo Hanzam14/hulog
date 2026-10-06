@@ -119,10 +119,10 @@ export default function Propose({ data, run, busy }: ViewProps) {
               key={m.user_id}
               className={`who ${receiver === m.user_id ? "on" : ""}`}
               aria-pressed={receiver === m.user_id}
-              aria-label={name(data, m.user_id)}
               onClick={() => setReceiver(m.user_id)}
             >
               <Avatar data={data} id={m.user_id} size="lg" />
+              <span>{name(data, m.user_id).split(" ")[0]}</span>
             </button>
           ))}
         </div>
@@ -142,6 +142,7 @@ export default function Propose({ data, run, busy }: ViewProps) {
           <strong>{total}</strong>
           <IconArrowRight aria-label="goes to" />
           <Avatar data={data} id={receiver} />
+          <span>{name(data, receiver).split(" ")[0]}</span>
         </div>
       )}
       <button className="big" disabled={busy}>
