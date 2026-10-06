@@ -18,6 +18,14 @@ export function addDays(date: string, days: number): string {
   value.setUTCDate(value.getUTCDate() + days);
   return value.toISOString().slice(0, 10);
 }
+/** "2026-10-07" → "Oct 7": compact enough for a sticker. */
+export function shortDate(date: string): string {
+  return new Intl.DateTimeFormat("en-PH", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T00:00:00Z`));
+}
 export function phaseDisplay(phase: string, daysLeft: number): string {
   if (phase === "open")
     return `Open · ${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`;

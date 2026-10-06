@@ -1,7 +1,9 @@
+import { IconCheck, IconX } from "@tabler/icons-react";
 import type { Cycle } from "../data";
 import { rpc } from "../data";
 import type { Run } from "./shared";
 
+/** Yes/no stickers for a proposed round; the proposer can only take it back. */
 export default function Proposal({
   c,
   user,
@@ -13,40 +15,39 @@ export default function Proposal({
   run: Run;
   busy: boolean;
 }) {
+  const respond = (p_action: "accept" | "decline" | "cancel") =>
+    run(() => rpc("respond_cycle", { p_id: c.id, p_action }));
   return (
-    <div className="actions">
+    <div className="answer">
       {c.proposed_by === user ? (
-        <button
-          className="secondary"
-          disabled={busy}
-          onClick={() =>
-            run(() => rpc("respond_cycle", { p_id: c.id, p_action: "cancel" }))
-          }
-        >
-          Cancel proposal
-        </button>
+        <>
+          <span className="waiting">waiting…</span>
+          <button
+            className="round secondary"
+            aria-label="Cancel proposal"
+            disabled={busy}
+            onClick={() => respond("cancel")}
+          >
+            <IconX />
+          </button>
+        </>
       ) : (
         <>
           <button
+            className="round no"
+            aria-label="Decline"
             disabled={busy}
-            onClick={() =>
-              run(() =>
-                rpc("respond_cycle", { p_id: c.id, p_action: "accept" }),
-              )
-            }
+            onClick={() => respond("decline")}
           >
-            Accept terms
+            <IconX />
           </button>
           <button
-            className="secondary"
+            className="round ok"
+            aria-label="Accept"
             disabled={busy}
-            onClick={() =>
-              run(() =>
-                rpc("respond_cycle", { p_id: c.id, p_action: "decline" }),
-              )
-            }
+            onClick={() => respond("accept")}
           >
-            Decline
+            <IconCheck />
           </button>
         </>
       )}
