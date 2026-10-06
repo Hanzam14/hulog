@@ -53,35 +53,49 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `4`
-- Updated: `2026-10-06T08:59:50Z`
+- Revision: `5`
+- Updated: `2026-10-06T22:40:43Z`
 - Status: `HELD`
 - Persistence: `committed`
-- Summary: The Hulog root entry layer and continuity initialization are committed; owner-hosted setup and phone smoke checks remain pending.
-- Authority: Owner authorization in chat 2026-10-06: register Hulog and document the owner-operated setup next action.
+- Summary: Hulog personalization is committed on feat/personalize with passing local checks; independent Claude security review is pending. Main and hosted onboarding remain unchanged.
+- Authority: Owner implementation brief 2026-10-07: work only in Hulog-personalize, commit on feat/personalize with Claude co-author; no push, merge or hosted writes.
 
 ### Decisions
 
-- Hulog onboarding documentation and continuity artifacts persisted in commit 16f63dac29b41c4affd73f2207896ef198dd6ca0.
+- Implemented the final Claude-led spec within the existing worktree without runtime dependencies.
+- Darkened light green/orange text shades to #2b8046/#ad5b19 to meet 4.5:1 contrast.
+- Workstream hulog-personalize is HELD for the required Claude security review.
 
 ### Blockers
 
-- Owner must configure Supabase, Google OAuth, and Vercel.
-- Owner must complete the two-phone smoke test with distinct accounts.
+- Fresh independent Claude review is required before completion.
 
 ### Risks and unresolved items
 
-- Hosted configuration and two-phone behavior are not verified.
-- Route must remain held until the owner completes hosted setup and smoke testing.
+- Security claims have builder-run tests but no independent Claude PASS.
+- Browser UI uses synthetic local data and install/standalone UA simulations; physical Android/iOS installation and Google OAuth were not tested.
+- Owner must apply the new migration before using the updated client against hosted data.
+- Independent Claude security review.
+- Existing owner-operated hosted setup and two-phone smoke checks remain pending.
 
 ### Evidence and checks
 
-- HANDOFF.md
-- .continuity/state.json
-- .continuity/checkpoints/checkpoint-000003-20261006T085628Z-001f816404c9.json
-- Hulog commit: 16f63dac29b41c4affd73f2207896ef198dd6ca0
-- npm lint/test/build: PASS
-- continuity verify/audit: PASS
+- docs/SPEC.md
+- supabase/migrations/20261007000100_profile_personalization.sql
+- supabase/tests/database/profile.test.sql
+- src/components/shared.test.ts
+- src/theme.test.ts
+- src/palette.test.ts
+- .shots/ui-checks.json
+- .shots/artifact-checks.json
+- .shots/claude-review-claims.md
+- Baseline npm run lint PASS; npm test/build sandbox cache write failure, configLoader runner reruns PASS (18 tests/build).
+- Nickname/color regression baseline: 9 fail / 3 pass; final 12 pass.
+- Final exact npm run lint PASS; npm test PASS (40); npm run build PASS.
+- Disposable local npx supabase test db PASS (145, 33 profile); initial invalid SQL test statement corrected without changing assertions; instance stopped and config restored.
+- Headless local fixtures: Home, Settings and profile at 360px in light/dark PASS; all six screenshots visually inspected.
+- PNG dimensions/opaque touch icon/maskable safe zone and built manifest PASS; 32px/512px icons visually inspected.
+- git diff --check PASS; no hosted actions, merge or push.
 
 ### Governed artifact correlations
 
@@ -89,5 +103,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Owner follows SETUP.md for hosted setup, then records two-phone smoke results in HANDOFF.md.
+Claude lead reviews feat/personalize against 34293a8 using .shots/claude-review-claims.md and records the verdict; no merge or publication is authorized.
 <!-- CONTINUITY_CHECKPOINT_END -->
