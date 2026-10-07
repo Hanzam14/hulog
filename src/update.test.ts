@@ -66,6 +66,7 @@ describe("user-controlled app updates", () => {
     time.mockReturnValue(2000000 + 31 * 60 * 1000);
     doc.dispatchEvent(new Event("visibilitychange"));
     await vi.waitFor(() => expect(mock.update).toHaveBeenCalledTimes(3));
+    expect(updates.updateSnapshot().message).toBe("Updated ka na ✓");
   });
   it("dismisses only the banner, applies only on request, and reloads a first-visit tab", async () => {
     const updates = await import("./update");
@@ -108,6 +109,40 @@ describe("user-controlled app updates", () => {
     expect(updates.updateSnapshot().message).toBe(
       "Hindi ma-check ang update. Subukan ulit kapag online.",
     );
+  });
+  it("reports a resolved apply that does not reload within fifteen seconds", async () => {
+    const updates = await import("./update");
+    updates.initializeUpdates();
+    await vi.waitFor(() => expect(mock.update).toHaveBeenCalledOnce());
+    mock.options.onNeedRefresh();
+    vi.useFakeTimers();
+    try {
+      await updates.applyUpdate();
+      expect(updates.updateSnapshot().applying).toBe(true);
+      await vi.advanceTimersByTimeAsync(15000);
+      expect(updates.updateSnapshot()).toMatchObject({
+        applying: false,
+        message: "Hindi ma-update. Subukan ulit.",
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it("clears the reload timeout when the service worker reloads", async () => {
+    const updates = await import("./update");
+    updates.initializeUpdates();
+    await vi.waitFor(() => expect(mock.update).toHaveBeenCalledOnce());
+    mock.options.onNeedRefresh();
+    vi.useFakeTimers();
+    try {
+      await updates.applyUpdate();
+      serviceWorker.dispatchEvent(new Event("controllerchange"));
+      await vi.advanceTimersByTimeAsync(15000);
+      expect(mock.reload).toHaveBeenCalledOnce();
+      expect(updates.updateSnapshot().message).toBe("");
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it("clears manual results after four seconds and resets the timer for a new check", async () => {
     const updates = await import("./update");

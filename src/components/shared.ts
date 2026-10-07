@@ -1,7 +1,10 @@
 import type { Cycle, Snapshot } from "../data";
 import { t } from "../i18n";
 
-export type Run = (action: () => Promise<unknown>) => Promise<void>;
+export type Run = (
+  action: () => Promise<unknown>,
+  options?: { showSuccess?: boolean },
+) => Promise<void>;
 export interface ViewProps {
   data: Snapshot;
   user: string;
