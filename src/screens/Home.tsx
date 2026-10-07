@@ -20,7 +20,7 @@ export default function Home(props: ViewProps) {
   );
   const c = live ?? cycles.find((c) => c.status === "accepted");
   const waiting = data.payments.filter(
-    (p) => p.status === "pending" && !p.deleted_at,
+    (p) => p.status === "pending" && !p.deleted_at && p.member_id !== user,
   );
   return (
     <>
@@ -68,7 +68,7 @@ export default function Home(props: ViewProps) {
           <IconSparkles aria-hidden="true" /> {t("new round")}
         </Link>
       )}
-      {group.owner_id === user && waiting.length > 0 && (
+      {waiting.length > 0 && (
         <div className="confirm-list" aria-label={t("Waiting for your check")}>
           {waiting.map((p) => {
             const cycle = data.cycles.find((cycle) => cycle.id === p.cycle_id)!;

@@ -2,6 +2,15 @@ import { useSyncExternalStore } from "react";
 
 export type Lang = "en" | "tl" | "taglish";
 const taglish = {
+  "of {amount}": "sa {amount}",
+  "Pot progress": "Progress ng ipon",
+  "Give to {name}": "Ibigay kay {name}",
+  "Give this round’s payout to {name}?":
+    "Ibigay kay {name} ang payout ng round na ito?",
+  "Other member must confirm": "Ang partner mo ang kailangang mag-confirm",
+  "Current receiver only": "Ang kasalukuyang tatanggap lang ang puwede",
+  "Payout hand-off window closed": "Hindi na puwedeng ibigay ang payout",
+  "Other active member required": "Kailangan ng isa pang active member",
   Angelo: "Angelo",
   Vinice: "Vinice",
   groups: "groups",
@@ -133,7 +142,7 @@ const taglish = {
   "Other number of days": "Other number of days",
   "pot goes to": "pot goes to",
   starts: "starts",
-  "goes to": "goes to",
+  "goes to": "para kay",
   propose: "propose",
   "No open round.": "No open round.",
   "One day less": "One day less",
@@ -246,6 +255,14 @@ const taglish = {
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
 const en = {
+  "of {amount}": "of {amount}",
+  "Pot progress": "Pot progress",
+  "Give to {name}": "Give to {name}",
+  "Give this round’s payout to {name}?": "Give this round’s payout to {name}?",
+  "Other member must confirm": "The other member must confirm",
+  "Current receiver only": "Only the current receiver can do this",
+  "Payout hand-off window closed": "The payout hand-off window has closed",
+  "Other active member required": "Another active member is required",
   Angelo: "Angelo",
   Vinice: "Vinice",
   groups: "groups",
@@ -488,6 +505,17 @@ const en = {
   membership: "membership",
 } satisfies Dictionary;
 const tl = {
+  "of {amount}": "sa {amount}",
+  "Pot progress": "Pag-usad ng ipon",
+  "Give to {name}": "Ibigay kay {name}",
+  "Give this round’s payout to {name}?":
+    "Ibigay kay {name} ang matatanggap na ipon sa round na ito?",
+  "Other member must confirm": "Ang kabilang miyembro ang dapat magkumpirma",
+  "Current receiver only":
+    "Ang kasalukuyang tatanggap lamang ang maaaring gumawa nito",
+  "Payout hand-off window closed":
+    "Lumipas na ang panahon para ibigay ang ipon",
+  "Other active member required": "Kailangan ng isa pang aktibong miyembro",
   Angelo: "Angelo",
   Vinice: "Vinice",
   groups: "mga grupo",

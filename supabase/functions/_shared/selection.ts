@@ -159,16 +159,17 @@ export function selectNotifications(input: SelectionInput): Notice[] {
       continue;
     const cycle = input.cycles.find((item) => item.id === payment.cycle_id);
     const group = cycle && groupById.get(cycle.group_id);
+    if (!cycle || !group || cycle.status !== "accepted") continue;
+    const members = activeByGroup.get(cycle.group_id) ?? [];
+    const reviewer = members.find((userId) => userId !== payment.member_id);
     if (
-      !cycle ||
-      !group ||
-      payment.member_id === group.owner_id ||
-      !(activeByGroup.get(cycle.group_id) ?? []).includes(payment.member_id) ||
-      !prefsByUser.get(group.owner_id)?.enabled
+      !members.includes(payment.member_id) ||
+      !reviewer ||
+      !prefsByUser.get(reviewer)?.enabled
     )
       continue;
     add(
-      group.owner_id,
+      reviewer,
       "confirm_payment",
       payment.id,
       "Confirm payment?",

@@ -299,22 +299,19 @@ select:focus {
   align-items: center;
   justify-content: space-between;
 }
-/* The pot is the one sticker that sits a little crooked. */
+/* The pot is the round's hero card. */
 .pot {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 2px 14px;
+  gap: 14px;
   margin: 4px 0 6px;
-  padding: 14px 16px;
-  background: var(--card);
+  padding: 20px;
+  background: var(--highlight);
   border: 2px solid var(--ink);
-  border-radius: 18px;
-  box-shadow: 3px 3px 0 var(--line);
+  border-radius: 24px;
+  box-shadow: 4px 4px 0 var(--line);
   color: var(--ink);
   font-weight: inherit;
   text-decoration: none;
-  transform: rotate(-1.2deg);
 }
 .pot:hover {
   color: var(--ink);
@@ -322,27 +319,59 @@ select:focus {
 section .pot {
   margin-top: 0;
 }
+.pot-top,
+.pot-amount,
+.pot-receiver,
+.pot-bottom {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  min-width: 0;
+}
+.pot-top {
+  flex-wrap: nowrap;
+}
 .pot .pig {
   color: var(--pink-deep);
+  flex-shrink: 0;
 }
 .pot strong {
-  display: block;
   font-family: var(--display);
-  font-size: 44px;
+  font-size: clamp(32px, 8vw, 48px);
   font-weight: 600;
   line-height: 1.05;
 }
-.pot-line {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.pot-target,
+.pot-receiver,
+.pot small {
   color: var(--soft);
+}
+.pot-target {
   font-size: 14px;
-  font-weight: 800;
+}
+.pot-progress {
+  height: 14px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--card);
+}
+.pot-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--pink);
+}
+.pot-receiver {
+  font-size: 14px;
+}
+.pot-receiver b {
+  color: var(--ink);
+}
+.pot-bottom {
+  justify-content: space-between;
 }
 .pot small {
-  grid-column: 1 / -1;
-  color: var(--soft);
   font-size: 12px;
   font-weight: 700;
 }

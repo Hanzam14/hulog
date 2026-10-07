@@ -80,7 +80,14 @@ select is((select end_date from cycles where id=pg_temp.id('c1')),'2026-11-15'::
 select is((select phase from cycle_summary where id=pg_temp.id('c1')),'open','Cycle 1 open');
 select pg_temp.actor(1);
 insert into fixture values('a1',record_payment(pg_temp.id('c1'),15)::text);
-select is((select status from payments where id=pg_temp.id('a1')),'confirmed','Owner immediately confirmed');
+select is((select status from payments where id=pg_temp.id('a1')),'pending','Owner payment starts pending');
+select ok(not (select was_confirmed from payments where id=pg_temp.id('a1')),'New owner payment was never confirmed');
+select is((select pot_centavos from cycle_summary where id=pg_temp.id('c1')),0::bigint,'Pending owner payment excluded from pot');
+select throws_ok($$select confirm_payment(pg_temp.id('a1'))$$,'P0001','Other member must confirm','Owner cannot confirm own payment');
+select pg_temp.actor(2);
+select lives_ok($$select confirm_payment(pg_temp.id('a1'))$$,'Partner confirms owner payment');
+select is((select confirmed_by from payments where id=pg_temp.id('a1')),auth.uid(),'Owner payment confirmation records partner identity');
+select pg_temp.actor(1);
 select throws_ok($$select record_payment(pg_temp.id('c1'),1)$$,'P0001','Payment days exceed cap or are invalid','Days cap enforced');
 -- B pays and A confirms separately on each of Nov 1..13.
 do $$ declare pid uuid; begin for d in 1..13 loop
@@ -114,12 +121,16 @@ select throws_ok($$select confirm_payment(pg_temp.id('p15'))$$,'P0001','Confirma
 select lives_ok($$select respond_cycle(pg_temp.id('c2'),'accept')$$,'A accepts cycle 2 on Nov 17');
 select is((select phase from cycle_summary where id=pg_temp.id('c2')),'upcoming','Upcoming phase');
 insert into fixture values('a2',record_payment(pg_temp.id('c2'),10)::text);
-select lives_ok($$select edit_payment(pg_temp.id('a2'),9)$$,'Member payments allowed ahead before start; owner edit stays confirmed');
-select is((select status from payments where id=pg_temp.id('a2')),'confirmed','Owner payment edit remains confirmed');
+select pg_temp.actor(2); select confirm_payment(pg_temp.id('a2'));
+select pg_temp.actor(1);
+select lives_ok($$select edit_payment(pg_temp.id('a2'),9)$$,'Owner can correct ahead-of-start payment');
+select is((select status from payments where id=pg_temp.id('a2')),'pending','Owner payment edit resets to pending');
+select ok((select was_confirmed from payments where id=pg_temp.id('a2')),'Owner correction preserves was_confirmed');
+select ok((select confirmed_by is null and confirmed_at is null from payments where id=pg_temp.id('a2')),'Owner correction clears confirmation metadata');
 select edit_payment(pg_temp.id('a2'),10);
-select pg_temp.actor(2);
+select pg_temp.actor(2); select confirm_payment(pg_temp.id('a2'));
 insert into fixture values('b4',record_payment(pg_temp.id('c2'),4)::text),('b3',record_payment(pg_temp.id('c2'),3)::text);
-select throws_ok($$select confirm_payment(pg_temp.id('b4'))$$,'P0001','Owner only','B cannot confirm own payment');
+select throws_ok($$select confirm_payment(pg_temp.id('b4'))$$,'P0001','Other member must confirm','B cannot confirm own payment');
 select pg_temp.actor(1);
 select confirm_payment(pg_temp.id('b4')); select confirm_payment(pg_temp.id('b3'));
 select set_config('hulog.test_date','2026-11-30',true);
@@ -171,7 +182,11 @@ select confirm_payment(pg_temp.id('b4'));
 select is((select debt_centavos from member_progress where cycle_id=pg_temp.id('c2') and member_id='00000000-0000-0000-0000-000000000002'),0::bigint,'Overpaid repayment never creates reverse debt after payment correction');
 select pg_temp.actor(2);
 select lives_ok($$select edit_payment(pg_temp.id('a2'),9)$$,'Either active member can correct owner payment');
-select is((select status from payments where id=pg_temp.id('a2')),'confirmed','Owner payment remains confirmed when edited by member');
+select is((select status from payments where id=pg_temp.id('a2')),'pending','Partner correction of owner payment resets to pending');
+select pg_temp.actor(1);
+select throws_ok($$select confirm_payment(pg_temp.id('a2'))$$,'P0001','Other member must confirm','Owner cannot reconfirm own corrected payment');
+select pg_temp.actor(2);
+select lives_ok($$select confirm_payment(pg_temp.id('a2'))$$,'Partner can reconfirm corrected owner payment after close');
 select pg_temp.actor(1);
 select throws_ok($$select record_repayment(pg_temp.id('c3'),'00000000-0000-0000-0000-000000000001',100)$$,'P0001','Cycle must be closed','Open cycle cannot have repayment');
 -- Late acceptance, decline and cancel.
@@ -203,6 +218,7 @@ select throws_ok($$select record_payment(pg_temp.id('c2'),1)$$,'P0001','Cycle no
 select throws_ok($$select edit_payment(pg_temp.id('b4'),1)$$,'P0001','Payment not in your group','Foreign payment edit blocked');
 select throws_ok($$select confirm_payment(pg_temp.id('b4'))$$,'P0001','Payment not in your group','Foreign payment confirm blocked');
 select throws_ok($$select receive_payout(pg_temp.id('c2'))$$,'P0001','Cycle not in your group','Foreign payout blocked');
+select throws_ok($$select give_payout(pg_temp.id('c2'))$$,'P0001','Cycle not in your group','Foreign payout hand-off blocked');
 select throws_ok($$select record_repayment(pg_temp.id('c2'),auth.uid(),100)$$,'P0001','Cycle not in your group','Foreign repayment blocked');
 select throws_ok($$select edit_repayment(pg_temp.id('r1'),100)$$,'P0001','Repayment not in your group','Foreign repayment edit blocked');
 select throws_ok($$select confirm_repayment(pg_temp.id('r1'))$$,'P0001','Repayment not in your group','Foreign repayment confirm blocked');
