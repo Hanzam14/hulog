@@ -56,12 +56,13 @@ describe("user-controlled app updates", () => {
     const updates = await import("./update");
     updates.initializeUpdates();
     await vi.waitFor(() => expect(mock.update).toHaveBeenCalledTimes(1));
-    expect(updates.updateSnapshot().message).toBe("Updated ka na ✓");
+    expect(updates.updateSnapshot().message).toBe("");
     doc.dispatchEvent(new Event("visibilitychange"));
     await updates.checkForUpdate(true);
     expect(mock.update).toHaveBeenCalledTimes(1);
     await updates.checkForUpdate();
     expect(mock.update).toHaveBeenCalledTimes(2);
+    expect(updates.updateSnapshot().message).toBe("Updated ka na ✓");
     time.mockReturnValue(2000000 + 31 * 60 * 1000);
     doc.dispatchEvent(new Event("visibilitychange"));
     await vi.waitFor(() => expect(mock.update).toHaveBeenCalledTimes(3));
@@ -102,8 +103,28 @@ describe("user-controlled app updates", () => {
     await vi.waitFor(() =>
       expect(updates.updateSnapshot().checking).toBe(false),
     );
+    expect(updates.updateSnapshot().message).toBe("");
+    await updates.checkForUpdate();
     expect(updates.updateSnapshot().message).toBe(
       "Hindi ma-check ang update. Subukan ulit kapag online.",
     );
+  });
+  it("clears manual results after four seconds and resets the timer for a new check", async () => {
+    const updates = await import("./update");
+    updates.initializeUpdates();
+    await vi.waitFor(() => expect(mock.update).toHaveBeenCalledOnce());
+    vi.useFakeTimers();
+    try {
+      await updates.checkForUpdate();
+      expect(updates.updateSnapshot().message).toBe("Updated ka na ✓");
+      await vi.advanceTimersByTimeAsync(3000);
+      await updates.checkForUpdate();
+      await vi.advanceTimersByTimeAsync(1000);
+      expect(updates.updateSnapshot().message).toBe("Updated ka na ✓");
+      await vi.advanceTimersByTimeAsync(3000);
+      expect(updates.updateSnapshot().message).toBe("");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

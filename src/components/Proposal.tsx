@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import type { Cycle } from "../data";
 import { rpc } from "../data";
@@ -21,10 +22,10 @@ export default function Proposal({
     <div className="answer">
       {c.proposed_by === user ? (
         <>
-          <span className="waiting">waiting…</span>
+          <span className="waiting">{t("waiting…")}</span>
           <button
             className="round secondary"
-            aria-label="Cancel proposal"
+            aria-label={t("Cancel proposal")}
             disabled={busy}
             onClick={() => respond("cancel")}
           >
@@ -35,7 +36,7 @@ export default function Proposal({
         <>
           <button
             className="round no"
-            aria-label="Decline"
+            aria-label={t("Decline")}
             disabled={busy}
             onClick={() => respond("decline")}
           >
@@ -43,7 +44,7 @@ export default function Proposal({
           </button>
           <button
             className="round ok"
-            aria-label="Accept"
+            aria-label={t("Accept")}
             disabled={busy}
             onClick={() => respond("accept")}
           >

@@ -1,4 +1,5 @@
 import type { Tone } from "./shared";
+import { t } from "../i18n";
 
 /** One row of the planner: a sticker per paid day, dashed while waiting. */
 export default function Tally({
@@ -21,7 +22,12 @@ export default function Tally({
     <div
       className={`tally ${tone}`}
       role="img"
-      aria-label={`${label}: ${paid} of ${total} days paid, ${pending} pending`}
+      aria-label={t("{label}: {paid} of {total} days paid, {pending} pending", {
+        label,
+        paid,
+        total,
+        pending,
+      })}
     >
       {marks.map((mark, i) => (
         <span key={i} className={mark} />

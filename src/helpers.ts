@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 export function money(centavos: number): string {
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -28,16 +29,19 @@ export function shortDate(date: string): string {
 }
 export function phaseDisplay(phase: string, daysLeft: number): string {
   if (phase === "open")
-    return `Open · ${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`;
+    return t("Open · {days} {unit} left", {
+      days: daysLeft,
+      unit: t(daysLeft === 1 ? "day" : "days"),
+    });
   return (
     (
       {
-        upcoming: "Upcoming · paying ahead is okay",
-        settling: "Settling · last day to confirm",
-        ended: "Ended",
-        proposed: "Waiting for agreement",
-        declined: "Declined",
-        cancelled: "Cancelled",
+        upcoming: t("Upcoming · paying ahead is okay"),
+        settling: t("Settling · last day to confirm"),
+        ended: t("Ended"),
+        proposed: t("Waiting for agreement"),
+        declined: t("Declined"),
+        cancelled: t("Cancelled"),
       } as Record<string, string>
     )[phase] ?? phase
   );

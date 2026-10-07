@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useNavigate } from "react-router-dom";
 import { rpc } from "../data";
 import type { Run } from "../components/shared";
@@ -6,9 +7,8 @@ export default function NoGroup({ run, busy }: { run: Run; busy: boolean }) {
   const navigate = useNavigate();
   return (
     <>
-      <h1>Start your daily promise.</h1>
+      <h1 className="sr-only">{t("Create group")}</h1>
       <section>
-        <h2>Create group</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -22,18 +22,18 @@ export default function NoGroup({ run, busy }: { run: Run; busy: boolean }) {
           }}
         >
           <label>
-            Group name
-            <input name="name" required placeholder="Our little pot" />
+            {t("Group name")}
+            <input name="name" required placeholder={t("Our little pot")} />
           </label>
           <label>
-            Pot held at
-            <input name="pot" placeholder="MariBank, cash…" />
+            {t("Pot held at")}
+            <input name="pot" placeholder={t("MariBank, cash…")} />
           </label>
-          <button disabled={busy}>Create group</button>
+          <button disabled={busy}>{t("Create group")}</button>
         </form>
       </section>
       <section>
-        <h2>I have an invite link</h2>
+        <h2>{t("I have an invite link")}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -44,11 +44,11 @@ export default function NoGroup({ run, busy }: { run: Run; busy: boolean }) {
           }}
         >
           <label>
-            Paste the invite link
+            {t("Paste the invite link")}
             <input name="link" required />
           </label>
           <button disabled={busy} className="secondary">
-            Open invite
+            {t("Open invite")}
           </button>
         </form>
       </section>

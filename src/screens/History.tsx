@@ -1,3 +1,4 @@
+import { t, label } from "../i18n";
 import { useState } from "react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name } from "../components/shared";
@@ -9,7 +10,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
   const [editing, setEditing] = useState<string | null>(null);
   return (
     <>
-      <h1>Past pots & debts</h1>
+      <h1>{t("Past pots & debts")}</h1>
       {data.cycles
         .filter(
           (c) =>
@@ -20,7 +21,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
           <section key={c.id}>
             <CycleCard c={c} data={data} />
             <p>
-              <strong>{c.payout_state ?? c.status}</strong>
+              <strong>{label(c.payout_state ?? c.status)}</strong>
             </p>
             {data.progress
               .filter(
@@ -29,7 +30,8 @@ export default function History({ data, user, run, busy }: ViewProps) {
               .map((p) => (
                 <div key={p.member_id}>
                   <h3>
-                    {name(data, p.member_id)} · Owes {money(p.debt_centavos)}
+                    {name(data, p.member_id)} {t("· Owes")}{" "}
+                    {money(p.debt_centavos)}
                   </h3>
                   {p.debt_centavos > 0 && (
                     <form
@@ -48,7 +50,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                       }}
                     >
                       <label>
-                        Repayment amount (₱)
+                        {t("Repayment amount (₱)")}
                         <input
                           name="amount"
                           inputMode="decimal"
@@ -56,7 +58,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                           defaultValue={(p.debt_centavos / 100).toFixed(2)}
                         />
                       </label>
-                      <button disabled={busy}>Record repayment</button>
+                      <button disabled={busy}>{t("Record repayment")}</button>
                     </form>
                   )}
                 </div>
@@ -70,7 +72,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                   </strong>
                   <p>
                     {money(r.amount_centavos)} ·{" "}
-                    {r.deleted_at ? "Deleted" : r.status}
+                    {r.deleted_at ? t("Deleted") : label(r.status)}
                   </p>
                   {!r.deleted_at && (
                     <>
@@ -84,7 +86,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                               )
                             }
                           >
-                            Confirm repayment
+                            {t("Confirm repayment")}
                           </button>
                         )}
                         <button
@@ -94,13 +96,15 @@ export default function History({ data, user, run, busy }: ViewProps) {
                             setEditing(editing === r.id ? null : r.id)
                           }
                         >
-                          Edit amount
+                          {t("Edit amount")}
                         </button>
                         <button
                           className="quiet danger"
                           disabled={busy}
                           onClick={() => {
-                            if (window.confirm("Delete this repayment record?"))
+                            if (
+                              window.confirm(t("Delete this repayment record?"))
+                            )
                               void run(() =>
                                 rpc("edit_repayment", {
                                   p_id: r.id,
@@ -109,7 +113,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                               );
                           }}
                         >
-                          Delete
+                          {t("Delete")}
                         </button>
                       </div>
                       {editing === r.id && (
@@ -129,7 +133,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                           }}
                         >
                           <label>
-                            Correct amount (₱)
+                            {t("Correct amount (₱)")}
                             <input
                               name="amount"
                               inputMode="decimal"
@@ -139,7 +143,9 @@ export default function History({ data, user, run, busy }: ViewProps) {
                               required
                             />
                           </label>
-                          <button disabled={busy}>Save correction</button>
+                          <button disabled={busy}>
+                            {t("Save correction")}
+                          </button>
                         </form>
                       )}
                     </>
@@ -150,7 +156,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
         ))}
       {!data.cycles.some(
         (c) => closed(c) || ["declined", "cancelled"].includes(c.status),
-      ) && <p>Past cycles will appear here.</p>}
+      ) && <p>{t("Past cycles will appear here.")}</p>}
     </>
   );
 }

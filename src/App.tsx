@@ -1,3 +1,4 @@
+import { t, useLanguage, label, type Key } from "./i18n";
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
@@ -25,12 +26,18 @@ import {
 } from "@tabler/icons-react";
 
 export default function App() {
+  useLanguage();
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [data, setData] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState<{ message: Key } | null>(null);
+  useEffect(() => {
+    if (!success) return;
+    const timer = window.setTimeout(() => setSuccess(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [success]);
   const location = useLocation();
   useEffect(() => {
     if (
@@ -103,11 +110,11 @@ export default function App() {
   const run: Run = async (action) => {
     setBusy(true);
     setError("");
-    setSuccess("");
+    setSuccess(null);
     try {
       await action();
       if ((await supabase!.auth.getSession()).data.session) await refresh();
-      setSuccess("Saved. Salamat!");
+      setSuccess({ message: "Saved. Salamat!" });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -134,12 +141,14 @@ export default function App() {
     return (
       <main className="welcome">
         <UpdateBanner />
-        <h1>Hulog</h1>
-        <p>Our pot, one day at a time.</p>
+        <h1>{t("Hulog")}</h1>
+        <p>{t("Our pot, one day at a time.")}</p>
         <section>
-          <h2>Connect your Supabase project</h2>
+          <h2>{t("Connect your Supabase project")}</h2>
           <p>
-            Copy .env.example to .env and follow SETUP.md, then restart the app.
+            {t(
+              "Copy .env.example to .env and follow SETUP.md, then restart the app.",
+            )}
           </p>
         </section>
       </main>
@@ -149,82 +158,103 @@ export default function App() {
     <div className="app">
       <header>
         <Link to="/" className="brand">
-          hulog<span className="dot">.</span>
+          {t("Hulog").toLowerCase()}
+          <span className="dot">.</span>
         </Link>
         {session && (
           <button className="quiet" disabled={busy} onClick={signOut}>
-            Sign out
+            {t("Sign out")}
           </button>
         )}
       </header>
       <UpdateBanner />
       {error && (
         <div role="alert" className="notice error">
-          {error}
+          {label(error)}
           <button className="quiet" onClick={() => setError("")}>
-            Dismiss
+            {t("Dismiss")}
           </button>
         </div>
       )}
       {success && (
         <div role="status" className="notice">
-          {success}
+          {t(success.message)}
         </div>
       )}
       {!ready ? (
         <main>
-          <p>Loading…</p>
+          <p>{t("Loading…")}</p>
         </main>
       ) : !session ? (
         <main className="welcome">
           <h1>
-            Paluwagan para sa
+            {t("Paluwagan para sa")}
             <br />
-            ating dalawa<span className="dot">.</span>
+            {t("ating dalawa")}
+            <span className="dot">.</span>
           </h1>
           <p>
-            One sticker for every day you hulog. Fill your row, take turns
-            getting the pot. You hold the money; Hulog keeps the record.
+            {t(
+              "One sticker for every day you hulog. Fill your row, take turns getting the pot. You hold the money; Hulog keeps the record.",
+            )}
           </p>
           <figure>
             <div className="row">
-              <strong>Angelo</strong>
+              <strong>{t("Angelo")}</strong>
               <span className="meta">9/15</span>
             </div>
-            <Tally label="Angelo" paid={9} pending={0} total={15} tone="pink" />
+            <Tally
+              label={t("Angelo")}
+              paid={9}
+              pending={0}
+              total={15}
+              tone="pink"
+            />
             <div className="row">
-              <strong>Vinice</strong>
+              <strong>{t("Vinice")}</strong>
               <span className="meta">7/15</span>
             </div>
-            <Tally label="Vinice" paid={7} pending={2} total={15} tone="blue" />
-            <figcaption>Example: ₱50 a day for 15 days.</figcaption>
+            <Tally
+              label={t("Vinice")}
+              paid={7}
+              pending={2}
+              total={15}
+              tone="blue"
+            />
+            <figcaption>{t("Example: ₱50 a day for 15 days.")}</figcaption>
           </figure>
           <button disabled={busy} onClick={signIn}>
-            Continue with Google
+            {t("Continue with Google")}
           </button>
           {location.pathname.startsWith("/join/") && (
-            <p>Your invite will be here after sign-in.</p>
+            <p>{t("Your invite will be here after sign-in.")}</p>
           )}
         </main>
       ) : !data ? (
         <main>
-          <p>Loading your group…</p>
+          <p>{t("Loading your group…")}</p>
           <button disabled={busy} onClick={() => run(refresh)}>
-            Try again
+            {t("Try again")}
           </button>
         </main>
       ) : own && own.status !== "active" ? (
         <main>
           <h1>
-            {own.status === "pending" ? "Konting hintay." : "Request denied"}
+            {own.status === "pending"
+              ? t("Konting hintay.")
+              : t("Request denied")}
           </h1>
           <p>
             {own.status === "pending"
-              ? "Your holder will review your join request. This screen refreshes automatically."
-              : "Ask the group owner about your request. Your membership must be removed before you can join elsewhere."}
+              ? t(
+                  "Your holder will review your join request. This screen refreshes automatically.",
+                )
+              : t(
+                  "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.",
+                )}
           </p>
           <button disabled={busy} onClick={() => run(refresh)}>
-            Refresh status
+            {t("Refresh status")}
           </button>
         </main>
       ) : !own ? (
@@ -242,15 +272,15 @@ export default function App() {
           <nav>
             <NavLink to="/" end>
               <IconHome aria-hidden="true" />
-              <span className="sr-only">Home</span>
+              <span className="sr-only">{t("Home")}</span>
             </NavLink>
             <NavLink to="/history">
               <IconCalendar aria-hidden="true" />
-              <span className="sr-only">History</span>
+              <span className="sr-only">{t("History")}</span>
             </NavLink>
             <NavLink to="/changes">
               <IconBell aria-hidden="true" />
-              <span className="sr-only">Changes</span>
+              <span className="sr-only">{t("Changes")}</span>
               {data.changes.some((h) => h.unread) && (
                 <span className="badge">
                   {data.changes.filter((h) => h.unread).length}
@@ -259,7 +289,7 @@ export default function App() {
             </NavLink>
             <NavLink to="/settings">
               <IconUsers aria-hidden="true" />
-              <span className="sr-only">Group</span>
+              <span className="sr-only">{t("Group")}</span>
             </NavLink>
           </nav>
           <main>
@@ -338,7 +368,8 @@ export default function App() {
                 path="*"
                 element={
                   <p>
-                    You already have a group. <Link to="/">Go home</Link>
+                    {t("You already have a group.")}{" "}
+                    <Link to="/">{t("Go home")}</Link>
                   </p>
                 }
               />
@@ -346,7 +377,7 @@ export default function App() {
           </main>
         </>
       )}
-      <footer>Records only. No money moves through Hulog.</footer>
+      <footer>{t("Records only. No money moves through Hulog.")}</footer>
     </div>
   );
 }

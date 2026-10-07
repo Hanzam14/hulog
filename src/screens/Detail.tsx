@@ -1,3 +1,5 @@
+import { t, label } from "../i18n";
+import PendingPaymentActions from "../components/PendingPaymentActions";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import type { ViewProps } from "../components/shared";
@@ -15,12 +17,12 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
   if (!c)
     return (
       <p>
-        Cycle unavailable. <Link to="/">Go home</Link>
+        {t("Cycle unavailable.")} <Link to="/">{t("Go home")}</Link>
       </p>
     );
   return (
     <>
-      <h1>Cycle detail</h1>
+      <h1>{t("Cycle detail")}</h1>
       <section>
         <CycleCard c={c} data={data} />
         {c.status === "proposed" && (
@@ -28,23 +30,23 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
         )}
       </section>
       <section>
-        <h2>Payments</h2>
+        <h2>{t("Payments")}</h2>
         {data.payments
           .filter((p) => p.cycle_id === id)
           .map((p) => (
             <article className="entry" key={p.id}>
               <div className="row">
                 <strong>
-                  {name(data, p.member_id)} · {p.days} days
+                  {name(data, p.member_id)} · {p.days} {t("days")}
                 </strong>
                 <span className="chip">
                   {p.deleted_at
-                    ? "Deleted"
+                    ? t("Deleted")
                     : p.status === "pending" &&
                         c.phase === "ended" &&
                         !p.was_confirmed
-                      ? "Unconfirmed — not counted"
-                      : p.status}
+                      ? t("Unconfirmed — not counted")
+                      : label(p.status)}
                 </span>
               </div>
               <p>
@@ -58,7 +60,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                       disabled={busy}
                       onClick={() => setEditing(editing === p.id ? null : p.id)}
                     >
-                      Edit days
+                      {t("Edit days")}
                     </button>
                     <button
                       className="quiet danger"
@@ -66,7 +68,9 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                       onClick={() => {
                         if (
                           window.confirm(
-                            "Delete this payment record? The change stays in history.",
+                            t(
+                              "Delete this payment record? The change stays in history.",
+                            ),
                           )
                         )
                           void run(() =>
@@ -74,19 +78,18 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           );
                       }}
                     >
-                      Delete
+                      {t("Delete")}
                     </button>
                     {data.groups[0].owner_id === user &&
-                      p.status === "pending" &&
-                      (c.phase !== "ended" || p.was_confirmed) && (
-                        <button
-                          disabled={busy}
-                          onClick={() =>
-                            run(() => rpc("confirm_payment", { p_id: p.id }))
-                          }
-                        >
-                          Confirm
-                        </button>
+                      p.status === "pending" && (
+                        <PendingPaymentActions
+                          id={p.id}
+                          memberName={name(data, p.member_id)}
+                          amount={p.amount_centavos}
+                          allowed={c.phase !== "ended" || p.was_confirmed}
+                          busy={busy}
+                          run={run}
+                        />
                       )}
                   </div>
                   {editing === p.id && (
@@ -104,7 +107,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                       }}
                     >
                       <label>
-                        Correct number of days
+                        {t("Correct number of days")}
                         <input
                           name="days"
                           type="number"
@@ -114,7 +117,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           required
                         />
                       </label>
-                      <button disabled={busy}>Save correction</button>
+                      <button disabled={busy}>{t("Save correction")}</button>
                     </form>
                   )}
                 </>

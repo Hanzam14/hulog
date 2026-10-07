@@ -58,38 +58,43 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `7`
-- Updated: `2026-10-07`
-- Status: `ACTIVE`
+- Revision: `8`
+- Updated: `2026-10-07T03:39:59Z`
+- Status: `HELD`
 - Persistence: `commit_pending`
-- Summary: Personalization, confetti and update button are live on Hulog production; hosted migration applied; installed apps move to the prompt update flow automatically.
-- Authority: Owner in chat 2026-10-07: merge feat/personalize, apply hosted migration then push, fix installed-app update button; owner confirmed it works on device.
+- Summary: Language and UI polish implemented and builder-tested in feat/i18n-polish; independent Claude lead review pending.
+- Authority: Owner's explicit six-part implementation brief and branch commit authorization on 2026-10-07; no hosted writes, migrations, deployment, or dependency changes.
 
 ### Decisions
 
-- Merged feat/personalize into main (ee8ad66) after Claude review; confetti limited to payouts received within 7 days.
-- New service worker skips waiting once when replacing a legacy auto-update worker, then relies on the in-app update button.
+- Use device-local en/tl/taglish dictionaries without dependencies; preserve existing Taglish copy except listed removals.
+- Use the existing edit_payment soft-delete RPC for declining pending payments.
+- Keep Home in one widened column; Settings uses two columns at tablet and desktop widths.
 
 ### Blockers
 
-- None.
+- Independent Claude review pending.
 
 ### Risks and unresolved items
 
-- SW legacy-takeover fix has no independent second-model review.
-- Full two-account smoke not recorded.
-- Full two-phone smoke test record.
+- Builder checks are not independent review.
+- Browser uses synthetic local data; real OAuth and phone smoke remain owner-operated.
+- Server push text and CSV headers remain unchanged; unfamiliar remote errors are shown as received.
+- Claude lead review
+- Owner phone smoke for these changes
 
 ### Evidence and checks
 
-- HANDOFF.md
-- src/sw.ts
-- src/components/confetti.test.ts
-- npm run lint PASS; npm test PASS (48); npm run build PASS on main 3bde170.
-- Headless Playwright: legacy auto-update page moved to new worker and reloaded; fresh install loads; next deploy waits for button. First attempt deadlocked (navigate inside activate waitUntil) and was fixed before push.
-- Hosted: migration repair marked 20261006000100/000200 applied; db push applied 20261007000100; migration list local==remote.
-- Vercel production status success for ee8ad66 and 3bde170.
-- Owner device check: installed app updated and update button shows.
+- src/i18n.test.ts
+- src/update.test.ts
+- src/components/PendingPaymentActions.test.ts
+- .scratch/i18n-polish/layout-results.json
+- .scratch/i18n-polish/result.md
+- Baseline npm.cmd run lint PASS; npm.cmd test PASS (48); npm.cmd run build PASS after Vite-cache sandbox escalation.
+- Update regression baseline: three failing assertions for automatic messages and uncleared manual results.
+- Final npm.cmd run lint PASS; npm.cmd test PASS (56); npm.cmd run build PASS.
+- Headless synthetic Settings/Home screenshots at 360,768,1280 PASS; language switching, success timer reset, persistent errors, expired pending decline RPC checks PASS.
+- Visible JSX/static accessibility-string scan PASS; git diff --check PASS.
 
 ### Governed artifact correlations
 
@@ -97,5 +102,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Owner completes remaining SETUP.md two-phone smoke steps and reports; then update HANDOFF and JVC route status.
+Claude lead reviews the local branch and result report before any merge; no push or deployment.
 <!-- CONTINUITY_CHECKPOINT_END -->

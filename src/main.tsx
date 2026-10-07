@@ -6,8 +6,10 @@ import "./style.css";
 import { initializeTheme } from "./theme";
 import { initializeInstall } from "./install";
 import { initializeUpdates } from "./update";
+import { initializeLanguage } from "./i18n";
 
 initializeTheme();
+initializeLanguage();
 initializeInstall();
 initializeUpdates();
 
