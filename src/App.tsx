@@ -1,8 +1,8 @@
-import { t, useLanguage, label, type Key } from "./i18n";
-import { useCallback, useEffect, useState } from "react";
+import { t, useLanguage, label, languageSnapshot, type Key, type Lang } from "./i18n";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
-import { load, supabase } from "./data";
+import { load, rpc, supabase } from "./data";
 import type { Snapshot } from "./data";
 import type { Run } from "./components/shared";
 import Join from "./screens/Join";
@@ -26,8 +26,10 @@ import {
 } from "@tabler/icons-react";
 
 export default function App() {
-  useLanguage();
+  const language = useLanguage();
   const [session, setSession] = useState<Session | null>(null);
+  const languageReadyUser = useRef<string | null>(null);
+  const lastLanguageAttempt = useRef<{ userId: string; language: Lang } | null>(null);
   const [ready, setReady] = useState(false);
   const [data, setData] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
@@ -39,6 +41,57 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [success]);
   const location = useLocation();
+  const persistLanguage = useCallback((userId: string, value: Lang) => {
+    if (
+      lastLanguageAttempt.current?.userId === userId &&
+      lastLanguageAttempt.current.language === value
+    )
+      return;
+    lastLanguageAttempt.current = { userId, language: value };
+    void rpc("set_notification_language", { p_language: value }).catch(() => {
+      // Push-language sync must never prevent the local language from applying.
+    });
+  }, []);
+  useEffect(() => {
+    if (!session) {
+      languageReadyUser.current = null;
+      lastLanguageAttempt.current = null;
+      return;
+    }
+    let alive = true;
+    languageReadyUser.current = null;
+    lastLanguageAttempt.current = null;
+    void (async () => {
+      let serverLanguage: Lang | null = null;
+      try {
+        const rawPrefs = await rpc("get_notification_prefs");
+        const row = Array.isArray(rawPrefs) ? rawPrefs[0] : rawPrefs;
+        if (
+          row &&
+          (row.language === "en" || row.language === "tl" || row.language === "taglish")
+        )
+          serverLanguage = row.language;
+      } catch {
+        // A failed preference read should not affect app language or sign-in.
+      }
+      if (!alive) return;
+      languageReadyUser.current = session.user.id;
+      const currentLanguage = languageSnapshot();
+      if (serverLanguage === currentLanguage)
+        lastLanguageAttempt.current = {
+          userId: session.user.id,
+          language: currentLanguage,
+        };
+      else persistLanguage(session.user.id, currentLanguage);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [session, persistLanguage]);
+  useEffect(() => {
+    if (session && languageReadyUser.current === session.user.id)
+      persistLanguage(session.user.id, language);
+  }, [language, persistLanguage, session]);
   useEffect(() => {
     if (
       !data ||

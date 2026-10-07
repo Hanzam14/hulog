@@ -65,7 +65,7 @@ Deno.serve(async (request) => {
       .gte("created_at", recentSince),
     supabase
       .from("notification_prefs")
-      .select("user_id,reminder_time,enabled")
+      .select("user_id,reminder_time,enabled,language")
       .eq("enabled", true),
     supabase.from("push_subscriptions").select("user_id,endpoint,p256dh,auth"),
     supabase

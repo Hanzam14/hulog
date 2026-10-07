@@ -1,5 +1,6 @@
 export type NoticeKind =
   "reminder" | "confirm_payment" | "cycle_ends" | "payout_day";
+type Language = "en" | "tl" | "taglish";
 
 export interface Notice {
   userId: string;
@@ -37,7 +38,12 @@ export interface SelectionInput {
     created_at: string;
     deleted_at: string | null;
   }[];
-  prefs: { user_id: string; reminder_time: string; enabled: boolean }[];
+  prefs: {
+    user_id: string;
+    reminder_time: string;
+    enabled: boolean;
+    language?: Language;
+  }[];
   sent: { user_id: string; kind: string; ref_id: string; sent_on: string }[];
 }
 
@@ -57,6 +63,29 @@ const manila = (date: Date) => {
 const dayNumber = (date: string) => Date.parse(`${date}T00:00:00Z`);
 const nextDay = (date: string) =>
   new Date(dayNumber(date) + 86_400_000).toISOString().slice(0, 10);
+
+const noticeText: Record<NoticeKind, Record<Language, [string, string]>> = {
+  reminder: {
+    en: ["Payment reminder", "Log today's payment for this round when you're ready."],
+    tl: ["Paalala sa hulog", "Itala ang hulog mo para sa round na ito kapag handa ka na."],
+    taglish: ["Hulog today", "Log today’s hulog when you’re ready."],
+  },
+  confirm_payment: {
+    en: ["Confirm payment?", "A payment needs your review."],
+    tl: ["Kumpirmahin ang hulog?", "May hulog na kailangan mong tingnan."],
+    taglish: ["Confirm payment?", "A member logged a hulog that needs your review."],
+  },
+  cycle_ends: {
+    en: ["Round ends tomorrow", "Your current round ends tomorrow."],
+    tl: ["Matatapos ang round bukas", "Bukas matatapos ang kasalukuyan ninyong round."],
+    taglish: ["Cycle ends tomorrow", "Your current hulog cycle ends tomorrow."],
+  },
+  payout_day: {
+    en: ["Payout day", "Today is payout day. Check in with each other."],
+    tl: ["Araw ng payout", "Araw ng payout ngayon. Magkumustahan kayo."],
+    taglish: ["Payout day", "Today is payout day. Check in with each other."],
+  },
+};
 
 export function selectNotifications(input: SelectionInput): Notice[] {
   const local = manila(input.now);
@@ -90,6 +119,11 @@ export function selectNotifications(input: SelectionInput): Notice[] {
     sentKeys.add(key);
     notices.push({ userId, kind, refId, title, body, url: "/", sentOn: today });
   };
+  const addLocalized = (userId: string, kind: NoticeKind, refId: string) => {
+    const language = prefsByUser.get(userId)?.language ?? "taglish";
+    const [title, body] = noticeText[kind][language];
+    add(userId, kind, refId, title, body);
+  };
 
   for (const cycle of input.cycles) {
     const members = activeByGroup.get(cycle.group_id) ?? [];
@@ -111,13 +145,7 @@ export function selectNotifications(input: SelectionInput): Notice[] {
         const paidDays =
           (paid?.confirmed_days ?? 0) + (paid?.pending_days ?? 0);
         if (paidDays < elapsed) {
-          add(
-            userId,
-            "reminder",
-            cycle.id,
-            "Hulog today",
-            "Log today’s hulog when you’re ready.",
-          );
+          addLocalized(userId, "reminder", cycle.id);
         }
       }
     }
@@ -125,26 +153,14 @@ export function selectNotifications(input: SelectionInput): Notice[] {
     if (cycle.end_date === nextDay(today) && inMorningWindow(local)) {
       for (const userId of members) {
         if (!prefsByUser.get(userId)?.enabled) continue;
-        add(
-          userId,
-          "cycle_ends",
-          cycle.id,
-          "Cycle ends tomorrow",
-          "Your current hulog cycle ends tomorrow.",
-        );
+        addLocalized(userId, "cycle_ends", cycle.id);
       }
     }
 
     if (nextDay(cycle.end_date) === today && inMorningWindow(local)) {
       for (const userId of members) {
         if (!prefsByUser.get(userId)?.enabled) continue;
-        add(
-          userId,
-          "payout_day",
-          cycle.id,
-          "Payout day",
-          "Today is payout day. Check in with each other.",
-        );
+        addLocalized(userId, "payout_day", cycle.id);
       }
     }
   }
@@ -168,13 +184,7 @@ export function selectNotifications(input: SelectionInput): Notice[] {
       !prefsByUser.get(reviewer)?.enabled
     )
       continue;
-    add(
-      reviewer,
-      "confirm_payment",
-      payment.id,
-      "Confirm payment?",
-      "A member logged a hulog that needs your review.",
-    );
+    addLocalized(reviewer, "confirm_payment", payment.id);
   }
   return notices;
 }
