@@ -49,7 +49,7 @@ describe("device theme", () => {
     expect(metaColor).toBe("#fff6d8");
     applyTheme("dark");
     expect(html.dataset.theme).toBe("dark");
-    expect(metaColor).toBe("#1d1915");
+    expect(metaColor).toBe("#17130f");
   });
   it("Auto follows OS changes while explicit light stays light", () => {
     initializeTheme();

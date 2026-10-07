@@ -64,39 +64,42 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `16`
-- Updated: `2026-10-07T04:38:58Z`
+- Revision: `17`
+- Updated: `2026-10-07T04:50:07Z`
 - Status: `PARTIAL`
-- Persistence: `commit_pending`
-- Summary: Desktop nav and partner-color polish is locally ready with visual and automated evidence. Commit and authorized push await independent Claude review.
-- Authority: Owner task 2026-10-07 explicitly authorizes main commit and push origin main after UI polish and checks; no Supabase changes. Independent Claude review gate retained.
+- Persistence: `committed`
+- Summary: Warm night notebook dark theme implemented and locally committed; Claude lead screenshot review remains pending before any push.
+- Authority: Owner 2026-10-07 supplied Claude lead spec authorizes ordinary local CSS/theme work and main commit with co-author trailer; do not push.
 
 ### Decisions
 
-- Preserved Claude WIP; desktop-only app padding and nav bottom use 16px plus safe-area inset; mobile nav rules unchanged.
-- Removed obsolete partner-color note from all three dictionaries; retained partner-color aria label.
-- Historical workstream holds remain outside this scoped task.
+- Dark surfaces: page #17130f, card #26201a, inset #1d1814; muted edges and raised translucent nav.
+- Retained visible hard offset shadows after comparing a top-highlight alternative.
+- Preserved member fills and all light-mode pixels; updated existing meta-color test expectation to match requested color.
+- Owner requested one-agent work and main commit; review is delegated back to the Claude lead as specified, with no push.
 
 ### Blockers
 
-- Required independent Claude review conflicts with one-agent brief; owner review exception question is pending.
+- Claude lead screenshot review pending.
 
 ### Risks and unresolved items
 
-- Synthetic data screenshots; hosted OAuth and phone smoke not exercised.
-- Independent review not yet performed; commit/push not attempted.
-- Claude review, commit hash, push result.
+- Synthetic browser fixture; hosted OAuth and phone smoke were not exercised.
+- Lead screenshot review is still pending; screenshots and report are ignored local artifacts.
+- Claude lead screenshot/diff review.
 
 ### Evidence and checks
 
-- .scratch/nav-polish-result.md
-- .scratch/nav-polish-review-claims.md
-- .scratch/nav-polish/final/metrics.json
-- .scratch/nav-polish/final/palette-sheet.jpg
-- Baseline and final lint PASS.
-- Baseline and final unit tests 69/69 PASS.
-- Baseline and final build PASS; existing chunk-size and inlineDynamicImports warnings.
-- Synthetic browser: six width/theme combinations, 30 taken-color variants with contrast >=4.5:1, page-end clearance and no horizontal overflow/page errors PASS; screenshots visually inspected.
+- .scratch/dark-result.md
+- .scratch/dark/final/metrics.json
+- .scratch/dark/final/contrast.json
+- .scratch/dark/final/settings-1280-dark.png
+- Baseline/final npm.cmd run lint PASS.
+- Baseline/final npm.cmd test: 69/69 PASS.
+- Baseline/final npm.cmd run build PASS; existing chunk-size and inlineDynamicImports warnings.
+- Baseline hierarchy probe failed as expected; final passed. Nine final screenshots visually inspected; no browser errors or horizontal overflow.
+- Light Settings 1280: zero changed pixels; member fills unchanged.
+- Contrast primary/card 13.51:1; muted/card 6.67:1; muted/page 7.65:1; control border/inset 3.59:1 and border/card 3.28:1.
 - git diff --check PASS.
 
 ### Governed artifact correlations
@@ -105,5 +108,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Resolve review exception, obtain Claude review verdict, commit with requested co-author trailer, and push origin main.
+Claude lead reviews .scratch/dark/final/settings-1280-dark.png and the diff; no push is authorized by this task.
 <!-- CONTINUITY_CHECKPOINT_END -->

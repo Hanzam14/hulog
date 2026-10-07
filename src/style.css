@@ -977,17 +977,23 @@ button svg,
   }
 }
 
-/* The same stickers on a night planner; fill text keeps its dark ink. */
+/* Warm night paper; member sticker fills keep their original colors. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #1d1915;
-  --dots: #3a3129;
-  --ink: #f6ecd4;
-  --soft: #b9a98f;
-  --card: #28221c;
+  --paper: #17130f;
+  --dots: rgba(58, 49, 41, 0.5);
+  --ink: #f4ead9;
+  --soft: #b3a58f;
+  --card: #26201a;
+  --inset: #1d1814;
+  --card-border: #4a3f34;
+  --control-border: #806e56;
+  --nav-surface: #2c251e;
+  --action-pink: #ff8db0;
   --tan: #7a6a4c;
-  --line: #0d0b09;
-  --highlight: #443722;
+  --line: rgba(0, 0, 0, 0.55);
+  --highlight: #3a2f1e;
+  --highlight-border: #6b5530;
   --hover-card: #382e24;
   --danger: #ffaaa1;
   --pink-deep: #ff9bbc;
@@ -1190,4 +1196,85 @@ button svg,
   font-family: var(--display);
   font-size: 13px;
   font-weight: 800;
+}
+
+/* Dark-only surface and edge hierarchy; light stays on the original rules. */
+:root[data-theme="dark"] :is(
+  section,
+  .sticker,
+  .place,
+  .welcome figure,
+  .invite .qr,
+  .invite img,
+  .celebration-toast,
+  .preview-pot
+) {
+  border-color: var(--card-border);
+}
+:root[data-theme="dark"] :is(.pot, .celebrate, .chip) {
+  border-color: var(--highlight-border);
+}
+:root[data-theme="dark"] .celebrate.done {
+  border-color: var(--card-border);
+}
+:root[data-theme="dark"] .pot {
+  box-shadow: 3px 3px 0 var(--line);
+}
+:root[data-theme="dark"] :where(button, .button, input, select, .segmented, .back, .pot-progress):not(:where(.quiet, .who, .avatar-edit, .segmented button)) {
+  border-color: var(--control-border);
+}
+:root[data-theme="dark"] :is(input, select, .segmented, .pot-progress) {
+  background: var(--inset);
+}
+:root[data-theme="dark"] :where(button, .button):not(:where(.secondary, .quiet, .pick, .who, .avatar-edit, .color-choice, .emoji-grid button, .segmented button, .round.ok, .round.no)) {
+  background: var(--action-pink);
+  border-color: var(--sticker-ink);
+}
+:root[data-theme="dark"] :where(button, .button):not(:where(.secondary, .quiet, .pick, .who, .avatar-edit, .color-choice, .emoji-grid button, .segmented button, .round.ok, .round.no)):hover:not(:disabled) {
+  background: #ffa0bd;
+}
+:root[data-theme="dark"] :is(nav a.active, .segmented button[aria-pressed="true"], .emoji-grid button[aria-pressed="true"]) {
+  background: var(--action-pink);
+  border-color: var(--sticker-ink);
+}
+:root[data-theme="dark"] .pot-progress > span {
+  background: var(--action-pink);
+}
+:root[data-theme="dark"] :is(.avatar, .badge, .tally .paid) {
+  border-color: var(--sticker-ink);
+}
+:root[data-theme="dark"] nav {
+  background: var(--nav-surface);
+  border-color: var(--card-border);
+  box-shadow: 3px 3px 0 var(--line);
+  z-index: 10;
+}
+@supports (backdrop-filter: blur(10px)) {
+  :root[data-theme="dark"] nav {
+    background: rgba(44, 37, 30, 0.96);
+    backdrop-filter: blur(10px);
+  }
+}
+:root[data-theme="dark"] :is(.round.ok, .notice) {
+  background: #263326;
+  color: var(--green-deep);
+  border-color: var(--control-border);
+}
+:root[data-theme="dark"] :is(.round.no, .notice.error) {
+  background: #3b2523;
+  color: var(--danger);
+  border-color: var(--control-border);
+}
+:root[data-theme="dark"] .notice .quiet {
+  color: inherit;
+}
+:root[data-theme="dark"] .round.ok:hover:not(:disabled) {
+  background: #324332;
+}
+:root[data-theme="dark"] .round.no:hover:not(:disabled) {
+  background: #4b302c;
+}
+:root[data-theme="dark"] :is(input:focus, select:focus, :focus-visible) {
+  outline: 2px solid var(--action-pink);
+  outline-offset: 2px;
 }
