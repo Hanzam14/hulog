@@ -1150,9 +1150,16 @@ button svg,
   .app {
     --container-width: 760px;
     max-width: var(--container-width);
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
   nav {
-    margin-inline: 20px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    width: min(440px, calc(100% - 40px));
+    margin: 16px auto 0;
+    padding: 8px 12px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--line);
   }
   .settings-grid {
     display: grid;
@@ -1178,4 +1185,9 @@ button svg,
   .app {
     --container-width: 1000px;
   }
+}
+.swatch.taken {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 800;
 }

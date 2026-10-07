@@ -64,46 +64,40 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `15`
-- Updated: `2026-10-07T04:24:06Z`
+- Revision: `16`
+- Updated: `2026-10-07T04:38:58Z`
 - Status: `PARTIAL`
-- Persistence: `committed`
-- Summary: Push-language implementation is committed on feat/push-language. Independent Claude lead review, production apply/deploy, and two-phone smoke remain pending.
-- Authority: Owner's explicit Hulog task brief dated 2026-10-07 authorizes local implementation, checks, handoff/checkpoint, and branch commit; hosted apply/deploy remains owner-operated.
+- Persistence: `commit_pending`
+- Summary: Desktop nav and partner-color polish is locally ready with visual and automated evidence. Commit and authorized push await independent Claude review.
+- Authority: Owner task 2026-10-07 explicitly authorizes main commit and push origin main after UI polish and checks; no Supabase changes. Independent Claude review gate retained.
 
 ### Decisions
 
-- Push-language workstream is HELD pending independent review and owner-operated release steps.
+- Preserved Claude WIP; desktop-only app padding and nav bottom use 16px plus safe-area inset; mobile nav rules unchanged.
+- Removed obsolete partner-color note from all three dictionaries; retained partner-color aria label.
+- Historical workstream holds remain outside this scoped task.
 
 ### Blockers
 
-- Independent Claude lead review of this branch diff is pending.
-- Local pgTAP NOT RUN because Docker is unavailable.
-- Owner apply of migration and notify deployment remain pending.
-- Two-phone smoke test remains incomplete.
+- Required independent Claude review conflicts with one-agent brief; owner review exception question is pending.
 
 ### Risks and unresolved items
 
-- Local pgTAP coverage is unverified because Docker is unavailable.
-- Independent review has not yet confirmed this branch diff.
-- Independent Claude lead review.
-- Apply migration and deploy notify to production.
-- Complete two-phone smoke test.
+- Synthetic data screenshots; hosted OAuth and phone smoke not exercised.
+- Independent review not yet performed; commit/push not attempted.
+- Claude review, commit hash, push result.
 
 ### Evidence and checks
 
-- supabase/migrations/20261007000300_notification_language.sql
-- supabase/tests/database/rules.test.sql
-- src/notificationSelection.test.ts
-- HANDOFF.md
-- Baseline lint PASS.
-- Baseline unit tests 66/66 PASS with Vite runner mode.
-- Baseline build PASS with Vite runner mode.
-- Final lint PASS.
-- Final unit tests 69/69 PASS with Vite runner mode.
-- Final build PASS with Vite runner mode.
-- pgTAP NOT RUN: Docker executable unavailable; five focused assertions added.
-- Continuity verify and audit PASS.
+- .scratch/nav-polish-result.md
+- .scratch/nav-polish-review-claims.md
+- .scratch/nav-polish/final/metrics.json
+- .scratch/nav-polish/final/palette-sheet.jpg
+- Baseline and final lint PASS.
+- Baseline and final unit tests 69/69 PASS.
+- Baseline and final build PASS; existing chunk-size and inlineDynamicImports warnings.
+- Synthetic browser: six width/theme combinations, 30 taken-color variants with contrast >=4.5:1, page-end clearance and no horizontal overflow/page errors PASS; screenshots visually inspected.
+- git diff --check PASS.
 
 ### Governed artifact correlations
 
@@ -111,5 +105,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews the branch diff; after review, applies the migration and deploys notify. Owner completes the two-phone SETUP.md smoke test.
+Resolve review exception, obtain Claude review verdict, commit with requested co-author trailer, and push origin main.
 <!-- CONTINUITY_CHECKPOINT_END -->
