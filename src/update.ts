@@ -1,3 +1,4 @@
+import type { Key } from "./i18n";
 import { registerSW } from "virtual:pwa-register";
 
 export interface UpdateState {
@@ -5,7 +6,7 @@ export interface UpdateState {
   checking: boolean;
   applying: boolean;
   dismissed: boolean;
-  message: string;
+  message: Key | "";
 }
 let state: UpdateState = {
   needRefresh: false,
@@ -34,6 +35,17 @@ let updateSW: (reload?: boolean) => Promise<void>;
 let lastCheck = 0;
 let initialized = false;
 let reloading = false;
+let messageTimer: ReturnType<typeof setTimeout> | undefined;
+function clearMessage() {
+  clearTimeout(messageTimer);
+  messageTimer = undefined;
+  set({ message: "" });
+}
+function showMessage(message: Key) {
+  clearMessage();
+  set({ message });
+  messageTimer = setTimeout(() => set({ message: "" }), 4000);
+}
 function reloadOnce() {
   if (reloading) return;
   reloading = true;
@@ -106,9 +118,10 @@ export async function checkForUpdate(automatic = false) {
     (automatic && Date.now() - lastCheck < 30 * 60 * 1000)
   )
     return;
+  clearMessage();
   if (import.meta.env.DEV || !("serviceWorker" in navigator)) {
     if (!automatic)
-      set({ message: "Updates ay para sa installed o built app lang." });
+      showMessage("Updates ay para sa installed o built app lang.");
     return;
   }
   set({ checking: true, message: "" });
@@ -121,9 +134,10 @@ export async function checkForUpdate(automatic = false) {
     if (registration.installing)
       await finishInstalling(registration.installing);
     if (registration.waiting) set({ needRefresh: true });
-    set({ message: state.needRefresh ? "" : "Updated ka na ✓" });
+    if (!automatic && !state.needRefresh) showMessage("Updated ka na ✓");
   } catch {
-    set({ message: "Hindi ma-check ang update. Subukan ulit kapag online." });
+    if (!automatic)
+      showMessage("Hindi ma-check ang update. Subukan ulit kapag online.");
   } finally {
     set({ checking: false });
   }
@@ -131,10 +145,12 @@ export async function checkForUpdate(automatic = false) {
 
 export async function applyUpdate() {
   if (!state.needRefresh || state.applying) return;
+  clearMessage();
   set({ applying: true, message: "" });
   try {
     await updateSW(true);
   } catch {
-    set({ applying: false, message: "Hindi ma-update. Subukan ulit." });
+    set({ applying: false });
+    showMessage("Hindi ma-update. Subukan ulit.");
   }
 }

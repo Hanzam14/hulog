@@ -1,13 +1,9 @@
+import { t } from "../i18n";
 import { Link } from "react-router-dom";
-import {
-  IconCheck,
-  IconMapPin,
-  IconPlus,
-  IconSparkles,
-} from "@tabler/icons-react";
+import { IconMapPin, IconPlus, IconSparkles } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
-import { rpc } from "../data";
+import PendingPaymentActions from "../components/PendingPaymentActions";
 import { money, shortDate } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
@@ -24,7 +20,7 @@ export default function Home(props: ViewProps) {
   );
   const c = live ?? cycles.find((c) => c.status === "accepted");
   const waiting = data.payments.filter(
-    (p) => p.status === "pending" && !p.deleted_at,
+    (p) => p.status === "pending" && !p.deleted_at && p.member_id !== user,
   );
   return (
     <>
@@ -32,7 +28,9 @@ export default function Home(props: ViewProps) {
       {!c ? (
         <div className="empty">
           <IconSparkles size={48} aria-hidden="true" />
-          <p>Invite your partner from the group tab, then start a round.</p>
+          <p>
+            {t("Invite your partner from the group tab, then start a round.")}
+          </p>
         </div>
       ) : (
         <>
@@ -59,7 +57,7 @@ export default function Home(props: ViewProps) {
           )}
           {c.status === "accepted" && !closed(c) && (
             <Link className="button big" to="/hulog">
-              <IconPlus aria-hidden="true" /> hulog
+              <IconPlus aria-hidden="true" /> {t("hulog")}
             </Link>
           )}
           <Payout c={c} data={data} user={user} run={run} busy={busy} />
@@ -67,11 +65,11 @@ export default function Home(props: ViewProps) {
       )}
       {!live && (
         <Link className="button big secondary" to="/propose">
-          <IconSparkles aria-hidden="true" /> new round
+          <IconSparkles aria-hidden="true" /> {t("new round")}
         </Link>
       )}
-      {group.owner_id === user && waiting.length > 0 && (
-        <div className="confirm-list" aria-label="Waiting for your check">
+      {waiting.length > 0 && (
+        <div className="confirm-list" aria-label={t("Waiting for your check")}>
           {waiting.map((p) => {
             const cycle = data.cycles.find((cycle) => cycle.id === p.cycle_id)!;
             const allowed = cycle.phase !== "ended" || p.was_confirmed;
@@ -83,30 +81,26 @@ export default function Home(props: ViewProps) {
                   <div
                     className={`tally ${tone(data, p.member_id)} mini`}
                     role="img"
-                    aria-label={`${p.days} days`}
+                    aria-label={t("{days} days", { days: p.days })}
                   >
                     {Array.from({ length: p.days }, (_, i) => (
                       <span key={i} className="pending" />
                     ))}
                   </div>
                   <Link to={`/cycles/${cycle.id}`} className="muted">
-                    round {shortDate(cycle.start_date)} →{" "}
+                    {t("round")} {shortDate(cycle.start_date)} →{" "}
                     {shortDate(cycle.end_date)}
                   </Link>
-                  {!allowed && <small>not counted</small>}
+                  {!allowed && <small>{t("not counted")}</small>}
                 </div>
-                {allowed && (
-                  <button
-                    className="round ok"
-                    aria-label={`Confirm ${name(data, p.member_id)}'s ${money(p.amount_centavos)}`}
-                    disabled={busy}
-                    onClick={() =>
-                      run(() => rpc("confirm_payment", { p_id: p.id }))
-                    }
-                  >
-                    <IconCheck />
-                  </button>
-                )}
+                <PendingPaymentActions
+                  id={p.id}
+                  memberName={name(data, p.member_id)}
+                  amount={p.amount_centavos}
+                  allowed={allowed}
+                  busy={busy}
+                  run={run}
+                />
               </div>
             );
           })}
@@ -114,7 +108,8 @@ export default function Home(props: ViewProps) {
       )}
       {group.pot_location && (
         <p className="place">
-          <IconMapPin size={16} aria-label="Pot held at" /> {group.pot_location}
+          <IconMapPin size={16} aria-label={t("Pot held at")} />{" "}
+          {group.pot_location}
         </p>
       )}
     </>

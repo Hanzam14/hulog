@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react";
@@ -17,7 +18,7 @@ export default function Record({ data, user, run, busy }: ViewProps) {
   if (!c)
     return (
       <p>
-        No open round. <Link to="/">Go home</Link>
+        {t("No open round.")} <Link to="/">{t("Go home")}</Link>
       </p>
     );
   const mine = data.progress.find(
@@ -30,7 +31,7 @@ export default function Record({ data, user, run, busy }: ViewProps) {
   const set = (n: number) => setDays(Math.min(left, Math.max(1, n)));
   return (
     <div className="record">
-      <Link to="/" className="back" aria-label="Back">
+      <Link to="/" className="back" aria-label={t("Back")}>
         <IconArrowLeft />
       </Link>
       <Avatar data={data} id={user} size="lg" />
@@ -38,18 +39,18 @@ export default function Record({ data, user, run, busy }: ViewProps) {
         <button
           type="button"
           className="round secondary"
-          aria-label="One day less"
+          aria-label={t("One day less")}
           onClick={() => set(days - 1)}
         >
           <IconMinus />
         </button>
-        <output aria-live="polite" aria-label="Days">
+        <output aria-live="polite" aria-label={t("Days")}>
           {days}
         </output>
         <button
           type="button"
           className="round secondary"
-          aria-label="One day more"
+          aria-label={t("One day more")}
           onClick={() => set(days + 1)}
         >
           <IconPlus />
@@ -73,7 +74,7 @@ export default function Record({ data, user, run, busy }: ViewProps) {
           })
         }
       >
-        hulog!
+        {t("hulog!")}
       </button>
     </div>
   );

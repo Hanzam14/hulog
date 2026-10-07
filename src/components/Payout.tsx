@@ -1,3 +1,4 @@
+import { t, label } from "../i18n";
 import {
   IconCheck,
   IconHeartFilled,
@@ -33,10 +34,12 @@ export default function Payout({
       <IconStarFilled className="spark s3" aria-hidden="true" />
       <Avatar data={data} id={c.receiver_id} size="lg" />
       <strong>{money(c.pot_centavos)}</strong>
-      <span className="meta">{c.payout_state}</span>
+      <span className="meta">{label(c.payout_state ?? "")}</span>
       {done && (
         <p className="payout-congrats">
-          Congrats, {name(data, c.receiver_id)}! Nasa'yo na ang hulog.
+          {t("Congrats, {name}! Nasa'yo na ang hulog.", {
+            name: name(data, c.receiver_id),
+          })}
         </p>
       )}
       {!done && c.receiver_id === user && (
@@ -49,7 +52,7 @@ export default function Payout({
             })
           }
         >
-          got it <IconCheck size={18} aria-hidden="true" />
+          {t("got it")} <IconCheck size={18} aria-hidden="true" />
         </button>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { t, label } from "../i18n";
 import { useState, useSyncExternalStore } from "react";
 import {
   clearInstallPrompt,
@@ -15,7 +16,7 @@ export default function InstallSettings() {
   const [message, setMessage] = useState("");
   if (standalone) return null;
   if (isIosSafariOutsideHomeScreen())
-    return <p className="install-hint">Share → Add to Home Screen</p>;
+    return <p className="install-hint">{t("Share → Add to Home Screen")}</p>;
   if (!prompt && !message) return null;
   return (
     <div className="install-hint">
@@ -38,10 +39,10 @@ export default function InstallSettings() {
             }
           }}
         >
-          I-install ang Hulog
+          {t("I-install ang Hulog")}
         </button>
       )}
-      {message && <p role="status">{message}</p>}
+      {message && <p role="status">{label(message)}</p>}
     </div>
   );
 }

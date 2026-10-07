@@ -1,3 +1,4 @@
+import { t, label } from "../i18n";
 import { useEffect, useState } from "react";
 import { rpc, supabase } from "../data";
 import { isIosSafariOutsideHomeScreen } from "../install";
@@ -123,10 +124,9 @@ export default function NotificationSettings() {
 
   return (
     <section className="notify">
-      <h2>Notifications</h2>
-      <p>Get a gentle reminder and updates about payments and cycle dates.</p>
+      <h2>{t("Notifications")}</h2>
       <label>
-        Reminder time (Manila)
+        {t("Reminder time (Manila)")}
         <input
           type="time"
           value={prefs.reminder_time}
@@ -141,32 +141,37 @@ export default function NotificationSettings() {
         onClick={() =>
           void savePrefs(prefs)
             .then(() => setMessage("Reminder time saved."))
-            .catch((error) => setMessage(String(error)))
+            .catch((error) =>
+              setMessage(
+                error instanceof Error ? error.message : String(error),
+              ),
+            )
         }
       >
-        Save reminder time
+        {t("Save reminder time")}
       </button>
       {iosHelp ? (
         <p role="note">
-          Add Hulog to your Home Screen first: tap Share, then “Add to Home
-          Screen.” Open Hulog from that icon to enable notifications.
+          {t(
+            "Add Hulog to your Home Screen first: tap Share, then “Add to Home Screen.” Open Hulog from that icon to enable notifications.",
+          )}
         </p>
       ) : !supported ? (
-        <p>Your browser does not support web push notifications.</p>
+        <p>{t("Your browser does not support web push notifications.")}</p>
       ) : subscribed && prefs.enabled ? (
         <button
           className="secondary"
           disabled={busy}
           onClick={() => void disable()}
         >
-          Disable notifications
+          {t("Disable notifications")}
         </button>
       ) : (
         <button disabled={busy} onClick={() => void enable()}>
-          Enable notifications
+          {t("Enable notifications")}
         </button>
       )}
-      {message && <p role="status">{message}</p>}
+      {message && <p role="status">{label(message)}</p>}
     </section>
   );
 }

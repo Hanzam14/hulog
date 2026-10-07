@@ -1,3 +1,4 @@
+import { t, label } from "../i18n";
 import { useState } from "react";
 import { IconX } from "@tabler/icons-react";
 import { rpc } from "../data";
@@ -39,11 +40,11 @@ export default function ProfileEditor({
   return (
     <section className="profile-editor" aria-labelledby="profile-title">
       <div className="row">
-        <h2 id="profile-title">Ikaw</h2>
+        <h2 id="profile-title">{t("Ikaw")}</h2>
         <button
           type="button"
           className="round secondary"
-          aria-label="Isara ang profile"
+          aria-label={t("Isara ang profile")}
           onClick={close}
           disabled={busy}
         >
@@ -68,7 +69,7 @@ export default function ProfileEditor({
         }}
       >
         <label>
-          Nickname
+          {t("Nickname")}
           <input
             value={nickname}
             placeholder={own.display_name}
@@ -77,8 +78,8 @@ export default function ProfileEditor({
           />
         </label>
         <fieldset>
-          <legend>Avatar</legend>
-          <div className="segmented" role="group" aria-label="Avatar kind">
+          <legend>{t("Avatar")}</legend>
+          <div className="segmented" role="group" aria-label={t("Avatar kind")}>
             {(
               [
                 "initial",
@@ -93,16 +94,20 @@ export default function ProfileEditor({
                 onClick={() => setKind(value)}
               >
                 {value === "initial"
-                  ? "Initial"
+                  ? t("Initial")
                   : value === "emoji"
-                    ? "Emoji"
-                    : "Photo"}
+                    ? t("Emoji")
+                    : t("Photo")}
               </button>
             ))}
           </div>
         </fieldset>
         {kind === "emoji" && (
-          <div className="emoji-grid" role="group" aria-label="Pumili ng emoji">
+          <div
+            className="emoji-grid"
+            role="group"
+            aria-label={t("Pumili ng emoji")}
+          >
             {emojis.map((value) => (
               <button
                 type="button"
@@ -117,37 +122,50 @@ export default function ProfileEditor({
           </div>
         )}
         <fieldset>
-          <legend>Kulay</legend>
-          <div className="color-grid" role="group" aria-label="Profile color">
+          <legend>{t("Kulay")}</legend>
+          <div
+            className="color-grid"
+            role="group"
+            aria-label={t("Profile color")}
+          >
             {(["auto", ...palette] as const).map((value) => (
               <button
                 type="button"
                 className={`color-choice ${value}`}
                 key={value}
                 aria-pressed={color === value}
-                aria-label={`${value}${taken === value ? " — kulay ng partner" : ""}`}
+                aria-label={
+                  taken === value
+                    ? t("{color} — kulay ng partner", { color: label(value) })
+                    : label(value)
+                }
                 onClick={() => setColor(value)}
               >
                 <span className="swatch" aria-hidden="true">
                   {taken === value ? "•" : ""}
                 </span>
                 {value === "auto"
-                  ? "Auto"
-                  : value.charAt(0).toUpperCase() + value.slice(1)}
+                  ? t("Auto")
+                  : label(value).charAt(0).toUpperCase() +
+                    label(value).slice(1)}
               </button>
             ))}
           </div>
           {taken && (
-            <p className="muted">• Kulay ng partner — puwede pa ring piliin.</p>
+            <p className="muted">
+              {t("• Kulay ng partner — puwede pa ring piliin.")}
+            </p>
           )}
           {color !== "auto" && tone(preview, user) !== color && (
             <p className="muted">
-              Pareho kayo ng kulay. {tone(preview, user)} ang sticker mo para
-              madaling makilala.
+              {t(
+                "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.",
+                { color: label(tone(preview, user)) },
+              )}
             </p>
           )}
         </fieldset>
-        <button disabled={busy}>Save</button>
+        <button disabled={busy}>{t("Save")}</button>
       </form>
     </section>
   );

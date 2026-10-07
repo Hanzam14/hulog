@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useState } from "react";
 import {
   IconCheck,
@@ -19,6 +20,7 @@ import ProfileEditor from "../components/ProfileEditor";
 import ThemeSettings from "../components/ThemeSettings";
 import InstallSettings from "../components/InstallSettings";
 import AppUpdates from "../components/AppUpdates";
+import LanguageSettings from "../components/LanguageSettings";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
@@ -52,11 +54,11 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
   const share = () =>
     run(async () => {
       if (navigator.share)
-        await navigator.share({ title: "Join our hulog", url: invite });
+        await navigator.share({ title: t("Join our hulog"), url: invite });
       else await navigator.clipboard.writeText(invite);
     });
   return (
-    <>
+    <div className="settings-grid">
       <h1 className="sr-only">{group.name}</h1>
       <div className="duo">
         {active.map((m) => (
@@ -65,7 +67,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
               <button
                 type="button"
                 className="avatar-edit"
-                aria-label="I-edit ang profile mo"
+                aria-label={t("I-edit ang profile mo")}
                 aria-expanded={editingProfile}
                 disabled={busy}
                 onClick={() => setEditingProfile(!editingProfile)}
@@ -104,12 +106,12 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
           }}
         >
           <label>
-            Pangalan ng grupo
+            {t("Pangalan ng grupo")}
             <input name="group-name" defaultValue={group.name} required />
           </label>
           <button
             className="round"
-            aria-label="Save group name"
+            aria-label={t("Save group name")}
             disabled={busy}
           >
             <IconCheck />
@@ -134,18 +136,18 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
           <IconMapPin aria-hidden="true" />
           <input
             name="pot"
-            aria-label="Pot held at"
-            placeholder="where's the pot?"
+            aria-label={t("Pot held at")}
+            placeholder={t("where's the pot?")}
             defaultValue={group.pot_location}
           />
-          <button className="round" aria-label="Save" disabled={busy}>
+          <button className="round" aria-label={t("Save")} disabled={busy}>
             <IconCheck />
           </button>
         </form>
       ) : (
         group.pot_location && (
           <p className="place">
-            <IconMapPin size={16} aria-label="Pot held at" />{" "}
+            <IconMapPin size={16} aria-label={t("Pot held at")} />{" "}
             {group.pot_location}
           </p>
         )
@@ -163,7 +165,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
               </div>
               <button
                 className="round no"
-                aria-label={`Deny ${name(data, m.user_id)}`}
+                aria-label={t("Deny {name}", { name: name(data, m.user_id) })}
                 disabled={busy}
                 onClick={() =>
                   run(() =>
@@ -178,7 +180,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
               </button>
               <button
                 className="round ok"
-                aria-label={`Let ${name(data, m.user_id)} in`}
+                aria-label={t("Let {name} in", { name: name(data, m.user_id) })}
                 disabled={busy}
                 onClick={() =>
                   run(() =>
@@ -201,7 +203,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                     <img
                       className="qr"
                       src={qr}
-                      alt="Scan to join this Hulog group"
+                      alt={t("Scan to join this Hulog group")}
                       width="220"
                       height="220"
                     />
@@ -209,7 +211,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                   <div className="answer">
                     <button
                       className="round"
-                      aria-label="Share invite link"
+                      aria-label={t("Share invite link")}
                       disabled={busy}
                       onClick={share}
                     >
@@ -217,7 +219,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                     </button>
                     <button
                       className="round secondary"
-                      aria-label="Copy invite link"
+                      aria-label={t("Copy invite link")}
                       disabled={busy}
                       onClick={() =>
                         run(async () => navigator.clipboard.writeText(invite))
@@ -226,7 +228,9 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                       <IconCopy />
                     </button>
                   </div>
-                  <span className="muted center">one use · 24 hours</span>
+                  <span className="muted center">
+                    {t("one use · 24 hours")}
+                  </span>
                 </>
               ) : (
                 <button
@@ -247,7 +251,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                     })
                   }
                 >
-                  <IconQrcode aria-hidden="true" /> invite
+                  <IconQrcode aria-hidden="true" /> {t("invite")}
                 </button>
               )}
               {data.invites
@@ -265,7 +269,8 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                       })
                     }
                   >
-                    <IconTrash size={14} aria-hidden="true" /> revoke link
+                    <IconTrash size={14} aria-hidden="true" />{" "}
+                    {t("revoke link")}
                   </button>
                 ))}
             </div>
@@ -273,6 +278,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
         </>
       )}
       <ThemeSettings />
+      <LanguageSettings />
       <InstallSettings />
       <AppUpdates />
       <NotificationSettings />
@@ -281,8 +287,8 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
         disabled={busy}
         onClick={() => run(exportCsv)}
       >
-        <IconDownload size={18} aria-hidden="true" /> CSV
+        <IconDownload size={18} aria-hidden="true" /> {t("CSV")}
       </button>
-    </>
+    </div>
   );
 }

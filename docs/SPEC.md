@@ -16,7 +16,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 ## 2. Roles
 
 - **Group**: exactly one per pair; exactly 2 active members max; one group per user. Tables use a generic `memberships` table (so a fork could extend it), but all v1 rules are written for 2 people.
-- **Owner/holder**: the member who created the group. Holds the pot (informational editable text "Pot held at", e.g. MariBank). Approves join requests and confirms the other member's payments.
+- **Owner/holder**: the member who created the group. Holds the pot (informational editable text "Pot held at", e.g. MariBank). Approves join requests. Both active members confirm each other’s payments; nobody confirms their own.
 - **Member**: the other person.
 - **Receiver**: chosen per cycle.
 
@@ -62,10 +62,11 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 2. **Invite**: owner creates invite → app shows `https://<host>/join/<token>` and a QR code. Owner can revoke. Expires after 24h. Creating a new invite revokes older unused ones.
 3. **Join**: open link → Google sign-in → `claim_invite(token)` does, in one statement/transaction, `update invites set used_by, used_at where token_hash = sha256(token) and used_at is null and revoked_at is null and expires_at > now()`; 0 rows → "Invite invalid or used". Success creates a `pending` membership. Owner sees "Join request from <name> (<email>)" → **Accept** (`active`) or **Deny** (`denied`). Accept locks the group row and fails if there are already 2 active members. Pending/denied users see a waiting/denied screen only.
 4. **Propose cycle**: any active member, when the group has no live cycle. Fields: daily amount (₱), number of days, start date (≥ today, default tomorrow), receiver (default = the member who did not receive the most recent accepted cycle; owner for the first). Proposer can cancel; the other member can **Accept** or **Decline**. Accept allowed only while today ≤ start_date (otherwise decline and re-propose).
-5. **Pay ("Hulog")**: an active member records a payment for themselves of `days` whole days. Allowed only for an `accepted` cycle while today ≤ end_date (paying ahead before start is allowed). Cap: under a lock on the cycle row, (sum of days of the member's non-deleted payments, pending or confirmed) + new days ≤ num_days. Owner's own payments are `confirmed` immediately; the member's are `pending`.
-6. **Confirm**: owner confirms the member's pending payments while today ≤ end_date + 1. After that, pending payments stay pending and don't count ("Unconfirmed — not counted"). Exception: a payment with `was_confirmed = true` (was confirmed, then edited back to pending) can be re-confirmed by the owner at any time. Confirming sets `was_confirmed = true`.
-7. **Edit/delete payments (mistakes)**: any active member can change `days` or soft-delete any payment in the group, any time. Days cap (rule 5) still applies. Editing a confirmed payment of the non-owner member sets it to `pending` (keeps `was_confirmed`). Owner payments stay confirmed. Every change writes `history`.
+5. **Pay ("Hulog")**: an active member records a payment for themselves of `days` whole days. Allowed only for an `accepted` cycle while today ≤ end_date (paying ahead before start is allowed). Cap: under a lock on the cycle row, (sum of days of the member's non-deleted payments, pending or confirmed) + new days ≤ num_days. Every payment starts `pending`, including the owner’s own payments.
+6. **Confirm**: the other active member (not the payer) confirms pending payments while today ≤ end_date + 1. After that, pending payments stay pending and don't count ("Unconfirmed — not counted"). Exception: a payment with `was_confirmed = true` (was confirmed, then edited back to pending) can be re-confirmed by the other active member at any time. Confirming sets `was_confirmed = true`.
+7. **Edit/delete payments (mistakes)**: any active member can change `days` or soft-delete any payment in the group, any time. Days cap (rule 5) still applies. Changing days on any confirmed payment sets it to `pending` (keeps `was_confirmed`) and clears `confirmed_by` / `confirmed_at`, for both members. Saving unchanged days is a no-op. Every change writes `history`.
 8. **Payout**: receiver = owner → received when the cycle closes. Otherwise the receiver taps **Got it** (sets `received_at`) once the cycle is closed. After that RPC succeeds, celebrate with a brief canvas confetti burst in both members' resolved colors, gold, and contrasting ink. The other member celebrates on first seeing the received cycle; device-local `hulog-confetti-seen` ids prevent repeats (storage failure is tolerated). Reduced motion shows a static “Natanggap na! 🎉” sticker. The received card says “Congrats, {name}! Nasa'yo na ang hulog.”
+   **Receiver hand-off**: `give_payout(p_cycle_id)` is callable only by the current receiver who is an active member, for an accepted cycle with `received_at` null and today ≤ end_date (including upcoming cycles). Under the cycle lock it sets `receiver_id` to the other active member and writes history. The next proposal still defaults to the member other than the most recent accepted receiver, including any hand-off. Hulog only changes the record; it does not transfer money.
 9. **Repay debt**: debtor or creditor records a repayment against a closed cycle. Cap: new amount ≤ expected − confirmed paid − (pending + confirmed non-deleted repayments) for that cycle/debtor. Creditor confirms (any time). Repayments are outside any pot. Edit/delete like rule 7: changing amount resets a confirmed repayment to pending; creditor reconfirms; same cap applies to edits. Repayment create/edit takes the same cycle-row lock as rule 5.
 10. **Caps on edits** (rules 5, 7, 9): when editing, exclude the edited row's current value from the sum before adding the new value.
 11. **Export CSV**: client-side download of cycles, payments, repayments for the group.
@@ -79,9 +80,9 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 - Sign in (Google).
 - No group: "Create group" or "I have an invite link".
 - Join: claim → waiting / denied screen.
-- Home (live/most recent cycle): terms, receiver, phase + days left, pot ₱ / target ₱, per-member progress (days paid / num_days, pending count), big **Hulog** button (days picker), owner's "To confirm" list, unread Changes badge, payout card when closed.
+- Home (live/most recent cycle): terms, receiver, phase + days left, hero pot card without rotation: pig + large amount, muted target, clamped accessible pink progress bar, avatar + first name with “goes to”, and phase/days left plus daily amount × days/date range wrapping at 360px, per-member progress (days paid / num_days, pending count), big **Hulog** button (days picker), the other member’s "To confirm" list (confirm and decline X), unread Changes badge, payout card when closed.
 - Propose cycle form; pending proposal card with Accept / Decline / Cancel.
-- Cycle detail: payments list with edit/delete and status chips.
+- Cycle detail: payments list with edit/delete and status chips; mutual confirmation and decline actions; current receiver’s quiet “Give to {name}” button with confirmation while the hand-off window is open.
 - History: past cycles with receiver, pot, payout state, debts ("Owes ₱X") + Record repayment.
 - Group settings: members (tap your own avatar to open **Ikaw**), owner group-name and pot-location forms, invite (link + QR + revoke), join requests (Accept/Deny), **Itsura** (Auto / Light / Dark), install hint, Export CSV, sign out. Ikaw has a live preview, nickname (Google-name placeholder), Initial / Emoji / Photo choices (Photo hidden without Google avatar), 4×4 emoji grid, Auto + five color swatches, partner-color marker (still selectable), and Save through `update_profile`. Controls fit 360px and use large tap targets.
 - v1.1 Settings: enable notifications, reminder time.
@@ -91,7 +92,7 @@ The app **records** money; it never moves money. Keep it simple: this is a coupl
 - Web Push with VAPID; service worker via `vite-plugin-pwa` (injectManifest). Permission requested only from a button tap. One subscription per device.
 - Edge Function `notify`, invoked by `pg_cron` every 15 minutes, deduped via `notification_log`:
   - Reminder at the user's `reminder_time` (Manila) if the cycle is `open` and the user's paid days (pending + confirmed) < days elapsed including today.
-  - "Confirm payment?" to the owner for pending member payments created since the last run.
+  - "Confirm payment?" to the other active member for pending payments created since the last run.
   - "Cycle ends tomorrow" at 09:00 on end_date − 1.
   - "Payout day" at 09:00 on end_date + 1, to both.
 - iOS: show an "Add to Home Screen first" helper on iOS Safari when not in standalone mode.
@@ -103,7 +104,7 @@ Owner **A**, member **B**.
 
 **Cycle 1**: ₱50/day, 15 days, start 2026-11-01, end 2026-11-15, receiver B.
 
-- A pays 15 days on 11-01 → confirmed (₱750).
+- A pays 15 days on 11-01 → pending; A cannot confirm their own payment. B confirms → confirmed (₱750).
 - B pays 1 day on each of 11-01..11-13 (13 payments), A confirms each → B confirmed ₱650.
 - 11-15 22:00: B pays 1 day (P14) → pending. 11-15 23:00: B pays 1 day (P15) → pending.
 - 11-16 (settling): A confirms P14 → allowed. B confirmed = ₱700. B tries to pay → rejected (after end_date).
@@ -113,11 +114,15 @@ Owner **A**, member **B**.
 
 **Cycle 2**: B proposes on 11-16 (allowed: cycle 1 no longer live). ₱100/day, 10 days, start 11-20, end 11-29. Default receiver = A. A accepts on 11-17.
 
-- A pays 10 days → ₱1,000 confirmed. B pays 4 days, then 3 days; A confirms both → B ₱700.
+- A pays 10 days → pending; B confirms → ₱1,000 confirmed. B pays 4 days, then 3 days; A confirms both → B ₱700.
 - 11-30: closed. Pot ₱1,700. Receiver A = owner → auto Received.
 - Debt: B owes A 1,000 − 700 = ₱300 for Cycle 2.
 - B records a ₱300 repayment; tries a second ₱1 repayment → rejected (cap). A confirms → debt ₱0. Cycle 3's pot is unaffected.
 - **Correction after close (12-02)**: the 3-day entry was really 2. A edits it to 2 → it returns to pending (`was_confirmed`). B confirmed = ₱400 → debt = max(0, 1,000 − 400 − 300) = ₱300. History row written; B sees an unread badge. A re-confirms (allowed, `was_confirmed`) → B confirmed ₱600 → debt = ₱100.
+
+**Hand-off example**: in a live accepted cycle with receiver A, B cannot take the payout. A chooses “Give to B” and confirms → receiver B, history records A and the receiver change. After the cycle closes the next proposal defaults to A. A received cycle, a proposed cycle, or any cycle past end_date cannot be handed off.
+
+**Migration transition (2026-10-07)**: existing confirmed, non-deleted owner payments in accepted cycles with today ≤ end_date + 1 reset to pending, keep `was_confirmed = true`, and clear confirmation metadata. The payment audit trigger writes before/after history with null actor (system entry supported by the schema). Older cycles, partner payments, deleted payments, and unaccepted cycles stay unchanged.
 
 Also test: invite reuse fails; expired and revoked invites fail; concurrent claims → exactly one succeeds; third member can't be accepted; denied/pending user can't read group data; non-member can't call RPCs on another group's ids; second live cycle can't be proposed; days over num_days rejected (including via edit); accept after start_date rejected; editing an originally-pending payment after the settling day does not make it confirmable.
 
