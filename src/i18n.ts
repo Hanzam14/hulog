@@ -267,7 +267,7 @@ const en = {
   Vinice: "Vinice",
   groups: "groups",
   cycles: "rounds",
-  payments: "contributions",
+  payments: "payments",
   repayments: "repayments",
   memberships: "memberships",
   invites: "invites",
@@ -280,7 +280,7 @@ const en = {
   "Connect your Supabase project": "Connect your Supabase project",
   "Copy .env.example to .env and follow SETUP.md, then restart the app.":
     "Copy .env.example to .env and follow SETUP.md, then restart the app.",
-  hulog: "contribute",
+  hulog: "Pay",
   "Sign out": "Sign out",
   Dismiss: "Dismiss",
   "Loading…": "Loading…",
@@ -310,7 +310,7 @@ const en = {
   "Records only. No money moves through Hulog.":
     "Records only. No money moves through Hulog.",
   "Updates ay para sa installed o built app lang.":
-    "Updates are available in the installed or built app.",
+    "Updates only work in the installed app.",
   "Updated ka na ✓": "You're up to date ✓",
   "Hindi ma-check ang update. Subukan ulit kapag online.":
     "Could not check for updates. Try again when online.",
@@ -330,13 +330,13 @@ const en = {
   Days: "Days",
   Amount: "Amount",
   "Daily amount": "Daily amount",
-  "Cycle length": "Cycle length",
+  "Cycle length": "Round length",
   Starts: "Starts",
   Ends: "Ends",
   Receiver: "Receiver",
   Deleted: "Deleted",
   Received: "Received",
-  "Waiting for Got it": "Waiting for acknowledgement",
+  "Waiting for Got it": "Waiting for receipt confirmation",
   pending: "pending",
   confirmed: "confirmed",
   proposed: "proposed",
@@ -350,8 +350,8 @@ const en = {
   New: "New",
   Manila: "Manila",
   "What changed": "What changed",
-  "Cycle unavailable.": "Cycle unavailable.",
-  "Cycle detail": "Cycle detail",
+  "Cycle unavailable.": "Round unavailable.",
+  "Cycle detail": "Round details",
   Payments: "Payments",
   days: "days",
   "Unconfirmed — not counted": "Unconfirmed — not counted",
@@ -370,7 +370,7 @@ const en = {
   "Edit amount": "Edit amount",
   "Delete this repayment record?": "Delete this repayment record?",
   "Correct amount (₱)": "Correct amount (₱)",
-  "Past cycles will appear here.": "Past cycles will appear here.",
+  "Past cycles will appear here.": "Past rounds will appear here.",
   "Invite your partner from the group tab, then start a round.":
     "Invite your partner from the group tab, then start a round.",
   "new round": "new round",
@@ -399,7 +399,7 @@ const en = {
   "No open round.": "No open round.",
   "One day less": "One day less",
   "One day more": "One day more",
-  "hulog!": "contribute!",
+  "hulog!": "Pay!",
   "Join our hulog": "Join our shared pot",
   "I-edit ang profile mo": "Edit your profile",
   "Pangalan ng grupo": "Group name",
@@ -480,7 +480,7 @@ const en = {
   Tagalog: "Tagalog",
   Taglish: "Taglish",
   "Decline {name}'s {amount} hulog? It will be removed.":
-    "Decline {name}'s {amount} contribution? It will be removed.",
+    "Decline {name}'s {amount} payment? It will be removed.",
   "Decline {name}'s {amount}": "Decline {name}'s {amount}",
   "Confirm {name}'s {amount}": "Confirm {name}'s {amount}",
   "{days} days": "{days} days",
@@ -506,15 +506,15 @@ const en = {
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
-  "Pot progress": "Pag-usad ng ipon",
+  "Pot progress": "Laman ng ipon",
   "Give to {name}": "Ibigay kay {name}",
   "Give this round’s payout to {name}?":
-    "Ibigay kay {name} ang matatanggap na ipon sa round na ito?",
+    "Ibigay kay {name} ang ipon ngayong round?",
   "Other member must confirm": "Ang kabilang miyembro ang dapat magkumpirma",
   "Current receiver only":
-    "Ang kasalukuyang tatanggap lamang ang maaaring gumawa nito",
+    "Kasalukuyang tatanggap lang ang puwedeng gumawa nito",
   "Payout hand-off window closed":
-    "Lumipas na ang panahon para ibigay ang ipon",
+    "Tapos na ang round. Hindi na maibibigay ang ipon.",
   "Other active member required": "Kailangan ng isa pang aktibong miyembro",
   Angelo: "Angelo",
   Vinice: "Vinice",
@@ -540,7 +540,7 @@ const tl = {
   "Paluwagan para sa": "Paluwagan para sa",
   "ating dalawa": "ating dalawa",
   "One sticker for every day you hulog. Fill your row, take turns getting the pot. You hold the money; Hulog keeps the record.":
-    "May sticker sa bawat araw na naghuhulog ka. Punuin ang hanay mo at magpalitan sa pagtanggap ng ipon. Hawak ninyo ang pera; tala lang ang Hulog.",
+    "May sticker sa bawat araw na naghuhulog ka. Punuin ang linya mo at magpalitan sa pagtanggap ng ipon. Hawak ninyo ang pera; record lang ang Hulog.",
   "Example: ₱50 a day for 15 days.":
     "Halimbawa: ₱50 bawat araw sa loob ng 15 araw.",
   "Continue with Google": "Magpatuloy gamit ang Google",
@@ -549,11 +549,11 @@ const tl = {
   "Loading your group…": "Naglo-load ang grupo mo…",
   "Try again": "Subukan ulit",
   "Konting hintay.": "Konting hintay.",
-  "Request denied": "Hindi tinanggap ang kahilingan",
+  "Request denied": "Hindi tinanggap ang request",
   "Your holder will review your join request. This screen refreshes automatically.":
-    "Titingnan ng may hawak ng ipon ang kahilingan mo. Kusang mag-a-update ang pahinang ito.",
+    "Titingnan ng may hawak ng ipon ang request mo. Kusang mag-a-update ang pahinang ito.",
   "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.":
-    "Tanungin ang may-ari ng grupo tungkol sa kahilingan mo. Kailangang alisin muna ang membership mo bago ka sumali sa iba.",
+    "Tanungin ang may-ari ng grupo tungkol sa request mo. Alisin muna ang pagiging miyembro mo bago ka sumali sa iba.",
   "Refresh status": "Tingnan ulit ang status",
   Home: "Home",
   History: "Mga nakaraang hulog",
@@ -562,10 +562,10 @@ const tl = {
   "You already have a group.": "May grupo ka na.",
   "Go home": "Bumalik sa Home",
   "Records only. No money moves through Hulog.":
-    "Tala lang ito. Walang perang dumadaan sa Hulog.",
+    "Record lang ito. Walang perang dumadaan sa Hulog.",
   "Updates ay para sa installed o built app lang.":
-    "Para lang sa naka-install o na-build na app ang mga update.",
-  "Updated ka na ✓": "Updated ka na ✓",
+    "Para lang gumana ang mga update sa naka-install na app.",
+  "Updated ka na ✓": "Pinakabago na ✓",
   "Hindi ma-check ang update. Subukan ulit kapag online.":
     "Hindi matingnan ang update. Subukan ulit kapag online.",
   "Hindi ma-update. Subukan ulit.": "Hindi ma-update. Subukan ulit.",
@@ -575,9 +575,9 @@ const tl = {
   "Upcoming · paying ahead is okay":
     "Hindi pa nagsisimula · puwedeng maghulog nang maaga",
   "Settling · last day to confirm":
-    "Tinatapos na · huling araw para magkumpirma",
+    "Huling araw na para magkumpirma",
   Ended: "Tapos na",
-  "Waiting for agreement": "Hinihintay ang pagsang-ayon",
+  "Waiting for agreement": "Hinihintay ang oo ng partner",
   Declined: "Hindi tinanggap",
   Cancelled: "Kinansela",
   "Group name": "Pangalan ng grupo",
@@ -592,9 +592,9 @@ const tl = {
   Receiver: "Tatanggap",
   Deleted: "Inalis",
   Received: "Natanggap na",
-  "Waiting for Got it": "Hinihintay ang kumpirmasyon ng pagtanggap",
+  "Waiting for Got it": "Hinihintay makumpirma ang pagtanggap",
   pending: "hinihintay",
-  confirmed: "kumpirmado",
+  confirmed: "nakumpirma",
   proposed: "iminungkahi",
   accepted: "tinanggap",
   declined: "hindi tinanggap",
@@ -613,7 +613,7 @@ const tl = {
   "Unconfirmed — not counted": "Hindi kumpirmado — hindi kasama sa bilang",
   "Edit days": "Baguhin ang mga araw",
   "Delete this payment record? The change stays in history.":
-    "Alisin ang talang ito ng hulog? Mananatili sa history ang pagbabago.",
+    "Alisin ang hulog na ito? Mananatili sa history ang pagbabago.",
   Delete: "Alisin",
   Confirm: "Kumpirmahin",
   "Correct number of days": "Tamang bilang ng araw",
@@ -624,13 +624,13 @@ const tl = {
   "Record repayment": "Itala ang bayad sa utang",
   "Confirm repayment": "Kumpirmahin ang bayad sa utang",
   "Edit amount": "Baguhin ang halaga",
-  "Delete this repayment record?": "Alisin ang talang ito ng bayad sa utang?",
+  "Delete this repayment record?": "Alisin ang bayad na ito sa utang?",
   "Correct amount (₱)": "Tamang halaga (₱)",
   "Past cycles will appear here.": "Dito makikita ang mga nakaraang round.",
   "Invite your partner from the group tab, then start a round.":
     "Imbitahan ang partner mo mula sa Grupo, saka magsimula ng round.",
   "new round": "bagong round",
-  "Waiting for your check": "Hinihintay ang kumpirmasyon mo",
+  "Waiting for your check": "Hinihintay ang sagot mo",
   round: "round",
   "not counted": "hindi kasama sa bilang",
   "You’re invited.": "May imbitasyon ka.",
@@ -646,7 +646,7 @@ const tl = {
   Back: "Bumalik",
   "New round": "Bagong round",
   "₱ a day": "₱ bawat araw",
-  "Other daily amount in pesos": "Ibang halaga ng hulog bawat araw sa piso",
+  "Other daily amount in pesos": "Halaga bawat araw (₱)",
   "Other number of days": "Ibang bilang ng araw",
   "pot goes to": "mapupunta ang ipon kay",
   starts: "simula",
@@ -722,7 +722,7 @@ const tl = {
   purple: "lila",
   "• Kulay ng partner — puwede pa ring piliin.":
     "• Kulay ng partner — puwede pa ring piliin.",
-  "waiting…": "naghihintay…",
+  "waiting…": "hinihintay…",
   "Cancel proposal": "Bawiin ang mungkahi",
   Decline: "Tanggihan",
   Accept: "Tanggapin",
@@ -742,13 +742,13 @@ const tl = {
   "Deny {name}": "Tanggihan si {name}",
   "Let {name} in": "Tanggapin si {name}",
   "{label}: {paid} of {total} days paid, {pending} pending":
-    "{label}: {paid} sa {total} araw ang nahulugan, {pending} ang hinihintay",
+    "{label}: {paid} sa {total} araw ang bayad na, {pending} ang hinihintay",
   "Congrats, {name}! Nasa'yo na ang hulog.":
     "Congrats, {name}! Nasa iyo na ang ipon.",
   "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.":
     "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.",
   "{color} — kulay ng partner": "{color} — kulay ng partner",
-  "Open · {days} {unit} left": "Bukas · {days} {unit} pa",
+  "Open · {days} {unit} left": "Bukas · {days} {unit} na lang",
   day: "araw",
   insert: "idinagdag",
   update: "binago",
@@ -757,7 +757,7 @@ const tl = {
   repayment: "bayad sa utang",
   cycle: "round",
   group: "grupo",
-  membership: "membership",
+  membership: "pagiging miyembro",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

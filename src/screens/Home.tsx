@@ -71,7 +71,8 @@ export default function Home(props: ViewProps) {
       {waiting.length > 0 && (
         <div className="confirm-list" aria-label={t("Waiting for your check")}>
           {waiting.map((p) => {
-            const cycle = data.cycles.find((cycle) => cycle.id === p.cycle_id)!;
+            const cycle = data.cycles.find((cycle) => cycle.id === p.cycle_id);
+            if (!cycle) return null;
             const allowed = cycle.phase !== "ended" || p.was_confirmed;
             return (
               <div className="sticker confirm" key={p.id}>

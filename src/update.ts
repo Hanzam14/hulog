@@ -36,6 +36,7 @@ let lastCheck = 0;
 let initialized = false;
 let reloading = false;
 let messageTimer: ReturnType<typeof setTimeout> | undefined;
+let applyReloadTimer: ReturnType<typeof setTimeout> | undefined;
 function clearMessage() {
   clearTimeout(messageTimer);
   messageTimer = undefined;
@@ -49,6 +50,8 @@ function showMessage(message: Key) {
 function reloadOnce() {
   if (reloading) return;
   reloading = true;
+  clearTimeout(applyReloadTimer);
+  applyReloadTimer = undefined;
   window.location.reload();
 }
 
@@ -66,7 +69,7 @@ export function initializeUpdates() {
       immediate: true,
       onNeedReload: reloadOnce,
       onNeedRefresh: () =>
-        set({ needRefresh: true, dismissed: false, message: "" }),
+        set({ needRefresh: true, dismissed: false }),
       onRegisteredSW: (_url, value) => {
         registration = value;
         resolve();
@@ -118,13 +121,13 @@ export async function checkForUpdate(automatic = false) {
     (automatic && Date.now() - lastCheck < 30 * 60 * 1000)
   )
     return;
-  clearMessage();
+  if (!automatic) clearMessage();
   if (import.meta.env.DEV || !("serviceWorker" in navigator)) {
     if (!automatic)
       showMessage("Updates ay para sa installed o built app lang.");
     return;
   }
-  set({ checking: true, message: "" });
+  set({ checking: true });
   lastCheck = Date.now();
   try {
     await registrationReady;
@@ -149,7 +152,16 @@ export async function applyUpdate() {
   set({ applying: true, message: "" });
   try {
     await updateSW(true);
+    if (!reloading)
+      applyReloadTimer = setTimeout(() => {
+        applyReloadTimer = undefined;
+        if (reloading) return;
+        set({ applying: false });
+        showMessage("Hindi ma-update. Subukan ulit.");
+      }, 15000);
   } catch {
+    clearTimeout(applyReloadTimer);
+    applyReloadTimer = undefined;
     set({ applying: false });
     showMessage("Hindi ma-update. Subukan ulit.");
   }

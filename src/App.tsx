@@ -107,14 +107,15 @@ export default function App() {
       window.removeEventListener("focus", reload);
     };
   }, [session]);
-  const run: Run = async (action) => {
+  const run: Run = async (action, options) => {
     setBusy(true);
     setError("");
     setSuccess(null);
     try {
       await action();
       if ((await supabase!.auth.getSession()).data.session) await refresh();
-      setSuccess({ message: "Saved. Salamat!" });
+      if (options?.showSuccess !== false)
+        setSuccess({ message: "Saved. Salamat!" });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -122,21 +123,27 @@ export default function App() {
     }
   };
   const signIn = () =>
-    run(async () => {
-      const { error: authError } = await supabase!.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}${location.pathname}`,
-        },
-      });
-      if (authError) throw authError;
-    });
+    run(
+      async () => {
+        const { error: authError } = await supabase!.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${window.location.origin}${location.pathname}`,
+          },
+        });
+        if (authError) throw authError;
+      },
+      { showSuccess: false },
+    );
   const signOut = () =>
-    run(async () => {
-      const { error: authError } = await supabase!.auth.signOut();
-      if (authError) throw authError;
-      setData(null);
-    });
+    run(
+      async () => {
+        const { error: authError } = await supabase!.auth.signOut();
+        if (authError) throw authError;
+        setData(null);
+      },
+      { showSuccess: false },
+    );
   if (!supabase)
     return (
       <main className="welcome">

@@ -187,7 +187,7 @@ describe("hero pot card", () => {
   it("translates progress and target labels in all three languages and shows first name", () => {
     for (const [lang, label] of [
       ["en", "Pot progress"],
-      ["tl", "Pag-usad ng ipon"],
+      ["tl", "Laman ng ipon"],
       ["taglish", "Progress ng ipon"],
     ] as const) {
       setLang(lang);

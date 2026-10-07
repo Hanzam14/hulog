@@ -58,42 +58,35 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `9`
-- Updated: `2026-10-07T03:54:07Z`
+- Revision: `11`
+- Updated: `2026-10-07T04:08:20Z`
 - Status: `HELD`
-- Persistence: `commit_pending`
-- Summary: Round 2 mutual confirmation, receiver hand-off and hero card implemented; all builder checks pass; Claude review pending.
-- Authority: Owner explicit 2026-10-07 round 2 brief and local branch commit authorization; no cloud writes, push, deployment or dependencies.
+- Persistence: `committed`
+- Summary: Sonnet review fixes are implemented and committed on fix/review-polish. Automated checks pass; independent Claude lead review remains pending.
+- Authority: Owner's explicit 2026-10-07 task authorizes local fixes and commit on fix/review-polish; no push, deployment, hosted writes, migrations, dependencies, or writes outside the worktree.
 
 ### Decisions
 
-- All payments start pending and only the other active member confirms; changed days reset both members' confirmed payments.
-- Current receiver may give accepted unreceived payout through end date; next proposal remains opposite the latest receiver.
-- Migration audit trigger writes nullable system actors; past-settling owner payments remain unchanged.
+- Automatic update checks and update notifications preserve manual messages.
+- Sign-in and sign-out do not show the data-action success notice.
 
 ### Blockers
 
-- Independent Claude review pending.
+- Independent Claude lead review remains pending before merge.
 
 ### Risks and unresolved items
 
-- Builder checks are not independent Claude review.
-- Browser checks use synthetic data; real OAuth and two-phone smoke remain owner-operated.
-- Migration intentionally lowers currently counted owner amounts until partner confirmation; older cycles remain untouched.
-- Claude independent review
-- Owner phone smoke
+- Default Vite bundle mode cannot write temp files through the node_modules junction; runner-mode checks passed.
+- Independent Claude lead review remains pending before merge.
 
 ### Evidence and checks
 
-- .scratch/round2/result.md
-- .scratch/round2/browser-results.json
-- supabase/tests/database/mutual_confirm.test.sql
+- src/update.test.ts
 - src/components/round2.test.ts
-- Baseline lint PASS, tests 56 PASS, build PASS; repaired stale local profile schema then pgTAP 145 PASS.
-- Discriminating regressions fail against original notification selector and payment RPCs.
-- Final lint PASS, tests 64 PASS, build PASS, full local pgTAP 178 PASS.
-- Synthetic browser four screenshots (360/1280, light/dark), mutual role controls and hand-off PASS; no overflow/errors.
-- Local Supabase STOPPED; git diff --check PASS.
+- Final npm.cmd run lint: PASS.
+- Final npm.cmd test -- --configLoader runner: PASS, 66 tests.
+- Final npm.cmd run build -- --configLoader runner: PASS.
+- Regression test failed when the old automatic message clear was temporarily restored; it passed after the fix.
 
 ### Governed artifact correlations
 
@@ -101,5 +94,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews feat/i18n-polish and .scratch/round2/result.md before merge.
+Claude lead reviews the committed branch diff and builder evidence; owner decides merge. No push or deployment authorized.
 <!-- CONTINUITY_CHECKPOINT_END -->
