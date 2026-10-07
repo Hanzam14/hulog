@@ -58,18 +58,18 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `8`
-- Updated: `2026-10-07T03:39:59Z`
+- Revision: `9`
+- Updated: `2026-10-07T03:54:07Z`
 - Status: `HELD`
 - Persistence: `commit_pending`
-- Summary: Language and UI polish implemented and builder-tested in feat/i18n-polish; independent Claude lead review pending.
-- Authority: Owner's explicit six-part implementation brief and branch commit authorization on 2026-10-07; no hosted writes, migrations, deployment, or dependency changes.
+- Summary: Round 2 mutual confirmation, receiver hand-off and hero card implemented; all builder checks pass; Claude review pending.
+- Authority: Owner explicit 2026-10-07 round 2 brief and local branch commit authorization; no cloud writes, push, deployment or dependencies.
 
 ### Decisions
 
-- Use device-local en/tl/taglish dictionaries without dependencies; preserve existing Taglish copy except listed removals.
-- Use the existing edit_payment soft-delete RPC for declining pending payments.
-- Keep Home in one widened column; Settings uses two columns at tablet and desktop widths.
+- All payments start pending and only the other active member confirms; changed days reset both members' confirmed payments.
+- Current receiver may give accepted unreceived payout through end date; next proposal remains opposite the latest receiver.
+- Migration audit trigger writes nullable system actors; past-settling owner payments remain unchanged.
 
 ### Blockers
 
@@ -77,24 +77,23 @@ or the current owner decision changes.
 
 ### Risks and unresolved items
 
-- Builder checks are not independent review.
-- Browser uses synthetic local data; real OAuth and phone smoke remain owner-operated.
-- Server push text and CSV headers remain unchanged; unfamiliar remote errors are shown as received.
-- Claude lead review
-- Owner phone smoke for these changes
+- Builder checks are not independent Claude review.
+- Browser checks use synthetic data; real OAuth and two-phone smoke remain owner-operated.
+- Migration intentionally lowers currently counted owner amounts until partner confirmation; older cycles remain untouched.
+- Claude independent review
+- Owner phone smoke
 
 ### Evidence and checks
 
-- src/i18n.test.ts
-- src/update.test.ts
-- src/components/PendingPaymentActions.test.ts
-- .scratch/i18n-polish/layout-results.json
-- .scratch/i18n-polish/result.md
-- Baseline npm.cmd run lint PASS; npm.cmd test PASS (48); npm.cmd run build PASS after Vite-cache sandbox escalation.
-- Update regression baseline: three failing assertions for automatic messages and uncleared manual results.
-- Final npm.cmd run lint PASS; npm.cmd test PASS (56); npm.cmd run build PASS.
-- Headless synthetic Settings/Home screenshots at 360,768,1280 PASS; language switching, success timer reset, persistent errors, expired pending decline RPC checks PASS.
-- Visible JSX/static accessibility-string scan PASS; git diff --check PASS.
+- .scratch/round2/result.md
+- .scratch/round2/browser-results.json
+- supabase/tests/database/mutual_confirm.test.sql
+- src/components/round2.test.ts
+- Baseline lint PASS, tests 56 PASS, build PASS; repaired stale local profile schema then pgTAP 145 PASS.
+- Discriminating regressions fail against original notification selector and payment RPCs.
+- Final lint PASS, tests 64 PASS, build PASS, full local pgTAP 178 PASS.
+- Synthetic browser four screenshots (360/1280, light/dark), mutual role controls and hand-off PASS; no overflow/errors.
+- Local Supabase STOPPED; git diff --check PASS.
 
 ### Governed artifact correlations
 
@@ -102,5 +101,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews the local branch and result report before any merge; no push or deployment.
+Claude lead reviews feat/i18n-polish and .scratch/round2/result.md before merge.
 <!-- CONTINUITY_CHECKPOINT_END -->

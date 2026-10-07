@@ -31,6 +31,28 @@ const base = (): SelectionInput => ({
 });
 
 describe("Manila notification selection", () => {
+  it("asks the other active member to confirm an owner's payment", () => {
+    const input = base();
+    input.payments = [
+      {
+        id: "owner-payment",
+        cycle_id: "c1",
+        member_id: "a",
+        status: "pending",
+        created_at: "2026-11-14T01:00:00.000Z",
+        deleted_at: null,
+      },
+    ];
+    expect(
+      selectNotifications(input)
+        .filter((n) => n.kind === "confirm_payment")
+        .map((n) => [n.userId, n.refId]),
+    ).toEqual([["b", "owner-payment"]]);
+    input.memberships[1].status = "removed";
+    expect(
+      selectNotifications(input).filter((n) => n.kind === "confirm_payment"),
+    ).toEqual([]);
+  });
   it("selects morning cycle-end and payout notices at 09:00 Manila", () => {
     const input = base();
     expect(selectNotifications(input).map((notice) => notice.kind)).toEqual([

@@ -9,6 +9,7 @@ import { money } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
+import GivePayout from "../components/GivePayout";
 
 export default function Detail({ data, user, run, busy }: ViewProps) {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
       <h1>{t("Cycle detail")}</h1>
       <section>
         <CycleCard c={c} data={data} />
+        <GivePayout c={c} data={data} user={user} run={run} busy={busy} />
         {c.status === "proposed" && (
           <Proposal c={c} user={user} run={run} busy={busy} />
         )}
@@ -80,17 +82,16 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                     >
                       {t("Delete")}
                     </button>
-                    {data.groups[0].owner_id === user &&
-                      p.status === "pending" && (
-                        <PendingPaymentActions
-                          id={p.id}
-                          memberName={name(data, p.member_id)}
-                          amount={p.amount_centavos}
-                          allowed={c.phase !== "ended" || p.was_confirmed}
-                          busy={busy}
-                          run={run}
-                        />
-                      )}
+                    {p.member_id !== user && p.status === "pending" && (
+                      <PendingPaymentActions
+                        id={p.id}
+                        memberName={name(data, p.member_id)}
+                        amount={p.amount_centavos}
+                        allowed={c.phase !== "ended" || p.was_confirmed}
+                        busy={busy}
+                        run={run}
+                      />
+                    )}
                   </div>
                   {editing === p.id && (
                     <form
