@@ -6,9 +6,12 @@
 
 ## Last verified
 
-- Date: 2026-10-06
-- Checks: `npm run lint` PASS; `npm test` PASS (17/17); `npm run build` PASS;
-  continuity verify and selective resume PASS.
+- Date: 2026-10-07
+- Checks: `npm run lint` PASS; `npm test` PASS (48/48); `npm run build` PASS;
+  local pgTAP suite PASS (145, builder-run); headless legacy-to-prompt service
+  worker transition PASS; Vercel production deploy of `3bde170` PASS.
+- Owner phone check 2026-10-07: installed app updated onto the new version and
+  the Settings update button shows.
 
 ## Active brief
 
@@ -16,34 +19,36 @@
 
 ## Current state
 
-v1 and v1.1 are built and pushed to the public GitHub repository. The hosted
-application has not completed owner-operated setup or device smoke testing.
-Hulog remains in onboarding hold until those checks pass.
+Hulog is live: hosted Supabase, Google OAuth and Vercel production are running
+with real data. `main` (`3bde170`) adds profile nickname/avatar/color, five
+member colors, light/dark/auto theme, group rename, install hint, alkansya
+icons, payout confetti, and a user-controlled update button. Hosted migration
+history was repaired (first two migrations marked applied; they had been run by
+hand) and `20261007000100_profile_personalization` was applied with `db push`.
 
 ## Current phase
 
-Owner-operated setup and release smoke test.
+Live use and polish.
 
 ## Assumptions and unknowns
 
-- No hosted Supabase project, Google OAuth configuration, or Vercel deployment
-  is recorded as complete here.
-- No two-phone smoke result is recorded here.
+- Full two-phone smoke test per `SETUP.md` is not recorded as complete; the
+  owner confirmed the app works and the update button shows on an installed app.
+- The SW fix `3bde170` has no independent second-model review yet.
 - The app records money and does not hold or transfer funds.
 
 ## Human decision needed
 
-- Status: owner action required
-- Decision: follow `SETUP.md` to create/configure Supabase, Google OAuth, and
-  Vercel, then complete the two-phone smoke test.
+- Status: none blocking.
+- Decision: whether to record a full two-phone smoke result and move the JVC
+  route from held to active.
 - Owner: Hulog owner
-- Needed before: changing the JVC route from held to active.
 
 ## Next action
 
-Owner follows `SETUP.md` to create/configure Supabase, Google OAuth, and Vercel,
-then completes the two-phone smoke test with two distinct Google accounts and
-records the results here.
+Owner runs the remaining `SETUP.md` two-phone smoke steps (two Google accounts,
+record/confirm a payment, payout + confetti) and reports results; then update
+this handoff and the JVC route status.
 
 ## Revalidate when
 
@@ -53,48 +58,38 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `6`
-- Updated: `2026-10-06T22:52:31Z`
-- Status: `HELD`
-- Persistence: `committed`
-- Summary: Round 2 implementation e823cf0 is committed on feat/personalize with builder checks and real update-flow evidence passing; independent Claude review is pending.
-- Authority: Owner round-2 implementation brief 2026-10-07: work only in this worktree, commit on feat/personalize with Claude co-author; one agent, no push/deploy/merge.
+- Revision: `7`
+- Updated: `2026-10-07`
+- Status: `ACTIVE`
+- Persistence: `commit_pending`
+- Summary: Personalization, confetti and update button are live on Hulog production; hosted migration applied; installed apps move to the prompt update flow automatically.
+- Authority: Owner in chat 2026-10-07: merge feat/personalize, apply hosted migration then push, fix installed-app update button; owner confirmed it works on device.
 
 ### Decisions
 
-- Implemented payout confetti and prompt update flow in the existing worktree without runtime dependencies.
-- Added controller-change reload handling after the real first-visit update test initially timed out.
-- Retained HELD status pending the required independent Claude review.
+- Merged feat/personalize into main (ee8ad66) after Claude review; confetti limited to payouts received within 7 days.
+- New service worker skips waiting once when replacing a legacy auto-update worker, then relies on the in-app update button.
 
 ### Blockers
 
-- Fresh independent Claude review remains required before completion.
+- None.
 
 ### Risks and unresolved items
 
-- Builder evidence has no fresh independent Claude PASS yet.
-- Browser tests use real built workers with synthetic local backend; no physical installed-phone, hosted OAuth or push delivery test.
-- Legacy auto-update clients need old tabs/apps closed before the first prompt-capable version takes control.
-- Storage blocked: no-repeat is limited to this page session. Seen ids are per device, as requested.
-- Screenshots/review claims/report are ignored local evidence; they are not in Git.
-- Independent Claude review.
-- Existing owner-operated hosted setup and two-phone smoke checks remain pending.
+- SW legacy-takeover fix has no independent second-model review.
+- Full two-account smoke not recorded.
+- Full two-phone smoke test record.
 
 ### Evidence and checks
 
-- docs/SPEC.md
+- HANDOFF.md
+- src/sw.ts
 - src/components/confetti.test.ts
-- src/update.test.ts
-- .shots/round2-browser-checks.json
-- .shots/round2-review-claims.md
-- .shots/round2-report.md
-- Baseline lint PASS; exact tests/build failed on junction config-cache EPERM; cache-free configLoader runner baseline PASS (40 tests/build).
-- New seen-id regression initially failed because module was absent; final three storage tests PASS.
-- Real first-visit A-to-B update reload initially timed out; final browser run PASS for waiting worker, unchanged version before apply, dismissal, Settings/banner apply and changed-version reload.
-- Final exact npm run lint PASS; npm test PASS (47); npm run build PASS. Interim build TS narrowing failure corrected.
-- Browser fixture receipt failure/success, other-member persisted seen id, DPR-aware canvas cleanup and reduced-motion status sticker PASS.
-- Six 360px light/dark screenshots captured and visually inspected; no horizontal overflow. Dev support explanation and 30-minute foreground throttle covered by unit tests.
-- git diff --check PASS; temporary package version restored, no dependencies/database changes, no hosted writes, push, merge or deploy.
+- npm run lint PASS; npm test PASS (48); npm run build PASS on main 3bde170.
+- Headless Playwright: legacy auto-update page moved to new worker and reloaded; fresh install loads; next deploy waits for button. First attempt deadlocked (navigate inside activate waitUntil) and was fixed before push.
+- Hosted: migration repair marked 20261006000100/000200 applied; db push applied 20261007000100; migration list local==remote.
+- Vercel production status success for ee8ad66 and 3bde170.
+- Owner device check: installed app updated and update button shows.
 
 ### Governed artifact correlations
 
@@ -102,5 +97,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews round 2 against f771f1a using .shots/round2-review-claims.md and the prior personalization claims against 34293a8, then records its verdict. No merge, push or deployment authorized.
+Owner completes remaining SETUP.md two-phone smoke steps and reports; then update HANDOFF and JVC route status.
 <!-- CONTINUITY_CHECKPOINT_END -->
