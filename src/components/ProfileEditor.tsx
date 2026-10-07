@@ -4,7 +4,7 @@ import { IconX } from "@tabler/icons-react";
 import { rpc } from "../data";
 import type { Profile } from "../data";
 import Avatar from "./Avatar";
-import { emojis, palette, tone } from "./shared";
+import { emojis, name, palette, tone } from "./shared";
 import type { ViewProps } from "./shared";
 
 export default function ProfileEditor({
@@ -141,8 +141,13 @@ export default function ProfileEditor({
                 }
                 onClick={() => setColor(value)}
               >
-                <span className="swatch" aria-hidden="true">
-                  {taken === value ? "•" : ""}
+                <span
+                  className={`swatch ${taken === value ? "taken" : ""}`}
+                  aria-hidden="true"
+                >
+                  {taken === value && partner
+                    ? name(data, partner.user_id).charAt(0).toUpperCase()
+                    : ""}
                 </span>
                 {value === "auto"
                   ? t("Auto")
@@ -151,11 +156,6 @@ export default function ProfileEditor({
               </button>
             ))}
           </div>
-          {taken && (
-            <p className="muted">
-              {t("• Kulay ng partner — puwede pa ring piliin.")}
-            </p>
-          )}
           {color !== "auto" && tone(preview, user) !== color && (
             <p className="muted">
               {t(

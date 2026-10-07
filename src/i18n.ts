@@ -214,8 +214,6 @@ const taglish = {
   green: "green",
   orange: "orange",
   purple: "purple",
-  "• Kulay ng partner — puwede pa ring piliin.":
-    "• Kulay ng partner — puwede pa ring piliin.",
   "waiting…": "waiting…",
   "Cancel proposal": "Cancel proposal",
   Decline: "Decline",
@@ -467,8 +465,6 @@ const en = {
   green: "green",
   orange: "orange",
   purple: "purple",
-  "• Kulay ng partner — puwede pa ring piliin.":
-    "• Partner's color — you can still choose it.",
   "waiting…": "waiting…",
   "Cancel proposal": "Cancel proposal",
   Decline: "Decline",
@@ -723,8 +719,6 @@ const tl = {
   green: "berde",
   orange: "kahel",
   purple: "lila",
-  "• Kulay ng partner — puwede pa ring piliin.":
-    "• Kulay ng partner — puwede pa ring piliin.",
   "waiting…": "hinihintay…",
   "Cancel proposal": "Bawiin ang mungkahi",
   Decline: "Tanggihan",
