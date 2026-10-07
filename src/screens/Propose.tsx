@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { FormEvent } from "react";
@@ -52,13 +53,13 @@ export default function Propose({ data, run, busy }: ViewProps) {
   };
   return (
     <form className="propose" onSubmit={submit}>
-      <Link to="/" className="back" aria-label="Back">
+      <Link to="/" className="back" aria-label={t("Back")}>
         <IconArrowLeft />
       </Link>
-      <h1 className="sr-only">New round</h1>
+      <h1 className="sr-only">{t("New round")}</h1>
       <fieldset>
         <legend>
-          <IconCoin aria-hidden="true" /> ₱ a day
+          <IconCoin aria-hidden="true" /> {t("₱ a day")}
         </legend>
         <div className="chips">
           {AMOUNTS.map((a) => (
@@ -73,7 +74,7 @@ export default function Propose({ data, run, busy }: ViewProps) {
             </button>
           ))}
           <input
-            aria-label="Other daily amount in pesos"
+            aria-label={t("Other daily amount in pesos")}
             inputMode="decimal"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -83,7 +84,7 @@ export default function Propose({ data, run, busy }: ViewProps) {
       </fieldset>
       <fieldset>
         <legend>
-          <IconCalendar aria-hidden="true" /> days
+          <IconCalendar aria-hidden="true" /> {t("days")}
         </legend>
         <div className="chips">
           {DAYS.map((d) => (
@@ -98,7 +99,7 @@ export default function Propose({ data, run, busy }: ViewProps) {
             </button>
           ))}
           <input
-            aria-label="Other number of days"
+            aria-label={t("Other number of days")}
             type="number"
             min="1"
             max="366"
@@ -110,7 +111,7 @@ export default function Propose({ data, run, busy }: ViewProps) {
       </fieldset>
       <fieldset>
         <legend>
-          <IconArrowRight aria-hidden="true" /> pot goes to
+          <IconArrowRight aria-hidden="true" /> {t("pot goes to")}
         </legend>
         <div className="chips">
           {members.map((m) => (
@@ -128,7 +129,7 @@ export default function Propose({ data, run, busy }: ViewProps) {
         </div>
       </fieldset>
       <label className="start">
-        starts
+        {t("starts")}
         <input
           name="start"
           type="date"
@@ -140,13 +141,13 @@ export default function Propose({ data, run, busy }: ViewProps) {
       {total && receiver && (
         <div className="preview-pot" aria-live="polite">
           <strong>{total}</strong>
-          <IconArrowRight aria-label="goes to" />
+          <IconArrowRight aria-label={t("goes to")} />
           <Avatar data={data} id={receiver} />
           <span>{name(data, receiver).split(" ")[0]}</span>
         </div>
       )}
       <button className="big" disabled={busy}>
-        propose
+        {t("propose")}
       </button>
     </form>
   );

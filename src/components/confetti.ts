@@ -1,5 +1,6 @@
 import type { Snapshot } from "../data";
 import { tone } from "./shared";
+import { t } from "../i18n";
 
 const key = "hulog-confetti-seen";
 const sessionSeen = new Set<string>();
@@ -59,7 +60,7 @@ export function celebratePayout(id: string, data: Snapshot) {
     const sticker = document.createElement("div");
     sticker.className = "celebration-toast";
     sticker.setAttribute("role", "status");
-    sticker.textContent = "Natanggap na! 🎉";
+    sticker.textContent = t("Natanggap na! 🎉");
     document.body.append(sticker);
     const timer = window.setTimeout(() => sticker.remove(), 2200);
     removeBurst = () => {
