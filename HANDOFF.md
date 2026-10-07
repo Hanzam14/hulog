@@ -7,100 +7,73 @@
 ## Last verified
 
 - Date: 2026-10-07
-- Production is live through `7d94a7e` (owner-provided state).
-- Push-language branch baseline: lint PASS; 66/66 unit tests and build PASS
-  with Vite runner mode because default config bundling hits `EPERM` through the
-  `node_modules` junction.
-- Push-language branch final: lint PASS; 69/69 unit tests and build PASS with
-  Vite runner mode. Local pgTAP NOT RUN: Docker is unavailable.
-
-## Active brief
-
-`feat/push-language` adds per-user push-language storage and localized notice
-text. Independent Claude lead review of this branch diff is pending. Its
-migration and Edge Function update are pending review and owner apply/deploy;
-no hosted writes or deployment were performed here.
+- Production is live on Vercel for `eb84788` (`main`); Vercel reported success.
+- English, Tagalog, and Taglish language picker is live. Push notifications follow each recipient's selected language. Hosted migrations `20261007000200_mutual_confirm` and `20261007000300_notification_language` are applied, and the `notify` function is deployed.
+- Live UI and flow changes: tablet/desktop layout, floating desktop navigation pill, transient success/update notices, decline-hulog X, mutual payment confirmation (owner payments in open rounds reset to pending), give-payout hand-off, hero pot card, history status chip and paid-up state, partner initial on taken color, and warm-night dark theme.
+- Latest checks reported: lint PASS, 69 tests PASS, and build PASS. Local pgTAP: 183 assertions PASS before migration `20261007000300_notification_language` was applied.
+- Reviews: Sol SQL reviewed by Claude Opus; UI/i18n reviewed by Sonnet; Luna fixes and final UI received Claude Opus review, including screenshot review.
 
 ## Current state
 
-Production is live through `7d94a7e` with the language picker, tablet/desktop
-layout, transient notices, decline-hulog action, mutual payment confirmation,
-give-payout hand-off, hero pot card, and Sonnet review fixes. Hosted migration
-`20261007000200_mutual_confirm` is applied and the `notify` Edge Function is
-deployed. Sol work was reviewed by Claude Opus (SQL) and Sonnet (UI/i18n); Luna
-fixes were reviewed by Claude Opus.
-
-This branch adds a `language` preference (`en`, `tl`, `taglish`) and selects
-localized push titles/bodies per recipient. Its local migration is
-`20261007000300_notification_language.sql`; production apply and Edge Function
-deployment remain pending the Claude lead. This branch has not been pushed or
-deployed.
+`main` at `eb84788` is deployed and the listed features are live in production. Today's i18n-polish, round 2, review-polish, push-language, and dark-theme workstreams are closed as completed in continuity. The JVC route remains held pending the owner's two-phone smoke test.
 
 ## Current phase
 
-Live use and polish.
+Live use; owner two-phone smoke test remains.
 
-## Assumptions and unknowns
+## Assumptions
 
-- Full two-phone smoke test per `SETUP.md` remains incomplete.
-- The app records money and does not hold or transfer funds.
+- Production deployment, hosted migration/function state, checks, and reviews above are owner-provided close-out facts; this task did not access hosted services or rerun the full test/build/database suites.
+- Hulog records money and does not hold, transfer, or pay out funds.
+- The two-phone smoke test has not yet been completed.
 
 ## Human decision needed
 
-- Status: production apply/deploy and two-phone smoke test remain owner tasks.
-- Decision: none blocking for this local branch.
+- Status: owner smoke test remains outstanding; JVC route stays `held` until it passes.
 - Owner: Hulog owner
 
 ## Next action
 
-Claude lead applies the migration and deploys the updated `notify` function;
-owner then runs the `SETUP.md` two-phone smoke test and reports results.
+Owner runs the two-phone smoke test: confirm a partner hulog, give a payout, then change language and confirm the notification arrives in the selected language. Record the results in `HANDOFF.md`; keep the JVC route held until the test passes.
 
 ## Revalidate when
 
-Hosted setup, deployment, a relevant automated check, the two-phone smoke test,
-or the current owner decision changes.
+The owner reports the two-phone smoke test, production state changes, or a relevant automated check is rerun.
 
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `17`
-- Updated: `2026-10-07T04:50:07Z`
+- Revision: `18`
+- Updated: `2026-10-07T04:57:39Z`
 - Status: `PARTIAL`
-- Persistence: `committed`
-- Summary: Warm night notebook dark theme implemented and locally committed; Claude lead screenshot review remains pending before any push.
-- Authority: Owner 2026-10-07 supplied Claude lead spec authorizes ordinary local CSS/theme work and main commit with co-author trailer; do not push.
+- Persistence: `commit_pending`
+- Summary: HANDOFF.md now reflects the owner-supplied production-live state for eb84788. Five implementation workstreams were archived as completed and today's stale review holds were superseded through the continuity CLI.
+- Authority: Owner's 2026-10-07 close-out brief authorizes continuity closure, handoff update, commit, and push to origin main.
 
 ### Decisions
 
-- Dark surfaces: page #17130f, card #26201a, inset #1d1814; muted edges and raised translucent nav.
-- Retained visible hard offset shadows after comparing a top-highlight alternative.
-- Preserved member fills and all light-mode pixels; updated existing meta-color test expectation to match requested color.
-- Owner requested one-agent work and main commit; review is delegated back to the Claude lead as specified, with no push.
+- HULOG-CLOSEOUT-20261007
+- HULOG-COMPLETE-I18N-POLISH-20261007
+- HULOG-COMPLETE-ROUND2-20261007
+- HULOG-COMPLETE-REVIEW-POLISH-20261007
+- HULOG-COMPLETE-PUSH-LANGUAGE-20261007
+- HULOG-COMPLETE-DARK-THEME-20261007
 
 ### Blockers
 
-- Claude lead screenshot review pending.
+- Owner two-phone smoke test remains outstanding.
 
 ### Risks and unresolved items
 
-- Synthetic browser fixture; hosted OAuth and phone smoke were not exercised.
-- Lead screenshot review is still pending; screenshots and report are ignored local artifacts.
-- Claude lead screenshot/diff review.
+- Production deployment, hosted state, full checks, and reviews are owner-provided facts; they were not independently accessed or rerun during this close-out.
+- Owner must complete and report the two-phone smoke test; JVC route remains held until it passes.
 
 ### Evidence and checks
 
-- .scratch/dark-result.md
-- .scratch/dark/final/metrics.json
-- .scratch/dark/final/contrast.json
-- .scratch/dark/final/settings-1280-dark.png
-- Baseline/final npm.cmd run lint PASS.
-- Baseline/final npm.cmd test: 69/69 PASS.
-- Baseline/final npm.cmd run build PASS; existing chunk-size and inlineDynamicImports warnings.
-- Baseline hierarchy probe failed as expected; final passed. Nine final screenshots visually inspected; no browser errors or horizontal overflow.
-- Light Settings 1280: zero changed pixels; member fills unchanged.
-- Contrast primary/card 13.51:1; muted/card 6.67:1; muted/page 7.65:1; control border/inset 3.59:1 and border/card 3.28:1.
-- git diff --check PASS.
+- HANDOFF.md
+- Preflight npm.cmd run lint: PASS.
+- Owner-reported latest checks: 69 tests PASS and build PASS.
+- Owner-reported local pgTAP: 183 assertions PASS before migration 20261007000300_notification_language was applied.
 
 ### Governed artifact correlations
 
@@ -108,5 +81,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews .scratch/dark/final/settings-1280-dark.png and the diff; no push is authorized by this task.
+Owner completes the two-phone smoke test for partner hulog confirmation, give payout, and a notification in the selected language; keep the JVC route held until it passes.
 <!-- CONTINUITY_CHECKPOINT_END -->
