@@ -21,48 +21,51 @@ export default function History({ data, user, run, busy }: ViewProps) {
           <section key={c.id}>
             <CycleCard c={c} data={data} />
             <p>
-              <strong>{label(c.payout_state ?? c.status)}</strong>
+              <span className="chip">{label(c.payout_state ?? c.status)}</span>
             </p>
-            {data.progress
-              .filter(
-                (p) => p.cycle_id === c.id && p.member_id !== c.receiver_id,
-              )
-              .map((p) => (
-                <div key={p.member_id}>
-                  <h3>
-                    {name(data, p.member_id)} {t("· Owes")}{" "}
-                    {money(p.debt_centavos)}
-                  </h3>
-                  {p.debt_centavos > 0 && (
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const f = new FormData(e.currentTarget);
-                        void run(() =>
-                          rpc("record_repayment", {
-                            p_cycle_id: c.id,
-                            p_debtor_id: p.member_id,
-                            p_amount_centavos: parsePesos(
-                              String(f.get("amount")),
-                            ),
-                          }),
-                        );
-                      }}
-                    >
-                      <label>
-                        {t("Repayment amount (₱)")}
-                        <input
-                          name="amount"
-                          inputMode="decimal"
-                          required
-                          defaultValue={(p.debt_centavos / 100).toFixed(2)}
-                        />
-                      </label>
-                      <button disabled={busy}>{t("Record repayment")}</button>
-                    </form>
-                  )}
-                </div>
-              ))}
+            {c.status === "accepted" &&
+              data.progress
+                .filter(
+                  (p) => p.cycle_id === c.id && p.member_id !== c.receiver_id,
+                )
+                .map((p) => (
+                  <div key={p.member_id}>
+                    <h3>
+                      {name(data, p.member_id)}{" "}
+                      {p.debt_centavos > 0
+                        ? `${t("· Owes")} ${money(p.debt_centavos)}`
+                        : t("· Paid up ✓")}
+                    </h3>
+                    {p.debt_centavos > 0 && (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          const f = new FormData(e.currentTarget);
+                          void run(() =>
+                            rpc("record_repayment", {
+                              p_cycle_id: c.id,
+                              p_debtor_id: p.member_id,
+                              p_amount_centavos: parsePesos(
+                                String(f.get("amount")),
+                              ),
+                            }),
+                          );
+                        }}
+                      >
+                        <label>
+                          {t("Repayment amount (₱)")}
+                          <input
+                            name="amount"
+                            inputMode="decimal"
+                            required
+                            defaultValue={(p.debt_centavos / 100).toFixed(2)}
+                          />
+                        </label>
+                        <button disabled={busy}>{t("Record repayment")}</button>
+                      </form>
+                    )}
+                  </div>
+                ))}
             {data.repayments
               .filter((r) => r.cycle_id === c.id)
               .map((r) => (
