@@ -58,38 +58,42 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `7`
-- Updated: `2026-10-07`
-- Status: `ACTIVE`
+- Revision: `9`
+- Updated: `2026-10-07T03:54:07Z`
+- Status: `HELD`
 - Persistence: `commit_pending`
-- Summary: Personalization, confetti and update button are live on Hulog production; hosted migration applied; installed apps move to the prompt update flow automatically.
-- Authority: Owner in chat 2026-10-07: merge feat/personalize, apply hosted migration then push, fix installed-app update button; owner confirmed it works on device.
+- Summary: Round 2 mutual confirmation, receiver hand-off and hero card implemented; all builder checks pass; Claude review pending.
+- Authority: Owner explicit 2026-10-07 round 2 brief and local branch commit authorization; no cloud writes, push, deployment or dependencies.
 
 ### Decisions
 
-- Merged feat/personalize into main (ee8ad66) after Claude review; confetti limited to payouts received within 7 days.
-- New service worker skips waiting once when replacing a legacy auto-update worker, then relies on the in-app update button.
+- All payments start pending and only the other active member confirms; changed days reset both members' confirmed payments.
+- Current receiver may give accepted unreceived payout through end date; next proposal remains opposite the latest receiver.
+- Migration audit trigger writes nullable system actors; past-settling owner payments remain unchanged.
 
 ### Blockers
 
-- None.
+- Independent Claude review pending.
 
 ### Risks and unresolved items
 
-- SW legacy-takeover fix has no independent second-model review.
-- Full two-account smoke not recorded.
-- Full two-phone smoke test record.
+- Builder checks are not independent Claude review.
+- Browser checks use synthetic data; real OAuth and two-phone smoke remain owner-operated.
+- Migration intentionally lowers currently counted owner amounts until partner confirmation; older cycles remain untouched.
+- Claude independent review
+- Owner phone smoke
 
 ### Evidence and checks
 
-- HANDOFF.md
-- src/sw.ts
-- src/components/confetti.test.ts
-- npm run lint PASS; npm test PASS (48); npm run build PASS on main 3bde170.
-- Headless Playwright: legacy auto-update page moved to new worker and reloaded; fresh install loads; next deploy waits for button. First attempt deadlocked (navigate inside activate waitUntil) and was fixed before push.
-- Hosted: migration repair marked 20261006000100/000200 applied; db push applied 20261007000100; migration list local==remote.
-- Vercel production status success for ee8ad66 and 3bde170.
-- Owner device check: installed app updated and update button shows.
+- .scratch/round2/result.md
+- .scratch/round2/browser-results.json
+- supabase/tests/database/mutual_confirm.test.sql
+- src/components/round2.test.ts
+- Baseline lint PASS, tests 56 PASS, build PASS; repaired stale local profile schema then pgTAP 145 PASS.
+- Discriminating regressions fail against original notification selector and payment RPCs.
+- Final lint PASS, tests 64 PASS, build PASS, full local pgTAP 178 PASS.
+- Synthetic browser four screenshots (360/1280, light/dark), mutual role controls and hand-off PASS; no overflow/errors.
+- Local Supabase STOPPED; git diff --check PASS.
 
 ### Governed artifact correlations
 
@@ -97,5 +101,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Owner completes remaining SETUP.md two-phone smoke steps and reports; then update HANDOFF and JVC route status.
+Claude lead reviews feat/i18n-polish and .scratch/round2/result.md before merge.
 <!-- CONTINUITY_CHECKPOINT_END -->

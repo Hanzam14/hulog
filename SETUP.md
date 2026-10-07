@@ -19,7 +19,9 @@ the installable PWA and v1.1 web push notifications.
    Email/password and other providers are not exposed by the application.
 4. Run `npm run dev`. Open `http://localhost:5173`.
 5. Checks: `npm run build`, `npm run lint`, `npm test`,
-   `npx supabase test db`. SQL tests create disposable users; the date override
+   `npx supabase migration up --local`, then `npx supabase test db`.
+   The transition test replays the actual SQL stored by the local migration CLI.
+   SQL tests create disposable users; the date override
    is transaction-scoped and rolled back. The concurrent-claim test commits
    dedicated fixtures for two database connections and cleans them up.
 6. When finished, run `npx supabase stop`. This stops this project's containers;
@@ -71,10 +73,14 @@ Use two different Google accounts / browser profiles at a 360px viewport:
 2. A creates an invite. B scans its QR or opens the link, signs in, and requests
    membership. A sees B's name/email and accepts. Check the waiting screen updates.
 3. A proposes a cycle starting today or tomorrow, receiver B; B accepts.
-4. A records a payment (immediately confirmed). B records one (pending).
-   A confirms it. Check the pot and both progress bars.
+4. A records a payment (pending); B confirms it. B records one (pending);
+   A confirms it. Neither member can confirm their own payment. Check the pot
+   and both progress bars.
 5. Open cycle details; edit B's confirmed payment. Check pending status, history
-   and B's unread Changes badge. Reconfirm. Soft-delete a mistaken entry.
+   and B's unread Changes badge. A reconfirms. Edit A’s payment; B reconfirms.
+   Soft-delete a mistaken entry. For a live accepted round, only the current
+   receiver sees Give to the other member; confirm the hand-off and verify
+   the receiver changes and the next proposal defaults to the other receiver.
 6. Export CSV from Group. Allow multiple downloads if the browser asks; verify
    all three files, including centavo amounts. Sign out and sign in again.
 7. Once a cycle closes, check Got it for B or automatic Received for A; record,
@@ -136,8 +142,8 @@ Use two different Google accounts / browser profiles at a 360px viewport:
    The function authenticates this bearer secret itself; `verify_jwt` is off for
    this endpoint. Keep the cron secret in Supabase Function secrets and Vault.
    The schedule sends reminders at each user's Manila reminder time, asks the
-   owner to confirm recent member payments, and sends cycle-end and payout-day
-   notices at 09:00 Manila. `notification_log` prevents repeat sends for the
+   other active member to confirm recent payments, and sends cycle-end and
+   payout-day notices at 09:00 Manila. `notification_log` prevents repeat sends for the
    same user, notice, reference, and Manila calendar date. Notifications never
    change Hulog records. The local SQL tests verify preference/subscription
    isolation, and the pure schedule tests use fixed Manila dates.

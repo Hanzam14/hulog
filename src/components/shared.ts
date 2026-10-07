@@ -1,4 +1,5 @@
 import type { Cycle, Snapshot } from "../data";
+import { t } from "../i18n";
 
 export type Run = (action: () => Promise<unknown>) => Promise<void>;
 export interface ViewProps {
@@ -31,7 +32,7 @@ export const emojis = [
 ] as const;
 export const name = (d: Snapshot, id: string) => {
   const profile = d.profiles.find((p) => p.id === id);
-  return profile?.nickname ?? profile?.display_name ?? "Member";
+  return profile?.nickname ?? profile?.display_name ?? t("Member");
 };
 /** Owner keeps a colliding color; partner gets the first unused palette color. */
 export const tone = (d: Snapshot, id: string): Tone => {
