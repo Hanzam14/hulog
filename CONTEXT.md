@@ -14,6 +14,12 @@
 - Default exclusions: `.env`, credentials, local runtime data, `node_modules`,
   `dist`, generated output, and unrelated projects.
 
+## Operations
+
+- Task brief lane: `task-briefs/` (materialize only for a scoped task).
+- Default freshness threshold: 30 days.
+- Playbook: `AGENTS.md`; product authority: `docs/SPEC.md`.
+
 ## Authority map
 
 | Question | Read first | Authority | Revalidate when |
@@ -34,7 +40,7 @@
 
 ## Current phase
 
-Owner-operated hosted setup and two-phone smoke testing; see `HANDOFF.md`.
+Live use; owner-reported two-phone smoke PASS on 2026-10-07. See `HANDOFF.md` for current state and exact next action.
 
 ## Boundaries
 
