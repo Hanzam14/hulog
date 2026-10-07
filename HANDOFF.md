@@ -7,24 +7,34 @@
 ## Last verified
 
 - Date: 2026-10-07
-- Checks: `npm run lint` PASS; `npm test` PASS (48/48); `npm run build` PASS;
-  local pgTAP suite PASS (145, builder-run); headless legacy-to-prompt service
-  worker transition PASS; Vercel production deploy of `3bde170` PASS.
-- Owner phone check 2026-10-07: installed app updated onto the new version and
-  the Settings update button shows.
+- Production is live through `7d94a7e` (owner-provided state).
+- Push-language branch baseline: lint PASS; 66/66 unit tests and build PASS
+  with Vite runner mode because default config bundling hits `EPERM` through the
+  `node_modules` junction.
+- Push-language branch final: lint PASS; 69/69 unit tests and build PASS with
+  Vite runner mode. Local pgTAP NOT RUN: Docker is unavailable.
 
 ## Active brief
 
-`none`
+`feat/push-language` adds per-user push-language storage and localized notice
+text. Independent Claude lead review of this branch diff is pending. Its
+migration and Edge Function update are pending review and owner apply/deploy;
+no hosted writes or deployment were performed here.
 
 ## Current state
 
-Hulog is live: hosted Supabase, Google OAuth and Vercel production are running
-with real data. `main` (`3bde170`) adds profile nickname/avatar/color, five
-member colors, light/dark/auto theme, group rename, install hint, alkansya
-icons, payout confetti, and a user-controlled update button. Hosted migration
-history was repaired (first two migrations marked applied; they had been run by
-hand) and `20261007000100_profile_personalization` was applied with `db push`.
+Production is live through `7d94a7e` with the language picker, tablet/desktop
+layout, transient notices, decline-hulog action, mutual payment confirmation,
+give-payout hand-off, hero pot card, and Sonnet review fixes. Hosted migration
+`20261007000200_mutual_confirm` is applied and the `notify` Edge Function is
+deployed. Sol work was reviewed by Claude Opus (SQL) and Sonnet (UI/i18n); Luna
+fixes were reviewed by Claude Opus.
+
+This branch adds a `language` preference (`en`, `tl`, `taglish`) and selects
+localized push titles/bodies per recipient. Its local migration is
+`20261007000300_notification_language.sql`; production apply and Edge Function
+deployment remain pending the Claude lead. This branch has not been pushed or
+deployed.
 
 ## Current phase
 
@@ -32,23 +42,19 @@ Live use and polish.
 
 ## Assumptions and unknowns
 
-- Full two-phone smoke test per `SETUP.md` is not recorded as complete; the
-  owner confirmed the app works and the update button shows on an installed app.
-- The SW fix `3bde170` has no independent second-model review yet.
+- Full two-phone smoke test per `SETUP.md` remains incomplete.
 - The app records money and does not hold or transfer funds.
 
 ## Human decision needed
 
-- Status: none blocking.
-- Decision: whether to record a full two-phone smoke result and move the JVC
-  route from held to active.
+- Status: production apply/deploy and two-phone smoke test remain owner tasks.
+- Decision: none blocking for this local branch.
 - Owner: Hulog owner
 
 ## Next action
 
-Owner runs the remaining `SETUP.md` two-phone smoke steps (two Google accounts,
-record/confirm a payment, payout + confetti) and reports results; then update
-this handoff and the JVC route status.
+Claude lead applies the migration and deploys the updated `notify` function;
+owner then runs the `SETUP.md` two-phone smoke test and reports results.
 
 ## Revalidate when
 
@@ -58,35 +64,46 @@ or the current owner decision changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `11`
-- Updated: `2026-10-07T04:08:20Z`
-- Status: `HELD`
+- Revision: `15`
+- Updated: `2026-10-07T04:24:06Z`
+- Status: `PARTIAL`
 - Persistence: `committed`
-- Summary: Sonnet review fixes are implemented and committed on fix/review-polish. Automated checks pass; independent Claude lead review remains pending.
-- Authority: Owner's explicit 2026-10-07 task authorizes local fixes and commit on fix/review-polish; no push, deployment, hosted writes, migrations, dependencies, or writes outside the worktree.
+- Summary: Push-language implementation is committed on feat/push-language. Independent Claude lead review, production apply/deploy, and two-phone smoke remain pending.
+- Authority: Owner's explicit Hulog task brief dated 2026-10-07 authorizes local implementation, checks, handoff/checkpoint, and branch commit; hosted apply/deploy remains owner-operated.
 
 ### Decisions
 
-- Automatic update checks and update notifications preserve manual messages.
-- Sign-in and sign-out do not show the data-action success notice.
+- Push-language workstream is HELD pending independent review and owner-operated release steps.
 
 ### Blockers
 
-- Independent Claude lead review remains pending before merge.
+- Independent Claude lead review of this branch diff is pending.
+- Local pgTAP NOT RUN because Docker is unavailable.
+- Owner apply of migration and notify deployment remain pending.
+- Two-phone smoke test remains incomplete.
 
 ### Risks and unresolved items
 
-- Default Vite bundle mode cannot write temp files through the node_modules junction; runner-mode checks passed.
-- Independent Claude lead review remains pending before merge.
+- Local pgTAP coverage is unverified because Docker is unavailable.
+- Independent review has not yet confirmed this branch diff.
+- Independent Claude lead review.
+- Apply migration and deploy notify to production.
+- Complete two-phone smoke test.
 
 ### Evidence and checks
 
-- src/update.test.ts
-- src/components/round2.test.ts
-- Final npm.cmd run lint: PASS.
-- Final npm.cmd test -- --configLoader runner: PASS, 66 tests.
-- Final npm.cmd run build -- --configLoader runner: PASS.
-- Regression test failed when the old automatic message clear was temporarily restored; it passed after the fix.
+- supabase/migrations/20261007000300_notification_language.sql
+- supabase/tests/database/rules.test.sql
+- src/notificationSelection.test.ts
+- HANDOFF.md
+- Baseline lint PASS.
+- Baseline unit tests 66/66 PASS with Vite runner mode.
+- Baseline build PASS with Vite runner mode.
+- Final lint PASS.
+- Final unit tests 69/69 PASS with Vite runner mode.
+- Final build PASS with Vite runner mode.
+- pgTAP NOT RUN: Docker executable unavailable; five focused assertions added.
+- Continuity verify and audit PASS.
 
 ### Governed artifact correlations
 
@@ -94,5 +111,5 @@ or the current owner decision changes.
 
 ### Exact next action
 
-Claude lead reviews the committed branch diff and builder evidence; owner decides merge. No push or deployment authorized.
+Claude lead reviews the branch diff; after review, applies the migration and deploys notify. Owner completes the two-phone SETUP.md smoke test.
 <!-- CONTINUITY_CHECKPOINT_END -->

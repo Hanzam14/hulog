@@ -31,6 +31,59 @@ const base = (): SelectionInput => ({
 });
 
 describe("Manila notification selection", () => {
+  it.each([
+    [
+      "en",
+      {
+        reminder: ["Payment reminder", "Log today's payment for this round when you're ready."],
+        confirm_payment: ["Confirm payment?", "A payment needs your review."],
+        cycle_ends: ["Round ends tomorrow", "Your current round ends tomorrow."],
+        payout_day: ["Payout day", "Today is payout day. Check in with each other."],
+      },
+    ],
+    [
+      "tl",
+      {
+        reminder: ["Paalala sa hulog", "Itala ang hulog mo para sa round na ito kapag handa ka na."],
+        confirm_payment: ["Kumpirmahin ang hulog?", "May hulog na kailangan mong tingnan."],
+        cycle_ends: ["Matatapos ang round bukas", "Bukas matatapos ang kasalukuyan ninyong round."],
+        payout_day: ["Araw ng payout", "Araw ng payout ngayon. Magkumustahan kayo."],
+      },
+    ],
+    [
+      "taglish",
+      {
+        reminder: ["Hulog today", "Log today’s hulog when you’re ready."],
+        confirm_payment: ["Confirm payment?", "A member logged a hulog that needs your review."],
+        cycle_ends: ["Cycle ends tomorrow", "Your current hulog cycle ends tomorrow."],
+        payout_day: ["Payout day", "Today is payout day. Check in with each other."],
+      },
+    ],
+  ] as const)("uses %s for every notice kind", (language, expected) => {
+    const input = base();
+    input.prefs.forEach((pref) => (pref.language = language));
+    input.payments = [
+      {
+        id: "recent-payment",
+        cycle_id: "c1",
+        member_id: "b",
+        status: "pending",
+        created_at: "2026-11-14T01:01:00.000Z",
+        deleted_at: null,
+      },
+    ];
+    const notices = selectNotifications(input);
+    for (const kind of ["reminder", "confirm_payment", "cycle_ends"] as const) {
+      const notice = notices.find((item) => item.kind === kind);
+      expect([notice?.title, notice?.body]).toEqual(expected[kind]);
+    }
+    input.now = new Date("2026-11-16T01:02:00.000Z");
+    const payout = selectNotifications(input).find(
+      (item) => item.kind === "payout_day",
+    );
+    expect([payout?.title, payout?.body]).toEqual(expected.payout_day);
+  });
+
   it("asks the other active member to confirm an owner's payment", () => {
     const input = base();
     input.payments = [

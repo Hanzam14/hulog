@@ -202,11 +202,17 @@ select is((select start_date from cycles where id=pg_temp.id('cancel')),'2026-12
 select respond_cycle(pg_temp.id('cancel'),'cancel');
 select pg_temp.actor(1);
 select set_notification_prefs('19:30',true);
+select set_notification_language('en');
 select save_push_subscription('https://push.example.test/sub-a','p256dh-a','auth-a');
 select is((select reminder_time::text||':'||enabled::text from get_notification_prefs()),'19:30:00:true','Owner can read own notification preferences through the RPC');
+select is((select language from get_notification_prefs()),'en','Owner can set and read own notification language through the RPC');
+select throws_ok($$select set_notification_language('fr')$$,'P0001','Valid notification language required','Invalid notification language is rejected');
 select is((select count(*) from get_push_subscriptions()),1::bigint,'Owner can read own push subscription through the RPC');
 select pg_temp.actor(2);
 select is((select reminder_time::text||':'||enabled::text from get_notification_prefs()),'20:00:00:false','Member receives only their own default preferences');
+select is((select language from get_notification_prefs()),'taglish','Member keeps their own default notification language');
+select set_notification_language('tl');
+select is((select language from get_notification_prefs()),'tl','Member can change only their own notification language');
 select is((select count(*) from get_push_subscriptions()),0::bigint,'Member cannot read the owner subscription through the RPC');
 select throws_ok($$select save_push_subscription('https://push.example.test/sub-a','p256dh-x','auth-x')$$,'P0001','Push subscription belongs to another account','Member cannot claim the owner subscription endpoint');
 select delete_push_subscription('https://push.example.test/sub-a');
@@ -237,6 +243,7 @@ select ok((select bool_and(not has_table_privilege('anon',t,'SELECT,INSERT,UPDAT
 select ok(has_table_privilege('authenticated','push_subscriptions','SELECT') is false and has_table_privilege('authenticated','notification_prefs','SELECT') is false and has_table_privilege('authenticated','notification_log','SELECT') is false,'Notification tables have no direct authenticated grants');
 select ok(exists(select 1 from push_subscriptions where user_id='00000000-0000-0000-0000-000000000001' and endpoint='https://push.example.test/sub-a'),'Member cannot delete another user subscription');
 select ok(not has_function_privilege('anon','public.set_notification_prefs(time,boolean)','execute'),'Anon cannot call notification preference RPC');
-select ok((select bool_and(proconfig @> array['search_path=public, pg_temp']) from pg_proc where pronamespace='public'::regnamespace and prosecdef and proname in ('get_notification_prefs','set_notification_prefs','get_push_subscriptions','save_push_subscription','delete_push_subscription')),'Notification RPCs pin search_path');
+select ok(not has_function_privilege('anon','public.set_notification_language(text)','execute'),'Anon cannot call notification language RPC');
+select ok((select bool_and(proconfig @> array['search_path=public, pg_temp']) from pg_proc where pronamespace='public'::regnamespace and prosecdef and proname in ('get_notification_prefs','set_notification_prefs','set_notification_language','get_push_subscriptions','save_push_subscription','delete_push_subscription')),'Notification RPCs pin search_path');
 select * from finish();
 rollback;
