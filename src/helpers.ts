@@ -42,9 +42,22 @@ export function phaseDisplay(phase: string, daysLeft: number): string {
         proposed: t("Waiting for agreement"),
         declined: t("Declined"),
         cancelled: t("Cancelled"),
+        completed: t("Goal reached ✓"),
+        withdrawn: t("Withdrawn"),
+        overdue: t("Past target date"),
+        expired: t("Proposal expired"),
       } as Record<string, string>
     )[phase] ?? phase
   );
+}
+export function cadenceDisplay(cadenceDays: number | null): string {
+  if (cadenceDays === null) return t("Flexible anytime");
+  if (cadenceDays === 1) return t("Every day");
+  if (cadenceDays === 7) return t("Every week");
+  return t("Every {days} days", { days: cadenceDays });
+}
+export function splitHalfCentavos(totalCentavos: number): number {
+  return Math.ceil(totalCentavos / 2);
 }
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";

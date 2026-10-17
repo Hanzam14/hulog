@@ -18,10 +18,15 @@ import Tally from "./components/Tally";
 import { UpdateBanner } from "./components/AppUpdates";
 import { celebratePayout, recentlyReceived } from "./components/confetti";
 import { closed } from "./components/shared";
+import ProposeIpon from "./screens/ProposeIpon";
+import IponDetail from "./screens/IponDetail";
+import RecordIpon from "./screens/RecordIpon";
+import Tracker from "./screens/Tracker";
 import {
   IconBell,
   IconCalendar,
   IconHome,
+  IconReceipt2,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -214,6 +219,7 @@ export default function App() {
       </main>
     );
   const own = data?.memberships.find((m) => m.user_id === session?.user.id);
+  const unreadCount = data?.changes.filter((h) => h.unread).length ?? 0;
   return (
     <div className="app">
       <header>
@@ -222,9 +228,27 @@ export default function App() {
           <span className="dot">.</span>
         </Link>
         {session && (
-          <button className="quiet" disabled={busy} onClick={signOut}>
-            {t("Sign out")}
-          </button>
+          <div className="header-actions">
+            {own && own.status === "active" && (
+              <NavLink
+                to="/changes"
+                className="header-bell"
+                aria-label={
+                  unreadCount > 0
+                    ? t("Unread changes: {count}", { count: unreadCount })
+                    : t("Changes")
+                }
+              >
+                <IconBell aria-hidden="true" />
+                {unreadCount > 0 && (
+                  <span className="badge">{unreadCount}</span>
+                )}
+              </NavLink>
+            )}
+            <button className="quiet" disabled={busy} onClick={signOut}>
+              {t("Sign out")}
+            </button>
+          </div>
         )}
       </header>
       <UpdateBanner />
@@ -334,18 +358,13 @@ export default function App() {
               <IconHome aria-hidden="true" />
               <span className="sr-only">{t("Home")}</span>
             </NavLink>
+            <NavLink to="/tracker">
+              <IconReceipt2 aria-hidden="true" />
+              <span className="sr-only">{t("Tracker")}</span>
+            </NavLink>
             <NavLink to="/history">
               <IconCalendar aria-hidden="true" />
               <span className="sr-only">{t("History")}</span>
-            </NavLink>
-            <NavLink to="/changes">
-              <IconBell aria-hidden="true" />
-              <span className="sr-only">{t("Changes")}</span>
-              {data.changes.some((h) => h.unread) && (
-                <span className="badge">
-                  {data.changes.filter((h) => h.unread).length}
-                </span>
-              )}
             </NavLink>
             <NavLink to="/settings">
               <IconUsers aria-hidden="true" />
@@ -391,6 +410,50 @@ export default function App() {
                 path="/cycles/:id"
                 element={
                   <Detail
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/ipon/new"
+                element={
+                  <ProposeIpon
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/ipon/:id"
+                element={
+                  <IponDetail
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/ipon/:id/record"
+                element={
+                  <RecordIpon
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/tracker"
+                element={
+                  <Tracker
                     data={data}
                     user={session.user.id}
                     run={run}

@@ -7,6 +7,7 @@ import {
   IconArrowRight,
   IconCalendar,
   IconCoin,
+  IconWallet,
 } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, name } from "../components/shared";
@@ -18,7 +19,7 @@ const AMOUNTS = ["20", "50", "100"];
 const DAYS = ["7", "15", "30"];
 
 /** Start a new round: tap a daily amount, a length, and who gets the pot. */
-export default function Propose({ data, run, busy }: ViewProps) {
+export default function Propose({ data, user, run, busy }: ViewProps) {
   const navigate = useNavigate();
   const accepted = data.cycles
     .filter((c) => c.status === "accepted")
@@ -31,6 +32,10 @@ export default function Propose({ data, run, busy }: ViewProps) {
       ? members.find((m) => m.user_id !== accepted.receiver_id)?.user_id
       : data.groups[0].owner_id) ?? members[0]?.user_id,
   );
+  const activeWallets = (data.wallets ?? []).filter((w) => !w.archived_at);
+  const defaultWallet =
+    activeWallets.find((w) => w.holder_id === user)?.id ?? activeWallets[0]?.id;
+  const [walletId, setWalletId] = useState<string | undefined>(defaultWallet);
   let total: string;
   try {
     // A round always has two people paying, even before the partner joins.
@@ -42,12 +47,16 @@ export default function Propose({ data, run, busy }: ViewProps) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     void run(async () => {
-      await rpc("propose_cycle", {
+      const payload: Record<string, unknown> = {
         p_daily_amount_centavos: parsePesos(amount),
         p_num_days: Number(days),
         p_start_date: f.get("start"),
         p_receiver_id: receiver,
-      });
+      };
+      if (walletId) {
+        payload.p_wallet_id = walletId;
+      }
+      await rpc("propose_cycle", payload);
       navigate("/");
     });
   };
@@ -128,6 +137,35 @@ export default function Propose({ data, run, busy }: ViewProps) {
           ))}
         </div>
       </fieldset>
+      {activeWallets.length > 0 && (
+        <fieldset>
+          <legend>
+            <IconWallet aria-hidden="true" /> {t("Wallet is held by")}
+          </legend>
+          <div className="chips">
+            {activeWallets.map((w) => (
+              <button
+                type="button"
+                key={w.id}
+                className={`pick ${walletId === w.id ? "on" : ""}`}
+                aria-pressed={walletId === w.id}
+                onClick={() => setWalletId(w.id)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "6px 14px",
+                }}
+              >
+                <Avatar data={data} id={w.holder_id} size="sm" />
+                <span>
+                  {w.label} ({name(data, w.holder_id).trim().split(/\s+/)[0]})
+                </span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
       <label className="start">
         {t("starts")}
         <input

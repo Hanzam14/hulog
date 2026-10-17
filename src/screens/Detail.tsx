@@ -21,6 +21,24 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
         {t("Cycle unavailable.")} <Link to="/">{t("Go home")}</Link>
       </p>
     );
+
+  const allActiveWallets = (data.wallets ?? []).filter((w) => !w.archived_at);
+  const canMoveWallet =
+    c.status === "accepted" &&
+    c.payout_state !== "Received" &&
+    allActiveWallets.length > 1;
+  const isAfterEndDate = c.phase === "settling" || c.phase === "ended";
+  const candidateWallets = allActiveWallets.filter((w) => {
+    if (w.id === c.wallet_id) return false;
+    if (isAfterEndDate) {
+      return user === c.holder_id && w.holder_id === c.holder_id;
+    }
+    return true;
+  });
+  const pendingWallet = (data.wallets ?? []).find(
+    (w) => w.id === c.pending_wallet_id,
+  );
+
   return (
     <>
       <h1>{t("Cycle detail")}</h1>
@@ -29,6 +47,116 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
         <GivePayout c={c} data={data} user={user} run={run} busy={busy} />
         {c.status === "proposed" && (
           <Proposal c={c} user={user} run={run} busy={busy} />
+        )}
+        {canMoveWallet && (
+          <div className="cycle-wallet-control" style={{ marginTop: "12px" }}>
+            {c.pending_wallet_id ? (
+              <div className="notice" role="alert">
+                <p style={{ margin: "0 0 8px" }}>
+                  {t("Wallet change proposed: {wallet}", {
+                    wallet: pendingWallet?.label ?? "",
+                  })}
+                </p>
+                <div className="actions" style={{ margin: 0 }}>
+                  {c.wallet_proposed_by === user ? (
+                    <button
+                      type="button"
+                      className="quiet danger"
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          rpc("respond_cycle_wallet", {
+                            p_cycle_id: c.id,
+                            p_action: "cancel",
+                          }),
+                        )
+                      }
+                    >
+                      {t("Cancel wallet move")}
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() =>
+                          void run(() =>
+                            rpc("respond_cycle_wallet", {
+                              p_cycle_id: c.id,
+                              p_action: "accept",
+                            }),
+                          )
+                        }
+                      >
+                        {t("Accept wallet move")}
+                      </button>
+                      <button
+                        type="button"
+                        className="quiet danger"
+                        disabled={busy}
+                        onClick={() =>
+                          void run(() =>
+                            rpc("respond_cycle_wallet", {
+                              p_cycle_id: c.id,
+                              p_action: "decline",
+                            }),
+                          )
+                        }
+                      >
+                        {t("Decline wallet move")}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
+              candidateWallets.length > 0 && (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const f = new FormData(e.currentTarget);
+                    const targetId = String(f.get("wallet_id"));
+                    if (!targetId) return;
+                    void run(() =>
+                      rpc("propose_cycle_wallet", {
+                        p_cycle_id: c.id,
+                        p_wallet_id: targetId,
+                      }),
+                    );
+                  }}
+                  style={{ display: "grid", gap: "8px" }}
+                >
+                  <label
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "var(--soft)",
+                    }}
+                  >
+                    {t("Move pot to another wallet")}
+                    <select name="wallet_id" defaultValue="" required>
+                      <option value="" disabled>
+                        -- {t("Move pot to another wallet")} --
+                      </option>
+                      {candidateWallets.map((w) => (
+                        <option key={w.id} value={w.id}>
+                          {w.label} ({name(data, w.holder_id)})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="submit"
+                    className="secondary"
+                    disabled={busy}
+                    style={{ justifySelf: "start" }}
+                  >
+                    {t("Move pot to another wallet")}
+                  </button>
+                </form>
+              )
+            )}
+          </div>
         )}
       </section>
       <section>
@@ -54,6 +182,14 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
               <p>
                 {money(p.amount_centavos)} · {p.created_at.slice(0, 10)}
               </p>
+              {p.note && (
+                <p
+                  className="meta"
+                  style={{ fontStyle: "italic", marginTop: "2px" }}
+                >
+                  {p.note}
+                </p>
+              )}
               {!p.deleted_at && (
                 <>
                   <div className="actions">
@@ -98,11 +234,17 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                       onSubmit={(e) => {
                         e.preventDefault();
                         const f = new FormData(e.currentTarget);
+                        const newDays = Number(f.get("days"));
+                        const noteVal = f.get("note")
+                          ? String(f.get("note")).trim()
+                          : "";
                         void run(async () => {
-                          await rpc("edit_payment", {
+                          const payload: Record<string, unknown> = {
                             p_id: p.id,
-                            p_days: Number(f.get("days")),
-                          });
+                            p_days: newDays,
+                            p_note: noteVal,
+                          };
+                          await rpc("edit_payment", payload);
                           setEditing(null);
                         });
                       }}
@@ -116,6 +258,16 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           max={c.num_days}
                           defaultValue={p.days}
                           required
+                        />
+                      </label>
+                      <label>
+                        {t("Note or ref # (optional)")}
+                        <input
+                          name="note"
+                          type="text"
+                          maxLength={140}
+                          defaultValue={p.note ?? ""}
+                          placeholder={t("e.g. GCash ref #1234")}
                         />
                       </label>
                       <button disabled={busy}>{t("Save correction")}</button>
