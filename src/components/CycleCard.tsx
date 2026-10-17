@@ -42,6 +42,16 @@ export default function CycleCard({ c, data }: { c: Cycle; data: Snapshot }) {
         <Avatar data={data} id={c.receiver_id} size="sm" />
         <b>{name(data, c.receiver_id).trim().split(/\s+/)[0]}</b>
       </div>
+      {c.holder_id && c.wallet_label && (
+        <div className="pot-custody">
+          <small>
+            {t("Held by {name} · {wallet}", {
+              name: name(data, c.holder_id).trim().split(/\s+/)[0],
+              wallet: c.wallet_label,
+            })}
+          </small>
+        </div>
+      )}
       <div className="pot-bottom">
         <small>{phaseDisplay(c.phase, c.days_left)}</small>
         <small>

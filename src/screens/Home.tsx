@@ -1,15 +1,24 @@
 import { t } from "../i18n";
 import { Link } from "react-router-dom";
-import { IconMapPin, IconPlus, IconSparkles } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconMapPin,
+  IconPlus,
+  IconSparkles,
+  IconX,
+} from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
 import PendingPaymentActions from "../components/PendingPaymentActions";
 import { money, shortDate } from "../helpers";
+import { rpc } from "../data";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
 import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
+import CustodyCard from "../components/CustodyCard";
+import IponCard from "../components/IponCard";
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
@@ -22,9 +31,32 @@ export default function Home(props: ViewProps) {
   const waiting = data.payments.filter(
     (p) => p.status === "pending" && !p.deleted_at && p.member_id !== user,
   );
+
+  const pendingContributions = (data.savingsContributions ?? []).filter(
+    (sc) =>
+      !sc.deleted_at &&
+      sc.status === "pending" &&
+      (sc.last_edited_by ?? sc.created_by) !== user,
+  );
+  const pendingAbono = (data.abonoEntries ?? []).filter(
+    (ae) =>
+      !ae.deleted_at &&
+      ae.status === "pending" &&
+      (ae.last_edited_by ?? ae.created_by) !== user,
+  );
+
+  const activeGoals = (data.savingsGoals ?? [])
+    .filter(
+      (g) =>
+        (g.status === "proposed" && g.phase !== "expired") ||
+        (g.status === "accepted" && !g.withdrawn_at),
+    )
+    .sort((a, b) => b.created_at.localeCompare(a.created_at));
+
   return (
     <>
       <h1 className="sr-only">{group.name}</h1>
+      <CustodyCard data={data} />
       {!c ? (
         <div className="empty">
           <IconSparkles size={48} aria-hidden="true" />
@@ -68,7 +100,36 @@ export default function Home(props: ViewProps) {
           <IconSparkles aria-hidden="true" /> {t("new round")}
         </Link>
       )}
-      {waiting.length > 0 && (
+
+      <div className="ipon-home-section">
+        <div className="row">
+          <h2>{t("Ipon goals")}</h2>
+        </div>
+        {activeGoals.map((g) => (
+          <div key={g.id} className="ipon-home-item">
+            <IponCard g={g} data={data} />
+            {g.status === "accepted" &&
+              !g.withdrawn_at &&
+              !g.withdraw_proposed_by && (
+                <Link
+                  className="button secondary ipon-quick-btn"
+                  to={`/ipon/${g.id}/record`}
+                >
+                  <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
+                </Link>
+              )}
+          </div>
+        ))}
+        {activeGoals.length < 3 && (
+          <Link className="button big secondary" to="/ipon/new">
+            <IconSparkles aria-hidden="true" /> {t("New ipon goal")}
+          </Link>
+        )}
+      </div>
+
+      {(waiting.length > 0 ||
+        pendingContributions.length > 0 ||
+        pendingAbono.length > 0) && (
         <div className="confirm-list" aria-label={t("Waiting for your check")}>
           {waiting.map((p) => {
             const cycle = data.cycles.find((cycle) => cycle.id === p.cycle_id);
@@ -105,6 +166,128 @@ export default function Home(props: ViewProps) {
               </div>
             );
           })}
+
+          {pendingContributions.map((sc) => {
+            const goal = (data.savingsGoals ?? []).find(
+              (g) => g.id === sc.goal_id,
+            );
+            return (
+              <div className="sticker confirm" key={sc.id}>
+                <Avatar data={data} id={sc.member_id} />
+                <div>
+                  <strong>{money(sc.amount_centavos)}</strong>
+                  {sc.steps ? (
+                    <div
+                      className={`tally ${tone(data, sc.member_id)} mini`}
+                      role="img"
+                      aria-label={t("{days} days", { days: sc.steps })}
+                    >
+                      {Array.from({ length: sc.steps }, (_, i) => (
+                        <span key={i} className="pending" />
+                      ))}
+                    </div>
+                  ) : null}
+                  <Link to={`/ipon/${sc.goal_id}`} className="muted">
+                    {goal?.title ?? t("Ipon detail")}
+                  </Link>
+                  {sc.note && <small>{sc.note}</small>}
+                </div>
+                <button
+                  className="round no"
+                  aria-label={t("Decline {name}'s {amount}", {
+                    name: name(data, sc.member_id),
+                    amount: money(sc.amount_centavos),
+                  })}
+                  disabled={busy}
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        t(
+                          "Delete this payment record? The change stays in history.",
+                        ),
+                      )
+                    )
+                      void run(() =>
+                        rpc("edit_savings_contribution", {
+                          p_id: sc.id,
+                          p_delete: true,
+                        }),
+                      );
+                  }}
+                >
+                  <IconX />
+                </button>
+                <button
+                  className="round ok"
+                  aria-label={t("Confirm {name}'s {amount}", {
+                    name: name(data, sc.member_id),
+                    amount: money(sc.amount_centavos),
+                  })}
+                  disabled={busy}
+                  onClick={() =>
+                    void run(() =>
+                      rpc("confirm_savings_contribution", { p_id: sc.id }),
+                    )
+                  }
+                >
+                  <IconCheck />
+                </button>
+              </div>
+            );
+          })}
+
+          {pendingAbono.map((ae) => (
+            <div className="sticker confirm" key={ae.id}>
+              <Avatar data={data} id={ae.from_member} />
+              <div>
+                <strong>{money(ae.owed_amount_centavos)}</strong>
+                <Link to="/tracker" className="muted">
+                  {ae.description} ({t("Tracker")})
+                </Link>
+                {ae.note && <small>{ae.note}</small>}
+              </div>
+              <button
+                className="round no"
+                aria-label={t("Decline {name}'s {amount}", {
+                  name: name(data, ae.from_member),
+                  amount: money(ae.owed_amount_centavos),
+                })}
+                disabled={busy}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      t(
+                        "Delete this payment record? The change stays in history.",
+                      ),
+                    )
+                  )
+                    void run(() =>
+                      rpc("edit_abono_entry", {
+                        p_id: ae.id,
+                        p_delete: true,
+                      }),
+                    );
+                }}
+              >
+                <IconX />
+              </button>
+              <button
+                className="round ok"
+                aria-label={t("Confirm {name}'s {amount}", {
+                  name: name(data, ae.from_member),
+                  amount: money(ae.owed_amount_centavos),
+                })}
+                disabled={busy}
+                onClick={() =>
+                  void run(() =>
+                    rpc("confirm_abono_entry", { p_id: ae.id }),
+                  )
+                }
+              >
+                <IconCheck />
+              </button>
+            </div>
+          ))}
         </div>
       )}
       {group.pot_location && (

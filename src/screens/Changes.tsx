@@ -29,17 +29,37 @@ export default function Changes({
     received_at: t("Received"),
     used_at: t("Invite used"),
     revoked_at: t("Invite revoked"),
+    label: t("Wallet name (e.g. SeaBank, GCash, Cash)"),
+    title: t("Goal title"),
+    goal_mode: t("Goal mode"),
+    target_amount_centavos: t("Target amount (₱)"),
+    step_amount_centavos: t("Amount per hulog (₱)"),
+    cadence_days: t("Every how many days?"),
+    num_steps: t("Number of hulogs"),
+    steps: t("steps"),
+    description: t("What was it for?"),
+    total_amount_centavos: t("Total receipt (₱)"),
+    owed_amount_centavos: t("Partner's share (₱)"),
+    from_member: t("Who paid?"),
+    to_member: t("Member"),
+    holder_id: t("Wallet is held by"),
+    wallet_id: t("wallets"),
+    withdrawn_at: t("Withdrawn"),
+    archived_at: t("Archive wallet"),
+    note: t("Note or ref # (optional)"),
   };
   const value = (key: string, v: unknown) =>
     v == null
       ? "—"
       : key.endsWith("_centavos")
         ? money(Number(v))
-        : key === "receiver_id"
+        : ["receiver_id", "holder_id", "from_member", "to_member"].includes(key)
           ? name(data, String(v))
-          : key.endsWith("_at")
-            ? t("Yes")
-            : label(String(v));
+          : key === "wallet_id"
+            ? ((data.wallets ?? []).find((w) => w.id === v)?.label ?? String(v))
+            : key.endsWith("_at")
+              ? t("Yes")
+              : label(String(v));
   return (
     <>
       <div className="row">

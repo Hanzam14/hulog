@@ -1180,6 +1180,7 @@ button svg,
   .settings-grid > .duo,
   .settings-grid > .group-name,
   .settings-grid > .pot-place,
+  .settings-grid > .wallets-section,
   .settings-grid > .profile-editor,
   .settings-grid > .confirm,
   .settings-grid > .place,
@@ -1278,3 +1279,187 @@ button svg,
   outline: 2px solid var(--action-pink);
   outline-offset: 2px;
 }
+
+/* Hulog v2 — Couples Financial Companion (Tactile sticker-notebook styling) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-bell {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: 2px 2px 0 var(--line);
+  transition: transform 0.08s, box-shadow 0.08s;
+  flex-shrink: 0;
+}
+.header-bell:hover {
+  background: var(--hover-card);
+}
+.header-bell:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.header-bell .badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  margin: 0;
+  pointer-events: none;
+}
+.custody-ledger {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 3px 3px 0 var(--line);
+  margin: 16px 0;
+}
+.custody-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.custody-holder {
+  display: grid;
+  gap: 8px;
+}
+.custody-wallet-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: var(--highlight);
+  border-radius: 999px;
+  border: 1.5px solid var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 100%;
+}
+.pot-custody {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--soft);
+}
+.pot-custody small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px dashed var(--tan);
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--soft);
+}
+.ipon-card {
+  background: #e8f7ee;
+  border-color: var(--ink);
+}
+.ipon-card:hover {
+  background: #def3e6;
+  color: var(--ink);
+}
+.ipon-card .pig {
+  color: var(--green-deep);
+}
+.ipon-card .pot-progress > span {
+  background: var(--green);
+}
+.ipon-home-section {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+}
+.ipon-home-item {
+  display: grid;
+  gap: 8px;
+}
+.ipon-quick-btn {
+  justify-self: start;
+}
+.abono-hero {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 3px 3px 0 var(--line);
+  margin: 16px 0;
+}
+.abono-form-card {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 3px 3px 0 var(--line);
+  margin: 16px 0;
+}
+.abono-entry {
+  display: grid;
+  gap: 8px;
+}
+.abono-entry .row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.abono-entry .meta {
+  color: var(--soft);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.wallets-section {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+}
+.wallets-list {
+  display: grid;
+  gap: 8px;
+}
+
+/* Dark mode overrides for v2 */
+:root[data-theme="dark"] :is(.custody-ledger, .abono-hero, .abono-form-card, .header-bell) {
+  border-color: var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .header-bell:hover {
+  background: var(--hover-card);
+}
+:root[data-theme="dark"] .custody-wallet-pill {
+  background: var(--highlight);
+  border-color: var(--highlight-border);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .pot-custody small {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--card-border);
+  color: var(--soft);
+}
+:root[data-theme="dark"] .ipon-card {
+  background: #1b2f23;
+  border-color: #355840;
+}
+:root[data-theme="dark"] .ipon-card:hover {
+  background: #21392b;
+}
+:root[data-theme="dark"] .ipon-card .pig {
+  color: var(--green-deep);
+}
+:root[data-theme="dark"] .ipon-card .pot-progress > span {
+  background: var(--green-deep);
+}
+

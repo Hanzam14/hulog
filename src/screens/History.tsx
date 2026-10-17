@@ -5,9 +5,18 @@ import { byNewest, closed, name } from "../components/shared";
 import { rpc } from "../data";
 import { money, parsePesos } from "../helpers";
 import CycleCard from "../components/CycleCard";
+import IponCard from "../components/IponCard";
 
 export default function History({ data, user, run, busy }: ViewProps) {
   const [editing, setEditing] = useState<string | null>(null);
+  const pastGoals = (data.savingsGoals ?? []).filter(
+    (g) =>
+      g.withdrawn_at != null ||
+      g.phase === "completed" ||
+      g.phase === "expired" ||
+      g.status === "declined" ||
+      g.status === "cancelled",
+  );
   return (
     <>
       <h1>{t("Past pots & debts")}</h1>
@@ -160,6 +169,19 @@ export default function History({ data, user, run, busy }: ViewProps) {
       {!data.cycles.some(
         (c) => closed(c) || ["declined", "cancelled"].includes(c.status),
       ) && <p>{t("Past cycles will appear here.")}</p>}
+      {pastGoals.length > 0 && (
+        <section>
+          <h2>{t("Completed & withdrawn ipon")}</h2>
+          {pastGoals.map((g) => (
+            <div key={g.id}>
+              <IponCard g={g} data={data} />
+              <p>
+                <span className="chip">{label(g.phase)}</span>
+              </p>
+            </div>
+          ))}
+        </section>
+      )}
     </>
   );
 }

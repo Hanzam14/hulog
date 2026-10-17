@@ -46,6 +46,11 @@ export interface Cycle {
   received_at: string | null;
   days_left: number;
   created_at: string;
+  wallet_id?: string;
+  holder_id?: string;
+  wallet_label?: string;
+  pending_wallet_id?: string | null;
+  wallet_proposed_by?: string | null;
 }
 export interface Payment {
   id: string;
@@ -53,6 +58,7 @@ export interface Payment {
   member_id: string;
   days: number;
   amount_centavos: number;
+  note?: string;
   status: string;
   was_confirmed: boolean;
   created_at: string;
@@ -88,6 +94,111 @@ export interface Change {
   created_at: string;
   unread: boolean;
 }
+export interface Wallet {
+  id: string;
+  group_id: string;
+  holder_id: string;
+  label: string;
+  archived_at: string | null;
+  created_by: string;
+  created_at: string;
+}
+export interface CustodyItem {
+  wallet_id: string;
+  group_id: string;
+  holder_id: string;
+  label: string;
+  archived_at: string | null;
+  holder_active: boolean;
+  paluwagan_centavos: number;
+  ipon_centavos: number;
+  total_centavos: number;
+}
+export interface SavingsGoal {
+  id: string;
+  group_id: string;
+  title: string;
+  goal_mode: "matched" | "flexible";
+  wallet_id: string;
+  holder_id: string;
+  wallet_label: string;
+  pending_wallet_id: string | null;
+  wallet_proposed_by: string | null;
+  target_amount_centavos: number;
+  step_amount_centavos: number | null;
+  cadence_days: number | null;
+  num_steps: number | null;
+  start_date: string;
+  end_date: string;
+  proposed_by: string;
+  status: string;
+  accepted_by: string | null;
+  accepted_at: string | null;
+  withdraw_proposed_by: string | null;
+  withdrawn_by: string | null;
+  withdrawn_at: string | null;
+  saved_centavos: number;
+  phase: string;
+  days_left: number;
+  expected_steps_today: number;
+  created_at: string;
+}
+export interface SavingsContribution {
+  id: string;
+  goal_id: string;
+  member_id: string;
+  steps: number | null;
+  amount_centavos: number;
+  note: string;
+  status: string;
+  was_confirmed: boolean;
+  created_by: string;
+  last_edited_by: string | null;
+  delete_proposed_by: string | null;
+  created_at: string;
+  confirmed_by: string | null;
+  confirmed_at: string | null;
+  edited_at: string | null;
+  deleted_at: string | null;
+}
+export interface SavingsMemberProgress {
+  goal_id: string;
+  member_id: string;
+  expected_centavos: number;
+  confirmed_centavos: number;
+  pending_centavos: number;
+  confirmed_steps: number;
+  pending_steps: number;
+}
+export interface AbonoEntry {
+  id: string;
+  group_id: string;
+  kind: "expense" | "settlement";
+  from_member: string;
+  to_member: string;
+  description: string;
+  total_amount_centavos: number;
+  owed_amount_centavos: number;
+  entry_date: string;
+  note: string;
+  status: string;
+  was_confirmed: boolean;
+  created_by: string;
+  last_edited_by: string | null;
+  delete_proposed_by: string | null;
+  created_at: string;
+  confirmed_by: string | null;
+  confirmed_at: string | null;
+  edited_at: string | null;
+  deleted_at: string | null;
+}
+export interface AbonoSummary {
+  group_id: string;
+  debtor_id: string;
+  creditor_id: string;
+  owed_centavos: number;
+  pending_settlement_centavos: number;
+}
 export interface Snapshot {
   profiles: Profile[];
   groups: Group[];
@@ -104,6 +215,13 @@ export interface Snapshot {
     revoked_at: string | null;
   }[];
   today: string;
+  wallets?: Wallet[];
+  custody?: CustodyItem[];
+  savingsGoals?: SavingsGoal[];
+  savingsContributions?: SavingsContribution[];
+  savingsProgress?: SavingsMemberProgress[];
+  abonoEntries?: AbonoEntry[];
+  abonoSummary?: AbonoSummary[];
 }
 export async function rpc(
   name: string,
@@ -127,9 +245,24 @@ async function rows<T>(
       .select(columns)
       .order(order)
       .range(offset, offset + 999);
-    if (error) throw new Error(error.message);
+    if (error) throw Object.assign(new Error(error.message), { code: error.code });
     all.push(...(data as T[]));
     if (data.length < 1000) return all;
+  }
+}
+export async function optionalRows<T>(
+  table: string,
+  order: string,
+  columns = "*",
+): Promise<T[]> {
+  try {
+    return await rows<T>(table, order, columns);
+  } catch (error) {
+    // Only a not-yet-deployed v2 relation is optional; other failures must not
+    // render as empty balances.
+    const code = (error as { code?: string }).code;
+    if (code === "PGRST205" || code === "42P01") return [];
+    throw error;
   }
 }
 export async function load(): Promise<Snapshot> {
@@ -144,6 +277,13 @@ export async function load(): Promise<Snapshot> {
     changes,
     invites,
     today,
+    wallets,
+    custody,
+    savingsGoals,
+    savingsContributions,
+    savingsProgress,
+    abonoEntries,
+    abonoSummary,
   ] = await Promise.all([
     rows<Profile>(
       "profiles",
@@ -159,6 +299,13 @@ export async function load(): Promise<Snapshot> {
     rows<Change>("history_changes", "id"),
     rows<Snapshot["invites"][number]>("invites", "id"),
     rpc("hulog_today"),
+    optionalRows<Wallet>("wallets", "id"),
+    optionalRows<CustodyItem>("custody_summary", "wallet_id"),
+    optionalRows<SavingsGoal>("savings_goal_summary", "id"),
+    optionalRows<SavingsContribution>("savings_contributions", "id"),
+    optionalRows<SavingsMemberProgress>("savings_member_progress", "goal_id"),
+    optionalRows<AbonoEntry>("abono_entries", "id"),
+    optionalRows<AbonoSummary>("abono_summary", "debtor_id"),
   ]);
   return {
     profiles,
@@ -171,5 +318,12 @@ export async function load(): Promise<Snapshot> {
     changes,
     invites,
     today: today as string,
+    wallets,
+    custody,
+    savingsGoals,
+    savingsContributions,
+    savingsProgress,
+    abonoEntries,
+    abonoSummary,
   };
 }

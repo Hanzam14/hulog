@@ -21,6 +21,7 @@ import ThemeSettings from "../components/ThemeSettings";
 import InstallSettings from "../components/InstallSettings";
 import AppUpdates from "../components/AppUpdates";
 import LanguageSettings from "../components/LanguageSettings";
+import WalletsSettings from "../components/WalletsSettings";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
@@ -34,13 +35,24 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
   const openInvite = data.invites.some((i) => !i.used_at && !i.revoked_at);
   const exportCsv = async () => {
     const fresh = await load();
-    for (const [file, rows] of [
+    const coreTables: [string, unknown[]][] = [
       ["cycles", fresh.cycles],
       ["payments", fresh.payments],
       ["repayments", fresh.repayments],
-    ] as const) {
+    ];
+    const optionalTables: [string, unknown[]][] = [
+      ["wallets", fresh.wallets ?? []],
+      ["savings-goals", fresh.savingsGoals ?? []],
+      ["savings-contributions", fresh.savingsContributions ?? []],
+      ["abono-entries", fresh.abonoEntries ?? []],
+    ];
+    const tables = [
+      ...coreTables,
+      ...optionalTables.filter(([, rows]) => rows.length > 0),
+    ];
+    for (const [file, rows] of tables) {
       const url = URL.createObjectURL(
-        new Blob(["﻿", csv(rows as unknown as Record<string, unknown>[])], {
+        new Blob(["\ufeff", csv(rows as unknown as Record<string, unknown>[])], {
           type: "text/csv;charset=utf-8",
         }),
       );
@@ -152,6 +164,7 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
           </p>
         )
       )}
+      <WalletsSettings data={data} user={user} run={run} busy={busy} />
       {owner && (
         <>
           {pending.map((m) => (

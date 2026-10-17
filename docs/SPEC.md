@@ -136,3 +136,81 @@ Also test: invite reuse fails; expired and revoked invites fail; concurrent clai
 
 - Repo at `C:\Projects\Hulog`: `README.md` (what it is, MIT), `LICENSE` (MIT), `SETUP.md` (create Supabase project, enable Google provider + redirect URLs, run migrations, env vars, deploy to Vercel, VAPID keys for v1.1, iOS home-screen note), `AGENTS.md` (startup, commands, rules summary pointing to this spec), `.env.example`, `supabase/` migrations + tests, `src/`.
 - Local git repo with commits; no remote.
+
+## 10. Hulog v2 — Couples Financial Companion (Custody, Ipon Goals & Abono Tracker)
+
+Hulog v2 expands the app from a single-mode paluwagan tracker into a read-only couples financial companion while keeping Paluwagan as a first-class feature. All v1 invariants hold: integer centavos (`bigint`), `hulog_today()` (`Asia/Manila`), RLS on every table with `security definer` RPCs, mutual two-person confirmation, and 360px mobile usability.
+
+### 10.1 Named Wallets & Custody Transparency (`wallets` + `custody_summary`)
+
+- `wallets(id, group_id, holder_id, label, archived_at, created_by, created_at)`:
+  - `holder_id` is immutable and must be an active member of `group_id`.
+  - `label` is trimmed, 1..40 characters, unique per `(group_id, holder_id, lower(btrim(label)))` where `archived_at is null`.
+  - Migration backfills one default wallet per existing group (`holder_id = owner_id`, `label = coalesce(nullif(btrim(pot_location), ''), 'Main Pot')`) and links existing `cycles.wallet_id` to it before updating `cycle_summary`.
+  - `create_wallet(p_label)`: any active member creates a wallet for `holder_id = auth.uid()`.
+  - `update_wallet(p_id, p_label, p_archive default false)`: only `holder_id = auth.uid()` may rename or archive their wallet. Archiving is rejected if any unreceived or proposed cycle (`wallet_id = p_id or pending_wallet_id = p_id`) or any unwithdrawn or proposed savings goal (`wallet_id = p_id or pending_wallet_id = p_id`) references it.
+- **Cycle wallet & custodian hand-off**:
+  - `cycles` adds `wallet_id uuid not null references wallets(id)`, `pending_wallet_id uuid references wallets(id)`, and `wallet_proposed_by uuid references profiles(id)`.
+  - `propose_cycle` accepts optional `p_wallet_id uuid default null` (defaults to the proposer's earliest non-archived wallet, or the group's earliest non-archived wallet; rejects archived wallets or wallets of inactive members).
+  - Auto-receive rule in `cycle_summary`: when a cycle closes (`hulog_today() > end_date`), `payout_state` is `'Received'` if `receiver_id = wallet.holder_id` or `received_at is not null`; otherwise `'Waiting for Got it'`.
+  - `propose_cycle_wallet(p_cycle_id, p_wallet_id)`: allowed on an `accepted` cycle while `payout_state is distinct from 'Received'`. After `end_date`, only moves between the current holder's own non-archived wallets are allowed (only `receive_payout` ends custody). On or before `end_date`, if `new_wallet.holder_id = current_wallet.holder_id` and `auth.uid() = current_wallet.holder_id`, `wallet_id` updates immediately and clears any pending wallet proposal; otherwise `pending_wallet_id = p_wallet_id` and `wallet_proposed_by = auth.uid()` are set, requiring the other active member to call `respond_cycle_wallet(p_cycle_id, 'accept' | 'decline')` (or proposer `'cancel'`). `respond_cycle_wallet` re-verifies under the cycle lock that the target wallet is non-archived, its holder is active, and the cycle is not yet received. `receive_payout` clears `pending_wallet_id` and `wallet_proposed_by`.
+- **When funds count in `custody_summary`**:
+  - `custody_summary` (`security_invoker = true`) groups by `wallet_id` and reports `paluwagan_centavos` (sum of confirmed, non-deleted `payments.amount_centavos` on `accepted` cycles where `payout_state is distinct from 'Received'`), `ipon_centavos` (sum of confirmed, non-deleted `savings_contributions.amount_centavos` on `accepted` goals where `withdrawn_at is null`), `total_centavos = paluwagan_centavos + ipon_centavos`, and `holder_active boolean`.
+  - Once a cycle is `'Received'` or a savings goal has `withdrawn_at is not null`, its funds leave `custody_summary`.
+  - `payments` adds `note text not null default '' check (char_length(note) <= 140)`. Editing only `note` via `edit_payment` preserves confirmation status and writes `history`.
+
+### 10.2 Savings Goals ("Ipon Goals" — `matched` Cadence & `flexible` Shared Pot)
+
+- `savings_goals(id, group_id, title, goal_mode, wallet_id, pending_wallet_id, wallet_proposed_by, target_amount_centavos, step_amount_centavos, cadence_days, num_steps, start_date, end_date, proposed_by, status, accepted_by, accepted_at, withdraw_proposed_by, withdrawn_by, withdrawn_at, created_at)`:
+  - `title` is trimmed, 1..60 characters.
+  - `goal_mode in ('matched', 'flexible')`.
+  - In `matched` mode: `step_amount_centavos between 100 and 1000000000`, `cadence_days between 1 and 90`, `num_steps between 1 and 366`, `end_date = start_date + ((num_steps - 1) * cadence_days)`, and `target_amount_centavos = step_amount_centavos * num_steps * 2` (computed by the RPC).
+  - In `flexible` mode: `step_amount_centavos is null`, `cadence_days is null`, `num_steps is null`, `target_amount_centavos between 100 and 10000000000`, and `end_date >= start_date`.
+  - Total span `end_date - start_date <= 1095` (max 3 years).
+  - **Active goal cap (max 3)**: under the group row lock, `propose_savings_goal` rejects a new proposal if the group already has 3 goals where `(status = 'proposed' and hulog_today() <= start_date) or (status = 'accepted' and withdrawn_at is null)`. Unaccepted proposals with `hulog_today() > start_date` have derived phase `'expired'` and do not count against the cap.
+  - **Accept / Decline / Cancel (`respond_savings_goal`)**: proposer can `'cancel'`; the other active member can `'accept'` (only while `hulog_today() <= start_date`) or `'decline'`.
+  - **Wallet change (`propose_goal_wallet` / `respond_goal_wallet`)**: allowed while `status = 'accepted' and withdrawn_at is null`. If moving between the current holder's own non-archived wallets by the holder, updates immediately; otherwise sets `pending_wallet_id` and `wallet_proposed_by` for the other active member to accept/decline.
+  - **Two-step withdrawal / closing (`propose_withdraw_goal` / `respond_withdraw_goal`)**:
+    - Allowed on an `accepted` goal with `withdrawn_at is null`.
+    - Blocked while any non-deleted contribution on the goal has `status = 'pending'` or `delete_proposed_by is not null`.
+    - While `withdraw_proposed_by is not null`, new contributions and contribution edits/delete proposals are blocked.
+    - The other active member (`<> withdraw_proposed_by`) confirms (`withdrawn_at = now(), withdrawn_by = auth.uid()`, clearing `pending_wallet_id` and `wallet_proposed_by`) or declines (`withdraw_proposed_by = null`); proposer can cancel.
+- `savings_contributions(id, goal_id, member_id, steps, amount_centavos, note, status, was_confirmed, created_by, last_edited_by, delete_proposed_by, created_at, confirmed_by, confirmed_at, edited_at, deleted_at)`:
+  - Recording (`record_savings_contribution`) is allowed while `goal.status = 'accepted' and goal.withdrawn_at is null and goal.withdraw_proposed_by is null` (including during `upcoming` before `start_date` and after `end_date`).
+  - Under the goal row lock (`private.lock_goal`):
+    - In `matched` mode: `steps >= 1`, `amount_centavos = steps * goal.step_amount_centavos`, and `(sum(steps) of the member's non-deleted contributions) + steps <= goal.num_steps`.
+    - In `flexible` mode: `steps is null`, `amount_centavos > 0`, and `(sum(amount_centavos) of all non-deleted contributions on the goal) + amount_centavos <= goal.target_amount_centavos`.
+  - Every contribution starts `status = 'pending'`.
+  - **Confirm (`confirm_savings_contribution`)**: callable by the active member `<> coalesce(last_edited_by, created_by)` while `goal.withdrawn_at is null`. Sets `status = 'confirmed', was_confirmed = true, confirmed_by = auth.uid(), confirmed_at = now(), delete_proposed_by = null`.
+  - **Edit / Delete (`edit_savings_contribution` / `respond_delete_savings_contribution`)**:
+    - Editing `steps` or `amount_centavos` (excluding the edited row from the cap) sets `status = 'pending'`, `last_edited_by = auth.uid()`, clears `confirmed_by`, `confirmed_at`, and `delete_proposed_by`, and preserves `created_by` and `was_confirmed`. Editing only `note` preserves confirmation status.
+    - Deleting a `pending` contribution soft-deletes immediately (`deleted_at = now(), edited_at = now()`).
+    - Deleting a `confirmed` contribution sets `delete_proposed_by = auth.uid()`, requiring the other active member (`<> delete_proposed_by`) to confirm (`deleted_at = now()`) or decline (`delete_proposed_by = null`); proposer can cancel.
+
+### 10.3 Shared Expense & "Abono" Tracker (`abono_entries` + `abono_summary`)
+
+- `abono_entries(id, group_id, kind, from_member, to_member, description, total_amount_centavos, owed_amount_centavos, entry_date, note, status, was_confirmed, created_by, last_edited_by, delete_proposed_by, created_at, confirmed_by, confirmed_at, edited_at, deleted_at)`:
+  - `kind in ('expense', 'settlement')` (immutable after creation).
+  - `from_member <> to_member`; both must be active members in `group_id`.
+  - For `'expense'`: `from_member` paid the merchant `total_amount_centavos > 0`, and `to_member` owes `from_member` `owed_amount_centavos` (`0 < owed_amount_centavos <= total_amount_centavos`).
+  - For `'settlement'`: `from_member` (the debtor) paid `to_member` (the creditor) `owed_amount_centavos = total_amount_centavos > 0`.
+  - `entry_date <= hulog_today()`.
+- **Net Abono Balance (`abono_summary` view, `security_invoker = true`)**:
+  - Separate from Paluwagan cycle shortfall debt.
+  - For active members $u$ and $v$ in a group:
+    $$\text{confirmed\_net}(u \to v) = \sum_{\substack{\text{confirmed expense}\\\text{from}=v, \text{to}=u}} \text{owed} - \sum_{\substack{\text{confirmed expense}\\\text{from}=u, \text{to}=v}} \text{owed} - \sum_{\substack{\text{confirmed settlement}\\\text{from}=u, \text{to}=v}} \text{owed} + \sum_{\substack{\text{confirmed settlement}\\\text{from}=v, \text{to}=u}} \text{owed}$$
+  - When `confirmed_net(u -> v) > 0`, $u$ owes $v$ that amount.
+- **Settlement Cap & Mutual Confirmation**:
+  - Recording or editing a `'settlement'` locks the group row and requires `new_amount + sum(pending non-deleted settlements from from_member to to_member, excluding edited row) <= confirmed_net(from_member -> to_member)`.
+  - `confirm_abono_entry(p_id)`: callable only by the active member `<> coalesce(last_edited_by, created_by)`. For a `'settlement'`, re-checks under the group lock that `owed_amount_centavos <= confirmed_net(from_member -> to_member)`.
+  - `edit_abono_entry` & `respond_delete_abono_entry`: changing financial fields (`from_member`, `to_member`, `description`, `total_amount_centavos`, `owed_amount_centavos`) resets `status = 'pending'`, sets `last_edited_by = auth.uid()`, clears `confirmed_by`/`confirmed_at`/`delete_proposed_by`, and preserves `created_by` and `was_confirmed`. Editing only `note` or `entry_date` preserves confirmation. Deleting a `pending` row soft-deletes immediately; deleting a `confirmed` row sets `delete_proposed_by = auth.uid()` for two-step partner confirmation.
+
+### 10.4 Navigation & Screens (v2)
+
+- **Top Header**: `hulog.` brand on left; `<NavLink to="/changes">` (`IconBell` with `aria-label` and numeric unread count badge) + `Sign out` on right.
+- **4-Tab Bottom Nav**: `Home` (`/`), `Tracker` (`/tracker`), `History` (`/history`), `Group` (`/settings`).
+- **Home**: Custody Breakdown Card (`custody_summary`), unified "Waiting for your check" confirm list, Paluwagan Round section, and Ipon Goals section (up to 3 active goals).
+- **Tracker**: Net Abono balance card with **Settle Abono** action + Shared Expense & Settlement log + `+ Add Abono`.
+- **History**: Closed Paluwagan cycles (with cycle debts/repayments) + completed/withdrawn/expired Ipon goals.
+- **Settings**: Profile (`Ikaw`), Group name, Wallets Manager, Invite QR, Theme (`Itsura`), Language (`Wika`), Notifications, Updates, and extended CSV export (`cycles`, `payments`, `repayments`, `wallets`, `savings-goals`, `savings-contributions`, `abono-entries`).
+

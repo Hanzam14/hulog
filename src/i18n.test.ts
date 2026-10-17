@@ -47,4 +47,38 @@ describe("device language", () => {
     setLang("taglish");
     expect(document.documentElement.lang).toBe("tl");
   });
+  it("translates v2 keys across en, tl, and taglish", () => {
+    setLang("en");
+    expect(t("Goal reached ✓")).toBe("Goal reached ✓");
+    expect(t("Tracker")).toBe("Tracker");
+    expect(
+      t("{debtor} owes {creditor} {amount}", {
+        debtor: "Ana",
+        creditor: "Ben",
+        amount: "₱100.00",
+      }),
+    ).toBe("Ana owes Ben ₱100.00");
+
+    setLang("tl");
+    expect(t("Goal reached ✓")).toBe("Naabot ang layunin ✓");
+    expect(t("Tracker")).toBe("Tracker");
+    expect(
+      t("{debtor} owes {creditor} {amount}", {
+        debtor: "Ana",
+        creditor: "Ben",
+        amount: "₱100.00",
+      }),
+    ).toBe("May utang si Ana kay Ben na ₱100.00");
+
+    setLang("taglish");
+    expect(t("Goal reached ✓")).toBe("Goal reached ✓");
+    expect(t("Tracker")).toBe("Tracker");
+    expect(
+      t("{debtor} owes {creditor} {amount}", {
+        debtor: "Ana",
+        creditor: "Ben",
+        amount: "₱100.00",
+      }),
+    ).toBe("May utang si Ana kay Ben na ₱100.00");
+  });
 });
