@@ -73,6 +73,8 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
                   <input
                     value={editLabel}
                     onChange={(e) => setEditLabel(e.target.value)}
+                    aria-label={t("Rename wallet")}
+                    placeholder={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
                     maxLength={40}
                     required
                     autoFocus
@@ -113,6 +115,8 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
                         type="button"
                         className="quiet"
                         disabled={busy}
+                        aria-label={t("Rename wallet")}
+                        title={t("Rename wallet")}
                         onClick={() => {
                           setEditingId(w.id);
                           setEditLabel(w.label);

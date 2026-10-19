@@ -185,6 +185,7 @@ function AbonoEditRow({
         <input
           type="text"
           maxLength={140}
+          placeholder={t("e.g. GCash ref #1234")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
@@ -355,7 +356,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                       p_kind: "settlement",
                       p_from_member: activeDebt.debtor_id,
                       p_to_member: activeDebt.creditor_id,
-                      p_description: "Settlement",
+                      p_description: t("Settlement"),
                       p_total_amount_centavos: amt,
                       p_owed_amount_centavos: amt,
                       p_entry_date: data.today,
@@ -573,7 +574,11 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                 >
                   <Avatar data={data} id={e.from_member} size="sm" />
                   <div>
-                    <strong>{e.description}</strong>
+                    <strong>
+                      {e.description === "Settlement"
+                        ? t("Settlement")
+                        : e.description}
+                    </strong>
                     <p>
                       {e.kind === "expense"
                         ? `${name(data, e.to_member)} · ${t(

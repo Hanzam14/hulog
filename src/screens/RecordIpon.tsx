@@ -113,7 +113,7 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
                 <button
                   type="button"
                   className="round secondary"
-                  aria-label={t("One day less")}
+                  aria-label={t("One hulog less")}
                   onClick={() => set(steps - 1)}
                   disabled={steps <= 1}
                 >
@@ -125,7 +125,7 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
                 <button
                   type="button"
                   className="round secondary"
-                  aria-label={t("One day more")}
+                  aria-label={t("One hulog more")}
                   onClick={() => set(steps + 1)}
                   disabled={steps >= remainingSteps}
                 >
