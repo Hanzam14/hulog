@@ -3,6 +3,8 @@ import {
   addDays,
   cadenceDisplay,
   csv,
+  filterHistory,
+  historyMonths,
   iponGoalProgress,
   money,
   parsePesos,
@@ -89,6 +91,87 @@ describe("display helpers", () => {
       '"name","note","amount"\r\n"\'=1+1","a,""b""\nline","5000"',
     );
     expect(csv([])).toBe("");
+  });
+  it("collects history months and filters history cycles, goals, and totals by month and member", () => {
+    const cycles = [
+      {
+        id: "c1",
+        end_date: "2026-09-15",
+        receiver_id: "a",
+        pot_centavos: 150000,
+      },
+      {
+        id: "c2",
+        end_date: "2026-10-20",
+        receiver_id: "b",
+        pot_centavos: 200000,
+      },
+    ];
+    const goals = [
+      {
+        id: "g1",
+        end_date: "2026-10-25",
+        holder_id: "a",
+        proposed_by: "b",
+        saved_centavos: 100000,
+      },
+      {
+        id: "g2",
+        end_date: "2026-08-10",
+        holder_id: "a",
+        proposed_by: "a",
+        saved_centavos: 50000,
+      },
+    ];
+    const progress = [
+      { cycle_id: "c1", member_id: "b", debt_centavos: 25000 },
+      { cycle_id: "c2", member_id: "a", debt_centavos: 10000 },
+    ];
+
+    expect(historyMonths(cycles, goals)).toEqual([
+      "2026-10",
+      "2026-09",
+      "2026-08",
+    ]);
+
+    const all = filterHistory({
+      cycles,
+      goals,
+      progress,
+      month: "all",
+      memberId: "all",
+    });
+    expect(all.cycles).toHaveLength(2);
+    expect(all.goals).toHaveLength(2);
+    expect(all.totalPotCentavos).toBe(350000);
+    expect(all.totalSavedCentavos).toBe(150000);
+    expect(all.totalDebtCentavos).toBe(35000);
+
+    const octOnly = filterHistory({
+      cycles,
+      goals,
+      progress,
+      month: "2026-10",
+      memberId: "all",
+    });
+    expect(octOnly.cycles.map((c) => c.id)).toEqual(["c2"]);
+    expect(octOnly.goals.map((g) => g.id)).toEqual(["g1"]);
+    expect(octOnly.totalPotCentavos).toBe(200000);
+    expect(octOnly.totalSavedCentavos).toBe(100000);
+    expect(octOnly.totalDebtCentavos).toBe(10000);
+
+    const memberBOnly = filterHistory({
+      cycles,
+      goals,
+      progress,
+      month: "all",
+      memberId: "b",
+    });
+    expect(memberBOnly.cycles.map((c) => c.id)).toEqual(["c2"]);
+    expect(memberBOnly.goals.map((g) => g.id)).toEqual(["g1"]);
+    expect(memberBOnly.totalPotCentavos).toBe(200000);
+    expect(memberBOnly.totalSavedCentavos).toBe(100000);
+    expect(memberBOnly.totalDebtCentavos).toBe(10000);
   });
   it("computes iponGoalProgress percent and On track / Behind pace labels", () => {
     setLang("en");
