@@ -565,6 +565,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
         {entries.length === 0 ? (
           <div className="empty">
             <p>{t("No shared expenses yet. Log a bill or abono above.")}</p>
+            {!showAdd && (
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setShowAdd(true)}
+              >
+                + {t("Add shared expense")}
+              </button>
+            )}
           </div>
         ) : (
           entries.map((e) => (

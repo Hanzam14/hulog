@@ -6,6 +6,7 @@ import {
   iponGoalProgress,
   money,
   parsePesos,
+  payoutCountdown,
   phaseDisplay,
   shortDate,
   splitHalfCentavos,
@@ -141,5 +142,57 @@ describe("display helpers", () => {
     expect(
       iponGoalProgress({ ...baseGoal, expected_steps_today: 6 }).paceLabel,
     ).toBe("Nahuhuli");
+  });
+  it("pins the final contribution day to payout tomorrow", () => {
+    setLang("en");
+    expect(payoutCountdown({
+      status: "accepted",
+      end_date: "2026-12-31",
+      receiver_id: "a",
+      payout_state: null,
+      received_at: null,
+    }, "2026-12-31", "a", "Ana")).toBe("Payout tomorrow - your turn");
+  });
+  it("computes payoutCountdown for today, tomorrow, multi-day, overdue, and no-active-cycle", () => {
+    setLang("en");
+    const base = {
+      status: "accepted",
+      end_date: "2026-10-20",
+      receiver_id: "a",
+      payout_state: null,
+      received_at: null,
+    };
+    expect(payoutCountdown(null, "2026-10-20", "a", "Ana")).toBeNull();
+    expect(
+      payoutCountdown({ ...base, status: "proposed" }, "2026-10-20", "a", "Ana"),
+    ).toBeNull();
+    expect(
+      payoutCountdown(
+        { ...base, payout_state: "Received" },
+        "2026-10-20",
+        "a",
+        "Ana",
+      ),
+    ).toBeNull();
+    expect(payoutCountdown(base, "2026-10-21", "a", "Ana")).toBe(
+      "Payout today - your turn",
+    );
+    expect(payoutCountdown(base, "2026-10-20", "b", "Ana")).toBe(
+      "Payout tomorrow - Ana's turn",
+    );
+    expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
+      "Payout in 4 days - your turn",
+    );
+    expect(payoutCountdown(base, "2026-10-17", "b", "Ana")).toBe(
+      "Payout in 4 days - Ana's turn",
+    );
+    expect(payoutCountdown(base, "2026-10-22", "b", "Ana")).toBe(
+      "Payout overdue - Ana's turn",
+    );
+
+    setLang("taglish");
+    expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
+      "Payout sa 4 araw - turn mo",
+    );
   });
 });
