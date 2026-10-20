@@ -130,7 +130,7 @@ export default function Home(props: ViewProps) {
               {data.progress
                 .filter((p) => p.cycle_id === c.id)
                 .map((p) => {
-                  const isSolo = isSoloCycle(c, active.length);
+                  const isSolo = isSoloCycle(c);
                   const isSaver = p.member_id === c.receiver_id;
                   const isObserving = isSolo && !isSaver;
                   return (

@@ -560,6 +560,45 @@ describe("Hulog v2 Unified Home Dashboard", () => {
 });
 
 describe("Hulog Solo Mode", () => {
+  it("keeps hosted flexible solo goals free of partner tallies while retaining partner controls", () => {
+    setLang("en");
+    const data = v2Snapshot();
+    const goal = data.savingsGoals![0];
+    Object.assign(goal, {
+      title: "[Solo] AI subscription", goal_mode: "flexible",
+      step_amount_centavos: null, cadence_days: null, num_steps: null,
+      expected_steps_today: 0,
+    });
+    data.savingsProgress = ["a", "b"].map((member_id) => ({
+      goal_id: goal.id, member_id, expected_centavos: goal.target_amount_centavos,
+      confirmed_centavos: 0, pending_centavos: 0, confirmed_steps: 0, pending_steps: 0,
+    }));
+    const card = html(createElement(IponCard, { g: goal, data, user: "b" }));
+    expect(card).toContain("₱0 · Observing");
+    expect(card).not.toContain('class="tally');
+    const detail = (user: string) => renderToStaticMarkup(createElement(
+      MemoryRouter, { initialEntries: ["/ipon/goal-1"] },
+      createElement(Routes, {}, createElement(Route, {
+        path: "/ipon/:id",
+        element: createElement(IponDetail, { data, user, run, busy: false }),
+      })),
+    ));
+    goal.status = "proposed";
+    expect(detail("b")).toContain('aria-label="Accept"');
+    expect(detail("b")).toContain('aria-label="Decline"');
+    expect(detail("a")).toContain('aria-label="Cancel proposal"');
+    goal.status = "accepted";
+    data.savingsContributions = [{
+      id: "pending-solo", goal_id: goal.id, member_id: "a", steps: null,
+      amount_centavos: 10000, note: "", status: "pending", was_confirmed: false,
+      created_by: "a", last_edited_by: null, delete_proposed_by: null,
+      created_at: data.today, confirmed_by: null, confirmed_at: null,
+      edited_at: null, deleted_at: null,
+    }];
+    expect(detail("b")).toContain(">Confirm</button>");
+    expect(detail("a")).not.toContain(">Confirm</button>");
+    expect(detail("b")).not.toContain('class="tally');
+  });
   it("enables and disables solo mode in localStorage", () => {
     const store: Record<string, string> = {};
     vi.stubGlobal("localStorage", {
@@ -703,7 +742,8 @@ describe("Hulog Solo Mode", () => {
     expect(updatedGoal?.phase).toBe("withdrawn");
   });
 
-  it("uses active.length for payout preview in Propose screen", () => {
+  it("previews one payer for local standalone rounds and two for partnered rounds", () => {
+    vi.stubGlobal("localStorage", { getItem: () => "true" });
     setLang("en");
     const soloData = v2Snapshot();
     soloData.memberships = [soloData.memberships[0]]; // 1 active member

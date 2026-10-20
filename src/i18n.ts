@@ -386,6 +386,8 @@ const taglish = {
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Mode ng pot",
   "Flexible solo pot": "Flexible solo pot",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Flexible ang solo goal sa shared pot. Walang nakatakdang hulog ang partner mo; kailangan pa rin niyang tanggapin ang goal at i-confirm ang mga hulog.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -774,6 +776,8 @@ const en = {
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Pot mode",
   "Flexible solo pot": "Flexible solo pot",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1166,6 +1170,8 @@ const tl = {
   "Standalone Solo": "Sariling Solo lang",
   "Pot mode": "Mode ng pot",
   "Flexible solo pot": "Maluwag na sariling ipon",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Walang takdang hulog ang sariling ipon sa pinagsasaluhang pondo. Hindi kailangang maghulog ang partner mo; kailangan pa rin niyang tanggapin ang layunin at kumpirmahin ang mga hulog.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

@@ -149,16 +149,8 @@ export function isSoloCycle(
     num_days: number;
     is_solo?: boolean;
   },
-  activeMemberCount = 2,
 ): boolean {
-  if (c.is_solo) return true;
-  if (
-    activeMemberCount > 1 &&
-    c.target_centavos === c.daily_amount_centavos * c.num_days
-  ) {
-    return true;
-  }
-  return false;
+  return c.is_solo === true;
 }
 
 export function getSoloCycleBadgeText(
@@ -178,7 +170,7 @@ export function getSoloCycleBadgeText(
   const activeMembers = (data.memberships ?? []).filter(
     (m) => m.status === "active",
   );
-  if (!isSoloCycle(c, activeMembers.length)) return "";
+  if (!isSoloCycle(c)) return "";
   const isMultiMember = activeMembers.length > 1;
   const isOwner = !c.receiver_id || c.receiver_id === currentUserId;
 

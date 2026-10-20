@@ -151,8 +151,9 @@ describe("solo helpers", () => {
       daily_amount_centavos: 5000,
       num_days: 15,
       target_centavos: 75000,
+      is_solo: true,
     };
-    expect(isSoloCycle(soloCycle, 2)).toBe(true);
+    expect(isSoloCycle(soloCycle)).toBe(true);
     expect(getSoloCycleBadgeText(soloCycle, mockData, "user-1")).toBe(
       "Solo · You (Partner can view)",
     );
@@ -166,7 +167,10 @@ describe("solo helpers", () => {
       num_days: 15,
       target_centavos: 150000,
     };
-    expect(isSoloCycle(duoCycle, 2)).toBe(false);
+    expect(isSoloCycle(duoCycle)).toBe(false);
     expect(getSoloCycleBadgeText(duoCycle, mockData, "user-1")).toBe("");
+    // Hosted cycle_summary uses 2x daily amount; even a legacy 1x target
+    // is not evidence of a solo cycle without the explicit local flag.
+    expect(isSoloCycle({ ...duoCycle, target_centavos: 75000 })).toBe(false);
   });
 });
