@@ -8,8 +8,11 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker, { buildSettlementPayload } from "../screens/Tracker";
+import Tracker from "../screens/Tracker";
+import { buildSettlementPayload } from "../helpers";
 import Home from "../screens/Home";
+import Propose from "../screens/Propose";
+import { isSoloMode, setSoloMode, loadSoloSnapshot, soloRpc } from "../solo";
 
 vi.mock("../data", async () => {
   const actual = await vi.importActual<typeof import("../data")>("../data");
@@ -555,3 +558,164 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(markup).toContain("Bagong ipon goal");
   });
 });
+
+describe("Hulog Solo Mode", () => {
+  it("enables and disables solo mode in localStorage", () => {
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+
+    expect(isSoloMode()).toBe(false);
+    setSoloMode(true);
+    expect(isSoloMode()).toBe(true);
+    setSoloMode(false);
+    expect(isSoloMode()).toBe(false);
+  });
+
+  it("loads a valid default solo snapshot with 1 member and 1 wallet", async () => {
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+
+    const snapshot = await loadSoloSnapshot();
+    expect(snapshot.groups.length).toBe(1);
+    expect(snapshot.memberships.length).toBe(1);
+    expect(snapshot.memberships[0].status).toBe("active");
+    expect(snapshot.wallets?.length).toBe(1);
+    expect(snapshot.custody?.length).toBe(1);
+    expect(snapshot.today).toBeDefined();
+  });
+
+  it("proposes cycle and auto-confirms with 1x solo pool", async () => {
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+
+    const cycleId = await soloRpc("propose_cycle", {
+      p_daily_amount_centavos: 5000,
+      p_num_days: 15,
+      p_start_date: "2026-10-21",
+    });
+
+    const snapshot = await loadSoloSnapshot();
+    const cycle = snapshot.cycles.find((c) => c.id === cycleId);
+    expect(cycle).toBeDefined();
+    expect(cycle?.status).toBe("accepted");
+    // 1x pool: 5000 * 15 * 1 = 75000 centavos
+    expect(cycle?.target_centavos).toBe(75000);
+    expect(cycle?.receiver_id).toBe("solo-user");
+
+    const paymentId = await soloRpc("record_payment", {
+      p_cycle_id: cycleId,
+      p_days: 2,
+      p_note: "solo test",
+    });
+
+    const afterPayment = await loadSoloSnapshot();
+    const payment = afterPayment.payments.find((p) => p.id === paymentId);
+    expect(payment?.status).toBe("confirmed");
+    expect(payment?.was_confirmed).toBe(true);
+    expect(payment?.amount_centavos).toBe(10000);
+    expect(afterPayment.cycles[0].pot_centavos).toBe(10000);
+    expect(afterPayment.progress[0].confirmed_days).toBe(2);
+  });
+
+  it("proposes ipon goal and auto-confirms with 1x matched pool and auto-confirms contributions and withdrawals", async () => {
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+
+    const goalId = await soloRpc("propose_savings_goal", {
+      p_title: "Solo Goal",
+      p_goal_mode: "matched",
+      p_start_date: "2026-10-21",
+      p_step_amount_centavos: 10000,
+      p_cadence_days: 1,
+      p_num_steps: 10,
+    });
+
+    const snapshot = await loadSoloSnapshot();
+    const goal = snapshot.savingsGoals?.find((g) => g.id === goalId);
+    expect(goal).toBeDefined();
+    expect(goal?.status).toBe("accepted");
+    // 1x pool: 10000 * 10 * 1 = 100000 centavos
+    expect(goal?.target_amount_centavos).toBe(100000);
+
+    const contribId = await soloRpc("record_savings_contribution", {
+      p_goal_id: goalId,
+      p_steps: 1,
+      p_amount_centavos: 10000,
+      p_note: "first step",
+    });
+
+    const afterContrib = await loadSoloSnapshot();
+    const contrib = afterContrib.savingsContributions?.find((c) => c.id === contribId);
+    expect(contrib?.status).toBe("confirmed");
+    expect(contrib?.was_confirmed).toBe(true);
+    expect(afterContrib.savingsGoals?.[0].saved_centavos).toBe(10000);
+
+    await soloRpc("propose_withdraw_goal", { p_goal_id: goalId });
+    const afterWithdraw = await loadSoloSnapshot();
+    expect(afterWithdraw.savingsGoals?.[0].withdrawn_at).toBeDefined();
+    expect(afterWithdraw.savingsGoals?.[0].phase).toBe("withdrawn");
+  });
+
+  it("uses active.length for payout preview in Propose screen", () => {
+    setLang("en");
+    const soloData = v2Snapshot();
+    soloData.memberships = [soloData.memberships[0]]; // 1 active member
+    const soloMarkup = html(
+      createElement(Propose, { data: soloData, user: "a", run, busy: false }),
+    );
+    // 50 pesos * 15 days * 1 = ₱750.00
+    expect(soloMarkup).toContain("₱750.00");
+
+    const duoData = v2Snapshot(); // 2 active members
+    const duoMarkup = html(
+      createElement(Propose, { data: duoData, user: "a", run, busy: false }),
+    );
+    // 50 pesos * 15 days * 2 = ₱1,500.00
+    expect(duoMarkup).toContain("₱1,500.00");
+  });
+
+  it("renders solo mode empty state and exit button on Home screen when solo", () => {
+    const store: Record<string, string> = { "hulog-solo-mode": "true" };
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+
+    setLang("en");
+    const soloData = v2Snapshot();
+    soloData.memberships = [soloData.memberships[0]];
+    soloData.cycles = []; // No cycle
+    const markup = html(
+      createElement(Home, { data: soloData, user: "a", run, busy: false }),
+    );
+
+    // Solo empty state without partner-waiting blocker
+    expect(markup).toContain("Start a round to begin tracking your savings.");
+    expect(markup).not.toContain("Invite your partner from the group tab");
+    expect(markup).toContain("Exit solo mode");
+  });
+});
+
+

@@ -24,7 +24,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   const accepted = data.cycles
     .filter((c) => c.status === "accepted")
     .sort(byNewest)[0];
-  const members = data.memberships.filter((m) => m.status === "active");
+  const active = data.memberships.filter((m) => m.status === "active");
+  const members = active;
   const [amount, setAmount] = useState("50");
   const [days, setDays] = useState("15");
   const [receiver, setReceiver] = useState(
@@ -39,7 +40,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   let total: string;
   try {
     // A round always has two people paying, even before the partner joins.
-    total = money(parsePesos(amount) * Number(days) * 2);
+    total = money(parsePesos(amount) * Number(days) * (active.length || 1));
   } catch {
     total = "";
   }

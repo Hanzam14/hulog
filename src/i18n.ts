@@ -354,6 +354,15 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "Go solo on this device": "Mag-solo muna sa device na ito",
+  "Go solo without a partner": "Mag-solo nang walang partner",
+  "Switch to solo mode": "Lumipat sa solo mode",
+  "Exit solo mode": "Mag-exit sa solo mode",
+  "Currently in solo mode.": "Nasa solo mode ka ngayon.",
+  "Start a round to begin tracking your savings.":
+    "Magsimula ng round para ma-track ang ipon mo.",
+  "Or track your own savings": "O i-track ang sariling ipon",
+  "Solo mode": "Solo mode",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -710,6 +719,15 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "Go solo on this device": "Go solo on this device",
+  "Go solo without a partner": "Go solo without a partner",
+  "Switch to solo mode": "Switch to solo mode",
+  "Exit solo mode": "Exit solo mode",
+  "Currently in solo mode.": "Currently in solo mode.",
+  "Start a round to begin tracking your savings.":
+    "Start a round to begin tracking your savings.",
+  "Or track your own savings": "Or track your own savings",
+  "Solo mode": "Solo mode",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1070,6 +1088,15 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "Go solo on this device": "Mag-solo muna sa device na ito",
+  "Go solo without a partner": "Mag-isa nang walang partner",
+  "Switch to solo mode": "Lumipat sa solo mode",
+  "Exit solo mode": "Umalis sa solo mode",
+  "Currently in solo mode.": "Kasalukuyang nasa solo mode.",
+  "Start a round to begin tracking your savings.":
+    "Magsimula ng round para maitala ang iyong ipon.",
+  "Or track your own savings": "O subaybayan ang sariling ipon",
+  "Solo mode": "Solo mode",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

@@ -19,9 +19,11 @@ import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
 import CustodyCard from "../components/CustodyCard";
 import IponCard from "../components/IponCard";
+import { isSoloMode, setSoloMode } from "../solo";
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
+  const active = data.memberships.filter((m) => m.status === "active");
   const group = data.groups[0];
   const cycles = [...data.cycles].sort(byNewest);
   const live = cycles.find(
@@ -61,8 +63,28 @@ export default function Home(props: ViewProps) {
         <div className="empty">
           <IconSparkles size={48} aria-hidden="true" />
           <p>
-            {t("Invite your partner from the group tab, then start a round.")}
+            {isSoloMode()
+              ? t("Start a round to begin tracking your savings.")
+              : t("Invite your partner from the group tab, then start a round.")}
           </p>
+
+          {!isSoloMode() && active.length < 2 && (
+            <button
+              type="button"
+              className="secondary"
+              style={{ marginTop: "12px" }}
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  setSoloMode(true, user);
+                })
+              }
+            >
+              {t("Switch to solo mode")}
+            </button>
+          )}
+
+
         </div>
       ) : (
         <>
@@ -288,6 +310,39 @@ export default function Home(props: ViewProps) {
               </button>
             </div>
           ))}
+        </div>
+      )}
+      {active.length < 2 && (
+        <div style={{ textAlign: "center", margin: "16px 0" }}>
+          {isSoloMode() ? (
+            <button
+              type="button"
+              className="quiet"
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  setSoloMode(false);
+                })
+              }
+            >
+              {t("Exit solo mode")}
+            </button>
+          ) : (
+            c && (
+              <button
+                type="button"
+                className="quiet"
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    setSoloMode(true, user);
+                  })
+                }
+              >
+                {t("Switch to solo mode")}
+              </button>
+            )
+          )}
         </div>
       )}
       {group.pot_location && (

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { isSoloMode, loadSoloSnapshot, soloRpc } from "./solo";
 export const supabase =
   import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
     ? createClient(
@@ -227,6 +228,7 @@ export async function rpc(
   name: string,
   args?: Record<string, unknown>,
 ): Promise<unknown> {
+  if (isSoloMode()) return soloRpc(name, args);
   if (!supabase) throw new Error("Add your Supabase settings in .env first.");
   const { data, error } = await supabase.rpc(name, args);
   if (error) throw new Error(error.message);
@@ -266,6 +268,7 @@ export async function optionalRows<T>(
   }
 }
 export async function load(): Promise<Snapshot> {
+  if (isSoloMode()) return loadSoloSnapshot();
   const [
     profiles,
     groups,

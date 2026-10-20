@@ -61,7 +61,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       const steps = Number(numSteps);
       const cadence = Number(cadenceDays);
       if (steps > 0 && cadence > 0) {
-        totalTarget = money(stepCentavos * steps * 2);
+        totalTarget = money(stepCentavos * steps * (activeMemberIds.size || 1));
         computedEndDate = addDays(startDate, (steps - 1) * cadence);
       }
     } catch {
