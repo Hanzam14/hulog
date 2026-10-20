@@ -59,6 +59,25 @@ export function cadenceDisplay(cadenceDays: number | null): string {
 export function splitHalfCentavos(totalCentavos: number): number {
   return Math.ceil(totalCentavos / 2);
 }
+/** Build the RPC payload for recording an abono settlement entry. */
+export function buildSettlementPayload(args: {
+  debtorId: string;
+  creditorId: string;
+  amountCentavos: number;
+  entryDate: string;
+  note: string;
+}) {
+  return {
+    p_kind: "settlement" as const,
+    p_from_member: args.debtorId,
+    p_to_member: args.creditorId,
+    p_description: "Settlement",
+    p_total_amount_centavos: args.amountCentavos,
+    p_owed_amount_centavos: args.amountCentavos,
+    p_entry_date: args.entryDate,
+    p_note: args.note.trim(),
+  };
+}
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];

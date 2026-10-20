@@ -4,27 +4,12 @@ import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
-import { money, parsePesos, splitHalfCentavos } from "../helpers";
-
-/** Build the RPC payload for recording an abono settlement entry. */
-export function buildSettlementPayload(args: {
-  debtorId: string;
-  creditorId: string;
-  amountCentavos: number;
-  entryDate: string;
-  note: string;
-}) {
-  return {
-    p_kind: "settlement" as const,
-    p_from_member: args.debtorId,
-    p_to_member: args.creditorId,
-    p_description: "Settlement",
-    p_total_amount_centavos: args.amountCentavos,
-    p_owed_amount_centavos: args.amountCentavos,
-    p_entry_date: args.entryDate,
-    p_note: args.note.trim(),
-  };
-}
+import {
+  buildSettlementPayload,
+  money,
+  parsePesos,
+  splitHalfCentavos,
+} from "../helpers";
 
 function AbonoEditRow({
   entry,
