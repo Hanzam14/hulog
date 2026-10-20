@@ -4,8 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { IconSparkles } from "@tabler/icons-react";
 import { rpc } from "../data";
 import type { Run } from "../components/shared";
+import { setSoloMode } from "../solo";
 
-export default function NoGroup({ run, busy }: { run: Run; busy: boolean }) {
+export default function NoGroup({
+  run,
+  busy,
+  user,
+}: {
+  run: Run;
+  busy: boolean;
+  user?: string;
+}) {
   const navigate = useNavigate();
   const nameRef = useRef<HTMLInputElement>(null);
   return (
@@ -72,6 +81,21 @@ export default function NoGroup({ run, busy }: { run: Run; busy: boolean }) {
             {t("Open invite")}
           </button>
         </form>
+      </section>
+      <section>
+        <h2>{t("Or track your own savings")}</h2>
+        <button
+          type="button"
+          className="secondary"
+          disabled={busy}
+          onClick={() => {
+            setSoloMode(true, user);
+            void run(async () => {});
+            navigate("/");
+          }}
+        >
+          {t("Go solo without a partner")}
+        </button>
       </section>
     </>
   );

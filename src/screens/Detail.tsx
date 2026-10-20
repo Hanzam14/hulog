@@ -43,7 +43,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
     <>
       <h1>{t("Cycle detail")}</h1>
       <section>
-        <CycleCard c={c} data={data} />
+        <CycleCard c={c} data={data} user={user} />
         <GivePayout c={c} data={data} user={user} run={run} busy={busy} />
         {c.status === "proposed" && (
           <Proposal c={c} user={user} run={run} busy={busy} />

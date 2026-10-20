@@ -14,6 +14,7 @@ import { byNewest, name } from "../components/shared";
 import { rpc } from "../data";
 import { addDays, money, parsePesos } from "../helpers";
 import Avatar from "../components/Avatar";
+import { isSoloMode } from "../solo";
 
 const AMOUNTS = ["20", "50", "100"];
 const DAYS = ["7", "15", "30"];
@@ -24,7 +25,10 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   const accepted = data.cycles
     .filter((c) => c.status === "accepted")
     .sort(byNewest)[0];
-  const members = data.memberships.filter((m) => m.status === "active");
+  const active = data.memberships.filter((m) => m.status === "active");
+  const local = isSoloMode();
+  const isSoloRound = local && active.length === 1;
+  const members = active;
   const [amount, setAmount] = useState("50");
   const [days, setDays] = useState("15");
   const [receiver, setReceiver] = useState(
@@ -39,7 +43,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   let total: string;
   try {
     // A round always has two people paying, even before the partner joins.
-    total = money(parsePesos(amount) * Number(days) * 2);
+    const multiplier = isSoloRound ? 1 : 2;
+    total = money(parsePesos(amount) * Number(days) * multiplier);
   } catch {
     total = "";
   }
@@ -51,7 +56,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
         p_daily_amount_centavos: parsePesos(amount),
         p_num_days: Number(days),
         p_start_date: f.get("start"),
-        p_receiver_id: receiver,
+        p_receiver_id: isSoloRound ? user : receiver,
+        ...(local ? { p_is_solo: isSoloRound } : {}),
       };
       if (walletId) {
         payload.p_wallet_id = walletId;

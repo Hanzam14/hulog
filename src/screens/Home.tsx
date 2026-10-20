@@ -19,9 +19,12 @@ import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
 import CustodyCard from "../components/CustodyCard";
 import IponCard from "../components/IponCard";
+import { isSoloMode, setSoloMode, setSoloPotMode } from "../solo";
+import { isSoloCycle } from "../helpers";
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
+  const active = data.memberships.filter((m) => m.status === "active");
   const group = data.groups[0];
   const cycles = [...data.cycles].sort(byNewest);
   const live = cycles.find(
@@ -56,17 +59,70 @@ export default function Home(props: ViewProps) {
   return (
     <>
       <h1 className="sr-only">{group.name}</h1>
+      {isSoloMode() && (
+        <div
+          className="segmented"
+          role="radiogroup"
+          aria-label={t("Pot mode")}
+          style={{ marginBottom: "16px" }}
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={active.length > 1}
+            aria-pressed={active.length > 1}
+            onClick={() => {
+              setSoloPotMode("partnered", user);
+              void run(async () => {});
+            }}
+          >
+            {t("Partnered Pot (with Solo & Shared goals)")}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={active.length <= 1}
+            aria-pressed={active.length <= 1}
+            onClick={() => {
+              setSoloPotMode("standalone", user);
+              void run(async () => {});
+            }}
+          >
+            {t("Standalone Solo")}
+          </button>
+        </div>
+      )}
       <CustodyCard data={data} />
       {!c ? (
         <div className="empty">
           <IconSparkles size={48} aria-hidden="true" />
           <p>
-            {t("Invite your partner from the group tab, then start a round.")}
+            {isSoloMode()
+              ? t("Start a round to begin tracking your savings.")
+              : t("Invite your partner from the group tab, then start a round.")}
           </p>
+
+          {!isSoloMode() && active.length < 2 && (
+            <button
+              type="button"
+              className="secondary"
+              style={{ marginTop: "12px" }}
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  setSoloMode(true, user);
+                })
+              }
+            >
+              {t("Switch to solo mode")}
+            </button>
+          )}
+
+
         </div>
       ) : (
         <>
-          <CycleCard c={c} data={data} />
+          <CycleCard c={c} data={data} user={user} />
           {(() => {
             const countdown = payoutCountdown(
               c,
@@ -86,18 +142,35 @@ export default function Home(props: ViewProps) {
             <div className="members">
               {data.progress
                 .filter((p) => p.cycle_id === c.id)
-                .map((p) => (
-                  <div className="member" key={p.member_id}>
-                    <Avatar data={data} id={p.member_id} />
-                    <Tally
-                      label={name(data, p.member_id)}
-                      paid={p.confirmed_days}
-                      pending={p.pending_days}
-                      total={c.num_days}
-                      tone={tone(data, p.member_id)}
-                    />
-                  </div>
-                ))}
+                .map((p) => {
+                  const isSolo = isSoloCycle(c);
+                  const isSaver = p.member_id === c.receiver_id;
+                  const isObserving = isSolo && !isSaver;
+                  return (
+                    <div className="member" key={p.member_id}>
+                      <Avatar data={data} id={p.member_id} />
+                      {isObserving ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <strong>{name(data, p.member_id)}</strong>
+                          <span
+                            className="chip"
+                            style={{ fontSize: "11px", alignSelf: "flex-start" }}
+                          >
+                            {t("₱0 · Observing")}
+                          </span>
+                        </div>
+                      ) : (
+                        <Tally
+                          label={name(data, p.member_id)}
+                          paid={p.confirmed_days}
+                          pending={p.pending_days}
+                          total={c.num_days}
+                          tone={tone(data, p.member_id)}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           )}
           {c.status === "accepted" && !closed(c) && (
@@ -125,7 +198,7 @@ export default function Home(props: ViewProps) {
         )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
-            <IponCard g={g} data={data} />
+            <IponCard g={g} data={data} user={user} />
             {g.status === "accepted" &&
               !g.withdrawn_at &&
               !g.withdraw_proposed_by && (
@@ -306,6 +379,39 @@ export default function Home(props: ViewProps) {
               </button>
             </div>
           ))}
+        </div>
+      )}
+      {active.length < 2 && (
+        <div style={{ textAlign: "center", margin: "16px 0" }}>
+          {isSoloMode() ? (
+            <button
+              type="button"
+              className="quiet"
+              disabled={busy}
+              onClick={() =>
+                run(async () => {
+                  setSoloMode(false);
+                })
+              }
+            >
+              {t("Exit solo mode")}
+            </button>
+          ) : (
+            c && (
+              <button
+                type="button"
+                className="quiet"
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    setSoloMode(true, user);
+                  })
+                }
+              >
+                {t("Switch to solo mode")}
+              </button>
+            )
+          )}
         </div>
       )}
       {group.pot_location && (

@@ -110,7 +110,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
       </section>
       {filteredCycles.map((c) => (
           <section key={c.id}>
-            <CycleCard c={c} data={data} />
+            <CycleCard c={c} data={data} user={user} />
             <p>
               <span className="chip">{label(c.payout_state ?? c.status)}</span>
             </p>
@@ -265,7 +265,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
           <h2>{t("Completed & withdrawn ipon")}</h2>
           {pastGoals.map((g) => (
             <div key={g.id}>
-              <IponCard g={g} data={data} />
+              <IponCard g={g} data={data} user={user} />
               <p>
                 <span className="chip">{label(g.phase)}</span>
               </p>

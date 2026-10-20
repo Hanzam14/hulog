@@ -4,6 +4,9 @@ import { IconWallet } from "@tabler/icons-react";
 import type { SavingsGoal, Snapshot } from "../data";
 import {
   cadenceDisplay,
+  cleanGoalTitle,
+  getSoloBadgeText,
+  isSoloGoal,
   iponGoalProgress,
   money,
   phaseDisplay,
@@ -19,9 +22,11 @@ import { name, tone } from "./shared";
 export default function IponCard({
   g,
   data,
+  user,
 }: {
   g: SavingsGoal;
   data: Snapshot;
+  user?: string;
 }) {
   const { percent: progress, paceLabel, reachedTarget } = iponGoalProgress(g);
   const radius = 18;
@@ -47,6 +52,9 @@ export default function IponCard({
             confirmed_steps: 0,
             pending_steps: 0,
           }));
+
+  const soloBadge = isSoloGoal(g) ? getSoloBadgeText(g, data, user) : "";
+  const activeMembers = data.memberships.filter((m) => m.status === "active");
 
   return (
     <Link
@@ -120,8 +128,31 @@ export default function IponCard({
                 wordBreak: "break-word",
               }}
             >
-              {g.title}
+              {cleanGoalTitle(g.title)}
             </span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                flexWrap: "wrap",
+              }}
+            >
+              {soloBadge && (
+                <span
+                  className="chip"
+                  style={{
+                    fontSize: "11px",
+                    padding: "1px 8px",
+                    fontWeight: 600,
+                    background: "var(--brand-soft, #fdf2f8)",
+                    color: "var(--brand, #db2777)",
+                    border: "1px solid currentColor",
+                  }}
+                >
+                  {soloBadge}
+                </span>
+              )}
             <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
               {g.status === "accepted" && !g.withdrawn_at && (
                 <span
@@ -156,6 +187,7 @@ export default function IponCard({
           </div>
         </div>
       </div>
+      </div>
       <div
         className="pot-progress"
         role="progressbar"
@@ -179,20 +211,59 @@ export default function IponCard({
           })}
         </span>
       </div>
-      {g.goal_mode === "matched" && g.status === "accepted" && g.num_steps && (
+      {((g.goal_mode === "matched" && g.status === "accepted" && g.num_steps) ||
+        (isSoloGoal(g) && g.status === "accepted" && activeMembers.length > 1)) && (
         <div className="members" style={{ padding: "4px 0 0" }}>
-          {memberItems.map((p) => (
-            <div className="member" key={p.member_id}>
-              <Avatar data={data} id={p.member_id} size="sm" />
-              <Tally
-                label={name(data, p.member_id)}
-                paid={p.confirmed_steps}
-                pending={p.pending_steps}
-                total={g.num_steps!}
-                tone={tone(data, p.member_id)}
-              />
-            </div>
-          ))}
+          {memberItems.map((p) => {
+            const isSolo = isSoloGoal(g);
+            const isSaver = !isSolo || p.member_id === g.proposed_by;
+            const isObserving = isSolo && !isSaver;
+            const memberSavedCentavos = (data.savingsContributions ?? [])
+              .filter(
+                (sc) =>
+                  sc.goal_id === g.id &&
+                  sc.member_id === p.member_id &&
+                  !sc.deleted_at &&
+                  sc.status === "confirmed",
+              )
+              .reduce((sum, sc) => sum + sc.amount_centavos, 0);
+
+            return (
+              <div className="member" key={p.member_id}>
+                <Avatar data={data} id={p.member_id} size="sm" />
+                {isObserving ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "13px", fontWeight: 500 }}>
+                      {name(data, p.member_id).trim().split(/\s+/)[0]}
+                    </span>
+                    <span
+                      className="chip"
+                      style={{ fontSize: "10px", padding: "1px 6px" }}
+                    >
+                      {t("₱0 · Observing")}
+                    </span>
+                  </div>
+                ) : g.goal_mode === "matched" && g.num_steps ? (
+                  <Tally
+                    label={name(data, p.member_id)}
+                    paid={p.confirmed_steps}
+                    pending={p.pending_steps}
+                    total={g.num_steps!}
+                    tone={tone(data, p.member_id)}
+                  />
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ fontSize: "13px", fontWeight: 500 }}>
+                      {name(data, p.member_id).trim().split(/\s+/)[0]}
+                    </span>
+                    <strong style={{ fontSize: "13px" }}>
+                      {money(memberSavedCentavos)}
+                    </strong>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
       <div className="pot-bottom">

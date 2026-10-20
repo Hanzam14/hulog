@@ -354,6 +354,40 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "Go solo on this device": "Mag-solo muna sa device na ito",
+  "Go solo without a partner": "Mag-solo nang walang partner",
+  "Switch to solo mode": "Lumipat sa solo mode",
+  "Exit solo mode": "Mag-exit sa solo mode",
+  "Currently in solo mode.": "Nasa solo mode ka ngayon.",
+  "Start a round to begin tracking your savings.":
+    "Magsimula ng round para ma-track ang ipon mo.",
+  "Or track your own savings": "O i-track ang sariling ipon",
+  "Solo mode": "Solo mode",
+  "Who is saving?": "Sino ang mag-iipon?",
+  "Shared goal (both of us)": "Shared goal (kaming dalawa)",
+  "Solo goal (just me — visible to partner)": "Solo goal (ako lang — kita ng partner)",
+  "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
+    "Mag-ipon para sa sarili mo (tulad ng AI subscription) sa loob ng shared pot ninyo para kita ng partner mo ang progress mo nang hindi kailangang mag-ambag.",
+  "Partnered round (both of us)": "Partnered round (kaming dalawa)",
+  "Solo round (just me — visible to partner)": "Solo round (ako lang — kita ng partner)",
+  "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
+    "Mag-ipon para sa sarili mo sa sarili mong schedule sa loob ng shared pot. Kita ng partner mo ang round mo nang hindi kailangang mag-ambag.",
+  "Solo · You (Partner can view)": "Solo · Ikaw (Kita ng partner)",
+  "Solo · You": "Solo · Ikaw",
+  "Solo · {name} — visible to partner": "Solo · {name} — kita ng partner",
+  "₱0 · Observing": "₱0 · Nakatunghay",
+  Observing: "Nakatunghay",
+  "Observing · Partner does not need to contribute": "Nakatunghay · Hindi kailangang mag-ambag ng partner",
+  "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
+    "Ito ay solo goal mo sa shared pot ninyo. Kita ng partner mo ang progress mo nang hindi kailangang mag-ambag.",
+  "This is a solo goal by {name}. You can view progress, but contributions are not required.":
+    "Solo goal ito ni {name}. Kita mo ang progress pero hindi mo kailangang mag-ambag.",
+  "Partnered Pot (with Solo & Shared goals)": "Partnered Pot (may Solo at Shared goals)",
+  "Standalone Solo": "Standalone Solo",
+  "Pot mode": "Mode ng pot",
+  "Flexible solo pot": "Flexible solo pot",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Flexible ang solo goal sa shared pot. Walang nakatakdang hulog ang partner mo; kailangan pa rin niyang tanggapin ang goal at i-confirm ang mga hulog.",
   "You're offline. Changes won't save until you're back online.":
     "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
   Month: "Buwan",
@@ -733,6 +767,40 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "Go solo on this device": "Go solo on this device",
+  "Go solo without a partner": "Go solo without a partner",
+  "Switch to solo mode": "Switch to solo mode",
+  "Exit solo mode": "Exit solo mode",
+  "Currently in solo mode.": "Currently in solo mode.",
+  "Start a round to begin tracking your savings.":
+    "Start a round to begin tracking your savings.",
+  "Or track your own savings": "Or track your own savings",
+  "Solo mode": "Solo mode",
+  "Who is saving?": "Who is saving?",
+  "Shared goal (both of us)": "Shared goal (both of us)",
+  "Solo goal (just me — visible to partner)": "Solo goal (just me — visible to partner)",
+  "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
+    "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.",
+  "Partnered round (both of us)": "Partnered round (both of us)",
+  "Solo round (just me — visible to partner)": "Solo round (just me — visible to partner)",
+  "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
+    "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.",
+  "Solo · You (Partner can view)": "Solo · You (Partner can view)",
+  "Solo · You": "Solo · You",
+  "Solo · {name} — visible to partner": "Solo · {name} — visible to partner",
+  "₱0 · Observing": "₱0 · Observing",
+  Observing: "Observing",
+  "Observing · Partner does not need to contribute": "Observing · Partner does not need to contribute",
+  "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
+    "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.",
+  "This is a solo goal by {name}. You can view progress, but contributions are not required.":
+    "This is a solo goal by {name}. You can view progress, but contributions are not required.",
+  "Partnered Pot (with Solo & Shared goals)": "Partnered Pot (with Solo & Shared goals)",
+  "Standalone Solo": "Standalone Solo",
+  "Pot mode": "Pot mode",
+  "Flexible solo pot": "Flexible solo pot",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.",
   "You're offline. Changes won't save until you're back online.":
     "You're offline. Changes won't save until you're back online.",
   Month: "Month",
@@ -1116,6 +1184,40 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "Go solo on this device": "Mag-solo muna sa device na ito",
+  "Go solo without a partner": "Mag-isa nang walang partner",
+  "Switch to solo mode": "Lumipat sa solo mode",
+  "Exit solo mode": "Umalis sa solo mode",
+  "Currently in solo mode.": "Kasalukuyang nasa solo mode.",
+  "Start a round to begin tracking your savings.":
+    "Magsimula ng round para maitala ang iyong ipon.",
+  "Or track your own savings": "O subaybayan ang sariling ipon",
+  "Solo mode": "Solo mode",
+  "Who is saving?": "Sino ang mag-iipon?",
+  "Shared goal (both of us)": "Pagsasaluhang layunin (kaming dalawa)",
+  "Solo goal (just me — visible to partner)": "Sariling layunin (ako lang — kita ng partner)",
+  "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
+    "Mag-ipon para sa sarili mo (tulad ng AI subscription) sa loob ng inyong shared pot upang makita ng iyong partner ang iyong progreso nang hindi kailangang mag-ambag.",
+  "Partnered round (both of us)": "Kasosyong round (kaming dalawa)",
+  "Solo round (just me — visible to partner)": "Sariling round (ako lang — kita ng partner)",
+  "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
+    "Mag-ipon para sa iyong sarili sa sarili mong iskedyul sa loob ng shared pot. Makikita ng iyong partner ang iyong round nang hindi kailangang mag-ambag.",
+  "Solo · You (Partner can view)": "Solo · Ikaw (Kita ng partner)",
+  "Solo · You": "Solo · Ikaw",
+  "Solo · {name} — visible to partner": "Solo · {name} — kita ng partner",
+  "₱0 · Observing": "₱0 · Nakatunghay",
+  Observing: "Nakatunghay",
+  "Observing · Partner does not need to contribute": "Nakatunghay · Hindi kailangang mag-ambag ng partner",
+  "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
+    "Ito ay sarili mong layunin sa inyong shared pot. Makikita ng iyong partner ang iyong progreso nang hindi kailangang mag-ambag.",
+  "This is a solo goal by {name}. You can view progress, but contributions are not required.":
+    "Sariling layunin ito ni {name}. Makikita mo ang progreso ngunit hindi kailangang mag-ambag.",
+  "Partnered Pot (with Solo & Shared goals)": "Kasosyong Pot (may Sarili at Pagsasaluhang layunin)",
+  "Standalone Solo": "Sariling Solo lang",
+  "Pot mode": "Mode ng pot",
+  "Flexible solo pot": "Maluwag na sariling ipon",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Walang takdang hulog ang sariling ipon sa pinagsasaluhang pondo. Hindi kailangang maghulog ang partner mo; kailangan pa rin niyang tanggapin ang layunin at kumpirmahin ang mga hulog.",
   "You're offline. Changes won't save until you're back online.":
     "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
   Month: "Buwan",
