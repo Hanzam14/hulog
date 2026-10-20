@@ -8,7 +8,8 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker, { buildSettlementPayload } from "../screens/Tracker";
+import { buildSettlementPayload } from "../helpers";
+import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
 
 vi.mock("../data", async () => {
@@ -533,6 +534,20 @@ describe("Hulog v2 Tracker", () => {
       createElement(Tracker, { data, user: "a", run, busy: false }),
     );
     expect(taglishMarkup).toContain("<strong>Bayad</strong>");
+  });
+
+  it("enforces 44px minimum tap targets and mobile wrapping rules in style.css", async () => {
+    const fs = await import("node:fs");
+    const css = fs.readFileSync("src/style.css", "utf8");
+    expect(css).toMatch(/\.back\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s);
+    expect(css).toMatch(
+      /\.header-bell\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s,
+    );
+    expect(css).toMatch(/\.quiet\s*\{[^}]*min-height:\s*44px;/s);
+    expect(css).toMatch(/nav a\s*\{[^}]*min-height:\s*44px;/s);
+    expect(css).toMatch(
+      /\.celebration-toast\s*\{[^}]*max-width:\s*calc\(100vw - 32px\);/s,
+    );
   });
 });
 
