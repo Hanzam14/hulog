@@ -8,7 +8,7 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker from "../screens/Tracker";
+import Tracker, { buildSettlementPayload } from "../screens/Tracker";
 import Home from "../screens/Home";
 
 vi.mock("../data", async () => {
@@ -474,6 +474,65 @@ describe("Hulog v2 Tracker", () => {
     expect(markup).toContain("Dinner &amp; Drinks");
     expect(markup).toContain("May utang na ₱1,000.00 sa ₱2,000.00");
     expect(markup).toContain("Half-half split");
+  });
+
+  it("sends canonical Settlement description when language is tl or taglish and displays stored Settlement row translated in each language", () => {
+    for (const lang of ["tl", "taglish", "en"] as const) {
+      setLang(lang);
+      const payload = buildSettlementPayload({
+        debtorId: "a",
+        creditorId: "b",
+        amountCentavos: 50000,
+        entryDate: "2026-10-17",
+        note: " GCash ",
+      });
+      expect(payload.p_description).toBe("Settlement");
+      expect(payload.p_note).toBe("GCash");
+    }
+
+    const data = v2Snapshot();
+    data.abonoEntries = [
+      {
+        id: "settle-1",
+        group_id: "group",
+        kind: "settlement",
+        from_member: "a",
+        to_member: "b",
+        description: "Settlement",
+        total_amount_centavos: 50000,
+        owed_amount_centavos: 50000,
+        entry_date: "2026-10-17",
+        note: "Paid via GCash",
+        status: "confirmed",
+        was_confirmed: true,
+        created_by: "a",
+        last_edited_by: null,
+        delete_proposed_by: null,
+        created_at: "2026-10-17",
+        confirmed_by: "b",
+        confirmed_at: "2026-10-17",
+        edited_at: null,
+        deleted_at: null,
+      },
+    ];
+
+    setLang("en");
+    const enMarkup = html(
+      createElement(Tracker, { data, user: "a", run, busy: false }),
+    );
+    expect(enMarkup).toContain("<strong>Settlement</strong>");
+
+    setLang("tl");
+    const tlMarkup = html(
+      createElement(Tracker, { data, user: "a", run, busy: false }),
+    );
+    expect(tlMarkup).toContain("<strong>Bayad</strong>");
+
+    setLang("taglish");
+    const taglishMarkup = html(
+      createElement(Tracker, { data, user: "a", run, busy: false }),
+    );
+    expect(taglishMarkup).toContain("<strong>Bayad</strong>");
   });
 });
 

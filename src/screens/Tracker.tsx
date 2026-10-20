@@ -6,6 +6,26 @@ import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
 import { money, parsePesos, splitHalfCentavos } from "../helpers";
 
+/** Build the RPC payload for recording an abono settlement entry. */
+export function buildSettlementPayload(args: {
+  debtorId: string;
+  creditorId: string;
+  amountCentavos: number;
+  entryDate: string;
+  note: string;
+}) {
+  return {
+    p_kind: "settlement" as const,
+    p_from_member: args.debtorId,
+    p_to_member: args.creditorId,
+    p_description: "Settlement",
+    p_total_amount_centavos: args.amountCentavos,
+    p_owed_amount_centavos: args.amountCentavos,
+    p_entry_date: args.entryDate,
+    p_note: args.note.trim(),
+  };
+}
+
 function AbonoEditRow({
   entry,
   data,
@@ -185,6 +205,7 @@ function AbonoEditRow({
         <input
           type="text"
           maxLength={140}
+          placeholder={t("e.g. GCash ref #1234")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
@@ -351,16 +372,16 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   e.preventDefault();
                   const amt = parsePesos(settleAmount);
                   void run(async () => {
-                    await rpc("record_abono_entry", {
-                      p_kind: "settlement",
-                      p_from_member: activeDebt.debtor_id,
-                      p_to_member: activeDebt.creditor_id,
-                      p_description: "Settlement",
-                      p_total_amount_centavos: amt,
-                      p_owed_amount_centavos: amt,
-                      p_entry_date: data.today,
-                      p_note: settleNote.trim(),
-                    });
+                    await rpc(
+                      "record_abono_entry",
+                      buildSettlementPayload({
+                        debtorId: activeDebt.debtor_id,
+                        creditorId: activeDebt.creditor_id,
+                        amountCentavos: amt,
+                        entryDate: data.today,
+                        note: settleNote,
+                      }),
+                    );
                     setShowSettle(false);
                     setSettleNote("");
                   });
@@ -573,7 +594,11 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                 >
                   <Avatar data={data} id={e.from_member} size="sm" />
                   <div>
-                    <strong>{e.description}</strong>
+                    <strong>
+                      {e.description === "Settlement"
+                        ? t("Settlement")
+                        : e.description}
+                    </strong>
                     <p>
                       {e.kind === "expense"
                         ? `${name(data, e.to_member)} · ${t(
