@@ -354,6 +354,12 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "your turn": "turn mo",
+  "{name}'s turn": "turn ni {name}",
+  "Payout today - {turn}": "Payout ngayon - {turn}",
+  "Payout tomorrow - {turn}": "Payout bukas - {turn}",
+  "Payout in {days} days - {turn}": "Payout sa {days} araw - {turn}",
+  "Payout overdue - {turn}": "Lagpas na ang payout - {turn}",
   "Start a shared pot or paste an invite link from your partner.":
     "Gumawa ng ipon group o mag-paste ng invite link mula sa partner mo.",
   "No ipon goals yet. Save together for a trip or goal.":
@@ -716,6 +722,12 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "your turn": "your turn",
+  "{name}'s turn": "{name}'s turn",
+  "Payout today - {turn}": "Payout today - {turn}",
+  "Payout tomorrow - {turn}": "Payout tomorrow - {turn}",
+  "Payout in {days} days - {turn}": "Payout in {days} days - {turn}",
+  "Payout overdue - {turn}": "Payout overdue - {turn}",
   "Start a shared pot or paste an invite link from your partner.":
     "Start a shared pot or paste an invite link from your partner.",
   "No ipon goals yet. Save together for a trip or goal.":
@@ -1082,6 +1094,12 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "your turn": "pagkakataon mo",
+  "{name}'s turn": "pagkakataon ni {name}",
+  "Payout today - {turn}": "Kuha ng ipon ngayon - {turn}",
+  "Payout tomorrow - {turn}": "Kuha ng ipon bukas - {turn}",
+  "Payout in {days} days - {turn}": "Kuha ng ipon sa {days} araw - {turn}",
+  "Payout overdue - {turn}": "Lagpas na ang kuha ng ipon - {turn}",
   "Start a shared pot or paste an invite link from your partner.":
     "Gumawa ng grupo sa pag-iipon o mag-paste ng link ng imbitasyon mula sa partner mo.",
   "No ipon goals yet. Save together for a trip or goal.":
