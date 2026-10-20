@@ -57,11 +57,7 @@ export default function IponCard({
   const activeMembers = data.memberships.filter((m) => m.status === "active");
 
   return (
-    <Link
-      to={`/ipon/${g.id}`}
-      className="pot ipon-card"
-      aria-label={g.title}
-    >
+    <Link to={`/ipon/${g.id}`} className="pot ipon-card" aria-label={g.title}>
       <div className="pot-top" style={{ alignItems: "flex-start" }}>
         <div
           className="ipon-ring"
@@ -153,7 +149,6 @@ export default function IponCard({
                   {soloBadge}
                 </span>
               )}
-            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
               {g.status === "accepted" && !g.withdrawn_at && (
                 <span
                   className="chip"
@@ -187,7 +182,6 @@ export default function IponCard({
           </div>
         </div>
       </div>
-      </div>
       <div
         className="pot-progress"
         role="progressbar"
@@ -212,7 +206,9 @@ export default function IponCard({
         </span>
       </div>
       {((g.goal_mode === "matched" && g.status === "accepted" && g.num_steps) ||
-        (isSoloGoal(g) && g.status === "accepted" && activeMembers.length > 1)) && (
+        (isSoloGoal(g) &&
+          g.status === "accepted" &&
+          activeMembers.length > 1)) && (
         <div className="members" style={{ padding: "4px 0 0" }}>
           {memberItems.map((p) => {
             const isSolo = isSoloGoal(g);
@@ -232,7 +228,13 @@ export default function IponCard({
               <div className="member" key={p.member_id}>
                 <Avatar data={data} id={p.member_id} size="sm" />
                 {isObserving ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
                     <span style={{ fontSize: "13px", fontWeight: 500 }}>
                       {name(data, p.member_id).trim().split(/\s+/)[0]}
                     </span>
@@ -252,7 +254,13 @@ export default function IponCard({
                     tone={tone(data, p.member_id)}
                   />
                 ) : (
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
                     <span style={{ fontSize: "13px", fontWeight: 500 }}>
                       {name(data, p.member_id).trim().split(/\s+/)[0]}
                     </span>
