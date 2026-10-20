@@ -1486,3 +1486,24 @@ button svg,
   background: var(--green-deep);
 }
 
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+  nav,
+  header .header-actions,
+  footer,
+  .no-print,
+  .actions,
+  form {
+    display: none !important;
+  }
+  section,
+  .pot {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+
+
