@@ -8,14 +8,30 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker, { buildSettlementPayload } from "../screens/Tracker";
+import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
+import App from "../App";
+import { buildSettlementPayload, isNavigatorOffline } from "../helpers";
+import { t } from "../i18n";
+
+vi.mock("./AppUpdates", () => ({
+  default: () => null,
+  UpdateBanner: () => null,
+}));
 
 vi.mock("../data", async () => {
   const actual = await vi.importActual<typeof import("../data")>("../data");
   return {
     ...actual,
     rpc: vi.fn().mockResolvedValue(undefined),
+    supabase: {
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: vi.fn() } },
+        }),
+      },
+    },
   };
 });
 
@@ -553,5 +569,42 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(markup).toContain("Japan Trip");
     expect(markup).toContain("Mag-ipon");
     expect(markup).toContain("Bagong ipon goal");
+  });
+});
+
+describe("Hulog v2 Loading Skeleton & Offline Banner", () => {
+  it("renders placeholder skeleton blocks and aria-busy while initial session loads", () => {
+    vi.stubGlobal("navigator", { onLine: true });
+    setLang("en");
+    const markup = html(createElement(App));
+    expect(markup).toContain('aria-busy="true"');
+    expect(markup).toContain("Loading…");
+    expect(markup).toContain('class="skeleton skeleton-card"');
+    expect(markup).not.toContain("offline-banner");
+  });
+
+  it("detects navigator offline state and renders translated offline banner", () => {
+    vi.stubGlobal("navigator", { onLine: false });
+    expect(isNavigatorOffline()).toBe(true);
+
+    setLang("en");
+    const enMarkup = html(createElement(App));
+    expect(enMarkup).toContain("offline-banner");
+    expect(enMarkup).toContain(
+      "You&#x27;re offline. Changes will sync when you reconnect.",
+    );
+
+    setLang("tl");
+    expect(t("You're offline. Changes will sync when you reconnect.")).toBe(
+      "Wala kang internet ngayon. Kusang mag-si-sync ang mga pagbabago kapag online ka na ulit.",
+    );
+
+    setLang("taglish");
+    expect(t("You're offline. Changes will sync when you reconnect.")).toBe(
+      "Offline ka ngayon. Mag-si-sync ang changes kapag online na ulit.",
+    );
+
+    vi.stubGlobal("navigator", { onLine: true });
+    expect(isNavigatorOffline()).toBe(false);
   });
 });

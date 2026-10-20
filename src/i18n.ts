@@ -354,6 +354,8 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "You're offline. Changes will sync when you reconnect.":
+    "Offline ka ngayon. Mag-si-sync ang changes kapag online na ulit.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -710,6 +712,8 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "You're offline. Changes will sync when you reconnect.":
+    "You're offline. Changes will sync when you reconnect.",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1070,6 +1074,8 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "You're offline. Changes will sync when you reconnect.":
+    "Wala kang internet ngayon. Kusang mag-si-sync ang mga pagbabago kapag online ka na ulit.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

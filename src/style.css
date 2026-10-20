@@ -1462,4 +1462,68 @@ button svg,
 :root[data-theme="dark"] .ipon-card .pot-progress > span {
   background: var(--green-deep);
 }
+.offline-banner {
+  background: var(--highlight);
+  font-size: 13px;
+}
+.skeleton-stack {
+  display: grid;
+  gap: 14px;
+  margin: 12px 0 18px;
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--hover-card) 25%,
+    var(--dots) 50%,
+    var(--hover-card) 75%
+  );
+  background-size: 200% 100%;
+  border: 2px dashed var(--tan);
+  border-radius: 16px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+.skeleton-title {
+  width: 55%;
+  height: 32px;
+  border-radius: 12px;
+}
+.skeleton-card {
+  width: 100%;
+  height: 128px;
+  border-radius: 20px;
+}
+.skeleton-row {
+  width: 100%;
+  height: 52px;
+}
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+:root[data-theme="dark"] .offline-banner {
+  background: var(--highlight);
+  color: var(--ink);
+  border-color: var(--highlight-border);
+}
+:root[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--card) 25%,
+    var(--hover-card) 50%,
+    var(--card) 75%
+  );
+  background-size: 200% 100%;
+  border-color: var(--card-border);
+}
+
 
