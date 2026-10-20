@@ -1,15 +1,27 @@
 import { t, label } from "../i18n";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { IconSparkles } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name } from "../components/shared";
 import { rpc } from "../data";
-import { money, parsePesos } from "../helpers";
+import { filterHistory, historyMonths, money, parsePesos } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import IponCard from "../components/IponCard";
 
 export default function History({ data, user, run, busy }: ViewProps) {
   const [editing, setEditing] = useState<string | null>(null);
-  const pastGoals = (data.savingsGoals ?? []).filter(
+  const [monthFilter, setMonthFilter] = useState("all");
+  const [memberFilter, setMemberFilter] = useState("all");
+
+  const allPastCycles = data.cycles
+    .filter(
+      (c) =>
+        closed(c) || c.status === "declined" || c.status === "cancelled",
+    )
+    .sort(byNewest);
+
+  const allPastGoals = (data.savingsGoals ?? []).filter(
     (g) =>
       g.withdrawn_at != null ||
       g.phase === "completed" ||
@@ -17,16 +29,86 @@ export default function History({ data, user, run, busy }: ViewProps) {
       g.status === "declined" ||
       g.status === "cancelled",
   );
+
+  const months = historyMonths(allPastCycles, allPastGoals);
+  const activeMembers = data.memberships.filter((m) => m.status === "active");
+  const {
+    cycles: filteredCycles,
+    goals: pastGoals,
+    totalPotCentavos,
+    totalSavedCentavos,
+    totalDebtCentavos,
+  } = filterHistory({
+    cycles: allPastCycles,
+    goals: allPastGoals,
+    progress: data.progress,
+    month: monthFilter,
+    memberId: memberFilter,
+  });
+
   return (
     <>
-      <h1>{t("Past pots & debts")}</h1>
-      {data.cycles
-        .filter(
-          (c) =>
-            closed(c) || c.status === "declined" || c.status === "cancelled",
-        )
-        .sort(byNewest)
-        .map((c) => (
+      <div className="row">
+        <h1>{t("Past pots & debts")}</h1>
+        <button
+          type="button"
+          className="secondary no-print"
+          onClick={() => window.print()}
+        >
+          {t("Print summary")}
+        </button>
+      </div>
+      <section className="history-filters no-print">
+        <div
+          className="row"
+          style={{ gap: "12px", alignItems: "flex-end" }}
+        >
+          <label style={{ flex: "1 1 140px" }}>
+            {t("Month")}
+            <select
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              aria-label={t("Month")}
+            >
+              <option value="all">{t("All months")}</option>
+              {months.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={{ flex: "1 1 140px" }}>
+            {t("Member")}
+            <select
+              value={memberFilter}
+              onChange={(e) => setMemberFilter(e.target.value)}
+              aria-label={t("Member")}
+            >
+              <option value="all">{t("All members")}</option>
+              {activeMembers.map((m) => (
+                <option key={m.user_id} value={m.user_id}>
+                  {name(data, m.user_id)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </section>
+      <section className="history-summary">
+        <div className="row" style={{ gap: "8px 16px" }}>
+          <span>
+            {t("Total pots")}: <strong>{money(totalPotCentavos)}</strong>
+          </span>
+          <span>
+            {t("Total saved")}: <strong>{money(totalSavedCentavos)}</strong>
+          </span>
+          <span>
+            {t("Outstanding debt")}: <strong>{money(totalDebtCentavos)}</strong>
+          </span>
+        </div>
+      </section>
+      {filteredCycles.map((c) => (
           <section key={c.id}>
             <CycleCard c={c} data={data} user={user} />
             <p>
@@ -166,9 +248,18 @@ export default function History({ data, user, run, busy }: ViewProps) {
               ))}
           </section>
         ))}
-      {!data.cycles.some(
-        (c) => closed(c) || ["declined", "cancelled"].includes(c.status),
-      ) && <p>{t("Past cycles will appear here.")}</p>}
+      {filteredCycles.length === 0 &&
+        (allPastCycles.length === 0 ? (
+          <div className="empty">
+            <IconSparkles size={40} aria-hidden="true" />
+            <p>{t("Past cycles will appear here.")}</p>
+            <Link className="button secondary" to="/propose">
+              {t("new round")}
+            </Link>
+          </div>
+        ) : (
+          <p>{t("Past cycles will appear here.")}</p>
+        ))}
       {pastGoals.length > 0 && (
         <section>
           <h2>{t("Completed & withdrawn ipon")}</h2>

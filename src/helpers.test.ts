@@ -8,8 +8,12 @@ import {
   isSoloCycle,
   isSoloGoal,
   csv,
+  filterHistory,
+  historyMonths,
+  iponGoalProgress,
   money,
   parsePesos,
+  payoutCountdown,
   phaseDisplay,
   shortDate,
   splitHalfCentavos,
@@ -92,6 +96,192 @@ describe("display helpers", () => {
       '"name","note","amount"\r\n"\'=1+1","a,""b""\nline","5000"',
     );
     expect(csv([])).toBe("");
+  });
+  it("collects history months and filters history cycles, goals, and totals by month and member", () => {
+    const cycles = [
+      {
+        id: "c1",
+        end_date: "2026-09-15",
+        receiver_id: "a",
+        pot_centavos: 150000,
+      },
+      {
+        id: "c2",
+        end_date: "2026-10-20",
+        receiver_id: "b",
+        pot_centavos: 200000,
+      },
+    ];
+    const goals = [
+      {
+        id: "g1",
+        end_date: "2026-10-25",
+        holder_id: "a",
+        proposed_by: "b",
+        saved_centavos: 100000,
+      },
+      {
+        id: "g2",
+        end_date: "2026-08-10",
+        holder_id: "a",
+        proposed_by: "a",
+        saved_centavos: 50000,
+      },
+    ];
+    const progress = [
+      { cycle_id: "c1", member_id: "b", debt_centavos: 25000 },
+      { cycle_id: "c2", member_id: "a", debt_centavos: 10000 },
+    ];
+
+    expect(historyMonths(cycles, goals)).toEqual([
+      "2026-10",
+      "2026-09",
+      "2026-08",
+    ]);
+
+    const all = filterHistory({
+      cycles,
+      goals,
+      progress,
+      month: "all",
+      memberId: "all",
+    });
+    expect(all.cycles).toHaveLength(2);
+    expect(all.goals).toHaveLength(2);
+    expect(all.totalPotCentavos).toBe(350000);
+    expect(all.totalSavedCentavos).toBe(150000);
+    expect(all.totalDebtCentavos).toBe(35000);
+
+    const octOnly = filterHistory({
+      cycles,
+      goals,
+      progress,
+      month: "2026-10",
+      memberId: "all",
+    });
+    expect(octOnly.cycles.map((c) => c.id)).toEqual(["c2"]);
+    expect(octOnly.goals.map((g) => g.id)).toEqual(["g1"]);
+    expect(octOnly.totalPotCentavos).toBe(200000);
+    expect(octOnly.totalSavedCentavos).toBe(100000);
+    expect(octOnly.totalDebtCentavos).toBe(10000);
+
+    const memberBOnly = filterHistory({
+      cycles,
+      goals,
+      progress,
+      month: "all",
+      memberId: "b",
+    });
+    expect(memberBOnly.cycles.map((c) => c.id)).toEqual(["c2"]);
+    expect(memberBOnly.goals.map((g) => g.id)).toEqual(["g1"]);
+    expect(memberBOnly.totalPotCentavos).toBe(200000);
+    expect(memberBOnly.totalSavedCentavos).toBe(100000);
+    expect(memberBOnly.totalDebtCentavos).toBe(10000);
+  });
+  it("computes iponGoalProgress percent and On track / Behind pace labels", () => {
+    setLang("en");
+    const baseGoal = {
+      saved_centavos: 50000,
+      target_amount_centavos: 100000,
+      goal_mode: "matched" as const,
+      step_amount_centavos: 5000,
+      expected_steps_today: 5,
+      start_date: "2026-10-17",
+      end_date: "2026-10-26",
+      phase: "open",
+    };
+    expect(iponGoalProgress(baseGoal)).toEqual({
+      percent: 50,
+      onTrack: true,
+      paceLabel: "On track",
+      reachedTarget: false,
+    });
+    expect(
+      iponGoalProgress({ ...baseGoal, expected_steps_today: 6 }),
+    ).toEqual({
+      percent: 50,
+      onTrack: false,
+      paceLabel: "Behind",
+      reachedTarget: false,
+    });
+    expect(
+      iponGoalProgress({ ...baseGoal, saved_centavos: 100000 }),
+    ).toEqual({
+      percent: 100,
+      onTrack: true,
+      paceLabel: "On track",
+      reachedTarget: true,
+    });
+    expect(
+      iponGoalProgress({
+        ...baseGoal,
+        goal_mode: "flexible",
+        step_amount_centavos: null,
+        phase: "overdue",
+      }),
+    ).toEqual({
+      percent: 50,
+      onTrack: false,
+      paceLabel: "Behind",
+      reachedTarget: false,
+    });
+
+    setLang("taglish");
+    expect(
+      iponGoalProgress({ ...baseGoal, expected_steps_today: 6 }).paceLabel,
+    ).toBe("Nahuhuli");
+  });
+  it("pins the final contribution day to payout tomorrow", () => {
+    setLang("en");
+    expect(payoutCountdown({
+      status: "accepted",
+      end_date: "2026-12-31",
+      receiver_id: "a",
+      payout_state: null,
+      received_at: null,
+    }, "2026-12-31", "a", "Ana")).toBe("Payout tomorrow - your turn");
+  });
+  it("computes payoutCountdown for today, tomorrow, multi-day, overdue, and no-active-cycle", () => {
+    setLang("en");
+    const base = {
+      status: "accepted",
+      end_date: "2026-10-20",
+      receiver_id: "a",
+      payout_state: null,
+      received_at: null,
+    };
+    expect(payoutCountdown(null, "2026-10-20", "a", "Ana")).toBeNull();
+    expect(
+      payoutCountdown({ ...base, status: "proposed" }, "2026-10-20", "a", "Ana"),
+    ).toBeNull();
+    expect(
+      payoutCountdown(
+        { ...base, payout_state: "Received" },
+        "2026-10-20",
+        "a",
+        "Ana",
+      ),
+    ).toBeNull();
+    expect(payoutCountdown(base, "2026-10-21", "a", "Ana")).toBe(
+      "Payout today - your turn",
+    );
+    expect(payoutCountdown(base, "2026-10-20", "b", "Ana")).toBe(
+      "Payout tomorrow - Ana's turn",
+    );
+    expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
+      "Payout in 4 days - your turn",
+    );
+    expect(payoutCountdown(base, "2026-10-17", "b", "Ana")).toBe(
+      "Payout in 4 days - Ana's turn",
+    );
+    expect(payoutCountdown(base, "2026-10-22", "b", "Ana")).toBe(
+      "Payout overdue - Ana's turn",
+    );
+
+    setLang("taglish");
+    expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
+      "Payout sa 4 araw - turn mo",
+    );
   });
 });
 

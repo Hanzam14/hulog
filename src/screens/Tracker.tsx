@@ -4,9 +4,12 @@ import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
-import { buildSettlementPayload, money, parsePesos, splitHalfCentavos } from "../helpers";
-
-
+import {
+  buildSettlementPayload,
+  money,
+  parsePesos,
+  splitHalfCentavos,
+} from "../helpers";
 
 function AbonoEditRow({
   entry,
@@ -562,6 +565,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
         {entries.length === 0 ? (
           <div className="empty">
             <p>{t("No shared expenses yet. Log a bill or abono above.")}</p>
+            {!showAdd && (
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setShowAdd(true)}
+              >
+                + {t("Add shared expense")}
+              </button>
+            )}
           </div>
         ) : (
           entries.map((e) => (

@@ -230,6 +230,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                     className="sticker confirm"
                     style={{
                       display: "flex",
+                      flexWrap: "wrap",
                       alignItems: "center",
                       justifyContent: "space-between",
                       gap: "10px",
@@ -364,6 +365,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   className="sticker confirm"
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: "10px",
@@ -373,7 +375,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   <div>
                     <strong>{t("Waiting to withdraw")}</strong>
                   </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {g.withdraw_proposed_by === user ? (
                       <button
                         className="quiet"
@@ -447,7 +449,16 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
       <section>
         <h2>{t("Contributions")}</h2>
         {contributions.length === 0 ? (
-          <p style={{ color: "var(--soft)" }}>—</p>
+          <div className="empty" style={{ paddingTop: "16px" }}>
+            <p>{t("No contributions yet. Start saving toward this goal.")}</p>
+            {g.status === "accepted" &&
+              !g.withdrawn_at &&
+              !g.withdraw_proposed_by && (
+                <Link className="button secondary" to={`/ipon/${g.id}/record`}>
+                  <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
+                </Link>
+              )}
+          </div>
         ) : (
           contributions.map((c) => {
             const isOwner = (c.last_edited_by ?? c.created_by) === user;
