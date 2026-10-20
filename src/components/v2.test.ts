@@ -8,7 +8,8 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker, { buildSettlementPayload } from "../screens/Tracker";
+import { buildSettlementPayload } from "../helpers";
+import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
 
 vi.mock("../data", async () => {

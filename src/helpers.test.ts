@@ -5,6 +5,7 @@ import {
   csv,
   money,
   parsePesos,
+  payoutCountdown,
   phaseDisplay,
   shortDate,
   splitHalfCentavos,
@@ -87,5 +88,47 @@ describe("display helpers", () => {
       '"name","note","amount"\r\n"\'=1+1","a,""b""\nline","5000"',
     );
     expect(csv([])).toBe("");
+  });
+  it("computes payoutCountdown for today, tomorrow, multi-day, overdue, and no-active-cycle", () => {
+    setLang("en");
+    const base = {
+      status: "accepted",
+      end_date: "2026-10-20",
+      receiver_id: "a",
+      payout_state: null,
+      received_at: null,
+    };
+    expect(payoutCountdown(null, "2026-10-20", "a", "Ana")).toBeNull();
+    expect(
+      payoutCountdown({ ...base, status: "proposed" }, "2026-10-20", "a", "Ana"),
+    ).toBeNull();
+    expect(
+      payoutCountdown(
+        { ...base, payout_state: "Received" },
+        "2026-10-20",
+        "a",
+        "Ana",
+      ),
+    ).toBeNull();
+    expect(payoutCountdown(base, "2026-10-20", "a", "Ana")).toBe(
+      "Payout today - your turn",
+    );
+    expect(payoutCountdown(base, "2026-10-19", "b", "Ana")).toBe(
+      "Payout tomorrow - Ana's turn",
+    );
+    expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
+      "Payout in 3 days - your turn",
+    );
+    expect(payoutCountdown(base, "2026-10-17", "b", "Ana")).toBe(
+      "Payout in 3 days - Ana's turn",
+    );
+    expect(payoutCountdown(base, "2026-10-21", "b", "Ana")).toBe(
+      "Payout overdue - Ana's turn",
+    );
+
+    setLang("taglish");
+    expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
+      "Payout sa 3 araw - turn mo",
+    );
   });
 });

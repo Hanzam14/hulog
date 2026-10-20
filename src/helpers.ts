@@ -59,6 +59,61 @@ export function cadenceDisplay(cadenceDays: number | null): string {
 export function splitHalfCentavos(totalCentavos: number): number {
   return Math.ceil(totalCentavos / 2);
 }
+/** Build the RPC payload for recording an abono settlement entry. */
+export function buildSettlementPayload(args: {
+  debtorId: string;
+  creditorId: string;
+  amountCentavos: number;
+  entryDate: string;
+  note: string;
+}) {
+  return {
+    p_kind: "settlement" as const,
+    p_from_member: args.debtorId,
+    p_to_member: args.creditorId,
+    p_description: "Settlement",
+    p_total_amount_centavos: args.amountCentavos,
+    p_owed_amount_centavos: args.amountCentavos,
+    p_entry_date: args.entryDate,
+    p_note: args.note.trim(),
+  };
+}
+/** Compute a next-payout countdown line for an active unreceived cycle, or null. */
+export function payoutCountdown(
+  cycle:
+    | {
+        status: string;
+        end_date: string;
+        receiver_id: string;
+        payout_state: string | null;
+        received_at: string | null;
+      }
+    | null
+    | undefined,
+  today: string,
+  userId: string,
+  receiverName: string,
+): string | null {
+  if (
+    !cycle ||
+    cycle.status !== "accepted" ||
+    cycle.payout_state === "Received" ||
+    cycle.received_at != null
+  ) {
+    return null;
+  }
+  const todayMs = new Date(`${today}T00:00:00Z`).getTime();
+  const endMs = new Date(`${cycle.end_date}T00:00:00Z`).getTime();
+  const diffDays = Math.round((endMs - todayMs) / 86400000);
+  const turn =
+    cycle.receiver_id === userId
+      ? t("your turn")
+      : t("{name}'s turn", { name: receiverName });
+  if (diffDays < 0) return t("Payout overdue - {turn}", { turn });
+  if (diffDays === 0) return t("Payout today - {turn}", { turn });
+  if (diffDays === 1) return t("Payout tomorrow - {turn}", { turn });
+  return t("Payout in {days} days - {turn}", { days: diffDays, turn });
+}
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
