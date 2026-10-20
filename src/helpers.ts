@@ -81,6 +81,161 @@ export function buildSettlementPayload(args: {
 export function isNavigatorOffline(): boolean {
   return typeof navigator !== "undefined" && navigator.onLine === false;
 }
+/** Collect sorted descending YYYY-MM months present in past cycles and goals. */
+export function historyMonths(
+  cycles: { end_date: string }[],
+  goals: { end_date: string }[],
+): string[] {
+  const set = new Set<string>();
+  for (const c of cycles) {
+    if (c.end_date) set.add(c.end_date.slice(0, 7));
+  }
+  for (const g of goals) {
+    if (g.end_date) set.add(g.end_date.slice(0, 7));
+  }
+  return [...set].sort((a, b) => b.localeCompare(a));
+}
+/** Filter past cycles, past savings goals, and compute summary totals by month and member. */
+export function filterHistory<
+  C extends {
+    id: string;
+    end_date: string;
+    receiver_id: string;
+    pot_centavos: number;
+  },
+  G extends {
+    id: string;
+    end_date: string;
+    holder_id: string;
+    proposed_by: string;
+    saved_centavos: number;
+  },
+>(args: {
+  cycles: C[];
+  goals: G[];
+  progress: { cycle_id: string; member_id: string; debt_centavos: number }[];
+  month: string;
+  memberId: string;
+}): {
+  cycles: C[];
+  goals: G[];
+  totalPotCentavos: number;
+  totalSavedCentavos: number;
+  totalDebtCentavos: number;
+} {
+  const { month, memberId, progress } = args;
+  const cycles = args.cycles.filter((c) => {
+    if (month !== "all" && c.end_date.slice(0, 7) !== month) return false;
+    if (memberId !== "all" && c.receiver_id !== memberId) return false;
+    return true;
+  });
+  const goals = args.goals.filter((g) => {
+    if (month !== "all" && g.end_date.slice(0, 7) !== month) return false;
+    if (
+      memberId !== "all" &&
+      g.holder_id !== memberId &&
+      g.proposed_by !== memberId
+    )
+      return false;
+    return true;
+  });
+  const cycleIds = new Set(cycles.map((c) => c.id));
+  const totalPotCentavos = cycles.reduce((sum, c) => sum + c.pot_centavos, 0);
+  const totalSavedCentavos = goals.reduce(
+    (sum, g) => sum + g.saved_centavos,
+    0,
+  );
+  const totalDebtCentavos = progress
+    .filter((p) => cycleIds.has(p.cycle_id))
+    .reduce((sum, p) => sum + Math.max(0, p.debt_centavos), 0);
+  return {
+    cycles,
+    goals,
+    totalPotCentavos,
+    totalSavedCentavos,
+    totalDebtCentavos,
+  };
+}
+/** Compute percent saved and cadence pace status for an Ipon goal. */
+export function iponGoalProgress(goal: {
+  saved_centavos: number;
+  target_amount_centavos: number;
+  goal_mode: "matched" | "flexible";
+  step_amount_centavos: number | null;
+  expected_steps_today: number;
+  start_date: string;
+  end_date: string;
+  phase: string;
+}): {
+  percent: number;
+  onTrack: boolean;
+  paceLabel: string;
+  reachedTarget: boolean;
+} {
+  const raw =
+    goal.target_amount_centavos > 0
+      ? (goal.saved_centavos / goal.target_amount_centavos) * 100
+      : 0;
+  const percent = Math.min(100, Math.max(0, Math.round(raw)));
+  const reachedTarget =
+    goal.target_amount_centavos > 0 &&
+    goal.saved_centavos >= goal.target_amount_centavos;
+
+  let expectedCentavos = 0;
+  if (goal.goal_mode === "matched" && goal.step_amount_centavos) {
+    expectedCentavos =
+      goal.expected_steps_today * goal.step_amount_centavos * 2;
+  } else if (goal.phase === "overdue") {
+    expectedCentavos = goal.target_amount_centavos;
+  }
+
+  const onTrack =
+    reachedTarget ||
+    (goal.phase !== "overdue" && goal.saved_centavos >= expectedCentavos);
+
+  return {
+    percent,
+    onTrack,
+    paceLabel: onTrack ? t("On track") : t("Behind"),
+    reachedTarget,
+  };
+}
+/** Compute a next-payout countdown line for an active unreceived cycle, or null. */
+export function payoutCountdown(
+  cycle:
+    | {
+        status: string;
+        end_date: string;
+        receiver_id: string;
+        payout_state: string | null;
+        received_at: string | null;
+      }
+    | null
+    | undefined,
+  today: string,
+  userId: string,
+  receiverName: string,
+): string | null {
+  if (
+    !cycle ||
+    cycle.status !== "accepted" ||
+    cycle.payout_state === "Received" ||
+    cycle.received_at != null
+  ) {
+    return null;
+  }
+  const todayMs = new Date(`${today}T00:00:00Z`).getTime();
+  const endMs = new Date(`${addDays(cycle.end_date, 1)}T00:00:00Z`).getTime();
+  const diffDays = Math.round((endMs - todayMs) / 86400000);
+  const turn =
+    cycle.receiver_id === userId
+      ? t("your turn")
+      : t("{name}'s turn", { name: receiverName });
+  if (diffDays < 0) return t("Payout overdue - {turn}", { turn });
+  if (diffDays === 0) return t("Payout today - {turn}", { turn });
+  if (diffDays === 1) return t("Payout tomorrow - {turn}", { turn });
+  return t("Payout in {days} days - {turn}", { days: diffDays, turn });
+}
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
