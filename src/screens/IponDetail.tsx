@@ -192,6 +192,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                     className="sticker confirm"
                     style={{
                       display: "flex",
+                      flexWrap: "wrap",
                       alignItems: "center",
                       justifyContent: "space-between",
                       gap: "10px",
@@ -326,6 +327,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   className="sticker confirm"
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: "10px",
@@ -335,7 +337,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   <div>
                     <strong>{t("Waiting to withdraw")}</strong>
                   </div>
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {g.withdraw_proposed_by === user ? (
                       <button
                         className="quiet"
