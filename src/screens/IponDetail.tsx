@@ -409,7 +409,16 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
       <section>
         <h2>{t("Contributions")}</h2>
         {contributions.length === 0 ? (
-          <p style={{ color: "var(--soft)" }}>—</p>
+          <div className="empty" style={{ paddingTop: "16px" }}>
+            <p>{t("No contributions yet. Start saving toward this goal.")}</p>
+            {g.status === "accepted" &&
+              !g.withdrawn_at &&
+              !g.withdraw_proposed_by && (
+                <Link className="button secondary" to={`/ipon/${g.id}/record`}>
+                  <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
+                </Link>
+              )}
+          </div>
         ) : (
           contributions.map((c) => {
             const isOwner = (c.last_edited_by ?? c.created_by) === user;

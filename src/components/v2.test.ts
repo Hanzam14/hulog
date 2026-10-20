@@ -8,8 +8,11 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker, { buildSettlementPayload } from "../screens/Tracker";
+import { buildSettlementPayload } from "../helpers";
+import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
+import History from "../screens/History";
+import NoGroup from "../screens/NoGroup";
 
 vi.mock("../data", async () => {
   const actual = await vi.importActual<typeof import("../data")>("../data");
@@ -553,5 +556,70 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(markup).toContain("Japan Trip");
     expect(markup).toContain("Mag-ipon");
     expect(markup).toContain("Bagong ipon goal");
+  });
+
+  it("renders friendly empty states and next-step actions across History, Tracker, Home/IponDetail, and NoGroup", () => {
+    setLang("en");
+    const data = v2Snapshot();
+    data.cycles = [];
+    data.savingsGoals = [];
+    data.savingsContributions = [];
+    data.abonoEntries = [];
+
+    const historyMarkup = html(
+      createElement(History, { data, user: "a", run, busy: false }),
+    );
+    expect(historyMarkup).toContain("Past rounds will appear here.");
+    expect(historyMarkup).toContain('href="/propose"');
+
+    const trackerMarkup = html(
+      createElement(Tracker, { data, user: "a", run, busy: false }),
+    );
+    expect(trackerMarkup).toContain(
+      "No shared expenses yet. Log a bill or abono above.",
+    );
+    expect(trackerMarkup).toContain("+ Add shared expense");
+
+    const homeMarkup = html(
+      createElement(Home, { data, user: "a", run, busy: false }),
+    );
+    expect(homeMarkup).toContain(
+      "No savings goals yet. Save together for a trip or goal.",
+    );
+    expect(homeMarkup).toContain('href="/ipon/new"');
+
+    const noGroupMarkup = html(
+      createElement(NoGroup, { run, busy: false }),
+    );
+    expect(noGroupMarkup).toContain(
+      "Start a shared pot or paste an invite link from your partner.",
+    );
+    expect(noGroupMarkup).toContain("Create group");
+
+    const dataWithGoal = v2Snapshot();
+    dataWithGoal.savingsContributions = [];
+    const iponDetailMarkup = renderToStaticMarkup(
+      createElement(
+        MemoryRouter,
+        { initialEntries: ["/ipon/goal-1"] },
+        createElement(
+          Routes,
+          {},
+          createElement(Route, {
+            path: "/ipon/:id",
+            element: createElement(IponDetail, {
+              data: dataWithGoal,
+              user: "a",
+              run,
+              busy: false,
+            }),
+          }),
+        ),
+      ),
+    );
+    expect(iponDetailMarkup).toContain(
+      "No contributions yet. Start saving toward this goal.",
+    );
+    expect(iponDetailMarkup).toContain('href="/ipon/goal-1/record"');
   });
 });
