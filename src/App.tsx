@@ -4,6 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { load, rpc, supabase } from "./data";
 import type { Snapshot } from "./data";
+import { isNavigatorOffline } from "./helpers";
 import type { Run } from "./components/shared";
 import Join from "./screens/Join";
 import NoGroup from "./screens/NoGroup";
@@ -39,7 +40,18 @@ export default function App() {
   const [data, setData] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [offline, setOffline] = useState(isNavigatorOffline);
   const [success, setSuccess] = useState<{ message: Key } | null>(null);
+  useEffect(() => {
+    const onOnline = () => setOffline(false);
+    const onOffline = () => setOffline(true);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, []);
   useEffect(() => {
     if (!success) return;
     const timer = window.setTimeout(() => setSuccess(null), 3000);
@@ -252,6 +264,11 @@ export default function App() {
         )}
       </header>
       <UpdateBanner />
+      {offline && (
+        <div role="status" className="notice offline-banner">
+          {t("You're offline. Changes won't save until you're back online.")}
+        </div>
+      )}
       {error && (
         <div role="alert" className="notice error">
           {label(error)}
@@ -266,8 +283,13 @@ export default function App() {
         </div>
       )}
       {!ready ? (
-        <main>
-          <p>{t("Loading…")}</p>
+        <main aria-busy="true">
+          <p className="sr-only">{t("Loading…")}</p>
+          <div className="skeleton-stack" aria-hidden="true">
+            <div className="skeleton skeleton-title" />
+            <div className="skeleton skeleton-card" />
+            <div className="skeleton skeleton-row" />
+          </div>
         </main>
       ) : !session ? (
         <main className="welcome">
@@ -315,8 +337,14 @@ export default function App() {
           )}
         </main>
       ) : !data ? (
-        <main>
-          <p>{t("Loading your group…")}</p>
+        <main aria-busy="true">
+          <p className="sr-only">{t("Loading your group…")}</p>
+          <div className="skeleton-stack" aria-hidden="true">
+            <div className="skeleton skeleton-title" />
+            <div className="skeleton skeleton-card" />
+            <div className="skeleton skeleton-row" />
+            <div className="skeleton skeleton-row" />
+          </div>
           <button disabled={busy} onClick={() => run(refresh)}>
             {t("Try again")}
           </button>

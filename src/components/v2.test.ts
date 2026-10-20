@@ -3,14 +3,20 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Snapshot } from "../data";
-import { setLang } from "../i18n";
+import { setLang, t } from "../i18n";
 import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import { buildSettlementPayload } from "../helpers";
 import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
+import App from "../App";
+import { buildSettlementPayload, isNavigatorOffline } from "../helpers";
+
+vi.mock("./AppUpdates", () => ({
+  default: () => null,
+  UpdateBanner: () => null,
+}));
 import History from "../screens/History";
 import NoGroup from "../screens/NoGroup";
 
@@ -19,6 +25,14 @@ vi.mock("../data", async () => {
   return {
     ...actual,
     rpc: vi.fn().mockResolvedValue(undefined),
+    supabase: {
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: vi.fn() } },
+        }),
+      },
+    },
   };
 });
 
@@ -641,5 +655,42 @@ describe("Hulog v2 Unified Home Dashboard", () => {
       "No contributions yet. Start saving toward this goal.",
     );
     expect(iponDetailMarkup).toContain('href="/ipon/goal-1/record"');
+  });
+});
+
+describe("Hulog v2 Loading Skeleton & Offline Banner", () => {
+  it("renders placeholder skeleton blocks and aria-busy while initial session loads", () => {
+    vi.stubGlobal("navigator", { onLine: true });
+    setLang("en");
+    const markup = html(createElement(App));
+    expect(markup).toContain('aria-busy="true"');
+    expect(markup).toContain("Loading…");
+    expect(markup).toContain('class="skeleton skeleton-card"');
+    expect(markup).not.toContain("offline-banner");
+  });
+
+  it("detects navigator offline state and renders translated offline banner", () => {
+    vi.stubGlobal("navigator", { onLine: false });
+    expect(isNavigatorOffline()).toBe(true);
+
+    setLang("en");
+    const enMarkup = html(createElement(App));
+    expect(enMarkup).toContain("offline-banner");
+    expect(enMarkup).toContain(
+      "You&#x27;re offline. Changes won&#x27;t save until you&#x27;re back online.",
+    );
+
+    setLang("tl");
+    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+      "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
+    );
+
+    setLang("taglish");
+    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+      "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
+    );
+
+    vi.stubGlobal("navigator", { onLine: true });
+    expect(isNavigatorOffline()).toBe(false);
   });
 });

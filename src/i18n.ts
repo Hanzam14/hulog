@@ -354,6 +354,8 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "You're offline. Changes won't save until you're back online.":
+    "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
   Month: "Buwan",
   "All months": "Lahat ng buwan",
   "All members": "Lahat ng member",
@@ -731,6 +733,8 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "You're offline. Changes won't save until you're back online.":
+    "You're offline. Changes won't save until you're back online.",
   Month: "Month",
   "All months": "All months",
   "All members": "All members",
@@ -1112,6 +1116,8 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "You're offline. Changes won't save until you're back online.":
+    "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
   Month: "Buwan",
   "All months": "Lahat ng buwan",
   "All members": "Lahat ng miyembro",
