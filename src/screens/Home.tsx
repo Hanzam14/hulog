@@ -105,6 +105,11 @@ export default function Home(props: ViewProps) {
         <div className="row">
           <h2>{t("Ipon goals")}</h2>
         </div>
+        {activeGoals.length === 0 && (
+          <div className="empty" style={{ paddingTop: "16px" }}>
+            <p>{t("No ipon goals yet. Save together for a trip or goal.")}</p>
+          </div>
+        )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
             <IponCard g={g} data={data} />

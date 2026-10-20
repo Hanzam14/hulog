@@ -354,6 +354,12 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "Start a shared pot or paste an invite link from your partner.":
+    "Gumawa ng ipon group o mag-paste ng invite link mula sa partner mo.",
+  "No ipon goals yet. Save together for a trip or goal.":
+    "Wala pang ipon goal. Mag-ipon nang sabay para sa trip o goal.",
+  "No contributions yet. Start saving toward this goal.":
+    "Wala pang hulog. Simulan na ang pag-iipon para sa goal na 'to.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -710,6 +716,12 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "Start a shared pot or paste an invite link from your partner.":
+    "Start a shared pot or paste an invite link from your partner.",
+  "No ipon goals yet. Save together for a trip or goal.":
+    "No savings goals yet. Save together for a trip or goal.",
+  "No contributions yet. Start saving toward this goal.":
+    "No contributions yet. Start saving toward this goal.",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1070,6 +1082,12 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "Start a shared pot or paste an invite link from your partner.":
+    "Gumawa ng grupo sa pag-iipon o mag-paste ng link ng imbitasyon mula sa partner mo.",
+  "No ipon goals yet. Save together for a trip or goal.":
+    "Wala pang layunin sa pag-iipon. Mag-ipon nang sabay para sa lakad o pangarap.",
+  "No contributions yet. Start saving toward this goal.":
+    "Wala pang hulog. Simulan ang pag-iipon para sa layuning ito.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

@@ -1,5 +1,7 @@
 import { t, label } from "../i18n";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { IconSparkles } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name } from "../components/shared";
 import { rpc } from "../data";
@@ -168,7 +170,15 @@ export default function History({ data, user, run, busy }: ViewProps) {
         ))}
       {!data.cycles.some(
         (c) => closed(c) || ["declined", "cancelled"].includes(c.status),
-      ) && <p>{t("Past cycles will appear here.")}</p>}
+      ) && (
+        <div className="empty">
+          <IconSparkles size={40} aria-hidden="true" />
+          <p>{t("Past cycles will appear here.")}</p>
+          <Link className="button secondary" to="/propose">
+            {t("new round")}
+          </Link>
+        </div>
+      )}
       {pastGoals.length > 0 && (
         <section>
           <h2>{t("Completed & withdrawn ipon")}</h2>
