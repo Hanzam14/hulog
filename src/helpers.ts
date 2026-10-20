@@ -103,7 +103,7 @@ export function payoutCountdown(
     return null;
   }
   const todayMs = new Date(`${today}T00:00:00Z`).getTime();
-  const endMs = new Date(`${cycle.end_date}T00:00:00Z`).getTime();
+  const endMs = new Date(`${addDays(cycle.end_date, 1)}T00:00:00Z`).getTime();
   const diffDays = Math.round((endMs - todayMs) / 86400000);
   const turn =
     cycle.receiver_id === userId
