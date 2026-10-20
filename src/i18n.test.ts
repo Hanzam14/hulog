@@ -81,4 +81,45 @@ describe("device language", () => {
       }),
     ).toBe("May utang si Ana kay Ben na ₱100.00");
   });
+  it("translates new wallet and ipon stepper keys and audited taglish/tl strings across all languages", () => {
+    setLang("en");
+    expect(t("Rename wallet")).toBe("Rename wallet");
+    expect(t("One hulog less")).toBe("One step less");
+    expect(t("One hulog more")).toBe("One step more");
+    expect(t("Status")).toBe("Status");
+    expect(t("Share → Add to Home Screen")).toBe("Share → Add to Home Screen");
+    expect(t("Auto")).toBe("Auto");
+    expect(t("Continue with Google")).toBe("Continue with Google");
+    expect(t("Confirm {name}'s {amount}", { name: "Ana", amount: "₱50.00" })).toBe(
+      "Confirm Ana's ₱50.00",
+    );
+
+    setLang("tl");
+    expect(t("Rename wallet")).toBe("Palitan ang pangalan ng wallet");
+    expect(t("One hulog less")).toBe("Bawasan ng isang hulog");
+    expect(t("One hulog more")).toBe("Dagdagan ng isang hulog");
+    expect(t("Status")).toBe("Kalagayan");
+    expect(t("Share → Add to Home Screen")).toBe(
+      "I-share → Idagdag sa Home Screen",
+    );
+    expect(t("Auto")).toBe("Kusa");
+    expect(t("Continue with Google")).toBe("Magpatuloy gamit ang Google");
+    expect(t("Confirm {name}'s {amount}", { name: "Ana", amount: "₱50.00" })).toBe(
+      "Kumpirmahin ang ₱50.00 ni Ana",
+    );
+
+    setLang("taglish");
+    expect(t("Rename wallet")).toBe("I-rename ang wallet");
+    expect(t("One hulog less")).toBe("Bawasan ng 1 hulog");
+    expect(t("One hulog more")).toBe("Dagdagan ng 1 hulog");
+    expect(t("Continue with Google")).toBe("Mag-sign in sa Google");
+    expect(t("Confirm {name}'s {amount}", { name: "Ana", amount: "₱50.00" })).toBe(
+      "I-confirm ang ₱50.00 ni Ana",
+    );
+    expect(t("Settling · last day to confirm")).toBe(
+      "Settling · last day na para mag-confirm",
+    );
+    expect(t("savings_goals")).toBe("mga ipon goal");
+    expect(t("abono_entries")).toBe("mga abono");
+  });
 });
