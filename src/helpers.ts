@@ -59,6 +59,100 @@ export function cadenceDisplay(cadenceDays: number | null): string {
 export function splitHalfCentavos(totalCentavos: number): number {
   return Math.ceil(totalCentavos / 2);
 }
+/** Build the RPC payload for recording an abono settlement entry. */
+export function buildSettlementPayload(args: {
+  debtorId: string;
+  creditorId: string;
+  amountCentavos: number;
+  entryDate: string;
+  note: string;
+}) {
+  return {
+    p_kind: "settlement" as const,
+    p_from_member: args.debtorId,
+    p_to_member: args.creditorId,
+    p_description: "Settlement",
+    p_total_amount_centavos: args.amountCentavos,
+    p_owed_amount_centavos: args.amountCentavos,
+    p_entry_date: args.entryDate,
+    p_note: args.note.trim(),
+  };
+}
+/** Collect sorted descending YYYY-MM months present in past cycles and goals. */
+export function historyMonths(
+  cycles: { end_date: string }[],
+  goals: { end_date: string }[],
+): string[] {
+  const set = new Set<string>();
+  for (const c of cycles) {
+    if (c.end_date) set.add(c.end_date.slice(0, 7));
+  }
+  for (const g of goals) {
+    if (g.end_date) set.add(g.end_date.slice(0, 7));
+  }
+  return [...set].sort((a, b) => b.localeCompare(a));
+}
+/** Filter past cycles, past savings goals, and compute summary totals by month and member. */
+export function filterHistory<
+  C extends {
+    id: string;
+    end_date: string;
+    receiver_id: string;
+    pot_centavos: number;
+  },
+  G extends {
+    id: string;
+    end_date: string;
+    holder_id: string;
+    proposed_by: string;
+    saved_centavos: number;
+  },
+>(args: {
+  cycles: C[];
+  goals: G[];
+  progress: { cycle_id: string; member_id: string; debt_centavos: number }[];
+  month: string;
+  memberId: string;
+}): {
+  cycles: C[];
+  goals: G[];
+  totalPotCentavos: number;
+  totalSavedCentavos: number;
+  totalDebtCentavos: number;
+} {
+  const { month, memberId, progress } = args;
+  const cycles = args.cycles.filter((c) => {
+    if (month !== "all" && c.end_date.slice(0, 7) !== month) return false;
+    if (memberId !== "all" && c.receiver_id !== memberId) return false;
+    return true;
+  });
+  const goals = args.goals.filter((g) => {
+    if (month !== "all" && g.end_date.slice(0, 7) !== month) return false;
+    if (
+      memberId !== "all" &&
+      g.holder_id !== memberId &&
+      g.proposed_by !== memberId
+    )
+      return false;
+    return true;
+  });
+  const cycleIds = new Set(cycles.map((c) => c.id));
+  const totalPotCentavos = cycles.reduce((sum, c) => sum + c.pot_centavos, 0);
+  const totalSavedCentavos = goals.reduce(
+    (sum, g) => sum + g.saved_centavos,
+    0,
+  );
+  const totalDebtCentavos = progress
+    .filter((p) => cycleIds.has(p.cycle_id))
+    .reduce((sum, p) => sum + Math.max(0, p.debt_centavos), 0);
+  return {
+    cycles,
+    goals,
+    totalPotCentavos,
+    totalSavedCentavos,
+    totalDebtCentavos,
+  };
+}
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];

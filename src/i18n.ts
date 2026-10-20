@@ -354,6 +354,13 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  Month: "Buwan",
+  "All months": "Lahat ng buwan",
+  "All members": "Lahat ng member",
+  "Print summary": "I-print ang summary",
+  "Total pots": "Kabuuang pot",
+  "Total saved": "Kabuuang ipon",
+  "Outstanding debt": "Natitirang utang",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -710,6 +717,13 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  Month: "Month",
+  "All months": "All months",
+  "All members": "All members",
+  "Print summary": "Print summary",
+  "Total pots": "Total pots",
+  "Total saved": "Total saved",
+  "Outstanding debt": "Outstanding debt",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1070,6 +1084,13 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  Month: "Buwan",
+  "All months": "Lahat ng buwan",
+  "All members": "Lahat ng miyembro",
+  "Print summary": "I-print ang buod",
+  "Total pots": "Kabuuang ipon sa round",
+  "Total saved": "Kabuuang naipon",
+  "Outstanding debt": "Natitirang utang",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
