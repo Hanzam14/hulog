@@ -8,7 +8,8 @@ import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
-import Tracker, { buildSettlementPayload } from "../screens/Tracker";
+import { buildSettlementPayload } from "../helpers";
+import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
 
 vi.mock("../data", async () => {
@@ -242,6 +243,12 @@ describe("Hulog v2 IponCard & ProposeIpon", () => {
     expect(markup).toContain("₱500.00");
     expect(markup).toContain("sa ₱1,000.00");
     expect(markup).toContain('aria-valuenow="50"');
+    expect(markup).toContain("50%");
+    expect(markup).toContain("On track");
+
+    const behindGoal = { ...goal, expected_steps_today: 8 };
+    const behindMarkup = html(createElement(IponCard, { g: behindGoal, data }));
+    expect(behindMarkup).toContain("Nahuhuli");
   });
 
   it("renders ProposeIpon with mode choices, title input, and options", () => {

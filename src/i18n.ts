@@ -354,6 +354,8 @@ const taglish = {
   completed: "nakumpleto",
   overdue: "lagpas sa target date",
   expired: "expired na",
+  "On track": "On track",
+  Behind: "Nahuhuli",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -710,6 +712,8 @@ const en = {
   completed: "completed",
   overdue: "overdue",
   expired: "expired",
+  "On track": "On track",
+  Behind: "Behind",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1070,6 +1074,8 @@ const tl = {
   completed: "nakumpleto",
   overdue: "lampas sa takdang petsa",
   expired: "paso",
+  "On track": "Nasa ayos",
+  Behind: "Nahuhuli",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

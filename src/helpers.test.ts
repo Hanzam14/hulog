@@ -3,6 +3,7 @@ import {
   addDays,
   cadenceDisplay,
   csv,
+  iponGoalProgress,
   money,
   parsePesos,
   phaseDisplay,
@@ -87,5 +88,58 @@ describe("display helpers", () => {
       '"name","note","amount"\r\n"\'=1+1","a,""b""\nline","5000"',
     );
     expect(csv([])).toBe("");
+  });
+  it("computes iponGoalProgress percent and On track / Behind pace labels", () => {
+    setLang("en");
+    const baseGoal = {
+      saved_centavos: 50000,
+      target_amount_centavos: 100000,
+      goal_mode: "matched" as const,
+      step_amount_centavos: 5000,
+      expected_steps_today: 5,
+      start_date: "2026-10-17",
+      end_date: "2026-10-26",
+      phase: "open",
+    };
+    expect(iponGoalProgress(baseGoal)).toEqual({
+      percent: 50,
+      onTrack: true,
+      paceLabel: "On track",
+      reachedTarget: false,
+    });
+    expect(
+      iponGoalProgress({ ...baseGoal, expected_steps_today: 6 }),
+    ).toEqual({
+      percent: 50,
+      onTrack: false,
+      paceLabel: "Behind",
+      reachedTarget: false,
+    });
+    expect(
+      iponGoalProgress({ ...baseGoal, saved_centavos: 100000 }),
+    ).toEqual({
+      percent: 100,
+      onTrack: true,
+      paceLabel: "On track",
+      reachedTarget: true,
+    });
+    expect(
+      iponGoalProgress({
+        ...baseGoal,
+        goal_mode: "flexible",
+        step_amount_centavos: null,
+        phase: "overdue",
+      }),
+    ).toEqual({
+      percent: 50,
+      onTrack: false,
+      paceLabel: "Behind",
+      reachedTarget: false,
+    });
+
+    setLang("taglish");
+    expect(
+      iponGoalProgress({ ...baseGoal, expected_steps_today: 6 }).paceLabel,
+    ).toBe("Nahuhuli");
   });
 });

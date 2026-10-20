@@ -59,6 +59,69 @@ export function cadenceDisplay(cadenceDays: number | null): string {
 export function splitHalfCentavos(totalCentavos: number): number {
   return Math.ceil(totalCentavos / 2);
 }
+/** Build the RPC payload for recording an abono settlement entry. */
+export function buildSettlementPayload(args: {
+  debtorId: string;
+  creditorId: string;
+  amountCentavos: number;
+  entryDate: string;
+  note: string;
+}) {
+  return {
+    p_kind: "settlement" as const,
+    p_from_member: args.debtorId,
+    p_to_member: args.creditorId,
+    p_description: "Settlement",
+    p_total_amount_centavos: args.amountCentavos,
+    p_owed_amount_centavos: args.amountCentavos,
+    p_entry_date: args.entryDate,
+    p_note: args.note.trim(),
+  };
+}
+/** Compute percent saved and cadence pace status for an Ipon goal. */
+export function iponGoalProgress(goal: {
+  saved_centavos: number;
+  target_amount_centavos: number;
+  goal_mode: "matched" | "flexible";
+  step_amount_centavos: number | null;
+  expected_steps_today: number;
+  start_date: string;
+  end_date: string;
+  phase: string;
+}): {
+  percent: number;
+  onTrack: boolean;
+  paceLabel: string;
+  reachedTarget: boolean;
+} {
+  const raw =
+    goal.target_amount_centavos > 0
+      ? (goal.saved_centavos / goal.target_amount_centavos) * 100
+      : 0;
+  const percent = Math.min(100, Math.max(0, Math.round(raw)));
+  const reachedTarget =
+    goal.target_amount_centavos > 0 &&
+    goal.saved_centavos >= goal.target_amount_centavos;
+
+  let expectedCentavos = 0;
+  if (goal.goal_mode === "matched" && goal.step_amount_centavos) {
+    expectedCentavos =
+      goal.expected_steps_today * goal.step_amount_centavos * 2;
+  } else if (goal.phase === "overdue") {
+    expectedCentavos = goal.target_amount_centavos;
+  }
+
+  const onTrack =
+    reachedTarget ||
+    (goal.phase !== "overdue" && goal.saved_centavos >= expectedCentavos);
+
+  return {
+    percent,
+    onTrack,
+    paceLabel: onTrack ? t("On track") : t("Behind"),
+    reachedTarget,
+  };
+}
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
