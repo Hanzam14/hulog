@@ -65,6 +65,7 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
                   onSubmit={handleRename(w)}
                   style={{
                     display: "flex",
+                    flexWrap: "wrap",
                     gap: "8px",
                     alignItems: "center",
                     margin: "4px 0",
@@ -78,7 +79,7 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
                     maxLength={40}
                     required
                     autoFocus
-                    style={{ flex: 1 }}
+                    style={{ flex: "1 1 180px" }}
                   />
                   <button type="submit" disabled={busy}>
                     {t("Save")}
