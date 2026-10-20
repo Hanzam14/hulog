@@ -78,6 +78,9 @@ export function buildSettlementPayload(args: {
     p_note: args.note.trim(),
   };
 }
+export function isNavigatorOffline(): boolean {
+  return typeof navigator !== "undefined" && navigator.onLine === false;
+}
 /** Collect sorted descending YYYY-MM months present in past cycles and goals. */
 export function historyMonths(
   cycles: { end_date: string }[],
