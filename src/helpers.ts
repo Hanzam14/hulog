@@ -153,6 +153,86 @@ export function filterHistory<
     totalDebtCentavos,
   };
 }
+/** Compute percent saved and cadence pace status for an Ipon goal. */
+export function iponGoalProgress(goal: {
+  saved_centavos: number;
+  target_amount_centavos: number;
+  goal_mode: "matched" | "flexible";
+  step_amount_centavos: number | null;
+  expected_steps_today: number;
+  start_date: string;
+  end_date: string;
+  phase: string;
+}): {
+  percent: number;
+  onTrack: boolean;
+  paceLabel: string;
+  reachedTarget: boolean;
+} {
+  const raw =
+    goal.target_amount_centavos > 0
+      ? (goal.saved_centavos / goal.target_amount_centavos) * 100
+      : 0;
+  const percent = Math.min(100, Math.max(0, Math.round(raw)));
+  const reachedTarget =
+    goal.target_amount_centavos > 0 &&
+    goal.saved_centavos >= goal.target_amount_centavos;
+
+  let expectedCentavos = 0;
+  if (goal.goal_mode === "matched" && goal.step_amount_centavos) {
+    expectedCentavos =
+      goal.expected_steps_today * goal.step_amount_centavos * 2;
+  } else if (goal.phase === "overdue") {
+    expectedCentavos = goal.target_amount_centavos;
+  }
+
+  const onTrack =
+    reachedTarget ||
+    (goal.phase !== "overdue" && goal.saved_centavos >= expectedCentavos);
+
+  return {
+    percent,
+    onTrack,
+    paceLabel: onTrack ? t("On track") : t("Behind"),
+    reachedTarget,
+  };
+}
+/** Compute a next-payout countdown line for an active unreceived cycle, or null. */
+export function payoutCountdown(
+  cycle:
+    | {
+        status: string;
+        end_date: string;
+        receiver_id: string;
+        payout_state: string | null;
+        received_at: string | null;
+      }
+    | null
+    | undefined,
+  today: string,
+  userId: string,
+  receiverName: string,
+): string | null {
+  if (
+    !cycle ||
+    cycle.status !== "accepted" ||
+    cycle.payout_state === "Received" ||
+    cycle.received_at != null
+  ) {
+    return null;
+  }
+  const todayMs = new Date(`${today}T00:00:00Z`).getTime();
+  const endMs = new Date(`${addDays(cycle.end_date, 1)}T00:00:00Z`).getTime();
+  const diffDays = Math.round((endMs - todayMs) / 86400000);
+  const turn =
+    cycle.receiver_id === userId
+      ? t("your turn")
+      : t("{name}'s turn", { name: receiverName });
+  if (diffDays < 0) return t("Payout overdue - {turn}", { turn });
+  if (diffDays === 0) return t("Payout today - {turn}", { turn });
+  if (diffDays === 1) return t("Payout tomorrow - {turn}", { turn });
+  return t("Payout in {days} days - {turn}", { days: diffDays, turn });
+}
 export function csv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return "";
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
