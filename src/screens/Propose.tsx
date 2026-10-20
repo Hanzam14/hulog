@@ -25,6 +25,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
     .filter((c) => c.status === "accepted")
     .sort(byNewest)[0];
   const active = data.memberships.filter((m) => m.status === "active");
+  const isMultiMember = active.length > 1;
+  const [isSoloRound, setIsSoloRound] = useState(!isMultiMember);
   const members = active;
   const [amount, setAmount] = useState("50");
   const [days, setDays] = useState("15");
@@ -40,7 +42,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   let total: string;
   try {
     // A round always has two people paying, even before the partner joins.
-    total = money(parsePesos(amount) * Number(days) * (active.length || 1));
+    const multiplier = isSoloRound ? 1 : (active.length || 1);
+    total = money(parsePesos(amount) * Number(days) * multiplier);
   } catch {
     total = "";
   }
@@ -52,7 +55,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
         p_daily_amount_centavos: parsePesos(amount),
         p_num_days: Number(days),
         p_start_date: f.get("start"),
-        p_receiver_id: receiver,
+        p_receiver_id: isSoloRound ? user : receiver,
+        p_is_solo: isSoloRound,
       };
       if (walletId) {
         payload.p_wallet_id = walletId;
@@ -67,6 +71,58 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
         <IconArrowLeft />
       </Link>
       <h1 className="sr-only">{t("New round")}</h1>
+      {isMultiMember && (
+        <fieldset style={{ border: "none", padding: 0, margin: "0 0 14px 0" }}>
+          <legend
+            style={{
+              color: "var(--soft)",
+              fontFamily: "var(--display)",
+              fontWeight: 500,
+              fontSize: "14px",
+              marginBottom: "6px",
+            }}
+          >
+            {t("Who is saving?")}
+          </legend>
+          <div className="segmented" role="radiogroup" aria-label={t("Who is saving?")}>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!isSoloRound}
+              aria-pressed={!isSoloRound}
+              onClick={() => setIsSoloRound(false)}
+            >
+              {t("Partnered round (both of us)")}
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={isSoloRound}
+              aria-pressed={isSoloRound}
+              onClick={() => {
+                setIsSoloRound(true);
+                setReceiver(user);
+              }}
+            >
+              {t("Solo round (just me — visible to partner)")}
+            </button>
+          </div>
+          {isSoloRound && (
+            <p
+              style={{
+                fontSize: "13px",
+                color: "var(--soft)",
+                margin: "6px 2px 0",
+                lineHeight: 1.4,
+              }}
+            >
+              {t(
+                "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.",
+              )}
+            </p>
+          )}
+        </fieldset>
+      )}
       <fieldset>
         <legend>
           <IconCoin aria-hidden="true" /> {t("₱ a day")}

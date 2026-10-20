@@ -21,6 +21,15 @@ const STEPS = ["10", "15", "30"];
 export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
   const navigate = useNavigate();
 
+  const activeMemberIds = new Set(
+    data.memberships
+      .filter((m) => m.status === "active")
+      .map((m) => m.user_id),
+  );
+  const isMultiMember = activeMemberIds.size > 1;
+  const [savingScope, setSavingScope] = useState<"shared" | "solo">(
+    isMultiMember ? "shared" : "solo",
+  );
   const [mode, setMode] = useState<"matched" | "flexible">("matched");
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(addDays(data.today, 1));
@@ -35,11 +44,6 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
   const [endDate, setEndDate] = useState(addDays(data.today, 30));
 
   // Active wallets of active members
-  const activeMemberIds = new Set(
-    data.memberships
-      .filter((m) => m.status === "active")
-      .map((m) => m.user_id),
-  );
   const activeWallets = (data.wallets ?? []).filter(
     (w) => !w.archived_at && activeMemberIds.has(w.holder_id),
   );
@@ -61,7 +65,8 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       const steps = Number(numSteps);
       const cadence = Number(cadenceDays);
       if (steps > 0 && cadence > 0) {
-        totalTarget = money(stepCentavos * steps * (activeMemberIds.size || 1));
+        const multiplier = savingScope === "solo" ? 1 : (activeMemberIds.size || 1);
+        totalTarget = money(stepCentavos * steps * multiplier);
         computedEndDate = addDays(startDate, (steps - 1) * cadence);
       }
     } catch {
@@ -85,23 +90,37 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
 
     void run(async () => {
       if (mode === "matched") {
+        const finalTitle =
+          savingScope === "solo"
+            ? (/^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
+                ? trimmedTitle
+                : `[Solo] ${trimmedTitle}`)
+            : trimmedTitle;
         await rpc("propose_savings_goal", {
-          p_title: trimmedTitle,
+          p_title: finalTitle,
           p_goal_mode: "matched",
           p_wallet_id: walletId,
           p_start_date: startDate,
           p_step_amount_centavos: parsePesos(stepAmount),
           p_cadence_days: Number(cadenceDays),
           p_num_steps: Number(numSteps),
+          p_is_solo: savingScope === "solo",
         });
       } else {
+        const finalTitle =
+          savingScope === "solo"
+            ? (/^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
+                ? trimmedTitle
+                : `[Solo] ${trimmedTitle}`)
+            : trimmedTitle;
         await rpc("propose_savings_goal", {
-          p_title: trimmedTitle,
+          p_title: finalTitle,
           p_goal_mode: "flexible",
           p_wallet_id: walletId,
           p_start_date: startDate,
           p_target_amount_centavos: parsePesos(targetAmount),
           p_end_date: endDate,
+          p_is_solo: savingScope === "solo",
         });
       }
       navigate("/");
@@ -114,6 +133,56 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
         <IconArrowLeft />
       </Link>
       <h1 className="sr-only">{t("New ipon goal")}</h1>
+
+      {isMultiMember && (
+        <fieldset style={{ border: "none", padding: 0, margin: "0 0 14px 0" }}>
+          <legend
+            style={{
+              color: "var(--soft)",
+              fontFamily: "var(--display)",
+              fontWeight: 500,
+              fontSize: "14px",
+              marginBottom: "6px",
+            }}
+          >
+            {t("Who is saving?")}
+          </legend>
+          <div className="segmented" role="radiogroup" aria-label={t("Who is saving?")}>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={savingScope === "shared"}
+              aria-pressed={savingScope === "shared"}
+              onClick={() => setSavingScope("shared")}
+            >
+              {t("Shared goal (both of us)")}
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={savingScope === "solo"}
+              aria-pressed={savingScope === "solo"}
+              onClick={() => setSavingScope("solo")}
+            >
+              {t("Solo goal (just me — visible to partner)")}
+            </button>
+          </div>
+          {savingScope === "solo" && (
+            <p
+              style={{
+                fontSize: "13px",
+                color: "var(--soft)",
+                margin: "6px 2px 0",
+                lineHeight: 1.4,
+              }}
+            >
+              {t(
+                "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.",
+              )}
+            </p>
+          )}
+        </fieldset>
+      )}
 
       <div className="segmented" role="radiogroup" aria-label={t("Goal mode")}>
         <button
@@ -132,7 +201,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           aria-pressed={mode === "flexible"}
           onClick={() => setMode("flexible")}
         >
-          {t("Flexible shared pot")}
+          {savingScope === "solo" ? t("Flexible solo pot") : t("Flexible shared pot")}
         </button>
       </div>
 

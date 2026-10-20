@@ -22,7 +22,7 @@ import InstallSettings from "../components/InstallSettings";
 import AppUpdates from "../components/AppUpdates";
 import LanguageSettings from "../components/LanguageSettings";
 import WalletsSettings from "../components/WalletsSettings";
-import { isSoloMode, setSoloMode } from "../solo";
+import { isSoloMode, setSoloMode, setSoloPotMode } from "../solo";
 
 export default function Settings({ data, user, run, busy }: ViewProps) {
   const group = data.groups[0];
@@ -215,6 +215,37 @@ export default function Settings({ data, user, run, busy }: ViewProps) {
                 {isSoloMode() ? (
                   <>
                     <p className="muted" style={{ margin: "4px 0 8px" }}>{t("Currently in solo mode.")}</p>
+                    <div
+                      className="segmented"
+                      role="radiogroup"
+                      aria-label={t("Pot mode")}
+                      style={{ marginBottom: "12px" }}
+                    >
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={active.length > 1}
+                        aria-pressed={active.length > 1}
+                        onClick={() => {
+                          setSoloPotMode("partnered", user);
+                          void run(async () => {});
+                        }}
+                      >
+                        {t("Partnered Pot (with Solo & Shared goals)")}
+                      </button>
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={active.length <= 1}
+                        aria-pressed={active.length <= 1}
+                        onClick={() => {
+                          setSoloPotMode("standalone", user);
+                          void run(async () => {});
+                        }}
+                      >
+                        {t("Standalone Solo")}
+                      </button>
+                    </div>
                     <button
                       type="button"
                       className="secondary"

@@ -98,3 +98,101 @@ export function buildSettlementPayload(args: {
     p_note: args.note.trim(),
   };
 }
+
+export function isSoloGoal(goal: { title: string } | string): boolean {
+  const title = typeof goal === "string" ? goal : goal.title;
+  return /^\[Solo(?::\s*[^\]]+)?\]/i.test(title.trim());
+}
+
+export function cleanGoalTitle(title: string): string {
+  return title.replace(/^\[Solo(?::\s*[^\]]+)?\]\s*/i, "").trim() || title;
+}
+
+export function formatGoalName(goal: { title: string } | string): string {
+  return cleanGoalTitle(typeof goal === "string" ? goal : goal.title);
+}
+
+export function getSoloBadgeText(
+  goal: { title: string; proposed_by?: string },
+  data: {
+    memberships?: { user_id: string; status: string }[];
+    profiles?: { id: string; display_name: string; nickname?: string | null }[];
+  },
+  currentUserId?: string,
+): string {
+  if (!isSoloGoal(goal)) return "";
+  const activeMembers = (data.memberships ?? []).filter(
+    (m) => m.status === "active",
+  );
+  const isMultiMember = activeMembers.length > 1;
+  const isOwner = !goal.proposed_by || goal.proposed_by === currentUserId;
+
+  if (isOwner) {
+    return isMultiMember
+      ? t("Solo · You (Partner can view)")
+      : t("Solo · You");
+  }
+
+  const ownerProfile = (data.profiles ?? []).find(
+    (p) => p.id === goal.proposed_by,
+  );
+  const rawName =
+    ownerProfile?.nickname || ownerProfile?.display_name || "Partner";
+  const firstName = rawName.trim().split(/\s+/)[0];
+  return t("Solo · {name} — visible to partner", { name: firstName });
+}
+
+export function isSoloCycle(
+  c: {
+    target_centavos: number;
+    daily_amount_centavos: number;
+    num_days: number;
+    is_solo?: boolean;
+  },
+  activeMemberCount = 2,
+): boolean {
+  if (c.is_solo) return true;
+  if (
+    activeMemberCount > 1 &&
+    c.target_centavos === c.daily_amount_centavos * c.num_days
+  ) {
+    return true;
+  }
+  return false;
+}
+
+export function getSoloCycleBadgeText(
+  c: {
+    receiver_id?: string;
+    is_solo?: boolean;
+    target_centavos: number;
+    daily_amount_centavos: number;
+    num_days: number;
+  },
+  data: {
+    memberships?: { user_id: string; status: string }[];
+    profiles?: { id: string; display_name: string; nickname?: string | null }[];
+  },
+  currentUserId?: string,
+): string {
+  const activeMembers = (data.memberships ?? []).filter(
+    (m) => m.status === "active",
+  );
+  if (!isSoloCycle(c, activeMembers.length)) return "";
+  const isMultiMember = activeMembers.length > 1;
+  const isOwner = !c.receiver_id || c.receiver_id === currentUserId;
+
+  if (isOwner) {
+    return isMultiMember
+      ? t("Solo · You (Partner can view)")
+      : t("Solo · You");
+  }
+
+  const ownerProfile = (data.profiles ?? []).find(
+    (p) => p.id === c.receiver_id,
+  );
+  const rawName =
+    ownerProfile?.nickname || ownerProfile?.display_name || "Partner";
+  const firstName = rawName.trim().split(/\s+/)[0];
+  return t("Solo · {name} — visible to partner", { name: firstName });
+}

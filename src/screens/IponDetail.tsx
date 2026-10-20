@@ -12,7 +12,7 @@ import Tally from "../components/Tally";
 import type { ViewProps } from "../components/shared";
 import { name, tone } from "../components/shared";
 import { rpc } from "../data";
-import { money, parsePesos, shortDate } from "../helpers";
+import { isSoloGoal, money, parsePesos, shortDate } from "../helpers";
 import { label, t } from "../i18n";
 
 /** Route /ipon/:id: Goal detail, custody, actions, and contribution history. */
@@ -68,7 +68,29 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
       </div>
 
       <section>
-        <IponCard g={g} data={data} />
+        <IponCard g={g} data={data} user={user} />
+
+        {isSoloGoal(g) && (
+          <div
+            className="sticker notice"
+            style={{
+              margin: "12px 0",
+              padding: "10px 14px",
+              fontSize: "13px",
+              color: "var(--ink)",
+              lineHeight: 1.4,
+            }}
+          >
+            {g.proposed_by === user
+              ? t(
+                  "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.",
+                )
+              : t(
+                  "This is a solo goal by {name}. You can view progress, but contributions are not required.",
+                  { name: name(data, g.proposed_by).trim().split(/\s+/)[0] },
+                )}
+          </div>
+        )}
 
         {/* Proposed state: Accept / Decline / Cancel */}
         {g.status === "proposed" && (
@@ -166,21 +188,37 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
               <div className="members">
                 {(data.savingsProgress ?? [])
                   .filter((p) => p.goal_id === g.id)
-                  .map((p) => (
-                    <div className="member" key={p.member_id}>
-                      <Avatar data={data} id={p.member_id} />
-                      <div>
-                        <strong>{name(data, p.member_id)}</strong>
-                        <Tally
-                          label={name(data, p.member_id)}
-                          paid={p.confirmed_steps}
-                          pending={p.pending_steps}
-                          total={g.num_steps ?? 1}
-                          tone={tone(data, p.member_id)}
-                        />
+                  .map((p) => {
+                    const isSolo = isSoloGoal(g);
+                    const isSaver = !isSolo || p.member_id === g.proposed_by;
+                    const isObserving = isSolo && !isSaver;
+                    return (
+                      <div className="member" key={p.member_id}>
+                        <Avatar data={data} id={p.member_id} />
+                        <div>
+                          <strong>{name(data, p.member_id)}</strong>
+                          {isObserving ? (
+                            <div>
+                              <span
+                                className="chip"
+                                style={{ fontSize: "11px", margin: "4px 0" }}
+                              >
+                                {t("₱0 · Observing")}
+                              </span>
+                            </div>
+                          ) : (
+                            <Tally
+                              label={name(data, p.member_id)}
+                              paid={p.confirmed_steps}
+                              pending={p.pending_steps}
+                              total={g.num_steps ?? 1}
+                              tone={tone(data, p.member_id)}
+                            />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
             )}
 

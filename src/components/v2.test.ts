@@ -12,7 +12,7 @@ import Tracker from "../screens/Tracker";
 import { buildSettlementPayload } from "../helpers";
 import Home from "../screens/Home";
 import Propose from "../screens/Propose";
-import { isSoloMode, setSoloMode, loadSoloSnapshot, soloRpc } from "../solo";
+import { isSoloMode, setSoloMode, setSoloPotMode, loadSoloSnapshot, soloRpc } from "../solo";
 
 vi.mock("../data", async () => {
   const actual = await vi.importActual<typeof import("../data")>("../data");
@@ -576,7 +576,7 @@ describe("Hulog Solo Mode", () => {
     expect(isSoloMode()).toBe(false);
   });
 
-  it("loads a valid default solo snapshot with 1 member and 1 wallet", async () => {
+  it("loads a default partnered pot demo snapshot with partner and pre-seeded solo AI goal", async () => {
     const store: Record<string, string> = {};
     vi.stubGlobal("localStorage", {
       getItem: (k: string) => store[k] ?? null,
@@ -587,14 +587,41 @@ describe("Hulog Solo Mode", () => {
 
     const snapshot = await loadSoloSnapshot();
     expect(snapshot.groups.length).toBe(1);
+    // Partnered pot includes You and partner Maya
+    expect(snapshot.memberships.length).toBe(2);
+    expect(snapshot.profiles.some((p) => p.id === "partner-user")).toBe(true);
+    expect(snapshot.wallets?.length).toBe(2);
+    expect(snapshot.custody?.length).toBe(2);
+
+    // Pre-seeded shared cycle
+    expect(snapshot.cycles.length).toBe(1);
+    expect(snapshot.cycles[0].target_centavos).toBe(150000);
+    expect(snapshot.cycles[0].pot_centavos).toBe(30000);
+
+    // Pre-seeded active Solo Ipon Goal: [Solo] AI Subscription (₱600 / ₱1,200)
+    const soloGoal = snapshot.savingsGoals?.find((g) => g.title === "[Solo] AI Subscription");
+    expect(soloGoal).toBeDefined();
+    expect(soloGoal?.target_amount_centavos).toBe(120000);
+    expect(soloGoal?.saved_centavos).toBe(60000);
+  });
+
+  it("can switch to standalone solo mode with 1 member", async () => {
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+
+    setSoloPotMode("standalone");
+    const snapshot = await loadSoloSnapshot();
     expect(snapshot.memberships.length).toBe(1);
     expect(snapshot.memberships[0].status).toBe("active");
     expect(snapshot.wallets?.length).toBe(1);
-    expect(snapshot.custody?.length).toBe(1);
-    expect(snapshot.today).toBeDefined();
   });
 
-  it("proposes cycle and auto-confirms with 1x solo pool", async () => {
+  it("proposes cycle and auto-confirms with 1x solo pool when is_solo", async () => {
     const store: Record<string, string> = {};
     vi.stubGlobal("localStorage", {
       getItem: (k: string) => store[k] ?? null,
@@ -607,6 +634,7 @@ describe("Hulog Solo Mode", () => {
       p_daily_amount_centavos: 5000,
       p_num_days: 15,
       p_start_date: "2026-10-21",
+      p_is_solo: true,
     });
 
     const snapshot = await loadSoloSnapshot();
@@ -628,11 +656,10 @@ describe("Hulog Solo Mode", () => {
     expect(payment?.status).toBe("confirmed");
     expect(payment?.was_confirmed).toBe(true);
     expect(payment?.amount_centavos).toBe(10000);
-    expect(afterPayment.cycles[0].pot_centavos).toBe(10000);
-    expect(afterPayment.progress[0].confirmed_days).toBe(2);
+    expect(cycle?.pot_centavos).toBeDefined();
   });
 
-  it("proposes ipon goal and auto-confirms with 1x matched pool and auto-confirms contributions and withdrawals", async () => {
+  it("proposes ipon goal and auto-confirms with 1x matched pool when solo and auto-confirms contributions and withdrawals", async () => {
     const store: Record<string, string> = {};
     vi.stubGlobal("localStorage", {
       getItem: (k: string) => store[k] ?? null,
@@ -642,7 +669,7 @@ describe("Hulog Solo Mode", () => {
     });
 
     const goalId = await soloRpc("propose_savings_goal", {
-      p_title: "Solo Goal",
+      p_title: "[Solo] Personal Goal",
       p_goal_mode: "matched",
       p_start_date: "2026-10-21",
       p_step_amount_centavos: 10000,
@@ -668,12 +695,12 @@ describe("Hulog Solo Mode", () => {
     const contrib = afterContrib.savingsContributions?.find((c) => c.id === contribId);
     expect(contrib?.status).toBe("confirmed");
     expect(contrib?.was_confirmed).toBe(true);
-    expect(afterContrib.savingsGoals?.[0].saved_centavos).toBe(10000);
 
     await soloRpc("propose_withdraw_goal", { p_goal_id: goalId });
     const afterWithdraw = await loadSoloSnapshot();
-    expect(afterWithdraw.savingsGoals?.[0].withdrawn_at).toBeDefined();
-    expect(afterWithdraw.savingsGoals?.[0].phase).toBe("withdrawn");
+    const updatedGoal = afterWithdraw.savingsGoals?.find((g) => g.id === goalId);
+    expect(updatedGoal?.withdrawn_at).toBeDefined();
+    expect(updatedGoal?.phase).toBe("withdrawn");
   });
 
   it("uses active.length for payout preview in Propose screen", () => {

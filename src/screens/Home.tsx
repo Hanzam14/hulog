@@ -19,7 +19,8 @@ import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
 import CustodyCard from "../components/CustodyCard";
 import IponCard from "../components/IponCard";
-import { isSoloMode, setSoloMode } from "../solo";
+import { isSoloMode, setSoloMode, setSoloPotMode } from "../solo";
+import { isSoloCycle } from "../helpers";
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
@@ -58,6 +59,39 @@ export default function Home(props: ViewProps) {
   return (
     <>
       <h1 className="sr-only">{group.name}</h1>
+      {isSoloMode() && (
+        <div
+          className="segmented"
+          role="radiogroup"
+          aria-label={t("Pot mode")}
+          style={{ marginBottom: "16px" }}
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={active.length > 1}
+            aria-pressed={active.length > 1}
+            onClick={() => {
+              setSoloPotMode("partnered", user);
+              void run(async () => {});
+            }}
+          >
+            {t("Partnered Pot (with Solo & Shared goals)")}
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={active.length <= 1}
+            aria-pressed={active.length <= 1}
+            onClick={() => {
+              setSoloPotMode("standalone", user);
+              void run(async () => {});
+            }}
+          >
+            {t("Standalone Solo")}
+          </button>
+        </div>
+      )}
       <CustodyCard data={data} />
       {!c ? (
         <div className="empty">
@@ -88,25 +122,42 @@ export default function Home(props: ViewProps) {
         </div>
       ) : (
         <>
-          <CycleCard c={c} data={data} />
+          <CycleCard c={c} data={data} user={user} />
           {c.status === "proposed" ? (
             <Proposal c={c} user={user} run={run} busy={busy} />
           ) : (
             <div className="members">
               {data.progress
                 .filter((p) => p.cycle_id === c.id)
-                .map((p) => (
-                  <div className="member" key={p.member_id}>
-                    <Avatar data={data} id={p.member_id} />
-                    <Tally
-                      label={name(data, p.member_id)}
-                      paid={p.confirmed_days}
-                      pending={p.pending_days}
-                      total={c.num_days}
-                      tone={tone(data, p.member_id)}
-                    />
-                  </div>
-                ))}
+                .map((p) => {
+                  const isSolo = isSoloCycle(c, active.length);
+                  const isSaver = p.member_id === c.receiver_id;
+                  const isObserving = isSolo && !isSaver;
+                  return (
+                    <div className="member" key={p.member_id}>
+                      <Avatar data={data} id={p.member_id} />
+                      {isObserving ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <strong>{name(data, p.member_id)}</strong>
+                          <span
+                            className="chip"
+                            style={{ fontSize: "11px", alignSelf: "flex-start" }}
+                          >
+                            {t("₱0 · Observing")}
+                          </span>
+                        </div>
+                      ) : (
+                        <Tally
+                          label={name(data, p.member_id)}
+                          paid={p.confirmed_days}
+                          pending={p.pending_days}
+                          total={c.num_days}
+                          tone={tone(data, p.member_id)}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           )}
           {c.status === "accepted" && !closed(c) && (
@@ -129,7 +180,7 @@ export default function Home(props: ViewProps) {
         </div>
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
-            <IponCard g={g} data={data} />
+            <IponCard g={g} data={data} user={user} />
             {g.status === "accepted" &&
               !g.withdrawn_at &&
               !g.withdraw_proposed_by && (

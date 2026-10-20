@@ -52,6 +52,7 @@ export interface Cycle {
   wallet_label?: string;
   pending_wallet_id?: string | null;
   wallet_proposed_by?: string | null;
+  is_solo?: boolean;
 }
 export interface Payment {
   id: string;

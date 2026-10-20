@@ -10,11 +10,15 @@ import type {
   SavingsGoal,
   SavingsContribution,
   AbonoEntry,
+  CustodyItem,
+  Progress,
+  SavingsMemberProgress,
 } from "./data";
-import { addDays } from "./helpers";
+import { addDays, isSoloCycle, isSoloGoal } from "./helpers";
 
 const SOLO_MODE_KEY = "hulog-solo-mode";
 const SOLO_SNAPSHOT_KEY = "hulog-solo-snapshot";
+const SOLO_POT_MODE_KEY = "hulog-solo-pot-mode";
 
 function generateId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -39,6 +43,30 @@ export function isSoloMode(): boolean {
   } catch {
     return false;
   }
+}
+
+export function getSoloPotMode(): "partnered" | "standalone" {
+  try {
+    const val = localStorage.getItem(SOLO_POT_MODE_KEY);
+    if (val === "standalone" || val === "partnered") return val;
+  } catch {
+    // Storage restricted
+  }
+  return "partnered";
+}
+
+export function setSoloPotMode(
+  mode: "partnered" | "standalone",
+  userId?: string,
+): Snapshot {
+  try {
+    localStorage.setItem(SOLO_POT_MODE_KEY, mode);
+  } catch {
+    // Storage restricted
+  }
+  const snap = createInitialSoloSnapshot(userId ?? getSoloUserId(), mode);
+  saveRawSoloSnapshot(snap);
+  return snap;
 }
 
 export function setSoloMode(enabled: boolean, userId?: string): void {
@@ -95,11 +123,16 @@ export function getSoloSession(userId?: string): Session {
   } as unknown as Session;
 }
 
-export function createInitialSoloSnapshot(userId?: string): Snapshot {
+export function createInitialSoloSnapshot(
+  userId?: string,
+  mode?: "partnered" | "standalone",
+): Snapshot {
   const uid = userId ?? "solo-user";
+  const currentMode = mode ?? getSoloPotMode();
   const today = getManilaToday();
   const groupId = "solo-group";
   const walletId = "solo-wallet";
+  const partnerId = "partner-user";
 
   const profile: Profile = {
     id: uid,
@@ -112,16 +145,34 @@ export function createInitialSoloSnapshot(userId?: string): Snapshot {
     color: "pink",
   };
 
+  const partnerProfile: Profile = {
+    id: partnerId,
+    display_name: "Maya (Partner — viewing)",
+    email: "maya@hulog.local",
+    avatar_url: null,
+    nickname: "Maya",
+    avatar_kind: "initial",
+    avatar_emoji: "🌸",
+    color: "blue",
+  };
+
   const group: Group = {
     id: groupId,
-    name: "My Savings",
+    name: currentMode === "partnered" ? "Our Shared Pot" : "My Savings",
     owner_id: uid,
-    pot_location: "Personal Pot",
+    pot_location: currentMode === "partnered" ? "GCash · Shared Home Pot" : "Personal Pot",
   };
 
   const membership: Membership = {
     group_id: groupId,
     user_id: uid,
+    status: "active",
+    last_seen_history_at: new Date().toISOString(),
+  };
+
+  const partnerMembership: Membership = {
+    group_id: groupId,
+    user_id: partnerId,
     status: "active",
     last_seen_history_at: new Date().toISOString(),
   };
@@ -136,34 +187,251 @@ export function createInitialSoloSnapshot(userId?: string): Snapshot {
     created_at: new Date().toISOString(),
   };
 
+  const partnerWallet: Wallet = {
+    id: "partner-wallet",
+    group_id: groupId,
+    holder_id: partnerId,
+    label: "Maya's GCash",
+    archived_at: null,
+    created_by: partnerId,
+    created_at: new Date().toISOString(),
+  };
+
+  if (currentMode === "standalone") {
+    return {
+      profiles: [profile],
+      groups: [group],
+      memberships: [membership],
+      cycles: [],
+      payments: [],
+      repayments: [],
+      progress: [],
+      changes: [],
+      invites: [],
+      today,
+      wallets: [wallet],
+      custody: [
+        {
+          wallet_id: walletId,
+          group_id: groupId,
+          holder_id: uid,
+          label: "Main Pot",
+          archived_at: null,
+          holder_active: true,
+          paluwagan_centavos: 0,
+          ipon_centavos: 0,
+          total_centavos: 0,
+        },
+      ],
+      savingsGoals: [],
+      savingsContributions: [],
+      savingsProgress: [],
+      abonoEntries: [],
+      abonoSummary: [],
+    };
+  }
+
+  // Partnered pot with pre-seeded shared round and active Solo Ipon Goal
+  const sharedCycleId = "demo-shared-cycle";
+  const sharedCycleStartDate = addDays(today, -3);
+  const sharedCycleEndDate = addDays(today, 11);
+  const sharedDailyAmount = 5000;
+  const sharedNumDays = 15;
+  const sharedTarget = sharedDailyAmount * sharedNumDays * 2; // 150000 (₱1,500)
+
+  const sharedCycle: Cycle = {
+    id: sharedCycleId,
+    group_id: groupId,
+    daily_amount_centavos: sharedDailyAmount,
+    num_days: sharedNumDays,
+    start_date: sharedCycleStartDate,
+    end_date: sharedCycleEndDate,
+    receiver_id: partnerId,
+    proposed_by: uid,
+    status: "accepted",
+    phase: "open",
+    pot_centavos: 30000,
+    target_centavos: sharedTarget,
+    payout_state: null,
+    received_at: null,
+    days_left: 11,
+    created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
+    wallet_id: walletId,
+    holder_id: uid,
+    wallet_label: "Main Pot",
+    pending_wallet_id: null,
+    wallet_proposed_by: null,
+    is_solo: false,
+  };
+
+  const payments: Payment[] = [
+    {
+      id: "pay-demo-1",
+      cycle_id: sharedCycleId,
+      member_id: uid,
+      days: 3,
+      amount_centavos: 15000,
+      note: "Days 1-3",
+      status: "confirmed",
+      was_confirmed: true,
+      created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
+      deleted_at: null,
+    },
+    {
+      id: "pay-demo-2",
+      cycle_id: sharedCycleId,
+      member_id: partnerId,
+      days: 3,
+      amount_centavos: 15000,
+      note: "Days 1-3",
+      status: "confirmed",
+      was_confirmed: true,
+      created_at: new Date(Date.now() - 1 * 86400000).toISOString(),
+      deleted_at: null,
+    },
+  ];
+
+  const progress: Progress[] = [
+    {
+      cycle_id: sharedCycleId,
+      member_id: uid,
+      expected_centavos: sharedDailyAmount * sharedNumDays,
+      confirmed_days: 3,
+      pending_days: 0,
+      pending_count: 0,
+      debt_centavos: 0,
+    },
+    {
+      cycle_id: sharedCycleId,
+      member_id: partnerId,
+      expected_centavos: sharedDailyAmount * sharedNumDays,
+      confirmed_days: 3,
+      pending_days: 0,
+      pending_count: 0,
+      debt_centavos: 0,
+    },
+  ];
+
+  // Active Solo Ipon Goal: [Solo] AI Subscription (₱600 / ₱1,200)
+  const soloGoalId = "demo-solo-ai-goal";
+  const soloGoalStartDate = addDays(today, -5);
+  const soloGoalEndDate = addDays(today, 25);
+  const soloGoalTarget = 120000; // ₱1,200
+  const soloGoalSaved = 60000; // ₱600
+
+  const soloGoal: SavingsGoal = {
+    id: soloGoalId,
+    group_id: groupId,
+    title: "[Solo] AI Subscription",
+    goal_mode: "flexible",
+    wallet_id: walletId,
+    holder_id: uid,
+    wallet_label: "Main Pot",
+    pending_wallet_id: null,
+    wallet_proposed_by: null,
+    target_amount_centavos: soloGoalTarget,
+    step_amount_centavos: null,
+    cadence_days: null,
+    num_steps: null,
+    start_date: soloGoalStartDate,
+    end_date: soloGoalEndDate,
+    proposed_by: uid,
+    status: "accepted",
+    accepted_by: uid,
+    accepted_at: new Date(Date.now() - 5 * 86400000).toISOString(),
+    withdraw_proposed_by: null,
+    withdrawn_by: null,
+    withdrawn_at: null,
+    saved_centavos: soloGoalSaved,
+    phase: "open",
+    days_left: 25,
+    expected_steps_today: 0,
+    created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
+  };
+
+  const savingsContributions: SavingsContribution[] = [
+    {
+      id: "demo-sc-ai-1",
+      goal_id: soloGoalId,
+      member_id: uid,
+      steps: null,
+      amount_centavos: soloGoalSaved,
+      note: "First half for Claude Pro",
+      status: "confirmed",
+      was_confirmed: true,
+      created_by: uid,
+      last_edited_by: null,
+      delete_proposed_by: null,
+      created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
+      confirmed_by: uid,
+      confirmed_at: new Date(Date.now() - 4 * 86400000).toISOString(),
+      edited_at: null,
+      deleted_at: null,
+    },
+  ];
+
+  const savingsProgress: SavingsMemberProgress[] = [
+    {
+      goal_id: soloGoalId,
+      member_id: uid,
+      expected_centavos: soloGoalTarget,
+      confirmed_centavos: soloGoalSaved,
+      pending_centavos: 0,
+      confirmed_steps: 1,
+      pending_steps: 0,
+    },
+    {
+      goal_id: soloGoalId,
+      member_id: partnerId,
+      expected_centavos: 0,
+      confirmed_centavos: 0,
+      pending_centavos: 0,
+      confirmed_steps: 0,
+      pending_steps: 0,
+    },
+  ];
+
+  const custody: CustodyItem[] = [
+    {
+      wallet_id: walletId,
+      group_id: groupId,
+      holder_id: uid,
+      label: "Main Pot",
+      archived_at: null,
+      holder_active: true,
+      paluwagan_centavos: 30000,
+      ipon_centavos: 60000,
+      total_centavos: 90000,
+    },
+    {
+      wallet_id: "partner-wallet",
+      group_id: groupId,
+      holder_id: partnerId,
+      label: "Maya's GCash",
+      archived_at: null,
+      holder_active: true,
+      paluwagan_centavos: 0,
+      ipon_centavos: 0,
+      total_centavos: 0,
+    },
+  ];
+
   return {
-    profiles: [profile],
+    profiles: [profile, partnerProfile],
     groups: [group],
-    memberships: [membership],
-    cycles: [],
-    payments: [],
+    memberships: [membership, partnerMembership],
+    cycles: [sharedCycle],
+    payments,
     repayments: [],
-    progress: [],
+    progress,
     changes: [],
     invites: [],
     today,
-    wallets: [wallet],
-    custody: [
-      {
-        wallet_id: walletId,
-        group_id: groupId,
-        holder_id: uid,
-        label: "Main Pot",
-        archived_at: null,
-        holder_active: true,
-        paluwagan_centavos: 0,
-        ipon_centavos: 0,
-        total_centavos: 0,
-      },
-    ],
-    savingsGoals: [],
-    savingsContributions: [],
-    savingsProgress: [],
+    wallets: [wallet, partnerWallet],
+    custody,
+    savingsGoals: [soloGoal],
+    savingsContributions,
+    savingsProgress,
     abonoEntries: [],
     abonoSummary: [],
   };
@@ -175,45 +443,45 @@ function adaptSoloSnapshotUser(
   newId: string,
 ): void {
   for (const p of snapshot.profiles) {
-    if (p.id === oldId) p.id = newId;
+    if (p.id === oldId && oldId !== "partner-user") p.id = newId;
   }
   for (const g of snapshot.groups) {
-    if (g.owner_id === oldId) g.owner_id = newId;
+    if (g.owner_id === oldId && oldId !== "partner-user") g.owner_id = newId;
   }
   for (const m of snapshot.memberships) {
-    if (m.user_id === oldId) m.user_id = newId;
+    if (m.user_id === oldId && oldId !== "partner-user") m.user_id = newId;
   }
   for (const w of snapshot.wallets ?? []) {
-    if (w.holder_id === oldId) w.holder_id = newId;
-    if (w.created_by === oldId) w.created_by = newId;
+    if (w.holder_id === oldId && oldId !== "partner-user") w.holder_id = newId;
+    if (w.created_by === oldId && oldId !== "partner-user") w.created_by = newId;
   }
   for (const c of snapshot.custody ?? []) {
-    if (c.holder_id === oldId) c.holder_id = newId;
+    if (c.holder_id === oldId && oldId !== "partner-user") c.holder_id = newId;
   }
   for (const c of snapshot.cycles) {
-    if (c.receiver_id === oldId) c.receiver_id = newId;
-    if (c.proposed_by === oldId) c.proposed_by = newId;
-    if (c.holder_id === oldId) c.holder_id = newId;
+    if (c.receiver_id === oldId && oldId !== "partner-user") c.receiver_id = newId;
+    if (c.proposed_by === oldId && oldId !== "partner-user") c.proposed_by = newId;
+    if (c.holder_id === oldId && oldId !== "partner-user") c.holder_id = newId;
   }
   for (const p of snapshot.payments) {
-    if (p.member_id === oldId) p.member_id = newId;
+    if (p.member_id === oldId && oldId !== "partner-user") p.member_id = newId;
   }
   for (const pr of snapshot.progress) {
-    if (pr.member_id === oldId) pr.member_id = newId;
+    if (pr.member_id === oldId && oldId !== "partner-user") pr.member_id = newId;
   }
   for (const sg of snapshot.savingsGoals ?? []) {
-    if (sg.proposed_by === oldId) sg.proposed_by = newId;
-    if (sg.holder_id === oldId) sg.holder_id = newId;
-    if (sg.accepted_by === oldId) sg.accepted_by = newId;
-    if (sg.withdrawn_by === oldId) sg.withdrawn_by = newId;
+    if (sg.proposed_by === oldId && oldId !== "partner-user") sg.proposed_by = newId;
+    if (sg.holder_id === oldId && oldId !== "partner-user") sg.holder_id = newId;
+    if (sg.accepted_by === oldId && oldId !== "partner-user") sg.accepted_by = newId;
+    if (sg.withdrawn_by === oldId && oldId !== "partner-user") sg.withdrawn_by = newId;
   }
   for (const sc of snapshot.savingsContributions ?? []) {
-    if (sc.member_id === oldId) sc.member_id = newId;
-    if (sc.created_by === oldId) sc.created_by = newId;
-    if (sc.confirmed_by === oldId) sc.confirmed_by = newId;
+    if (sc.member_id === oldId && oldId !== "partner-user") sc.member_id = newId;
+    if (sc.created_by === oldId && oldId !== "partner-user") sc.created_by = newId;
+    if (sc.confirmed_by === oldId && oldId !== "partner-user") sc.confirmed_by = newId;
   }
   for (const sp of snapshot.savingsProgress ?? []) {
-    if (sp.member_id === oldId) sp.member_id = newId;
+    if (sp.member_id === oldId && oldId !== "partner-user") sp.member_id = newId;
   }
 }
 
@@ -287,14 +555,19 @@ function computeGoalPhase(
 }
 
 export async function loadSoloSnapshot(): Promise<Snapshot> {
+  const currentMode = getSoloPotMode();
   let snapshot = loadRawSoloSnapshot();
   if (!snapshot) {
-    snapshot = createInitialSoloSnapshot();
+    snapshot = createInitialSoloSnapshot(undefined, currentMode);
+  } else if (currentMode === "partnered" && snapshot.memberships.length < 2) {
+    // Upgrade existing single-member solo snapshot to default partnered demo pot
+    snapshot = createInitialSoloSnapshot(snapshot.memberships[0]?.user_id, "partnered");
   }
 
   const today = getManilaToday();
   snapshot.today = today;
   const uid = snapshot.memberships[0]?.user_id ?? "solo-user";
+  const activeMembers = snapshot.memberships.filter((m) => m.status === "active");
 
   if (!snapshot.wallets || snapshot.wallets.length === 0) {
     snapshot.wallets = [
@@ -329,26 +602,32 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     );
   }
 
-  // Recalculate progress for cycles
-  snapshot.progress = snapshot.cycles.map((c) => {
-    const memberPayments = snapshot.payments.filter(
-      (p) =>
-        p.cycle_id === c.id &&
-        p.member_id === uid &&
-        !p.deleted_at &&
-        p.status === "confirmed",
-    );
-    const confirmedDays = memberPayments.reduce((sum, p) => sum + p.days, 0);
-    return {
-      cycle_id: c.id,
-      member_id: uid,
-      expected_centavos: c.daily_amount_centavos * c.num_days,
-      confirmed_days: confirmedDays,
-      pending_days: 0,
-      pending_count: 0,
-      debt_centavos: 0,
-    };
-  });
+  // Recalculate progress for cycles for all active members
+  snapshot.progress = [];
+  for (const c of snapshot.cycles) {
+    const isSolo = isSoloCycle(c, activeMembers.length);
+    for (const m of activeMembers) {
+      const memberPayments = snapshot.payments.filter(
+        (p) =>
+          p.cycle_id === c.id &&
+          p.member_id === m.user_id &&
+          !p.deleted_at &&
+          p.status === "confirmed",
+      );
+      const confirmedDays = memberPayments.reduce((sum, p) => sum + p.days, 0);
+      const isSaver = isSolo ? m.user_id === c.receiver_id : true;
+      const expectedDays = isSaver ? c.num_days : 0;
+      snapshot.progress.push({
+        cycle_id: c.id,
+        member_id: m.user_id,
+        expected_centavos: c.daily_amount_centavos * expectedDays,
+        confirmed_days: confirmedDays,
+        pending_days: 0,
+        pending_count: 0,
+        debt_centavos: 0,
+      });
+    }
+  }
 
   // Recalculate savings goals
   snapshot.savingsGoals = snapshot.savingsGoals ?? [];
@@ -365,33 +644,40 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     g.days_left = daysLeft;
   }
 
-  // Recalculate savingsProgress
-  snapshot.savingsProgress = snapshot.savingsGoals.map((g) => {
-    const memberContributions = (snapshot.savingsContributions ?? []).filter(
-      (sc) =>
-        sc.goal_id === g.id &&
-        sc.member_id === uid &&
-        !sc.deleted_at &&
-        sc.status === "confirmed",
-    );
-    const confirmedCentavos = memberContributions.reduce(
-      (sum, sc) => sum + sc.amount_centavos,
-      0,
-    );
-    const confirmedSteps = memberContributions.reduce(
-      (sum, sc) => sum + (sc.steps ?? 0),
-      0,
-    );
-    return {
-      goal_id: g.id,
-      member_id: uid,
-      expected_centavos: g.target_amount_centavos,
-      confirmed_centavos: confirmedCentavos,
-      pending_centavos: 0,
-      confirmed_steps: confirmedSteps,
-      pending_steps: 0,
-    };
-  });
+  // Recalculate savingsProgress for all active members
+  snapshot.savingsProgress = [];
+  for (const g of snapshot.savingsGoals) {
+    const isSolo = isSoloGoal(g);
+    for (const m of activeMembers) {
+      const memberContributions = (snapshot.savingsContributions ?? []).filter(
+        (sc) =>
+          sc.goal_id === g.id &&
+          sc.member_id === m.user_id &&
+          !sc.deleted_at &&
+          sc.status === "confirmed",
+      );
+      const confirmedCentavos = memberContributions.reduce(
+        (sum, sc) => sum + sc.amount_centavos,
+        0,
+      );
+      const confirmedSteps = memberContributions.reduce(
+        (sum, sc) => sum + (sc.steps ?? 0),
+        0,
+      );
+      const isSaver = isSolo ? m.user_id === g.proposed_by : true;
+      const expectedCentavos = isSaver ? g.target_amount_centavos : 0;
+
+      snapshot.savingsProgress.push({
+        goal_id: g.id,
+        member_id: m.user_id,
+        expected_centavos: expectedCentavos,
+        confirmed_centavos: confirmedCentavos,
+        pending_centavos: 0,
+        confirmed_steps: confirmedSteps,
+        pending_steps: 0,
+      });
+    }
+  }
 
   // Recalculate custody
   const activeWallets = (snapshot.wallets ?? []).filter((w) => !w.archived_at);
@@ -468,7 +754,7 @@ export async function soloRpc(
     }
 
     case "update_profile": {
-      const p = snapshot.profiles[0];
+      const p = snapshot.profiles.find((pr) => pr.id === uid) ?? snapshot.profiles[0];
       if (p) {
         if (args.p_nickname !== undefined) p.nickname = args.p_nickname as string;
         if (args.p_avatar_kind !== undefined)
@@ -518,8 +804,10 @@ export async function soloRpc(
       const wallet =
         activeWallets.find((w) => w.id === args.p_wallet_id) ?? activeWallets[0];
 
-      // In solo mode: auto-confirms immediately! Target is 1x pool.
-      const targetCentavos = dailyAmount * numDays * 1;
+      const activeCount = snapshot.memberships.filter((m) => m.status === "active").length;
+      const isSolo = Boolean(args.p_is_solo) || activeCount <= 1;
+      const multiplier = isSolo ? 1 : activeCount;
+      const targetCentavos = dailyAmount * numDays * multiplier;
       const { phase, daysLeft } = computeCyclePhase(startDate, endDate, today);
 
       const cycle: Cycle = {
@@ -544,19 +832,10 @@ export async function soloRpc(
         wallet_label: wallet?.label ?? "Main Pot",
         pending_wallet_id: null,
         wallet_proposed_by: null,
+        is_solo: isSolo,
       };
 
       snapshot.cycles.push(cycle);
-      snapshot.progress.push({
-        cycle_id: cycle.id,
-        member_id: uid,
-        expected_centavos: targetCentavos,
-        confirmed_days: 0,
-        pending_days: 0,
-        pending_count: 0,
-        debt_centavos: 0,
-      });
-
       saveRawSoloSnapshot(snapshot);
       return cycle.id;
     }
@@ -580,7 +859,6 @@ export async function soloRpc(
       if (!cycle) throw new Error("Cycle not found");
 
       const amountCentavos = days * cycle.daily_amount_centavos;
-      // In solo mode: auto-confirms immediately!
       const payment: Payment = {
         id: generateId(),
         cycle_id: cycleId,
@@ -681,12 +959,15 @@ export async function soloRpc(
       let cadenceDays: number | null = null;
       let numSteps: number | null = null;
 
+      const activeCount = snapshot.memberships.filter((m) => m.status === "active").length;
+      const isSolo = isSoloGoal(title) || Boolean(args.p_is_solo) || activeCount <= 1;
+
       if (goalMode === "matched") {
         stepAmountCentavos = Number(args.p_step_amount_centavos);
         cadenceDays = Number(args.p_cadence_days);
         numSteps = Number(args.p_num_steps);
-        // In solo mode: auto-confirms immediately! Target is 1x pool.
-        targetAmountCentavos = stepAmountCentavos * numSteps * 1;
+        const multiplier = isSolo ? 1 : activeCount;
+        targetAmountCentavos = stepAmountCentavos * numSteps * multiplier;
         endDate = addDays(startDate, (numSteps - 1) * cadenceDays);
       } else {
         targetAmountCentavos = Number(args.p_target_amount_centavos);
@@ -710,7 +991,7 @@ export async function soloRpc(
         start_date: startDate,
         end_date: endDate,
         proposed_by: uid,
-        status: "accepted", // Auto-confirm immediately!
+        status: "accepted",
         accepted_by: uid,
         accepted_at: new Date().toISOString(),
         withdraw_proposed_by: null,
@@ -746,7 +1027,6 @@ export async function soloRpc(
       const steps = args.p_steps !== undefined ? Number(args.p_steps) : null;
       const amountCentavos = Number(args.p_amount_centavos);
 
-      // In solo mode: auto-confirms immediately!
       const contribution: SavingsContribution = {
         id: generateId(),
         goal_id: goalId,
@@ -810,7 +1090,6 @@ export async function soloRpc(
         (g) => g.id === args.p_goal_id,
       );
       if (goal) {
-        // In solo mode: auto-confirms immediately!
         goal.withdrawn_by = uid;
         goal.withdrawn_at = new Date().toISOString();
         goal.phase = "withdrawn";
@@ -865,7 +1144,7 @@ export async function soloRpc(
         owed_amount_centavos: owedAmount,
         entry_date: (args.p_entry_date as string) || today,
         note: ((args.p_note as string) || "").trim(),
-        status: "confirmed", // In solo mode: auto-confirms immediately!
+        status: "confirmed",
         was_confirmed: true,
         created_by: uid,
         last_edited_by: null,
