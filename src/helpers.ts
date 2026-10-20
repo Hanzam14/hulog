@@ -78,6 +78,50 @@ export function buildSettlementPayload(args: {
     p_note: args.note.trim(),
   };
 }
+/** Compute percent saved and cadence pace status for an Ipon goal. */
+export function iponGoalProgress(goal: {
+  saved_centavos: number;
+  target_amount_centavos: number;
+  goal_mode: "matched" | "flexible";
+  step_amount_centavos: number | null;
+  expected_steps_today: number;
+  start_date: string;
+  end_date: string;
+  phase: string;
+}): {
+  percent: number;
+  onTrack: boolean;
+  paceLabel: string;
+  reachedTarget: boolean;
+} {
+  const raw =
+    goal.target_amount_centavos > 0
+      ? (goal.saved_centavos / goal.target_amount_centavos) * 100
+      : 0;
+  const percent = Math.min(100, Math.max(0, Math.round(raw)));
+  const reachedTarget =
+    goal.target_amount_centavos > 0 &&
+    goal.saved_centavos >= goal.target_amount_centavos;
+
+  let expectedCentavos = 0;
+  if (goal.goal_mode === "matched" && goal.step_amount_centavos) {
+    expectedCentavos =
+      goal.expected_steps_today * goal.step_amount_centavos * 2;
+  } else if (goal.phase === "overdue") {
+    expectedCentavos = goal.target_amount_centavos;
+  }
+
+  const onTrack =
+    reachedTarget ||
+    (goal.phase !== "overdue" && goal.saved_centavos >= expectedCentavos);
+
+  return {
+    percent,
+    onTrack,
+    paceLabel: onTrack ? t("On track") : t("Behind"),
+    reachedTarget,
+  };
+}
 /** Compute a next-payout countdown line for an active unreceived cycle, or null. */
 export function payoutCountdown(
   cycle:
