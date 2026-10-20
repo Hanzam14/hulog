@@ -591,17 +591,17 @@ describe("Hulog v2 Loading Skeleton & Offline Banner", () => {
     const enMarkup = html(createElement(App));
     expect(enMarkup).toContain("offline-banner");
     expect(enMarkup).toContain(
-      "You&#x27;re offline. Changes will sync when you reconnect.",
+      "You&#x27;re offline. Changes won&#x27;t save until you&#x27;re back online.",
     );
 
     setLang("tl");
-    expect(t("You're offline. Changes will sync when you reconnect.")).toBe(
-      "Wala kang internet ngayon. Kusang mag-si-sync ang mga pagbabago kapag online ka na ulit.",
+    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+      "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
     );
 
     setLang("taglish");
-    expect(t("You're offline. Changes will sync when you reconnect.")).toBe(
-      "Offline ka ngayon. Mag-si-sync ang changes kapag online na ulit.",
+    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+      "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
     );
 
     vi.stubGlobal("navigator", { onLine: true });

@@ -266,7 +266,7 @@ export default function App() {
       <UpdateBanner />
       {offline && (
         <div role="status" className="notice offline-banner">
-          {t("You're offline. Changes will sync when you reconnect.")}
+          {t("You're offline. Changes won't save until you're back online.")}
         </div>
       )}
       {error && (
