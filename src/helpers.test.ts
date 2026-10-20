@@ -2,6 +2,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   addDays,
   cadenceDisplay,
+  cleanGoalTitle,
+  getSoloBadgeText,
+  getSoloCycleBadgeText,
+  isSoloCycle,
+  isSoloGoal,
   csv,
   filterHistory,
   historyMonths,
@@ -277,5 +282,85 @@ describe("display helpers", () => {
     expect(payoutCountdown(base, "2026-10-17", "a", "Ana")).toBe(
       "Payout sa 4 araw - turn mo",
     );
+  });
+});
+
+describe("solo helpers", () => {
+  it("detects solo goals and formats title cleanly", () => {
+    expect(isSoloGoal("[Solo] AI Subscription")).toBe(true);
+    expect(isSoloGoal("[Solo: Angelo] AI Subscription")).toBe(true);
+    expect(isSoloGoal("Japan Trip")).toBe(false);
+    expect(cleanGoalTitle("[Solo] AI Subscription")).toBe("AI Subscription");
+    expect(cleanGoalTitle("[Solo: Angelo] Claude Pro")).toBe("Claude Pro");
+    expect(cleanGoalTitle("Japan Trip")).toBe("Japan Trip");
+  });
+
+  it("builds solo badge text for owner and observing partner", () => {
+    setLang("en");
+    const mockData = {
+      memberships: [
+        { user_id: "user-1", status: "active" },
+        { user_id: "user-2", status: "active" },
+      ],
+      profiles: [
+        { id: "user-1", display_name: "Angelo", nickname: "Angelo" },
+        { id: "user-2", display_name: "Maya", nickname: "Maya" },
+      ],
+    };
+
+    const goal = { title: "[Solo] AI Subscription", proposed_by: "user-1" };
+    expect(getSoloBadgeText(goal, mockData, "user-1")).toBe(
+      "Solo · You (Partner can view)",
+    );
+    expect(getSoloBadgeText(goal, mockData, "user-2")).toBe(
+      "Solo · Angelo — visible to partner",
+    );
+
+    const singleData = {
+      memberships: [{ user_id: "user-1", status: "active" }],
+      profiles: [{ id: "user-1", display_name: "You", nickname: "You" }],
+    };
+    expect(getSoloBadgeText(goal, singleData, "user-1")).toBe("Solo · You");
+  });
+
+  it("detects solo rounds and builds solo cycle badge text", () => {
+    setLang("en");
+    const mockData = {
+      memberships: [
+        { user_id: "user-1", status: "active" },
+        { user_id: "user-2", status: "active" },
+      ],
+      profiles: [
+        { id: "user-1", display_name: "Angelo", nickname: "Angelo" },
+        { id: "user-2", display_name: "Maya", nickname: "Maya" },
+      ],
+    };
+
+    const soloCycle = {
+      receiver_id: "user-1",
+      daily_amount_centavos: 5000,
+      num_days: 15,
+      target_centavos: 75000,
+      is_solo: true,
+    };
+    expect(isSoloCycle(soloCycle)).toBe(true);
+    expect(getSoloCycleBadgeText(soloCycle, mockData, "user-1")).toBe(
+      "Solo · You (Partner can view)",
+    );
+    expect(getSoloCycleBadgeText(soloCycle, mockData, "user-2")).toBe(
+      "Solo · Angelo — visible to partner",
+    );
+
+    const duoCycle = {
+      receiver_id: "user-1",
+      daily_amount_centavos: 5000,
+      num_days: 15,
+      target_centavos: 150000,
+    };
+    expect(isSoloCycle(duoCycle)).toBe(false);
+    expect(getSoloCycleBadgeText(duoCycle, mockData, "user-1")).toBe("");
+    // Hosted cycle_summary uses 2x daily amount; even a legacy 1x target
+    // is not evidence of a solo cycle without the explicit local flag.
+    expect(isSoloCycle({ ...duoCycle, target_centavos: 75000 })).toBe(false);
   });
 });

@@ -9,6 +9,7 @@ import type { Run } from "./components/shared";
 import Join from "./screens/Join";
 import NoGroup from "./screens/NoGroup";
 import Home from "./screens/Home";
+import { getSoloSession, isSoloMode, setSoloMode } from "./solo";
 import Propose from "./screens/Propose";
 import Detail from "./screens/Detail";
 import History from "./screens/History";
@@ -33,10 +34,10 @@ import {
 
 export default function App() {
   const language = useLanguage();
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<Session | null>(() => (isSoloMode() ? getSoloSession() : null));
   const languageReadyUser = useRef<string | null>(null);
   const lastLanguageAttempt = useRef<{ userId: string; language: Lang } | null>(null);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => isSoloMode() || !supabase);
   const [data, setData] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -130,11 +131,16 @@ export default function App() {
     }
   }, [data, session]);
   const refresh = useCallback(async () => {
+    if (!isSoloMode() && session?.user.id === "solo-user") {
+      setSession(null);
+      setData(null);
+      return;
+    }
     const next = await load();
     setData(next);
-  }, []);
+  }, [session]);
   useEffect(() => {
-    if (!supabase) return;
+    if (isSoloMode() || !supabase) return;
     let alive = true;
     supabase.auth.getSession().then(({ data: result, error: authError }) => {
       if (alive) {
@@ -145,9 +151,11 @@ export default function App() {
     });
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, next) => {
-        setSession(next);
-        setData(null);
-        setReady(true);
+        if (!isSoloMode()) {
+          setSession(next);
+          setData(null);
+          setReady(true);
+        }
       },
     );
     return () => {
@@ -183,7 +191,11 @@ export default function App() {
     setSuccess(null);
     try {
       await action();
-      if ((await supabase!.auth.getSession()).data.session) await refresh();
+      if (isSoloMode()) {
+        await refresh();
+      } else if (supabase && (await supabase.auth.getSession()).data.session) {
+        await refresh();
+      }
       if (options?.showSuccess !== false)
         setSuccess({ message: "Saved. Salamat!" });
     } catch (e) {
@@ -208,13 +220,19 @@ export default function App() {
   const signOut = () =>
     run(
       async () => {
+        if (isSoloMode()) {
+          setSoloMode(false);
+          setSession(null);
+          setData(null);
+          return;
+        }
         const { error: authError } = await supabase!.auth.signOut();
         if (authError) throw authError;
         setData(null);
       },
       { showSuccess: false },
     );
-  if (!supabase)
+  if (!supabase && !isSoloMode())
     return (
       <main className="welcome">
         <UpdateBanner />
@@ -228,6 +246,17 @@ export default function App() {
             )}
           </p>
         </section>
+        <button
+          type="button"
+          className="big"
+          onClick={() => {
+            setSoloMode(true);
+            setSession(getSoloSession());
+            void refresh();
+          }}
+        >
+          {t("Go solo on this device")}
+        </button>
       </main>
     );
   const own = data?.memberships.find((m) => m.user_id === session?.user.id);
@@ -332,6 +361,18 @@ export default function App() {
           <button disabled={busy} onClick={signIn}>
             {t("Continue with Google")}
           </button>
+          <button
+            type="button"
+            className="secondary"
+            disabled={busy}
+            onClick={() => {
+              setSoloMode(true);
+              setSession(getSoloSession());
+              void refresh();
+            }}
+          >
+            {t("Go solo on this device")}
+          </button>
           {location.pathname.startsWith("/join/") && (
             <p>{t("Your invite will be here after sign-in.")}</p>
           )}
@@ -376,7 +417,7 @@ export default function App() {
               path="/join/:token"
               element={<Join run={run} busy={busy} />}
             />
-            <Route path="*" element={<NoGroup run={run} busy={busy} />} />
+            <Route path="*" element={<NoGroup run={run} busy={busy} user={session.user.id} />} />
           </Routes>
         </main>
       ) : (

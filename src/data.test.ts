@@ -1,12 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const result: { data: unknown; error: unknown } = { data: [], error: null };
+const hosted = vi.hoisted(() => ({ from: vi.fn(), rpc: vi.fn() }));
 
 vi.mock("@supabase/supabase-js", () => ({
   createClient: () => ({
-    from: () => ({
-      select: () => ({ order: () => ({ range: async () => result }) }),
-    }),
+    rpc: hosted.rpc,
+    from: (...args: unknown[]) => {
+      hosted.from(...args);
+      return {
+        select: () => ({ order: () => ({ range: async () => result }) }),
+      };
+    },
   }),
 }));
 
@@ -19,8 +24,57 @@ async function loadData() {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
   result.data = [];
   result.error = null;
+});
+
+describe("local solo dispatch", () => {
+  it("loads the demo and records local proposals without querying Supabase", async () => {
+    const store: Record<string, string> = { "hulog-solo-mode": "true" };
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => store[key] ?? null,
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+    });
+    const { load, rpc } = await loadData();
+    const demo = await load();
+    expect(
+      demo.savingsGoals?.some((g) => g.title === "[Solo] AI Subscription"),
+    ).toBe(true);
+    const cycleId = await rpc("propose_cycle", {
+      p_daily_amount_centavos: 5000,
+      p_num_days: 15,
+      p_start_date: demo.today,
+      p_is_solo: true,
+    });
+    const goalId = await rpc("propose_savings_goal", {
+      p_title: "[Solo] Local only",
+      p_goal_mode: "matched",
+      p_start_date: demo.today,
+      p_step_amount_centavos: 10000,
+      p_cadence_days: 1,
+      p_num_steps: 10,
+      p_is_solo: true,
+    });
+    const saved = await load();
+    expect(saved.cycles.find((c) => c.id === cycleId)).toMatchObject({
+      is_solo: true,
+      target_centavos: 75000,
+    });
+    expect(saved.savingsGoals?.find((g) => g.id === goalId)).toMatchObject({
+      target_amount_centavos: 100000,
+    });
+    expect(
+      JSON.parse(store["hulog-solo-snapshot"]).cycles.some(
+        (c: { id: string }) => c.id === cycleId,
+      ),
+    ).toBe(true);
+    expect(hosted.from).not.toHaveBeenCalled();
+    expect(hosted.rpc).not.toHaveBeenCalled();
+  });
 });
 
 describe("optionalRows", () => {

@@ -2,16 +2,32 @@ import { t } from "../i18n";
 import { Link } from "react-router-dom";
 import { IconPigMoney } from "@tabler/icons-react";
 import type { Cycle, Snapshot } from "../data";
-import { money, phaseDisplay, shortDate } from "../helpers";
+import {
+  getSoloCycleBadgeText,
+  money,
+  phaseDisplay,
+  shortDate,
+} from "../helpers";
 import Avatar from "./Avatar";
 import { name } from "./shared";
 
 /** The pot sticker: how much is in, the target, and who gets it. */
-export default function CycleCard({ c, data }: { c: Cycle; data: Snapshot }) {
+export default function CycleCard({
+  c,
+  data,
+  user,
+}: {
+  c: Cycle;
+  data: Snapshot;
+  user?: string;
+}) {
   const progress =
     c.target_centavos > 0
       ? Math.min(100, Math.max(0, (c.pot_centavos / c.target_centavos) * 100))
       : 0;
+
+  const soloBadge = getSoloCycleBadgeText(c, data, user);
+
   return (
     <Link
       to={`/cycles/${c.id}`}
@@ -20,11 +36,30 @@ export default function CycleCard({ c, data }: { c: Cycle; data: Snapshot }) {
     >
       <div className="pot-top">
         <IconPigMoney className="pig" size={44} aria-hidden="true" />
-        <div className="pot-amount">
-          <strong>{money(c.pot_centavos)}</strong>
-          <span className="pot-target">
-            {t("of {amount}", { amount: money(c.target_centavos) })}
-          </span>
+        <div className="pot-amount" style={{ display: "flex", flexDirection: "column" }}>
+          {soloBadge && (
+            <span
+              className="chip"
+              style={{
+                fontSize: "11px",
+                padding: "1px 8px",
+                fontWeight: 600,
+                background: "var(--brand-soft, #fdf2f8)",
+                color: "var(--brand, #db2777)",
+                border: "1px solid currentColor",
+                marginBottom: "4px",
+                alignSelf: "flex-start",
+              }}
+            >
+              {soloBadge}
+            </span>
+          )}
+          <div style={{ display: "flex", alignItems: "baseline", gap: "8px", flexWrap: "wrap" }}>
+            <strong>{money(c.pot_centavos)}</strong>
+            <span className="pot-target">
+              {t("of {amount}", { amount: money(c.target_centavos) })}
+            </span>
+          </div>
         </div>
       </div>
       <div

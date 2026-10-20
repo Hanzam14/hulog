@@ -59,25 +59,6 @@ export function cadenceDisplay(cadenceDays: number | null): string {
 export function splitHalfCentavos(totalCentavos: number): number {
   return Math.ceil(totalCentavos / 2);
 }
-/** Build the RPC payload for recording an abono settlement entry. */
-export function buildSettlementPayload(args: {
-  debtorId: string;
-  creditorId: string;
-  amountCentavos: number;
-  entryDate: string;
-  note: string;
-}) {
-  return {
-    p_kind: "settlement" as const,
-    p_from_member: args.debtorId,
-    p_to_member: args.creditorId,
-    p_description: "Settlement",
-    p_total_amount_centavos: args.amountCentavos,
-    p_owed_amount_centavos: args.amountCentavos,
-    p_entry_date: args.entryDate,
-    p_note: args.note.trim(),
-  };
-}
 export function isNavigatorOffline(): boolean {
   return typeof navigator !== "undefined" && navigator.onLine === false;
 }
@@ -254,4 +235,114 @@ export function csv(rows: Record<string, unknown>[]): string {
     keys.map(cell).join(","),
     ...rows.map((row) => keys.map((key) => cell(row[key])).join(",")),
   ].join("\r\n");
+}
+
+/** Build the RPC payload for recording an abono settlement entry. */
+export function buildSettlementPayload(args: {
+  debtorId: string;
+  creditorId: string;
+  amountCentavos: number;
+  entryDate: string;
+  note: string;
+}) {
+  return {
+    p_kind: "settlement" as const,
+    p_from_member: args.debtorId,
+    p_to_member: args.creditorId,
+    p_description: "Settlement",
+    p_total_amount_centavos: args.amountCentavos,
+    p_owed_amount_centavos: args.amountCentavos,
+    p_entry_date: args.entryDate,
+    p_note: args.note.trim(),
+  };
+}
+
+export function isSoloGoal(goal: { title: string } | string): boolean {
+  const title = typeof goal === "string" ? goal : goal.title;
+  return /^\[Solo(?::\s*[^\]]+)?\]/i.test(title.trim());
+}
+
+export function cleanGoalTitle(title: string): string {
+  return title.replace(/^\[Solo(?::\s*[^\]]+)?\]\s*/i, "").trim() || title;
+}
+
+export function formatGoalName(goal: { title: string } | string): string {
+  return cleanGoalTitle(typeof goal === "string" ? goal : goal.title);
+}
+
+export function getSoloBadgeText(
+  goal: { title: string; proposed_by?: string },
+  data: {
+    memberships?: { user_id: string; status: string }[];
+    profiles?: { id: string; display_name: string; nickname?: string | null }[];
+  },
+  currentUserId?: string,
+): string {
+  if (!isSoloGoal(goal)) return "";
+  const activeMembers = (data.memberships ?? []).filter(
+    (m) => m.status === "active",
+  );
+  const isMultiMember = activeMembers.length > 1;
+  const isOwner = !goal.proposed_by || goal.proposed_by === currentUserId;
+
+  if (isOwner) {
+    return isMultiMember
+      ? t("Solo · You (Partner can view)")
+      : t("Solo · You");
+  }
+
+  const ownerProfile = (data.profiles ?? []).find(
+    (p) => p.id === goal.proposed_by,
+  );
+  const rawName =
+    ownerProfile?.nickname || ownerProfile?.display_name || "Partner";
+  const firstName = rawName.trim().split(/\s+/)[0];
+  return t("Solo · {name} — visible to partner", { name: firstName });
+}
+
+export function isSoloCycle(
+  c: {
+    target_centavos: number;
+    daily_amount_centavos: number;
+    num_days: number;
+    is_solo?: boolean;
+  },
+): boolean {
+  return c.is_solo === true;
+}
+
+export function getSoloCycleBadgeText(
+  c: {
+    receiver_id?: string;
+    is_solo?: boolean;
+    target_centavos: number;
+    daily_amount_centavos: number;
+    num_days: number;
+  },
+  data: {
+    memberships?: { user_id: string; status: string }[];
+    profiles?: { id: string; display_name: string; nickname?: string | null }[];
+  },
+  currentUserId?: string,
+): string {
+  const activeMembers = (data.memberships ?? []).filter(
+    (m) => m.status === "active",
+  );
+  if (!isSoloCycle(c)) return "";
+  const isMultiMember = activeMembers.length > 1;
+  const isOwner = !c.receiver_id || c.receiver_id === currentUserId;
+
+  if (isOwner) {
+    return isMultiMember
+      ? t("Solo · You (Partner can view)")
+      : t("Solo · You");
+  }
+
+  const ownerProfile = (data.profiles ?? []).find(
+    (p) => p.id === c.receiver_id,
+  );
+  const rawName =
+    ownerProfile?.nickname || ownerProfile?.display_name || "Partner";
+  const firstName = rawName.trim().split(/\s+/)[0];
+  return t("Solo · {name} — visible to partner", { name: firstName });
 }

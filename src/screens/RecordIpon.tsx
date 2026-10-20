@@ -5,7 +5,13 @@ import Avatar from "../components/Avatar";
 import type { ViewProps } from "../components/shared";
 import { tone } from "../components/shared";
 import { rpc } from "../data";
-import { money, parsePesos } from "../helpers";
+import {
+  cleanGoalTitle,
+  getSoloBadgeText,
+  isSoloGoal,
+  money,
+  parsePesos,
+} from "../helpers";
 import { t } from "../i18n";
 
 /** Route /ipon/:id/record: Log a contribution towards a matched or flexible savings goal. */
@@ -98,8 +104,25 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
           textAlign: "center",
         }}
       >
-        {g.title}
+        {cleanGoalTitle(g.title)}
       </h1>
+      {isSoloGoal(g) && (
+        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+          <span
+            className="chip"
+            style={{
+              fontSize: "11px",
+              padding: "1px 8px",
+              fontWeight: 600,
+              background: "var(--brand-soft, #fdf2f8)",
+              color: "var(--brand, #db2777)",
+              border: "1px solid currentColor",
+            }}
+          >
+            {getSoloBadgeText(g, data, user)}
+          </span>
+        </div>
+      )}
 
       {g.goal_mode === "matched" ? (
         <>
