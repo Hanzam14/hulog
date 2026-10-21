@@ -41,6 +41,7 @@ export default function Changes({
     receiver_id: t("Receiver"),
     deleted_at: t("Deleted"),
     received_at: t("Received"),
+    closed_early_by: t("Closed early by"),
     used_at: t("Invite used"),
     revoked_at: t("Invite revoked"),
     label: t("Wallet name (e.g. SeaBank, GCash, Cash)"),
@@ -67,7 +68,13 @@ export default function Changes({
       ? "—"
       : key.endsWith("_centavos")
         ? money(Number(v))
-        : ["receiver_id", "holder_id", "from_member", "to_member"].includes(key)
+        : [
+              "receiver_id",
+              "holder_id",
+              "closed_early_by",
+              "from_member",
+              "to_member",
+            ].includes(key)
           ? name(data, String(v))
           : key === "wallet_id"
             ? ((data.wallets ?? []).find((w) => w.id === v)?.label ?? String(v))
@@ -135,8 +142,7 @@ export default function Changes({
                   <p key={key}>
                     <strong>{label}</strong>
                     <br />
-                    {value(key, h.before?.[key])} →{" "}
-                    {value(key, h.after?.[key])}
+                    {value(key, h.before?.[key])} → {value(key, h.after?.[key])}
                   </p>
                 ))}
             </details>

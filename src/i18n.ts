@@ -154,6 +154,10 @@ const taglish = {
   Deleted: "Inalis",
   Received: "Natanggap na",
   "Waiting for Got it": "Hinihintay ang Got it",
+  "Close round early": "Isara na ang round",
+  "Close this round now? Payout can happen today. This can't be undone.":
+    "Isara na ang round ngayon? Puwede nang i-payout today. Hindi na ito maibabalik.",
+  "Closed early by": "Maagang isinara ni",
   pending: "hinihintay",
   confirmed: "nakumpirma",
   proposed: "iminungkahi",
@@ -652,6 +656,10 @@ const en = {
   Deleted: "Deleted",
   Received: "Received",
   "Waiting for Got it": "Waiting for receipt confirmation",
+  "Close round early": "Close round early",
+  "Close this round now? Payout can happen today. This can't be undone.":
+    "Close this round now? Payout can happen today. This can't be undone.",
+  "Closed early by": "Closed early by",
   pending: "pending",
   confirmed: "confirmed",
   proposed: "proposed",
@@ -1150,6 +1158,10 @@ const tl = {
   Deleted: "Inalis",
   Received: "Natanggap na",
   "Waiting for Got it": "Hinihintay makumpirma ang pagtanggap",
+  "Close round early": "Isara na ang ikot",
+  "Close this round now? Payout can happen today. This can't be undone.":
+    "Isara na ang ikot ngayon? Maaari nang ibigay ang hulog ngayong araw. Hindi na ito maibabalik.",
+  "Closed early by": "Maagang isinara ni",
   pending: "hinihintay",
   confirmed: "nakumpirma",
   proposed: "iminungkahi",

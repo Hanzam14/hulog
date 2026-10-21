@@ -10,6 +10,7 @@ import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
 import GivePayout from "../components/GivePayout";
+import CloseEarly from "../components/CloseEarly";
 
 export default function Detail({ data, user, run, busy }: ViewProps) {
   const { id } = useParams();
@@ -45,6 +46,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
       <section>
         <CycleCard c={c} data={data} user={user} />
         <GivePayout c={c} data={data} user={user} run={run} busy={busy} />
+        <CloseEarly c={c} data={data} user={user} run={run} busy={busy} />
         {c.status === "proposed" && (
           <Proposal c={c} user={user} run={run} busy={busy} />
         )}

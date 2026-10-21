@@ -993,6 +993,23 @@ export async function soloRpc(
       return true;
     }
 
+    case "close_cycle_early": {
+      const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
+      if (cycle) {
+        const day = new Date(`${today}T00:00:00Z`);
+        day.setUTCDate(day.getUTCDate() - 1);
+        cycle.end_date = day.toISOString().slice(0, 10);
+        cycle.phase = "settling";
+        cycle.days_left = 0;
+        cycle.payout_state =
+          cycle.receiver_id === cycle.holder_id
+            ? "Received"
+            : "Waiting for Got it";
+      }
+      saveRawSoloSnapshot(snapshot);
+      return true;
+    }
+
     case "propose_cycle_wallet": {
       const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
       const wallet = (snapshot.wallets ?? []).find(
