@@ -94,7 +94,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
           paddingBottom: "10px",
         }}
       >
-        <h2 style={{ margin: 0, fontSize: "19px" }}>
+        <h2 style={{ margin: 0, fontSize: "20px" }}>
           {t("Where our money is")}
         </h2>
         <strong
@@ -107,7 +107,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
           {money(totalActive)}
         </strong>
       </div>
-      <div style={{ display: "grid", gap: "14px" }}>
+      <div style={{ display: "grid", gap: "12px" }}>
         {holderIds.map((holderId) => {
           const holderWallets = unifiedWallets.filter(
             (item) => item.holder_id === holderId,
@@ -135,58 +135,43 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                   {!holderActive && (
                     <span
                       className="chip"
-                      style={{ fontSize: "11px", padding: "1px 8px" }}
+                      style={{ fontSize: "13px", padding: "4px 8px" }}
                     >
                       {t("Former member")}
                     </span>
                   )}
                 </div>
                 <strong
-                  style={{ fontFamily: "var(--display)", fontSize: "16px" }}
+                  style={{ fontFamily: "var(--display)", fontSize: "15px" }}
                 >
                   {money(holderTotal)}
                 </strong>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "6px 8px",
-                }}
-              >
+              <ul className="custody-wallets">
                 {holderWallets.map((item) => (
-                  <div
-                    key={item.wallet_id}
-                    className="custody-wallet-pill chip"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      padding: "3px 10px",
-                      background: "var(--highlight)",
-                      borderRadius: "999px",
-                      border: "1.5px solid var(--ink)",
-                      fontSize: "13px",
-                    }}
-                  >
-                    <span>{item.label}:</span>
-                    <strong>{money(item.total_centavos)}</strong>
+                  <li key={item.wallet_id} className="custody-wallet">
+                    <div className="custody-wallet-row">
+                      <span>{item.label}</span>
+                      <strong>{money(item.total_centavos)}</strong>
+                    </div>
                     {item.paluwagan_centavos > 0 && item.ipon_centavos > 0 && (
-                      <span
-                        style={{
-                          color: "var(--soft)",
-                          fontSize: "11px",
-                          marginLeft: "2px",
-                        }}
-                      >
-                        ({t("Paluwagan")}: {money(item.paluwagan_centavos)} ·{" "}
-                        {t("Ipon")}: {money(item.ipon_centavos)})
-                      </span>
+                      <ul className="custody-split">
+                        <li>
+                          <span>
+                            {t("Paluwagan")}: {money(item.paluwagan_centavos)}
+                          </span>
+                        </li>
+                        <li>
+                          <span>
+                            {t("Ipon")}: {money(item.ipon_centavos)}
+                          </span>
+                        </li>
+                      </ul>
                     )}
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           );
         })}

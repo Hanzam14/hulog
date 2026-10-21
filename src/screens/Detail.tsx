@@ -167,7 +167,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
             <article className="entry" key={p.id}>
               <div className="row">
                 <strong>
-                  {name(data, p.member_id)} · {p.days} {t("days")}
+                  {name(data, p.member_id)} <br /> {p.days} {t("days")}
                 </strong>
                 <span className="chip">
                   {p.deleted_at
@@ -180,12 +180,12 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                 </span>
               </div>
               <p>
-                {money(p.amount_centavos)} · {p.created_at.slice(0, 10)}
+                {money(p.amount_centavos)} <br /> {p.created_at.slice(0, 10)}
               </p>
               {p.note && (
                 <p
                   className="meta"
-                  style={{ fontStyle: "italic", marginTop: "2px" }}
+                  style={{ fontStyle: "italic", marginTop: "4px" }}
                 >
                   {p.note}
                 </p>

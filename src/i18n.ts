@@ -2,6 +2,67 @@ import { useSyncExternalStore } from "react";
 
 export type Lang = "en" | "tl" | "taglish";
 const taglish = {
+  "Personal savings history": "History ng sariling ipon",
+  Goal: "Goal",
+  "Savings entry": "Record ng ipon",
+  Cancel: "Kanselahin",
+  "Personal savings": "Sariling ipon",
+  "Personal target (₱)": "Target na ipon (₱)",
+  Visibility: "Sino ang makakakita",
+  "Private — only you": "Private — ikaw lang",
+  "Shared — partner can view": "Shared — kita ng partner",
+  "Only you can change this goal or its records.":
+    "Ikaw lang ang puwedeng magbago ng goal at records nito.",
+  "Save goal": "I-save ang goal",
+  "Create personal goal": "Gumawa ng sariling goal",
+  "Edit personal entry": "Baguhin ang record",
+  "Record deposit": "I-record ang dagdag na ipon",
+  "Record withdrawal": "I-record ang bawas sa ipon",
+  "This records money you moved yourself. Hulog does not move money.":
+    "Record lang ito ng perang ikaw ang naglipat. Hindi naglilipat ng pera ang Hulog.",
+  "Delete this personal savings record? It stays in your history.":
+    "Alisin ang record na ito? Mananatili ito sa history mo.",
+  Private: "Private",
+  "Shared read-only": "Shared, tingin lang",
+  "Personal savings by {name}": "Sariling ipon ni {name}",
+  "Personal savings progress": "Progress ng sariling ipon",
+  "Share read-only": "Ipakita sa partner",
+  "Make private": "Gawing private",
+  "Read-only. Only the owner can change these records.":
+    "Tingin lang. Ang may-ari lang ang puwedeng magbago ng records.",
+  "Savings records": "Mga record ng ipon",
+  "No entries yet. Record your first deposit.":
+    "Wala pang record. I-record ang unang dagdag na ipon.",
+  Deposit: "Dagdag sa ipon",
+  Withdrawal: "Bawas sa ipon",
+  "Delete entry": "Alisin ang record",
+  "Manage personal goal": "Ayusin ang goal",
+  "Edit goal": "Baguhin ang goal",
+  "Delete goal": "Alisin ang goal",
+  "On this device only. Sign in to sync personal savings.":
+    "Sa device na ito lang. Mag-sign in para ma-sync ang sariling ipon.",
+  "Your goals sync to your account. Private unless you choose to share.":
+    "Naka-sync sa account mo ang goals. Private maliban kung gusto mong ipakita.",
+  "New personal goal": "Bagong sariling goal",
+  "Use Personal savings on Home for your own goals.":
+    "Sa Sariling ipon sa Home gumawa ng sarili mong goals.",
+  "Invalid personal savings amount":
+    "Maglagay ng halaga mula ₱0.01 hanggang ₱100,000,000.",
+  "Invalid visibility": "Pumili ng private o shared.",
+  "Goal title must be 1 to 60 characters":
+    "Dapat 1 hanggang 60 characters ang title ng goal.",
+  "Entry date cannot be in the future":
+    "Gumamit ng valid date hanggang ngayon sa Manila.",
+  "Note must be at most 140 characters":
+    "Hanggang 140 characters lang ang note.",
+  "Personal savings owner only":
+    "May-ari lang ang puwedeng magbago ng goal na ito.",
+  "Personal savings entry unavailable": "Hindi na available ang record na ito.",
+  "Invalid personal savings entry kind": "Pumili ng dagdag o bawas sa ipon.",
+  "Personal savings balance out of range":
+    "Dapat manatili sa ₱0 hanggang ₱100,000,000 ang balance. Tingnan ang mga bawas bago baguhin ang dagdag.",
+  "Amount (₱)": "Halaga (₱)",
+  "Note (optional)": "Note (opsyonal)",
   "of {amount}": "sa {amount}",
   "Pot progress": "Progress ng ipon",
   "Give to {name}": "Ibigay kay {name}",
@@ -66,8 +127,8 @@ const taglish = {
   "Enter pesos with up to two decimal places.":
     "Maglagay ng piso na hanggang 2 decimal lang.",
   "Enter a positive amount.": "Maglagay ng halagang lampas sa zero.",
-  "Upcoming · paying ahead is okay": "Upcoming · puwedeng mag-advance hulog",
-  "Settling · last day to confirm": "Settling · last day na para mag-confirm",
+  "Upcoming · paying ahead is okay": "Upcoming, puwedeng mag-advance hulog",
+  "Settling · last day to confirm": "Settling, last day na para mag-confirm",
   Ended: "Ended",
   "Waiting for agreement": "Hinihintay ang oo ng partner",
   Declined: "Tinanggihan",
@@ -112,7 +173,7 @@ const taglish = {
   "Save correction": "I-save ang pagbabago",
   "Past pots & debts": "Mga nakaraang pot at utang",
   "· Owes": "· May utang na",
-  "· Paid up ✓": "· Bayad na ✓",
+  "· Paid up ✓": "Bayad na ✓",
   "Repayment amount (₱)": "Bayad sa utang (₱)",
   "Record repayment": "Itala ang bayad",
   "Confirm repayment": "I-confirm ang bayad",
@@ -148,7 +209,7 @@ const taglish = {
   "No open round.": "Walang open na round.",
   "One day less": "Bawasan ng 1 araw",
   "One day more": "Dagdagan ng 1 araw",
-  "hulog!": "hulog!",
+  "hulog!": "I-record ang hulog",
   "Join our hulog": "Sali ka sa hulog namin",
   "I-edit ang profile mo": "I-edit ang profile mo",
   "Pangalan ng grupo": "Pangalan ng grupo",
@@ -158,7 +219,7 @@ const taglish = {
   "Scan to join this Hulog group": "I-scan para sumali sa Hulog group",
   "Share invite link": "I-share ang invite link",
   "Copy invite link": "I-copy ang invite link",
-  "one use · 24 hours": "isang gamit · 24 oras",
+  "one use · 24 hours": "isang gamit, 24 oras",
   invite: "invite",
   "revoke link": "bawiin ang link",
   CSV: "CSV",
@@ -240,7 +301,7 @@ const taglish = {
   "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.":
     "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.",
   "{color} — kulay ng partner": "{color} — kulay ng partner",
-  "Open · {days} {unit} left": "Open · {days} {unit} left",
+  "Open · {days} {unit} left": "Open, {days} {unit} left",
   day: "day",
   insert: "idinagdag",
   update: "binago",
@@ -262,7 +323,7 @@ const taglish = {
   "Unread changes: {count}": "Hindi pa nababasa: {count}",
   "Where our money is": "Nasaan ang pera natin",
   "Held by {name}": "Hawak ni {name}",
-  "Held by {name} · {wallet}": "Hawak ni {name} · {wallet}",
+  "Held by {name} · {wallet}": "Hawak ni {name} ({wallet})",
   "Former member": "Dating miyembro",
   "Total tracked": "Kabuuang naitala",
   Paluwagan: "Paluwagan",
@@ -307,7 +368,8 @@ const taglish = {
   "Amount to save (₱)": "Halagang ihuhulog (₱)",
   "Note or ref # (optional)": "Note o ref # (opsyonal)",
   "e.g. GCash ref #1234": "hal. GCash ref #1234",
-  "Propose withdrawal / close goal": "Magmungkahi ng withdrawal / isara ang goal",
+  "Propose withdrawal / close goal":
+    "Magmungkahi ng withdrawal / isara ang goal",
   "Waiting to withdraw": "Hinihintay ang pag-withdraw",
   "Confirm withdrawal": "Kumpirmahin ang withdrawal",
   "Decline withdrawal": "Tanggihan ang withdrawal",
@@ -320,7 +382,7 @@ const taglish = {
   "Cancel delete": "Kanselahin ang pag-alis",
   "Deletion requested": "Humiling na alisin",
   "Shared expenses & Abono": "Shared expenses at Abono",
-  "All settled up ✓": "Walang utang ang bawat isa ✓",
+  "All settled up": "Walang utang ang bawat isa",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
   "Bayaran (Settle)": "Bayaran (Settle)",
@@ -365,24 +427,28 @@ const taglish = {
   "Solo mode": "Solo mode",
   "Who is saving?": "Sino ang mag-iipon?",
   "Shared goal (both of us)": "Shared goal (kaming dalawa)",
-  "Solo goal (just me — visible to partner)": "Solo goal (ako lang — kita ng partner)",
+  "Solo goal (just me — visible to partner)":
+    "Solo goal (ako lang — kita ng partner)",
   "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
     "Mag-ipon para sa sarili mo (tulad ng AI subscription) sa loob ng shared pot ninyo para kita ng partner mo ang progress mo nang hindi kailangang mag-ambag.",
   "Partnered round (both of us)": "Partnered round (kaming dalawa)",
-  "Solo round (just me — visible to partner)": "Solo round (ako lang — kita ng partner)",
+  "Solo round (just me — visible to partner)":
+    "Solo round (ako lang — kita ng partner)",
   "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
     "Mag-ipon para sa sarili mo sa sarili mong schedule sa loob ng shared pot. Kita ng partner mo ang round mo nang hindi kailangang mag-ambag.",
-  "Solo · You (Partner can view)": "Solo · Ikaw (Kita ng partner)",
-  "Solo · You": "Solo · Ikaw",
-  "Solo · {name} — visible to partner": "Solo · {name} — kita ng partner",
-  "₱0 · Observing": "₱0 · Nakatunghay",
+  "Solo · You (Partner can view)": "Solo, Ikaw (Kita ng partner)",
+  "Solo · You": "Solo, Ikaw",
+  "Solo · {name} — visible to partner": "Solo, {name} — kita ng partner",
+  "₱0 · Observing": "₱0, Nakatunghay",
   Observing: "Nakatunghay",
-  "Observing · Partner does not need to contribute": "Nakatunghay · Hindi kailangang mag-ambag ng partner",
+  "Observing · Partner does not need to contribute":
+    "Nakatunghay, Hindi kailangang mag-ambag ng partner",
   "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
     "Ito ay solo goal mo sa shared pot ninyo. Kita ng partner mo ang progress mo nang hindi kailangang mag-ambag.",
   "This is a solo goal by {name}. You can view progress, but contributions are not required.":
     "Solo goal ito ni {name}. Kita mo ang progress pero hindi mo kailangang mag-ambag.",
-  "Partnered Pot (with Solo & Shared goals)": "Partnered Pot (may Solo at Shared goals)",
+  "Partnered Pot (with Solo & Shared goals)":
+    "Partnered Pot (may Solo at Shared goals)",
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Mode ng pot",
   "Flexible solo pot": "Flexible solo pot",
@@ -411,10 +477,79 @@ const taglish = {
     "Wala pang ipon goal. Mag-ipon nang sabay para sa trip o goal.",
   "No contributions yet. Start saving toward this goal.":
     "Wala pang hulog. Simulan na ang pag-iipon para sa goal na 'to.",
+  "Held by you ({wallet})": "Hawak mo ({wallet})",
+  "Own goal": "Sariling goal",
+  "Visible to {name}": "Nakikita ni {name}",
+  "{name}'s goal, view only": "Goal ni {name}, tingin lang",
+  "Together": "Kami",
+  "Solo": "Solo",
+  "Visible to partner": "Nakikita ng partner",
+  "Add savings": "Dagdag",
+  "Take out savings": "Bawas",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
 const en = {
+  "Personal savings history": "Your savings history",
+  Goal: "Goal",
+  "Savings entry": "Savings entry",
+  Cancel: "Cancel",
+  "Personal savings": "Personal savings",
+  "Personal target (₱)": "Target (₱)",
+  Visibility: "Who can see it",
+  "Private — only you": "Private — only you",
+  "Shared — partner can view": "Shared — partner can view",
+  "Only you can change this goal or its records.":
+    "Only you can change this goal or its records.",
+  "Save goal": "Save goal",
+  "Create personal goal": "Create personal goal",
+  "Edit personal entry": "Edit entry",
+  "Record deposit": "Record deposit",
+  "Record withdrawal": "Record withdrawal",
+  "This records money you moved yourself. Hulog does not move money.":
+    "This records money you moved yourself. Hulog does not move money.",
+  "Delete this personal savings record? It stays in your history.":
+    "Delete this savings record? It stays in your history.",
+  Private: "Private",
+  "Shared read-only": "Shared, read-only",
+  "Personal savings by {name}": "Personal savings by {name}",
+  "Personal savings progress": "Savings progress",
+  "Share read-only": "Let partner view",
+  "Make private": "Make private",
+  "Read-only. Only the owner can change these records.":
+    "Read-only. Only the owner can change these records.",
+  "Savings records": "Savings records",
+  "No entries yet. Record your first deposit.":
+    "No entries yet. Record your first deposit.",
+  Deposit: "Deposit",
+  Withdrawal: "Withdrawal",
+  "Delete entry": "Delete entry",
+  "Manage personal goal": "Manage goal",
+  "Edit goal": "Edit goal",
+  "Delete goal": "Delete goal",
+  "On this device only. Sign in to sync personal savings.":
+    "On this device only. Sign in to sync personal savings.",
+  "Your goals sync to your account. Private unless you choose to share.":
+    "Your goals sync to your account. Private unless you choose to share.",
+  "New personal goal": "New personal goal",
+  "Use Personal savings on Home for your own goals.":
+    "Use Personal savings on Home for your own goals.",
+  "Invalid personal savings amount":
+    "Enter an amount from ₱0.01 to ₱100,000,000.",
+  "Invalid visibility": "Choose private or shared.",
+  "Goal title must be 1 to 60 characters":
+    "Goal title must be 1 to 60 characters.",
+  "Entry date cannot be in the future":
+    "Use a valid date up to today in Manila.",
+  "Note must be at most 140 characters": "Keep the note within 140 characters.",
+  "Personal savings owner only": "Only the owner can change this savings goal.",
+  "Personal savings entry unavailable":
+    "This savings entry is no longer available.",
+  "Invalid personal savings entry kind": "Choose deposit or withdrawal.",
+  "Personal savings balance out of range":
+    "The balance must stay between ₱0 and ₱100,000,000. Check later withdrawals before changing a deposit.",
+  "Amount (₱)": "Amount (₱)",
+  "Note (optional)": "Note (optional)",
   "of {amount}": "of {amount}",
   "Pot progress": "Pot progress",
   "Give to {name}": "Give to {name}",
@@ -478,8 +613,8 @@ const en = {
   "Enter pesos with up to two decimal places.":
     "Enter pesos with up to two decimal places.",
   "Enter a positive amount.": "Enter a positive amount.",
-  "Upcoming · paying ahead is okay": "Upcoming · paying ahead is okay",
-  "Settling · last day to confirm": "Settling · last day to confirm",
+  "Upcoming · paying ahead is okay": "Upcoming, paying ahead is okay",
+  "Settling · last day to confirm": "Settling, last day to confirm",
   Ended: "Ended",
   "Waiting for agreement": "Waiting for agreement",
   Declined: "Declined",
@@ -524,7 +659,7 @@ const en = {
   "Save correction": "Save correction",
   "Past pots & debts": "Past pots & debts",
   "· Owes": "· Owes",
-  "· Paid up ✓": "· Paid up ✓",
+  "· Paid up ✓": "Paid up ✓",
   "Repayment amount (₱)": "Repayment amount (₱)",
   "Record repayment": "Record repayment",
   "Confirm repayment": "Confirm repayment",
@@ -560,7 +695,7 @@ const en = {
   "No open round.": "No open round.",
   "One day less": "One day less",
   "One day more": "One day more",
-  "hulog!": "Pay!",
+  "hulog!": "Record contribution",
   "Join our hulog": "Join our shared pot",
   "I-edit ang profile mo": "Edit your profile",
   "Pangalan ng grupo": "Group name",
@@ -570,7 +705,7 @@ const en = {
   "Scan to join this Hulog group": "Scan to join this Hulog group",
   "Share invite link": "Share invite link",
   "Copy invite link": "Copy invite link",
-  "one use · 24 hours": "one use · 24 hours",
+  "one use · 24 hours": "one use, 24 hours",
   invite: "invite",
   "revoke link": "revoke link",
   CSV: "CSV",
@@ -652,7 +787,7 @@ const en = {
   "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.":
     "You chose the same color. Your stickers use {color} so they're easy to tell apart.",
   "{color} — kulay ng partner": "{color} — partner's color",
-  "Open · {days} {unit} left": "Open · {days} {unit} left",
+  "Open · {days} {unit} left": "Open, {days} {unit} left",
   day: "day",
   insert: "added",
   update: "updated",
@@ -674,7 +809,7 @@ const en = {
   "Unread changes: {count}": "Unread changes: {count}",
   "Where our money is": "Where our money is",
   "Held by {name}": "Held by {name}",
-  "Held by {name} · {wallet}": "Held by {name} · {wallet}",
+  "Held by {name} · {wallet}": "Held by {name} ({wallet})",
   "Former member": "Former member",
   "Total tracked": "Total tracked",
   Paluwagan: "Shared pot",
@@ -687,8 +822,7 @@ const en = {
   "Archive wallet": "Archive wallet",
   "Wallet is held by": "Wallet is held by",
   "Move pot to another wallet": "Move pot to another wallet",
-  "Wallet change proposed: {wallet}":
-    "Wallet change proposed: {wallet}",
+  "Wallet change proposed: {wallet}": "Wallet change proposed: {wallet}",
   "Accept wallet move": "Accept wallet move",
   "Decline wallet move": "Decline wallet move",
   "Cancel wallet move": "Cancel wallet move",
@@ -733,9 +867,8 @@ const en = {
   "Cancel delete": "Cancel delete",
   "Deletion requested": "Deletion requested",
   "Shared expenses & Abono": "Shared expenses & Abono",
-  "All settled up ✓": "All settled up ✓",
-  "{debtor} owes {creditor} {amount}":
-    "{debtor} owes {creditor} {amount}",
+  "All settled up": "All settled up",
+  "{debtor} owes {creditor} {amount}": "{debtor} owes {creditor} {amount}",
   "Bayaran (Settle)": "Settle balance",
   "Natanggap ko (Record settlement)": "Received payment (Record settlement)",
   "Add shared expense": "Add shared expense",
@@ -778,24 +911,28 @@ const en = {
   "Solo mode": "Solo mode",
   "Who is saving?": "Who is saving?",
   "Shared goal (both of us)": "Shared goal (both of us)",
-  "Solo goal (just me — visible to partner)": "Solo goal (just me — visible to partner)",
+  "Solo goal (just me — visible to partner)":
+    "Solo goal (just me — visible to partner)",
   "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
     "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.",
   "Partnered round (both of us)": "Partnered round (both of us)",
-  "Solo round (just me — visible to partner)": "Solo round (just me — visible to partner)",
+  "Solo round (just me — visible to partner)":
+    "Solo round (just me — visible to partner)",
   "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
     "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.",
-  "Solo · You (Partner can view)": "Solo · You (Partner can view)",
-  "Solo · You": "Solo · You",
-  "Solo · {name} — visible to partner": "Solo · {name} — visible to partner",
-  "₱0 · Observing": "₱0 · Observing",
+  "Solo · You (Partner can view)": "Solo, You (Partner can view)",
+  "Solo · You": "Solo, You",
+  "Solo · {name} — visible to partner": "Solo, {name} — visible to partner",
+  "₱0 · Observing": "₱0, Observing",
   Observing: "Observing",
-  "Observing · Partner does not need to contribute": "Observing · Partner does not need to contribute",
+  "Observing · Partner does not need to contribute":
+    "Observing, Partner does not need to contribute",
   "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
     "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.",
   "This is a solo goal by {name}. You can view progress, but contributions are not required.":
     "This is a solo goal by {name}. You can view progress, but contributions are not required.",
-  "Partnered Pot (with Solo & Shared goals)": "Partnered Pot (with Solo & Shared goals)",
+  "Partnered Pot (with Solo & Shared goals)":
+    "Partnered Pot (with Solo & Shared goals)",
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Pot mode",
   "Flexible solo pot": "Flexible solo pot",
@@ -824,8 +961,76 @@ const en = {
     "No savings goals yet. Save together for a trip or goal.",
   "No contributions yet. Start saving toward this goal.":
     "No contributions yet. Start saving toward this goal.",
+  "Held by you ({wallet})": "Held by you ({wallet})",
+  "Own goal": "Own goal",
+  "Visible to {name}": "Visible to {name}",
+  "{name}'s goal, view only": "{name}'s goal, view only",
+  "Together": "Together",
+  "Solo": "Solo",
+  "Visible to partner": "Visible to partner",
+  "Add savings": "Add",
+  "Take out savings": "Take out",
 } satisfies Dictionary;
 const tl = {
+  "Personal savings history": "Kasaysayan ng sariling ipon",
+  Goal: "Layunin",
+  "Savings entry": "Tala ng ipon",
+  Cancel: "Kanselahin",
+  "Personal savings": "Sariling ipon",
+  "Personal target (₱)": "Layunin (₱)",
+  Visibility: "Sino ang makakakita",
+  "Private — only you": "Pribado — ikaw lang",
+  "Shared — partner can view": "Ibinahagi — makikita ng kasama",
+  "Only you can change this goal or its records.":
+    "Ikaw lang ang makakabago sa layunin at mga tala nito.",
+  "Save goal": "I-save ang layunin",
+  "Create personal goal": "Gumawa ng sariling layunin",
+  "Edit personal entry": "Baguhin ang tala",
+  "Record deposit": "Itala ang dagdag na ipon",
+  "Record withdrawal": "Itala ang bawas sa ipon",
+  "This records money you moved yourself. Hulog does not move money.":
+    "Tala ito ng perang ikaw mismo ang naglipat. Hindi naglilipat ng pera ang Hulog.",
+  "Delete this personal savings record? It stays in your history.":
+    "Alisin ang talang ito? Mananatili ito sa kasaysayan mo.",
+  Private: "Pribado",
+  "Shared read-only": "Ibinahagi, makikita lang",
+  "Personal savings by {name}": "Sariling ipon ni {name}",
+  "Personal savings progress": "Pag-usad ng sariling ipon",
+  "Share read-only": "Ipakita sa kasama",
+  "Make private": "Gawing pribado",
+  "Read-only. Only the owner can change these records.":
+    "Makikita lang. Ang may-ari lang ang makakabago sa mga tala.",
+  "Savings records": "Mga tala ng ipon",
+  "No entries yet. Record your first deposit.":
+    "Wala pang tala. Itala ang unang dagdag na ipon.",
+  Deposit: "Dagdag sa ipon",
+  Withdrawal: "Bawas sa ipon",
+  "Delete entry": "Alisin ang tala",
+  "Manage personal goal": "Pamahalaan ang layunin",
+  "Edit goal": "Baguhin ang layunin",
+  "Delete goal": "Alisin ang layunin",
+  "On this device only. Sign in to sync personal savings.":
+    "Sa device na ito lang. Mag-sign in para mai-sync ang sariling ipon.",
+  "Your goals sync to your account. Private unless you choose to share.":
+    "Naka-sync ang mga layunin sa account mo. Pribado maliban kung ibabahagi mo.",
+  "New personal goal": "Bagong sariling layunin",
+  "Use Personal savings on Home for your own goals.":
+    "Gamitin ang Sariling ipon sa Home para sa sarili mong mga layunin.",
+  "Invalid personal savings amount":
+    "Maglagay ng halaga mula ₱0.01 hanggang ₱100,000,000.",
+  "Invalid visibility": "Pumili ng pribado o ibinahagi.",
+  "Goal title must be 1 to 60 characters":
+    "Dapat 1 hanggang 60 karakter ang pamagat.",
+  "Entry date cannot be in the future":
+    "Gumamit ng wastong petsa hanggang ngayon sa Maynila.",
+  "Note must be at most 140 characters": "Hanggang 140 karakter lang ang tala.",
+  "Personal savings owner only": "May-ari lang ang makakabago sa layuning ito.",
+  "Personal savings entry unavailable": "Hindi na magagamit ang talang ito.",
+  "Invalid personal savings entry kind": "Pumili ng dagdag o bawas sa ipon.",
+  "Personal savings balance out of range":
+    "Dapat manatili sa ₱0 hanggang ₱100,000,000 ang balanse. Suriin ang mga bawas bago baguhin ang dagdag.",
+  "Amount (₱)": "Halaga (₱)",
+  "Note (optional)": "Tala (opsyonal)",
   "of {amount}": "sa {amount}",
   "Pot progress": "Laman ng ipon",
   "Give to {name}": "Ibigay kay {name}",
@@ -894,9 +1099,8 @@ const tl = {
     "Ilagay ang halaga sa piso, hanggang dalawang decimal lang.",
   "Enter a positive amount.": "Maglagay ng halagang higit sa zero.",
   "Upcoming · paying ahead is okay":
-    "Hindi pa nagsisimula · puwedeng maghulog nang maaga",
-  "Settling · last day to confirm":
-    "Huling araw na para magkumpirma",
+    "Hindi pa nagsisimula, puwedeng maghulog nang maaga",
+  "Settling · last day to confirm": "Huling araw na para magkumpirma",
   Ended: "Tapos na",
   "Waiting for agreement": "Hinihintay ang oo ng partner",
   Declined: "Hindi tinanggap",
@@ -941,7 +1145,7 @@ const tl = {
   "Save correction": "I-save ang pagwawasto",
   "Past pots & debts": "Mga nakaraang ipon at utang",
   "· Owes": "· May utang na",
-  "· Paid up ✓": "· Bayad na ✓",
+  "· Paid up ✓": "Bayad na ✓",
   "Repayment amount (₱)": "Halaga ng bayad sa utang (₱)",
   "Record repayment": "Itala ang bayad sa utang",
   "Confirm repayment": "Kumpirmahin ang bayad sa utang",
@@ -977,7 +1181,7 @@ const tl = {
   "No open round.": "Walang bukas na round.",
   "One day less": "Bawasan ng isang araw",
   "One day more": "Dagdagan ng isang araw",
-  "hulog!": "hulog!",
+  "hulog!": "Itala ang hulog",
   "Join our hulog": "Sumali sa paluwagan namin",
   "I-edit ang profile mo": "Baguhin ang profile mo",
   "Pangalan ng grupo": "Pangalan ng grupo",
@@ -987,7 +1191,7 @@ const tl = {
   "Scan to join this Hulog group": "I-scan para sumali sa grupong ito sa Hulog",
   "Share invite link": "Ibahagi ang link ng imbitasyon",
   "Copy invite link": "Kopyahin ang link ng imbitasyon",
-  "one use · 24 hours": "isang gamit · 24 oras",
+  "one use · 24 hours": "isang gamit, 24 oras",
   invite: "imbitasyon",
   "revoke link": "bawiin ang link",
   CSV: "CSV",
@@ -1068,7 +1272,7 @@ const tl = {
   "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.":
     "Pareho kayo ng kulay. {color} ang sticker mo para madaling makilala.",
   "{color} — kulay ng partner": "{color} — kulay ng partner",
-  "Open · {days} {unit} left": "Bukas · {days} {unit} na lang",
+  "Open · {days} {unit} left": "Bukas, {days} {unit} na lang",
   day: "araw",
   insert: "idinagdag",
   update: "binago",
@@ -1090,7 +1294,7 @@ const tl = {
   "Unread changes: {count}": "Hindi pa nababasa: {count}",
   "Where our money is": "Nasaan ang pera natin",
   "Held by {name}": "Hawak ni {name}",
-  "Held by {name} · {wallet}": "Hawak ni {name} · {wallet}",
+  "Held by {name} · {wallet}": "Hawak ni {name} ({wallet})",
   "Former member": "Dating miyembro",
   "Total tracked": "Kabuuang naitala",
   Paluwagan: "Paluwagan",
@@ -1103,8 +1307,7 @@ const tl = {
   "Archive wallet": "I-archive ang wallet",
   "Wallet is held by": "Ang may hawak ng wallet ay si",
   "Move pot to another wallet": "Ilipat ang ipon sa ibang wallet",
-  "Wallet change proposed: {wallet}":
-    "Iminungkahing bagong wallet: {wallet}",
+  "Wallet change proposed: {wallet}": "Iminungkahing bagong wallet: {wallet}",
   "Accept wallet move": "Tanggapin ang paglipat ng wallet",
   "Decline wallet move": "Tanggihan ang paglipat ng wallet",
   "Cancel wallet move": "Kanselahin ang paglipat ng wallet",
@@ -1150,13 +1353,13 @@ const tl = {
   "Cancel delete": "Kanselahin ang pag-alis",
   "Deletion requested": "Humiling na alisin",
   "Shared expenses & Abono": "Pinagsamang gastos at abono",
-  "All settled up ✓": "Bayad na ang lahat ✓",
+  "All settled up": "Bayad na ang lahat",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
   "Bayaran (Settle)": "Bayaran",
   "Natanggap ko (Record settlement)": "Natanggap ko (Itala ang bayad)",
   "Add shared expense": "Magdagdag ng pinagsamang gastos",
-  "What was it for?" : "Para saan ito?",
+  "What was it for?": "Para saan ito?",
   "e.g. Meralco, Groceries, Dinner": "hal. Meralco, Groceries, Dinner",
   "Total receipt (₱)": "Kabuuang resibo (₱)",
   "Partner's share (₱)": "Hati ng partner (₱)",
@@ -1195,24 +1398,28 @@ const tl = {
   "Solo mode": "Solo mode",
   "Who is saving?": "Sino ang mag-iipon?",
   "Shared goal (both of us)": "Pagsasaluhang layunin (kaming dalawa)",
-  "Solo goal (just me — visible to partner)": "Sariling layunin (ako lang — kita ng partner)",
+  "Solo goal (just me — visible to partner)":
+    "Sariling layunin (ako lang — kita ng partner)",
   "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
     "Mag-ipon para sa sarili mo (tulad ng AI subscription) sa loob ng inyong shared pot upang makita ng iyong partner ang iyong progreso nang hindi kailangang mag-ambag.",
   "Partnered round (both of us)": "Kasosyong round (kaming dalawa)",
-  "Solo round (just me — visible to partner)": "Sariling round (ako lang — kita ng partner)",
+  "Solo round (just me — visible to partner)":
+    "Sariling round (ako lang — kita ng partner)",
   "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
     "Mag-ipon para sa iyong sarili sa sarili mong iskedyul sa loob ng shared pot. Makikita ng iyong partner ang iyong round nang hindi kailangang mag-ambag.",
-  "Solo · You (Partner can view)": "Solo · Ikaw (Kita ng partner)",
-  "Solo · You": "Solo · Ikaw",
-  "Solo · {name} — visible to partner": "Solo · {name} — kita ng partner",
-  "₱0 · Observing": "₱0 · Nakatunghay",
+  "Solo · You (Partner can view)": "Solo, Ikaw (Kita ng partner)",
+  "Solo · You": "Solo, Ikaw",
+  "Solo · {name} — visible to partner": "Solo, {name} — kita ng partner",
+  "₱0 · Observing": "₱0, Nakatunghay",
   Observing: "Nakatunghay",
-  "Observing · Partner does not need to contribute": "Nakatunghay · Hindi kailangang mag-ambag ng partner",
+  "Observing · Partner does not need to contribute":
+    "Nakatunghay, Hindi kailangang mag-ambag ng partner",
   "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
     "Ito ay sarili mong layunin sa inyong shared pot. Makikita ng iyong partner ang iyong progreso nang hindi kailangang mag-ambag.",
   "This is a solo goal by {name}. You can view progress, but contributions are not required.":
     "Sariling layunin ito ni {name}. Makikita mo ang progreso ngunit hindi kailangang mag-ambag.",
-  "Partnered Pot (with Solo & Shared goals)": "Kasosyong Pot (may Sarili at Pagsasaluhang layunin)",
+  "Partnered Pot (with Solo & Shared goals)":
+    "Kasosyong Pot (may Sarili at Pagsasaluhang layunin)",
   "Standalone Solo": "Sariling Solo lang",
   "Pot mode": "Mode ng pot",
   "Flexible solo pot": "Maluwag na sariling ipon",
@@ -1241,6 +1448,15 @@ const tl = {
     "Wala pang layunin sa pag-iipon. Mag-ipon nang sabay para sa lakad o pangarap.",
   "No contributions yet. Start saving toward this goal.":
     "Wala pang hulog. Simulan ang pag-iipon para sa layuning ito.",
+  "Held by you ({wallet})": "Hawak mo ({wallet})",
+  "Own goal": "Sariling layunin",
+  "Visible to {name}": "Nakikita ni {name}",
+  "{name}'s goal, view only": "Layunin ni {name}, tingin lang",
+  "Together": "Kami",
+  "Solo": "Solo",
+  "Visible to partner": "Nakikita ng partner",
+  "Add savings": "Dagdag",
+  "Take out savings": "Bawas",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
