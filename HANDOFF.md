@@ -48,16 +48,18 @@ The owner reports the two-phone check, or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `28`
-- Updated: `2026-10-21T03:13:44Z`
-- Status: `COMPLETED - SESSION CLOSED`
+- Revision: `29`
+- Updated: `2026-10-21T04:12:49Z`
+- Status: `completed, not merged`
 - Persistence: `commit_pending`
-- Summary: Simplified UI live on main (f306f2a): PR #12 plus follow-ups (select chevron, 760px desktop width, More card, no redundant round chip/countdown, Changes grouped by day with Show more, unused group-name and pot-location fields removed from Group). Owner reported two-phone private/shared personal goals PASS.
-- Authority: Owner chat 2026-10-21: UI simplification follow-ups; 'close this out'.
+- Summary: Close round early (SPEC rule 8a) on branch feat/close-early-round (commit 00a9589): close_cycle_early RPC moves end_date to yesterday when every active member's days are confirmed; round settles today and payout is available. Not merged, not pushed, migration not applied to hosted Supabase.
+- Authority: Owner request 2026-10-21 via linked session: option to close a full pot early; owner 'well do it' for review + 360px check.
 
 ### Decisions
 
-- None.
+- Either active member closes in one tap (no proposal) because a full pot is already mutually confirmed.
+- end_date = today-1 with planned_end_date kept, so all phase/payout/debt rules stay unchanged.
+- Closing early is irreversible.
 
 ### Blockers
 
@@ -65,17 +67,22 @@ The owner reports the two-phone check, or production state changes.
 
 ### Risks and unresolved items
 
-- Changes tab with real history only covered by server-render tests
-- Create-group form (NoGroup) still asks for group name and pot location
-- Optional: drop git stash@{0} (stale antigravity/solo-mode continuity chain)
-- Optional: delete merged remote branch design/simplify
-- Untracked .claude/launch.json (local dev preview config)
+- Hosted migration 20261021000200_close_cycle_early not applied.
+- Owner phone check pending.
+- In solo/demo mode the payout showed 'Natanggap na' immediately after close (solo-only display, not investigated).
+- Merge decision pending with owner.
 
 ### Evidence and checks
 
-- docs/SIMPLIFY_REPORT.md
-- src/screens/changes.test.ts
-- main f306f2a: npm run lint clean, npm test 139/139 (17 files), npm run build OK
+- docs/SPEC.md
+- supabase/migrations/20261021000200_close_cycle_early.sql
+- supabase/tests/database/close_early.test.sql
+- npm run lint clean
+- npm test 145/145 (18 files)
+- npm run build OK
+- local supabase test db 384 assertions PASS (7 files, new close_early.test.sql 27)
+- Sol (gpt-6.1-sol, high) diff review: no actionable defects
+- 360px browser check in solo mode: one 'Isara na ang round' link only when pot full, no horizontal scroll, closes to Settling, no console errors
 
 ### Governed artifact correlations
 
@@ -83,5 +90,5 @@ The owner reports the two-phone check, or production state changes.
 
 ### Exact next action
 
-None pending - live use; owner reports any screen that still feels cluttered.
+Owner decides to merge feat/close-early-round, then apply migration 20261021000200 to hosted Supabase and deploy.
 <!-- CONTINUITY_CHECKPOINT_END -->
