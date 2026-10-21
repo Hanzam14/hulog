@@ -1174,6 +1174,33 @@ button svg,
   text-align: center;
   margin: 16px 0;
 }
+.notice.install-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  font-size: 14px;
+}
+.install-banner > .round {
+  width: 44px;
+  height: 44px;
+}
+.install-banner > ol,
+.install-banner > button:last-child {
+  grid-column: 1 / -1;
+}
+.install-banner > ol {
+  margin: 0 0 4px;
+  padding-left: 20px;
+  font-weight: 600;
+  list-style: decimal;
+}
+.install-banner > ol > li {
+  list-style: inherit;
+}
+.install-banner li svg {
+  display: inline-block;
+  vertical-align: -3px;
+}
 
 @media (min-width: 768px) {
   .app {

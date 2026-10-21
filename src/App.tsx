@@ -25,6 +25,7 @@ import Settings from "./screens/Settings";
 import Record from "./screens/Record";
 import Tally from "./components/Tally";
 import { UpdateBanner } from "./components/AppUpdates";
+import { InstallBanner } from "./components/InstallSettings";
 import { celebratePayout, recentlyReceived } from "./components/confetti";
 import { closed } from "./components/shared";
 import ProposeIpon from "./screens/ProposeIpon";
@@ -312,6 +313,7 @@ export default function App() {
         )}
       </header>
       <UpdateBanner />
+      <InstallBanner />
       {offline && (
         <div role="status" className="notice offline-banner">
           {t("You're offline. Changes won't save until you're back online.")}

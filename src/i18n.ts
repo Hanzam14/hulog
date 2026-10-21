@@ -253,6 +253,12 @@ const taglish = {
   "Hindi ma-install ngayon. Subukan ulit sa browser menu.":
     "Hindi ma-install ngayon. Subukan ulit sa browser menu.",
   "I-install ang Hulog": "I-install ang Hulog",
+  "I-download ang Hulog": "I-download ang Hulog",
+  "I-tap ang Share (kung wala, i-tap muna ang ⋯).":
+    "I-tap ang Share (kung wala, i-tap muna ang ⋯).",
+  "Piliin ang “Add to Home Screen.”": "Piliin ang “Add to Home Screen.”",
+  "I-tap ang Add. Buksan ang Hulog mula sa bagong icon.":
+    "I-tap ang Add. Buksan ang Hulog mula sa bagong icon.",
   "Connect Supabase before enabling notifications.":
     "I-connect muna ang Supabase bago i-on ang notifications.",
   "Add VITE_VAPID_PUBLIC_KEY to .env first.":
@@ -755,6 +761,12 @@ const en = {
   "Hindi ma-install ngayon. Subukan ulit sa browser menu.":
     "Could not install now. Try the browser menu.",
   "I-install ang Hulog": "Install Hulog",
+  "I-download ang Hulog": "Get the Hulog app",
+  "I-tap ang Share (kung wala, i-tap muna ang ⋯).":
+    "Tap Share (if you don't see it, tap ⋯ first).",
+  "Piliin ang “Add to Home Screen.”": "Choose “Add to Home Screen.”",
+  "I-tap ang Add. Buksan ang Hulog mula sa bagong icon.":
+    "Tap Add, then open Hulog from the new icon.",
   "Connect Supabase before enabling notifications.":
     "Connect Supabase before enabling notifications.",
   "Add VITE_VAPID_PUBLIC_KEY to .env first.":
@@ -1257,6 +1269,12 @@ const tl = {
   "Hindi ma-install ngayon. Subukan ulit sa browser menu.":
     "Hindi ma-install ngayon. Subukan ulit sa menu ng browser.",
   "I-install ang Hulog": "I-install ang Hulog",
+  "I-download ang Hulog": "I-download ang Hulog",
+  "I-tap ang Share (kung wala, i-tap muna ang ⋯).":
+    "I-tap ang Share (kung wala, i-tap muna ang ⋯).",
+  "Piliin ang “Add to Home Screen.”": "Piliin ang “Add to Home Screen.”",
+  "I-tap ang Add. Buksan ang Hulog mula sa bagong icon.":
+    "I-tap ang Add, saka buksan ang Hulog mula sa bagong icon.",
   "Connect Supabase before enabling notifications.":
     "Ikonekta muna ang Supabase bago buksan ang mga abiso.",
   "Add VITE_VAPID_PUBLIC_KEY to .env first.":

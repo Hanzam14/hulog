@@ -22,7 +22,10 @@ import {
 import App from "../App";
 import { buildSettlementPayload, isNavigatorOffline } from "../helpers";
 
-vi.mock("./InstallSettings", () => ({ default: () => null }));
+vi.mock("./InstallSettings", () => ({
+  default: () => null,
+  InstallBanner: () => null,
+}));
 vi.mock("./AppUpdates", () => ({
   default: () => null,
   UpdateBanner: () => null,
