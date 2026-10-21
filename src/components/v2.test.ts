@@ -462,7 +462,8 @@ describe("Hulog v2 Tracker", () => {
     const markup = html(
       createElement(Tracker, { data, user: "a", run, busy: false }),
     );
-    expect(markup).toContain("Walang utang ang bawat isa ✓");
+    expect(markup).toContain("Walang utang ang bawat isa");
+    expect(markup).not.toContain("✓");
   });
 
   it("renders 50/50 split shared expense details", () => {
@@ -614,7 +615,8 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(trackerMarkup).toContain(
       "No shared expenses yet. Log a bill or abono above.",
     );
-    expect(trackerMarkup).toContain("+ Add shared expense");
+    expect(trackerMarkup).toContain("Add shared expense");
+    expect(trackerMarkup).not.toContain("+ Add shared expense");
 
     const homeMarkup = html(
       createElement(Home, { data, user: "a", run, busy: false }),

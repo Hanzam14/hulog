@@ -1,11 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { IconWallet } from "@tabler/icons-react";
 import type { SavingsGoal, Snapshot } from "../data";
 import {
   cadenceDisplay,
   cleanGoalTitle,
-  getSoloBadgeText,
   isSoloGoal,
   iponGoalProgress,
   money,
@@ -16,17 +15,19 @@ import { t } from "../i18n";
 import Avatar from "./Avatar";
 import { celebratePayout } from "./confetti";
 import Tally from "./Tally";
-import { name, tone } from "./shared";
+import { heldByText, name, tone } from "./shared";
 
 /** An Ipon goal card: title, mode badge, progress ring + bar, pace badge, custody, and member tallies. */
 export default function IponCard({
   g,
   data,
   user,
+  action,
 }: {
   g: SavingsGoal;
   data: Snapshot;
   user?: string;
+  action?: ReactNode;
 }) {
   const { percent: progress, paceLabel, reachedTarget } = iponGoalProgress(g);
   const radius = 18;
@@ -53,24 +54,37 @@ export default function IponCard({
             pending_steps: 0,
           }));
 
-  const soloBadge = isSoloGoal(g) ? getSoloBadgeText(g, data, user) : "";
+  const soloBadge = isSoloGoal(g);
   const activeMembers = data.memberships.filter((m) => m.status === "active");
 
-  return (
+  const partner = activeMembers.find((m) => m.user_id !== user);
+  const partnerName = partner
+    ? name(data, partner.user_id).trim().split(/\s+/)[0]
+    : "";
+  const ownerName = name(data, g.proposed_by).trim().split(/\s+/)[0];
+  const isOwnGoal = !g.proposed_by || g.proposed_by === user;
+  const statusChip = soloBadge
+    ? t("Own goal")
+    : g.status === "accepted" && !g.withdrawn_at
+      ? paceLabel
+      : "";
+  const cadenceLine =
+    g.goal_mode === "matched"
+      ? cadenceDisplay(g.cadence_days)
+      : t("Flexible anytime");
+  const visibilityLine =
+    soloBadge && activeMembers.length > 1
+      ? isOwnGoal
+        ? partnerName
+          ? t("Visible to {name}", { name: partnerName })
+          : ""
+        : t("{name}'s goal, view only", { name: ownerName })
+      : "";
+
+  const card = (
     <Link to={`/ipon/${g.id}`} className="pot ipon-card" aria-label={g.title}>
-      <div className="pot-top" style={{ alignItems: "flex-start" }}>
-        <div
-          className="ipon-ring"
-          style={{
-            position: "relative",
-            width: "44px",
-            height: "44px",
-            flexShrink: 0,
-            display: "grid",
-            placeItems: "center",
-          }}
-          aria-hidden="true"
-        >
+      <div className="pot-top">
+        <div className="ipon-ring" aria-hidden="true">
           <svg width="44" height="44" viewBox="0 0 44 44">
             <circle
               cx="22"
@@ -85,7 +99,7 @@ export default function IponCard({
               cy="22"
               r={radius}
               fill="none"
-              stroke="var(--green-deep)"
+              stroke="var(--leaf-deep)"
               strokeWidth="4"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -93,96 +107,20 @@ export default function IponCard({
               transform="rotate(-90 22 22)"
             />
           </svg>
-          <span
-            style={{
-              position: "absolute",
-              fontSize: "10px",
-              fontWeight: 800,
-              color: "var(--ink)",
-            }}
-          >
-            {progress}%
-          </span>
+          <span>{progress}%</span>
         </div>
-        <div className="pot-amount" style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "8px",
-              width: "100%",
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--display)",
-                fontSize: "20px",
-                fontWeight: 700,
-                color: "var(--ink)",
-                wordBreak: "break-word",
-              }}
-            >
-              {cleanGoalTitle(g.title)}
-            </span>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                flexWrap: "wrap",
-              }}
-            >
-              {soloBadge && (
-                <span
-                  className="chip"
-                  style={{
-                    fontSize: "13px",
-                    padding: "4px 8px",
-                    fontWeight: 600,
-                    background: "var(--brand-soft)",
-                    color: "var(--brand)",
-                    border: "1px solid currentColor",
-                  }}
-                >
-                  {soloBadge}
-                </span>
-              )}
-            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-              {g.status === "accepted" && !g.withdrawn_at && (
-                <span
-                  className="chip"
-                  style={{ fontSize: "11px", padding: "1px 8px" }}
-                >
-                  {paceLabel}
-                </span>
-              )}
-              <span
-                className="chip"
-                style={{ fontSize: "13px", padding: "4px 8px" }}
-              >
-                {g.goal_mode === "matched"
-                  ? cadenceDisplay(g.cadence_days)
-                  : t("Flexible anytime")}
-              </span>
-            </div>
+        <div className="ipon-head">
+          <div className="ipon-title-row">
+            <span className="ipon-title">{cleanGoalTitle(g.title)}</span>
+            {statusChip && <span className="chip">{statusChip}</span>}
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: "8px",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="ipon-amounts">
             <strong>{money(g.saved_centavos)}</strong>
             <span className="pot-target">
               {t("of {amount}", { amount: money(g.target_amount_centavos) })}
             </span>
           </div>
         </div>
-      </div>
       </div>
       <div
         className="pot-progress"
@@ -194,18 +132,13 @@ export default function IponCard({
       >
         <span style={{ width: `${progress}%` }} />
       </div>
-      <div className="pot-receiver">
-        <IconWallet
-          size={16}
-          aria-hidden="true"
-          style={{ color: "var(--soft)", flexShrink: 0 }}
-        />
-        <span>
-          {t("Held by {name} · {wallet}", {
-            name: name(data, g.holder_id).trim().split(/\s+/)[0],
-            wallet: g.wallet_label,
-          })}
-        </span>
+      <div className="ipon-meta">
+        <p>
+          <IconWallet size={16} aria-hidden="true" />
+          <span>{heldByText(data, g.holder_id, g.wallet_label, user)}</span>
+        </p>
+        <p>{cadenceLine}</p>
+        {visibilityLine && <p>{visibilityLine}</p>}
       </div>
       {((g.goal_mode === "matched" && g.status === "accepted" && g.num_steps) ||
         (isSoloGoal(g) &&
@@ -228,25 +161,12 @@ export default function IponCard({
 
             return (
               <div className="member" key={p.member_id}>
-                <Avatar data={data} id={p.member_id} size="sm" />
+                <div className="member-who">
+                  <Avatar data={data} id={p.member_id} size="sm" />
+                  <span>{name(data, p.member_id).trim().split(/\s+/)[0]}</span>
+                </div>
                 {isObserving ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <span style={{ fontSize: "13px", fontWeight: 500 }}>
-                      {name(data, p.member_id).trim().split(/\s+/)[0]}
-                    </span>
-                    <span
-                      className="chip"
-                      style={{ fontSize: "13px", padding: "4px 4px" }}
-                    >
-                      {t("₱0 · Observing")}
-                    </span>
-                  </div>
+                  <span className="meta">{t("₱0 · Observing")}</span>
                 ) : g.goal_mode === "matched" && g.num_steps ? (
                   <Tally
                     label={name(data, p.member_id)}
@@ -256,20 +176,9 @@ export default function IponCard({
                     tone={tone(data, p.member_id)}
                   />
                 ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <span style={{ fontSize: "13px", fontWeight: 500 }}>
-                      {name(data, p.member_id).trim().split(/\s+/)[0]}
-                    </span>
-                    <strong style={{ fontSize: "13px" }}>
-                      {money(memberSavedCentavos)}
-                    </strong>
-                  </div>
+                  <strong className="ipon-member-amount">
+                    {money(memberSavedCentavos)}
+                  </strong>
                 )}
               </div>
             );
@@ -283,5 +192,11 @@ export default function IponCard({
         </small>
       </div>
     </Link>
+  );
+  return (
+    <div className="ipon-item">
+      {card}
+      {action}
+    </div>
   );
 }

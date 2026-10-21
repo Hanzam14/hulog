@@ -72,24 +72,26 @@ export default function Home(props: ViewProps) {
             role="radio"
             aria-checked={active.length > 1}
             aria-pressed={active.length > 1}
+            aria-label={t("Partnered Pot (with Solo & Shared goals)")}
             onClick={() => {
               setSoloPotMode("partnered", user);
               void run(async () => {});
             }}
           >
-            {t("Partnered Pot (with Solo & Shared goals)")}
+            {t("Together")}
           </button>
           <button
             type="button"
             role="radio"
             aria-checked={active.length <= 1}
             aria-pressed={active.length <= 1}
+            aria-label={t("Standalone Solo")}
             onClick={() => {
               setSoloPotMode("standalone", user);
               void run(async () => {});
             }}
           >
-            {t("Standalone Solo")}
+            {t("Solo")}
           </button>
         </div>
       )}
@@ -149,26 +151,12 @@ export default function Home(props: ViewProps) {
                   const isObserving = isSolo && !isSaver;
                   return (
                     <div className="member" key={p.member_id}>
-                      <Avatar data={data} id={p.member_id} />
+                      <div className="member-who">
+                        <Avatar data={data} id={p.member_id} size="sm" />
+                        <strong>{name(data, p.member_id)}</strong>
+                      </div>
                       {isObserving ? (
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "4px",
-                          }}
-                        >
-                          <strong>{name(data, p.member_id)}</strong>
-                          <span
-                            className="chip"
-                            style={{
-                              fontSize: "13px",
-                              alignSelf: "flex-start",
-                            }}
-                          >
-                            {t("₱0 · Observing")}
-                          </span>
-                        </div>
+                        <span className="meta">{t("₱0 · Observing")}</span>
                       ) : (
                         <Tally
                           label={name(data, p.member_id)}
@@ -209,17 +197,23 @@ export default function Home(props: ViewProps) {
         )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
-            <IponCard g={g} data={data} user={user} />
-            {g.status === "accepted" &&
-              !g.withdrawn_at &&
-              !g.withdraw_proposed_by && (
-                <Link
-                  className="button secondary ipon-quick-btn"
-                  to={`/ipon/${g.id}/record`}
-                >
-                  <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
-                </Link>
-              )}
+            <IponCard
+              g={g}
+              data={data}
+              user={user}
+              action={
+                g.status === "accepted" &&
+                !g.withdrawn_at &&
+                !g.withdraw_proposed_by ? (
+                  <Link
+                    className="button ipon-quick-btn"
+                    to={`/ipon/${g.id}/record`}
+                  >
+                    <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
+                  </Link>
+                ) : undefined
+              }
+            />
           </div>
         ))}
         {activeGoals.length < 3 && (

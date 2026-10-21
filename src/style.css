@@ -1807,3 +1807,271 @@ select:focus {
     break-inside: avoid;
   }
 }
+
+/* Round 3 design fixes */
+html {
+  scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+main {
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+
+/* Coin stickers are the signature: big enough to read, wrapped evenly. */
+.tally {
+  --coin: 28px;
+  grid-template-columns: repeat(var(--coin-cols, auto-fill), var(--coin));
+  justify-content: start;
+  gap: 4px;
+}
+.tally span {
+  width: var(--coin);
+  height: var(--coin);
+}
+.tally .paid::after {
+  font-size: 14px;
+}
+.tally.mini {
+  --coin: 12px;
+  grid-template-columns: repeat(auto-fill, var(--coin));
+}
+.tally.preview {
+  --coin: 28px;
+  width: 100%;
+  grid-template-columns: repeat(var(--coin-cols, auto-fill), var(--coin));
+  justify-content: center;
+  min-height: var(--coin);
+  margin: 0;
+}
+.welcome figure .tally {
+  margin-bottom: 12px;
+}
+.member {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+.members {
+  gap: 16px;
+}
+.member-who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+}
+.member .tally {
+  margin: 0;
+}
+
+/* Where our money is: a plain two-level list. */
+.custody-wallets,
+.custody-split {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.custody-wallet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 15px;
+}
+.custody-wallet-row strong {
+  font-family: var(--display);
+  font-weight: 600;
+}
+.custody-split {
+  margin: 4px 0 4px 24px;
+}
+.custody-split li {
+  color: var(--soft);
+  font-size: 13px;
+}
+
+/* Ipon goal card: one chip at most, meta as plain lines, action inside. */
+.ipon-item {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+}
+.ipon-item > .ipon-card,
+.ipon-item > .ipon-card:hover {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.ipon-item .pot-top {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ipon-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+}
+.ipon-ring span {
+  position: absolute;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+.ipon-head {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+.ipon-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ipon-title {
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ipon-title-row .chip {
+  flex: none;
+  font-weight: 700;
+}
+.ipon-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+.ipon-amounts strong {
+  font-size: 26px;
+}
+.ipon-meta {
+  display: grid;
+  gap: 4px;
+}
+.ipon-meta p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ipon-meta svg {
+  flex: none;
+}
+.ipon-member-amount {
+  font-size: 15px;
+}
+.ipon-quick-btn {
+  width: 100%;
+  justify-self: stretch;
+}
+
+/* Personal savings: badge always top right, two short actions on one line. */
+.personal-goal > .row {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+.personal-goal h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.personal-visibility {
+  flex: none;
+  max-width: 55%;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+}
+.personal-goal > .actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.personal-goal > .actions > button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 8px;
+  white-space: nowrap;
+}
+
+/* Tracker: one sheet for status, add button and empty state. */
+.abono-sheet {
+  padding: 16px;
+  border-radius: 22px;
+}
+.abono-add {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1.5px dashed var(--dots);
+}
+.abono-empty {
+  margin: 12px 0 0;
+  color: var(--soft);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Disabled controls look disabled and never lift. */
+:root:root button:disabled,
+:root:root .button[aria-disabled="true"] {
+  background: color-mix(in srgb, var(--soft) 14%, var(--card));
+  color: var(--soft);
+  border-color: var(--control-border);
+  border-style: dashed;
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+:root:root .quiet:disabled,
+:root:root .round:disabled {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Settings: archive is a normal small button; link-like actions keep 44px. */
+.wallets-section .row {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wallet-actions {
+  margin: 0 0 0 auto;
+}
+.wallet-archive {
+  min-height: 44px;
+  padding: 4px 12px;
+  font-size: 13px;
+  text-decoration: none;
+}
+a.muted {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.quiet {
+  min-width: 44px;
+  min-height: 44px;
+}

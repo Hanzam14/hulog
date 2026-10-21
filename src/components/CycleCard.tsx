@@ -9,7 +9,7 @@ import {
   shortDate,
 } from "../helpers";
 import Avatar from "./Avatar";
-import { name } from "./shared";
+import { heldByText, name } from "./shared";
 
 /** The pot sticker: how much is in, the target, and who gets it. */
 export default function CycleCard({
@@ -89,12 +89,7 @@ export default function CycleCard({
       </div>
       {c.holder_id && c.wallet_label && (
         <div className="pot-custody">
-          <small>
-            {t("Held by {name} · {wallet}", {
-              name: name(data, c.holder_id).trim().split(/\s+/)[0],
-              wallet: c.wallet_label,
-            })}
-          </small>
+          <small>{heldByText(data, c.holder_id, c.wallet_label, user)}</small>
         </div>
       )}
       <div className="pot-bottom">

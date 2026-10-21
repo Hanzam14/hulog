@@ -148,46 +148,30 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                 </strong>
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "4px 8px",
-                }}
-              >
+              <ul className="custody-wallets">
                 {holderWallets.map((item) => (
-                  <div
-                    key={item.wallet_id}
-                    className="custody-wallet-pill chip"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      padding: "4px 8px",
-                      background: "var(--highlight)",
-                      borderRadius: "999px",
-                      border: "1.5px solid var(--line)",
-                      fontSize: "13px",
-                    }}
-                  >
-                    <span>{item.label}:</span>
-                    <strong>{money(item.total_centavos)}</strong>
+                  <li key={item.wallet_id} className="custody-wallet">
+                    <div className="custody-wallet-row">
+                      <span>{item.label}</span>
+                      <strong>{money(item.total_centavos)}</strong>
+                    </div>
                     {item.paluwagan_centavos > 0 && item.ipon_centavos > 0 && (
-                      <span
-                        style={{
-                          color: "var(--soft)",
-                          fontSize: "13px",
-                          marginLeft: "4px",
-                        }}
-                      >
-                        ({t("Paluwagan")}: {money(item.paluwagan_centavos)}
-                        <br />
-                        {t("Ipon")}: {money(item.ipon_centavos)})
-                      </span>
+                      <ul className="custody-split">
+                        <li>
+                          <span>
+                            {t("Paluwagan")}: {money(item.paluwagan_centavos)}
+                          </span>
+                        </li>
+                        <li>
+                          <span>
+                            {t("Ipon")}: {money(item.ipon_centavos)}
+                          </span>
+                        </li>
+                      </ul>
                     )}
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           );
         })}

@@ -1,5 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { IconEye, IconLock, IconPlus, IconTarget } from "@tabler/icons-react";
+import {
+  IconEye,
+  IconLock,
+  IconMinus,
+  IconPlus,
+  IconTarget,
+} from "@tabler/icons-react";
 import type { PersonalEntry, PersonalGoal } from "../data";
 import { rpc } from "../data";
 import { money, parsePesos, shortDate } from "../helpers";
@@ -172,6 +178,19 @@ export function PersonalGoalCard({
         b.entry_date.localeCompare(a.entry_date) ||
         b.created_at.localeCompare(a.created_at),
     );
+  const partnerId = data.memberships.find(
+    (m) => m.status === "active" && m.user_id !== user,
+  )?.user_id;
+  const visibilityText =
+    goal.visibility === "private"
+      ? t("Private")
+      : owner
+        ? partnerId
+          ? t("Visible to {name}", {
+              name: name(data, partnerId).trim().split(/\s+/)[0],
+            })
+          : t("Visible to partner")
+        : t("Shared read-only");
   const balance = personalBalance(entries, goal.id);
   const progress = Math.min(100, (balance / goal.target_amount_centavos) * 100);
   const [editingGoal, setEditingGoal] = useState(false);
@@ -207,7 +226,7 @@ export function PersonalGoalCard({
           ) : (
             <IconEye size={16} aria-hidden="true" />
           )}
-          {goal.visibility === "private" ? t("Private") : t("Shared read-only")}
+          {visibilityText}
         </span>
       </div>
       {!owner && (
@@ -257,23 +276,25 @@ export function PersonalGoalCard({
           </button>
           <div className="actions">
             <button
+              aria-label={t("Record deposit")}
               disabled={busy}
               onClick={() => {
                 setRecording("deposit");
                 setEditingEntry(null);
               }}
             >
-              {t("Record deposit")}
+              <IconPlus size={18} aria-hidden="true" /> {t("Add savings")}
             </button>
             <button
               className="secondary"
+              aria-label={t("Record withdrawal")}
               disabled={busy || balance === 0}
               onClick={() => {
                 setRecording("withdrawal");
                 setEditingEntry(null);
               }}
             >
-              {t("Record withdrawal")}
+              <IconMinus size={18} aria-hidden="true" /> {t("Take out savings")}
             </button>
           </div>
           {recording && (

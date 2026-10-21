@@ -50,5 +50,18 @@ export const tone = (d: Snapshot, id: string): Tone => {
     ? palette.find((value) => value !== ownerColor)!
     : color;
 };
+/** "Hawak mo" for the viewer, "Hawak ni <name>" for anyone else. */
+export const heldByText = (
+  d: Snapshot,
+  holderId: string,
+  wallet: string,
+  viewer?: string,
+) =>
+  holderId === viewer
+    ? t("Held by you ({wallet})", { wallet })
+    : t("Held by {name} · {wallet}", {
+        name: name(d, holderId).trim().split(/\s+/)[0],
+        wallet,
+      });
 export const byNewest = (a: Cycle, b: Cycle) =>
   b.created_at.localeCompare(a.created_at);

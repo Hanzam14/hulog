@@ -382,7 +382,7 @@ const taglish = {
   "Cancel delete": "Kanselahin ang pag-alis",
   "Deletion requested": "Humiling na alisin",
   "Shared expenses & Abono": "Shared expenses at Abono",
-  "All settled up ✓": "Walang utang ang bawat isa ✓",
+  "All settled up": "Walang utang ang bawat isa",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
   "Bayaran (Settle)": "Bayaran (Settle)",
@@ -477,6 +477,15 @@ const taglish = {
     "Wala pang ipon goal. Mag-ipon nang sabay para sa trip o goal.",
   "No contributions yet. Start saving toward this goal.":
     "Wala pang hulog. Simulan na ang pag-iipon para sa goal na 'to.",
+  "Held by you ({wallet})": "Hawak mo ({wallet})",
+  "Own goal": "Sariling goal",
+  "Visible to {name}": "Nakikita ni {name}",
+  "{name}'s goal, view only": "Goal ni {name}, tingin lang",
+  "Together": "Kami",
+  "Solo": "Solo",
+  "Visible to partner": "Nakikita ng partner",
+  "Add savings": "Dagdag",
+  "Take out savings": "Bawas",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -858,7 +867,7 @@ const en = {
   "Cancel delete": "Cancel delete",
   "Deletion requested": "Deletion requested",
   "Shared expenses & Abono": "Shared expenses & Abono",
-  "All settled up ✓": "All settled up ✓",
+  "All settled up": "All settled up",
   "{debtor} owes {creditor} {amount}": "{debtor} owes {creditor} {amount}",
   "Bayaran (Settle)": "Settle balance",
   "Natanggap ko (Record settlement)": "Received payment (Record settlement)",
@@ -952,6 +961,15 @@ const en = {
     "No savings goals yet. Save together for a trip or goal.",
   "No contributions yet. Start saving toward this goal.":
     "No contributions yet. Start saving toward this goal.",
+  "Held by you ({wallet})": "Held by you ({wallet})",
+  "Own goal": "Own goal",
+  "Visible to {name}": "Visible to {name}",
+  "{name}'s goal, view only": "{name}'s goal, view only",
+  "Together": "Together",
+  "Solo": "Solo",
+  "Visible to partner": "Visible to partner",
+  "Add savings": "Add",
+  "Take out savings": "Take out",
 } satisfies Dictionary;
 const tl = {
   "Personal savings history": "Kasaysayan ng sariling ipon",
@@ -1335,7 +1353,7 @@ const tl = {
   "Cancel delete": "Kanselahin ang pag-alis",
   "Deletion requested": "Humiling na alisin",
   "Shared expenses & Abono": "Pinagsamang gastos at abono",
-  "All settled up ✓": "Bayad na ang lahat ✓",
+  "All settled up": "Bayad na ang lahat",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
   "Bayaran (Settle)": "Bayaran",
@@ -1430,6 +1448,15 @@ const tl = {
     "Wala pang layunin sa pag-iipon. Mag-ipon nang sabay para sa lakad o pangarap.",
   "No contributions yet. Start saving toward this goal.":
     "Wala pang hulog. Simulan ang pag-iipon para sa layuning ito.",
+  "Held by you ({wallet})": "Hawak mo ({wallet})",
+  "Own goal": "Sariling layunin",
+  "Visible to {name}": "Nakikita ni {name}",
+  "{name}'s goal, view only": "Layunin ni {name}, tingin lang",
+  "Together": "Kami",
+  "Solo": "Solo",
+  "Visible to partner": "Nakikita ng partner",
+  "Add savings": "Dagdag",
+  "Take out savings": "Bawas",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

@@ -189,28 +189,21 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                     const isObserving = isSolo && !isSaver;
                     return (
                       <div className="member" key={p.member_id}>
-                        <Avatar data={data} id={p.member_id} />
-                        <div>
+                        <div className="member-who">
+                          <Avatar data={data} id={p.member_id} size="sm" />
                           <strong>{name(data, p.member_id)}</strong>
-                          {isObserving ? (
-                            <div>
-                              <span
-                                className="chip"
-                                style={{ fontSize: "13px", margin: "4px 0" }}
-                              >
-                                {t("₱0 · Observing")}
-                              </span>
-                            </div>
-                          ) : (
-                            <Tally
-                              label={name(data, p.member_id)}
-                              paid={p.confirmed_steps}
-                              pending={p.pending_steps}
-                              total={g.num_steps ?? 1}
-                              tone={tone(data, p.member_id)}
-                            />
-                          )}
                         </div>
+                        {isObserving ? (
+                          <span className="meta">{t("₱0 · Observing")}</span>
+                        ) : (
+                          <Tally
+                            label={name(data, p.member_id)}
+                            paid={p.confirmed_steps}
+                            pending={p.pending_steps}
+                            total={g.num_steps ?? 1}
+                            tone={tone(data, p.member_id)}
+                          />
+                        )}
                       </div>
                     );
                   })}
@@ -370,7 +363,9 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   <div>
                     <strong>{t("Waiting to withdraw")}</strong>
                   </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  <div
+                    style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                  >
                     {g.withdraw_proposed_by === user ? (
                       <button
                         className="quiet"

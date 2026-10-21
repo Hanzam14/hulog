@@ -111,7 +111,7 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
                     </span>
                   </div>
                   {isOwner && (
-                    <div className="actions" style={{ margin: 0 }}>
+                    <div className="actions wallet-actions">
                       <button
                         type="button"
                         className="quiet"
@@ -127,7 +127,7 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
                       </button>
                       <button
                         type="button"
-                        className="quiet danger"
+                        className="secondary danger wallet-archive"
                         disabled={busy}
                         onClick={handleArchive(w)}
                         title={t("Archive wallet")}
