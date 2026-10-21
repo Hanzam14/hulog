@@ -603,7 +603,8 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(markup).toContain("Ipon");
     expect(markup).toContain("Japan Trip");
     expect(markup).toContain("Mag-ipon");
-    expect(markup).toContain("Bagong ipon goal");
+    expect(markup).toContain("Kasama si ");
+    expect(markup).toContain("Para sa akin");
   });
 
   it("renders friendly empty states and next-step actions across History, Tracker, Home/IponDetail, and NoGroup", () => {
@@ -1026,5 +1027,6 @@ describe("Hulog Solo Mode", () => {
     expect(group).toContain("Pot mode");
     expect(group).toContain("Together");
     expect(group).toContain("custody-ledger");
+    expect(group).toContain("₱3,750.00");
   });
 });

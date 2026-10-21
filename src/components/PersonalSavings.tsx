@@ -401,8 +401,9 @@ export function PersonalGoalCard({
 }
 export default function PersonalSavings({
   trailing,
+  siblingGoals,
   ...props
-}: ViewProps & { trailing?: ReactNode }) {
+}: ViewProps & { trailing?: ReactNode; siblingGoals?: boolean }) {
   const [creating, setCreating] = useState(false);
   const goals = (props.data.personalGoals ?? []).filter(
     (g) =>
@@ -414,7 +415,16 @@ export default function PersonalSavings({
       id="personal-savings"
       aria-labelledby="personal-savings-title"
     >
-      <h3 id="personal-savings-title">{t("Personal savings")}</h3>
+      <h3
+        id="personal-savings-title"
+        className={
+          siblingGoals === undefined || (siblingGoals && goals.length > 0)
+            ? undefined
+            : "sr-only"
+        }
+      >
+        {t("Personal savings")}
+      </h3>
       {goals.map((goal) => (
         <PersonalGoalCard key={goal.id} goal={goal} {...props} />
       ))}
@@ -431,7 +441,7 @@ export default function PersonalSavings({
             disabled={props.busy}
             onClick={() => setCreating(true)}
           >
-            <IconPlus size={18} aria-hidden="true" /> {t("New personal goal")}
+            <IconPlus size={18} aria-hidden="true" /> {t("Just me")}
           </button>
           {trailing}
         </div>
