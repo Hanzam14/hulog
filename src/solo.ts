@@ -15,16 +15,26 @@ import type {
   SavingsMemberProgress,
 } from "./data";
 import { addDays, isSoloCycle, isSoloGoal } from "./helpers";
+import {
+  migratePersonalSavings,
+  personalRpc,
+  personalRpcNames,
+} from "./personal";
 
 const SOLO_MODE_KEY = "hulog-solo-mode";
 const SOLO_SNAPSHOT_KEY = "hulog-solo-snapshot";
 const SOLO_POT_MODE_KEY = "hulog-solo-pot-mode";
 
 function generateId(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
     return crypto.randomUUID();
   }
-  return "id-" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
+  return (
+    "id-" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36)
+  );
 }
 
 export function getManilaToday(): string {
@@ -65,6 +75,13 @@ export function setSoloPotMode(
     // Storage restricted
   }
   const snap = createInitialSoloSnapshot(userId ?? getSoloUserId(), mode);
+  const previous = loadRawSoloSnapshot();
+  if (previous) {
+    migratePersonalSavings(previous);
+    snap.personalGoals = previous.personalGoals;
+    snap.personalEntries = previous.personalEntries;
+    snap.personalHistory = previous.personalHistory;
+  }
   saveRawSoloSnapshot(snap);
   return snap;
 }
@@ -160,7 +177,8 @@ export function createInitialSoloSnapshot(
     id: groupId,
     name: currentMode === "partnered" ? "Our Shared Pot" : "My Savings",
     owner_id: uid,
-    pot_location: currentMode === "partnered" ? "GCash · Shared Home Pot" : "Personal Pot",
+    pot_location:
+      currentMode === "partnered" ? "GCash · Shared Home Pot" : "Personal Pot",
   };
 
   const membership: Membership = {
@@ -453,35 +471,53 @@ function adaptSoloSnapshotUser(
   }
   for (const w of snapshot.wallets ?? []) {
     if (w.holder_id === oldId && oldId !== "partner-user") w.holder_id = newId;
-    if (w.created_by === oldId && oldId !== "partner-user") w.created_by = newId;
+    if (w.created_by === oldId && oldId !== "partner-user")
+      w.created_by = newId;
   }
   for (const c of snapshot.custody ?? []) {
     if (c.holder_id === oldId && oldId !== "partner-user") c.holder_id = newId;
   }
   for (const c of snapshot.cycles) {
-    if (c.receiver_id === oldId && oldId !== "partner-user") c.receiver_id = newId;
-    if (c.proposed_by === oldId && oldId !== "partner-user") c.proposed_by = newId;
+    if (c.receiver_id === oldId && oldId !== "partner-user")
+      c.receiver_id = newId;
+    if (c.proposed_by === oldId && oldId !== "partner-user")
+      c.proposed_by = newId;
     if (c.holder_id === oldId && oldId !== "partner-user") c.holder_id = newId;
   }
   for (const p of snapshot.payments) {
     if (p.member_id === oldId && oldId !== "partner-user") p.member_id = newId;
   }
   for (const pr of snapshot.progress) {
-    if (pr.member_id === oldId && oldId !== "partner-user") pr.member_id = newId;
+    if (pr.member_id === oldId && oldId !== "partner-user")
+      pr.member_id = newId;
   }
   for (const sg of snapshot.savingsGoals ?? []) {
-    if (sg.proposed_by === oldId && oldId !== "partner-user") sg.proposed_by = newId;
-    if (sg.holder_id === oldId && oldId !== "partner-user") sg.holder_id = newId;
-    if (sg.accepted_by === oldId && oldId !== "partner-user") sg.accepted_by = newId;
-    if (sg.withdrawn_by === oldId && oldId !== "partner-user") sg.withdrawn_by = newId;
+    if (sg.proposed_by === oldId && oldId !== "partner-user")
+      sg.proposed_by = newId;
+    if (sg.holder_id === oldId && oldId !== "partner-user")
+      sg.holder_id = newId;
+    if (sg.accepted_by === oldId && oldId !== "partner-user")
+      sg.accepted_by = newId;
+    if (sg.withdrawn_by === oldId && oldId !== "partner-user")
+      sg.withdrawn_by = newId;
   }
   for (const sc of snapshot.savingsContributions ?? []) {
-    if (sc.member_id === oldId && oldId !== "partner-user") sc.member_id = newId;
-    if (sc.created_by === oldId && oldId !== "partner-user") sc.created_by = newId;
-    if (sc.confirmed_by === oldId && oldId !== "partner-user") sc.confirmed_by = newId;
+    if (sc.member_id === oldId && oldId !== "partner-user")
+      sc.member_id = newId;
+    if (sc.created_by === oldId && oldId !== "partner-user")
+      sc.created_by = newId;
+    if (sc.confirmed_by === oldId && oldId !== "partner-user")
+      sc.confirmed_by = newId;
   }
   for (const sp of snapshot.savingsProgress ?? []) {
-    if (sp.member_id === oldId && oldId !== "partner-user") sp.member_id = newId;
+    if (sp.member_id === oldId && oldId !== "partner-user")
+      sp.member_id = newId;
+  }
+  for (const goal of snapshot.personalGoals ?? []) {
+    if (goal.owner_id === oldId) goal.owner_id = newId;
+  }
+  for (const change of snapshot.personalHistory ?? []) {
+    if (change.actor_id === oldId) change.actor_id = newId;
   }
 }
 
@@ -561,13 +597,19 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     snapshot = createInitialSoloSnapshot(undefined, currentMode);
   } else if (currentMode === "partnered" && snapshot.memberships.length < 2) {
     // Upgrade existing single-member solo snapshot to default partnered demo pot
-    snapshot = createInitialSoloSnapshot(snapshot.memberships[0]?.user_id, "partnered");
+    snapshot = createInitialSoloSnapshot(
+      snapshot.memberships[0]?.user_id,
+      "partnered",
+    );
   }
 
   const today = getManilaToday();
   snapshot.today = today;
+  migratePersonalSavings(snapshot);
   const uid = snapshot.memberships[0]?.user_id ?? "solo-user";
-  const activeMembers = snapshot.memberships.filter((m) => m.status === "active");
+  const activeMembers = snapshot.memberships.filter(
+    (m) => m.status === "active",
+  );
 
   if (!snapshot.wallets || snapshot.wallets.length === 0) {
     snapshot.wallets = [
@@ -585,7 +627,11 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
 
   // Recalculate cycles
   for (const c of snapshot.cycles) {
-    const { phase, daysLeft } = computeCyclePhase(c.start_date, c.end_date, today);
+    const { phase, daysLeft } = computeCyclePhase(
+      c.start_date,
+      c.end_date,
+      today,
+    );
     c.phase = phase;
     c.days_left = daysLeft;
     if (phase === "settling" || phase === "ended") {
@@ -633,7 +679,8 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
   snapshot.savingsGoals = snapshot.savingsGoals ?? [];
   for (const g of snapshot.savingsGoals) {
     const confirmedContributions = (snapshot.savingsContributions ?? []).filter(
-      (sc) => sc.goal_id === g.id && !sc.deleted_at && sc.status === "confirmed",
+      (sc) =>
+        sc.goal_id === g.id && !sc.deleted_at && sc.status === "confirmed",
     );
     g.saved_centavos = confirmedContributions.reduce(
       (sum, sc) => sum + sc.amount_centavos,
@@ -715,6 +762,12 @@ export async function soloRpc(
   const uid = snapshot.memberships[0]?.user_id ?? "solo-user";
   const today = snapshot.today;
 
+  if (personalRpcNames.includes(name)) {
+    const result = personalRpc(snapshot, uid, name, args);
+    saveRawSoloSnapshot(snapshot);
+    return result;
+  }
+
   switch (name) {
     case "hulog_today":
       return today;
@@ -746,7 +799,8 @@ export async function soloRpc(
 
     case "update_group": {
       const pName = (args.p_name as string) || snapshot.groups[0].name;
-      const pPot = (args.p_pot_location as string) ?? snapshot.groups[0].pot_location;
+      const pPot =
+        (args.p_pot_location as string) ?? snapshot.groups[0].pot_location;
       snapshot.groups[0].name = pName;
       snapshot.groups[0].pot_location = pPot;
       saveRawSoloSnapshot(snapshot);
@@ -754,14 +808,17 @@ export async function soloRpc(
     }
 
     case "update_profile": {
-      const p = snapshot.profiles.find((pr) => pr.id === uid) ?? snapshot.profiles[0];
+      const p =
+        snapshot.profiles.find((pr) => pr.id === uid) ?? snapshot.profiles[0];
       if (p) {
-        if (args.p_nickname !== undefined) p.nickname = args.p_nickname as string;
+        if (args.p_nickname !== undefined)
+          p.nickname = args.p_nickname as string;
         if (args.p_avatar_kind !== undefined)
           p.avatar_kind = args.p_avatar_kind as Profile["avatar_kind"];
         if (args.p_avatar_emoji !== undefined)
           p.avatar_emoji = args.p_avatar_emoji as string;
-        if (args.p_color !== undefined) p.color = args.p_color as Profile["color"];
+        if (args.p_color !== undefined)
+          p.color = args.p_color as Profile["color"];
       }
       saveRawSoloSnapshot(snapshot);
       return true;
@@ -800,11 +857,16 @@ export async function soloRpc(
       const startDate = args.p_start_date as string;
       const receiverId = (args.p_receiver_id as string) || uid;
       const endDate = addDays(startDate, numDays - 1);
-      const activeWallets = (snapshot.wallets ?? []).filter((w) => !w.archived_at);
+      const activeWallets = (snapshot.wallets ?? []).filter(
+        (w) => !w.archived_at,
+      );
       const wallet =
-        activeWallets.find((w) => w.id === args.p_wallet_id) ?? activeWallets[0];
+        activeWallets.find((w) => w.id === args.p_wallet_id) ??
+        activeWallets[0];
 
-      const activeCount = snapshot.memberships.filter((m) => m.status === "active").length;
+      const activeCount = snapshot.memberships.filter(
+        (m) => m.status === "active",
+      ).length;
       const isSolo = Boolean(args.p_is_solo) || activeCount <= 1;
       const multiplier = isSolo ? 1 : activeCount;
       const targetCentavos = dailyAmount * numDays * multiplier;
@@ -885,9 +947,12 @@ export async function soloRpc(
         } else {
           if (args.p_days !== undefined) {
             payment.days = Number(args.p_days);
-            const cycle = snapshot.cycles.find((c) => c.id === payment.cycle_id);
+            const cycle = snapshot.cycles.find(
+              (c) => c.id === payment.cycle_id,
+            );
             if (cycle) {
-              payment.amount_centavos = payment.days * cycle.daily_amount_centavos;
+              payment.amount_centavos =
+                payment.days * cycle.daily_amount_centavos;
             }
           }
           if (args.p_note !== undefined) {
@@ -930,7 +995,9 @@ export async function soloRpc(
 
     case "propose_cycle_wallet": {
       const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
-      const wallet = (snapshot.wallets ?? []).find((w) => w.id === args.p_wallet_id);
+      const wallet = (snapshot.wallets ?? []).find(
+        (w) => w.id === args.p_wallet_id,
+      );
       if (cycle && wallet) {
         cycle.wallet_id = wallet.id;
         cycle.holder_id = wallet.holder_id;
@@ -949,9 +1016,12 @@ export async function soloRpc(
       const title = ((args.p_title as string) || "").trim();
       const goalMode = args.p_goal_mode as "matched" | "flexible";
       const startDate = args.p_start_date as string;
-      const activeWallets = (snapshot.wallets ?? []).filter((w) => !w.archived_at);
+      const activeWallets = (snapshot.wallets ?? []).filter(
+        (w) => !w.archived_at,
+      );
       const wallet =
-        activeWallets.find((w) => w.id === args.p_wallet_id) ?? activeWallets[0];
+        activeWallets.find((w) => w.id === args.p_wallet_id) ??
+        activeWallets[0];
 
       let targetAmountCentavos: number;
       let endDate: string;
@@ -959,8 +1029,11 @@ export async function soloRpc(
       let cadenceDays: number | null = null;
       let numSteps: number | null = null;
 
-      const activeCount = snapshot.memberships.filter((m) => m.status === "active").length;
-      const isSolo = isSoloGoal(title) || Boolean(args.p_is_solo) || activeCount <= 1;
+      const activeCount = snapshot.memberships.filter(
+        (m) => m.status === "active",
+      ).length;
+      const isSolo =
+        isSoloGoal(title) || Boolean(args.p_is_solo) || activeCount <= 1;
 
       if (goalMode === "matched") {
         stepAmountCentavos = Number(args.p_step_amount_centavos);
@@ -1011,7 +1084,9 @@ export async function soloRpc(
     }
 
     case "respond_savings_goal": {
-      const goal = (snapshot.savingsGoals ?? []).find((g) => g.id === args.p_id);
+      const goal = (snapshot.savingsGoals ?? []).find(
+        (g) => g.id === args.p_id,
+      );
       if (goal) {
         const action = args.p_action as string;
         if (action === "accept") goal.status = "accepted";
@@ -1114,7 +1189,9 @@ export async function soloRpc(
       const goal = (snapshot.savingsGoals ?? []).find(
         (g) => g.id === args.p_goal_id,
       );
-      const wallet = (snapshot.wallets ?? []).find((w) => w.id === args.p_wallet_id);
+      const wallet = (snapshot.wallets ?? []).find(
+        (w) => w.id === args.p_wallet_id,
+      );
       if (goal && wallet) {
         goal.wallet_id = wallet.id;
         goal.holder_id = wallet.holder_id;
@@ -1162,7 +1239,9 @@ export async function soloRpc(
     }
 
     case "confirm_abono_entry": {
-      const entry = (snapshot.abonoEntries ?? []).find((e) => e.id === args.p_id);
+      const entry = (snapshot.abonoEntries ?? []).find(
+        (e) => e.id === args.p_id,
+      );
       if (entry) {
         entry.status = "confirmed";
         entry.was_confirmed = true;
@@ -1174,7 +1253,9 @@ export async function soloRpc(
     }
 
     case "edit_abono_entry": {
-      const entry = (snapshot.abonoEntries ?? []).find((e) => e.id === args.p_id);
+      const entry = (snapshot.abonoEntries ?? []).find(
+        (e) => e.id === args.p_id,
+      );
       if (entry) {
         if (args.p_delete) {
           entry.deleted_at = new Date().toISOString();
@@ -1196,7 +1277,9 @@ export async function soloRpc(
     }
 
     case "respond_delete_abono_entry": {
-      const entry = (snapshot.abonoEntries ?? []).find((e) => e.id === args.p_id);
+      const entry = (snapshot.abonoEntries ?? []).find(
+        (e) => e.id === args.p_id,
+      );
       if (entry) {
         entry.deleted_at = new Date().toISOString();
       }

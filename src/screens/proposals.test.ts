@@ -6,6 +6,7 @@ import { setLang } from "../i18n";
 import { createInitialSoloSnapshot } from "../solo";
 import Propose from "./Propose";
 import ProposeIpon from "./ProposeIpon";
+import PersonalSavings from "../components/PersonalSavings";
 
 // Capture real form handlers without adding a DOM/test-renderer dependency.
 const state = vi.hoisted(() => ({ values: [] as unknown[], cursor: 0 }));
@@ -91,6 +92,8 @@ function form(Screen: typeof Propose, local = false, singleMember = false) {
   let tree = render();
   return {
     buttons: () => nodes(tree).filter((n) => n.type === "button"),
+    content: () => text(tree),
+    personal: () => tree.type === PersonalSavings,
     click: (label: string) => {
       const button = nodes(tree).find(
         (n) => n.type === "button" && text(n.props.children) === label,
@@ -154,41 +157,31 @@ describe("proposal backend contracts", () => {
       expect(payload.p_title).toBe("Trip");
     },
   );
-  it("offers hosted solo saving only as a flexible goal", async () => {
+  it("routes personal saving to the unified Home section instead of a shared solo proposal", () => {
     const screen = form(ProposeIpon);
-    screen.click("Solo goal (just me — visible to partner)");
-    screen.title("AI subscription");
-    const matched = screen
-      .buttons()
-      .find((n) => text(n.props.children) === "Matched cadence");
-    expect(matched?.props.disabled).toBe(true);
-    const [, payload] = await screen.submit();
-    expect(payload).not.toHaveProperty("p_is_solo");
-    expect(payload.p_goal_mode).toBe("flexible");
-    expect(payload.p_title).toBe("[Solo] AI subscription");
-    expect(payload).not.toHaveProperty("p_num_steps");
+    expect(screen.content()).toContain(
+      "Use Personal savings on Home for your own goals.",
+    );
+    expect(
+      screen
+        .buttons()
+        .some((n) => text(n.props.children).includes("Solo goal")),
+    ).toBe(false);
   });
-  it("recognizes a typed solo prefix even with shared scope selected", async () => {
+  it("removes a legacy solo prefix from a new shared proposal without changing its matched cadence", async () => {
     const screen = form(ProposeIpon);
     screen.title("[Solo: Ana] AI subscription");
     const [, payload] = await screen.submit();
-    expect(payload.p_goal_mode).toBe("flexible");
-    expect(payload.p_title).toBe("[Solo: Ana] AI subscription");
+    expect(payload.p_goal_mode).toBe("matched");
+    expect(payload.p_title).toBe("AI subscription");
+    expect(payload).not.toHaveProperty("p_is_solo");
+    expect(payload.p_num_steps).toBe(15);
   });
-  it.each(["Matched cadence", "Flexible solo pot"])(
-    "preserves labeled solo prefixes in local %s goals",
-    async (mode) => {
-      const screen = form(ProposeIpon, true, true);
-      screen.click(mode);
-      screen.title("[Solo: Ana] AI subscription");
-      const [, payload] = await screen.submit();
-      expect(payload.p_title).toBe("[Solo: Ana] AI subscription");
-      expect(payload.p_is_solo).toBe(true);
-      expect(payload.p_goal_mode).toBe(
-        mode === "Matched cadence" ? "matched" : "flexible",
-      );
-    },
-  );
+  it("uses the same personal component for standalone offline saving", () => {
+    const screen = form(ProposeIpon, true, true);
+    expect(screen.personal()).toBe(true);
+    expect(screen.buttons()).toHaveLength(0);
+  });
   it("keeps standalone local round proposals solo", async () => {
     const screen = form(Propose, true, true);
     const [, payload] = await screen.submit();

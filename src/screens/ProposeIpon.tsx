@@ -11,9 +11,15 @@ import {
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { rpc } from "../data";
-import { addDays, isSoloGoal, money, parsePesos, shortDate } from "../helpers";
+import {
+  addDays,
+  cleanGoalTitle,
+  money,
+  parsePesos,
+  shortDate,
+} from "../helpers";
 import { t } from "../i18n";
-import { isSoloMode } from "../solo";
+import PersonalSavings from "../components/PersonalSavings";
 
 const AMOUNTS = ["50", "100", "300"];
 const STEPS = ["10", "15", "30"];
@@ -25,16 +31,8 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
   const activeMemberIds = new Set(
     data.memberships.filter((m) => m.status === "active").map((m) => m.user_id),
   );
-  const isMultiMember = activeMemberIds.size > 1;
-  const local = isSoloMode();
-  const [savingScope, setSavingScope] = useState<"shared" | "solo">(
-    local && !isMultiMember ? "solo" : "shared",
-  );
-  const [selectedMode, setMode] = useState<"matched" | "flexible">("matched");
+  const [mode, setMode] = useState<"matched" | "flexible">("matched");
   const [title, setTitle] = useState("");
-  const soloSaving = savingScope === "solo" || isSoloGoal(title);
-  const hostedSolo = !local && soloSaving;
-  const mode = hostedSolo ? "flexible" : selectedMode;
   const [startDate, setStartDate] = useState(addDays(data.today, 1));
 
   // Matched fields
@@ -68,7 +66,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       const steps = Number(numSteps);
       const cadence = Number(cadenceDays);
       if (steps > 0 && cadence > 0) {
-        const multiplier = local && soloSaving ? 1 : 2;
+        const multiplier = 2;
         totalTarget = money(stepCentavos * steps * multiplier);
         computedEndDate = addDays(startDate, (steps - 1) * cadence);
       }
@@ -90,9 +88,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
     e.preventDefault();
     const trimmedTitle = title.trim();
     if (!trimmedTitle || !walletId) return;
-    const finalTitle = soloSaving && !isSoloGoal(trimmedTitle)
-      ? `[Solo] ${trimmedTitle}`
-      : trimmedTitle;
+    const finalTitle = cleanGoalTitle(trimmedTitle);
 
     void run(async () => {
       if (mode === "matched") {
@@ -104,7 +100,6 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           p_step_amount_centavos: parsePesos(stepAmount),
           p_cadence_days: Number(cadenceDays),
           p_num_steps: Number(numSteps),
-          ...(local ? { p_is_solo: soloSaving } : {}),
         });
       } else {
         await rpc("propose_savings_goal", {
@@ -114,12 +109,14 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           p_start_date: startDate,
           p_target_amount_centavos: parsePesos(targetAmount),
           p_end_date: endDate,
-          ...(local ? { p_is_solo: soloSaving } : {}),
         });
       }
       navigate("/");
     });
   };
+
+  if (activeMemberIds.size < 2)
+    return <PersonalSavings data={data} user={user} run={run} busy={busy} />;
 
   return (
     <form className="propose" onSubmit={submit}>
@@ -128,59 +125,9 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       </Link>
       <h1 className="sr-only">{t("New ipon goal")}</h1>
 
-      {isMultiMember && (
-        <fieldset style={{ border: "none", padding: 0, margin: "0 0 12px 0" }}>
-          <legend
-            style={{
-              color: "var(--soft)",
-              fontFamily: "var(--display)",
-              fontWeight: 500,
-              fontSize: "13px",
-              marginBottom: "4px",
-            }}
-          >
-            {t("Who is saving?")}
-          </legend>
-          <div
-            className="segmented"
-            role="radiogroup"
-            aria-label={t("Who is saving?")}
-          >
-            <button
-              type="button"
-              role="radio"
-              aria-checked={savingScope === "shared"}
-              aria-pressed={savingScope === "shared"}
-              onClick={() => setSavingScope("shared")}
-            >
-              {t("Shared goal (both of us)")}
-            </button>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={savingScope === "solo"}
-              aria-pressed={savingScope === "solo"}
-              onClick={() => setSavingScope("solo")}
-            >
-              {t("Solo goal (just me — visible to partner)")}
-            </button>
-          </div>
-          {savingScope === "solo" && (
-            <p
-              style={{
-                fontSize: "13px",
-                color: "var(--soft)",
-                margin: "4px 4px 0",
-                lineHeight: 1.4,
-              }}
-            >
-              {t(
-                "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.",
-              )}
-            </p>
-          )}
-        </fieldset>
-      )}
+      <Link to="/#personal-savings">
+        {t("Use Personal savings on Home for your own goals.")}
+      </Link>
 
       <div className="segmented" role="radiogroup" aria-label={t("Goal mode")}>
         <button
@@ -188,7 +135,6 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           role="radio"
           aria-checked={mode === "matched"}
           aria-pressed={mode === "matched"}
-          disabled={hostedSolo}
           onClick={() => setMode("matched")}
         >
           {t("Matched cadence")}
@@ -200,15 +146,9 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           aria-pressed={mode === "flexible"}
           onClick={() => setMode("flexible")}
         >
-          {soloSaving ? t("Flexible solo pot") : t("Flexible shared pot")}
+          {t("Flexible shared pot")}
         </button>
       </div>
-
-      {hostedSolo && (
-        <p className="meta">
-          {t("Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.")}
-        </p>
-      )}
 
       <label style={{ display: "grid", gap: "6px" }}>
         <span

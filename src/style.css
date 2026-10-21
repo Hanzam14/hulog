@@ -1667,6 +1667,56 @@ select:focus {
 .tally-sheet .members {
   padding-top: 0;
 }
+.personal-savings {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.personal-savings > .meta {
+  margin-bottom: 16px;
+}
+.personal-goal {
+  margin-bottom: 16px;
+  overflow-wrap: anywhere;
+}
+.personal-goal h3 {
+  margin: 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 160px;
+}
+.personal-goal h3 svg {
+  flex: none;
+}
+.personal-visibility,
+.personal-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.personal-goal .actions {
+  margin: 0;
+}
+.personal-goal .actions > button {
+  flex: 1 1 120px;
+}
+.personal-form {
+  background: var(--card-tint);
+  padding: 16px;
+  border-radius: 14px;
+  margin: 0;
+  min-width: 0;
+}
+.personal-goal details summary,
+.personal-history > summary {
+  min-height: 44px;
+  padding-block: 8px;
+}
+.personal-entry-amount {
+  font-family: var(--display);
+}
 .tally .stamped {
   animation: coin-stamp 220ms ease-out;
 }
@@ -1733,8 +1783,10 @@ select:focus {
   color: var(--ink);
   border-color: var(--highlight-border);
 }
-:root[data-theme="dark"] .skeleton { background: var(--card-tint); border-color: var(--card-border); }
-
+:root[data-theme="dark"] .skeleton {
+  background: var(--card-tint);
+  border-color: var(--card-border);
+}
 
 @media print {
   body {
@@ -1755,5 +1807,3 @@ select:focus {
     break-inside: avoid;
   }
 }
-
-

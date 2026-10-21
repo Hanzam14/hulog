@@ -19,6 +19,7 @@ import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
 import CustodyCard from "../components/CustodyCard";
 import IponCard from "../components/IponCard";
+import PersonalSavings from "../components/PersonalSavings";
 import { isSoloMode, setSoloMode, setSoloPotMode } from "../solo";
 import { isSoloCycle } from "../helpers";
 
@@ -196,6 +197,7 @@ export default function Home(props: ViewProps) {
         </Link>
       )}
 
+      <PersonalSavings {...props} />
       <div className="ipon-home-section">
         <div className="row">
           <h2>{t("Ipon goals")}</h2>

@@ -1,0 +1,108 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set search_path = public, extensions, pg_temp;
+select no_plan();
+insert into auth.users(id,email,raw_user_meta_data) values
+ ('71000000-0000-0000-0000-000000000001','personal-a@hulog.test','{"full_name":"Ana"}'),
+ ('71000000-0000-0000-0000-000000000002','personal-b@hulog.test','{"full_name":"Bea"}'),
+ ('71000000-0000-0000-0000-000000000003','personal-c@hulog.test','{"full_name":"Cai"}');
+create temporary table fixture(key text primary key,val text);
+grant all on fixture to authenticated,anon;
+create function pg_temp.actor(n integer) returns void language sql as $$
+ select set_config('request.jwt.claim.sub','71000000-0000-0000-0000-'||lpad(n::text,12,'0'),true)::text;
+$$;
+create function pg_temp.id(k text) returns uuid language sql as $$select val::uuid from fixture where key=k$$;
+set local role authenticated;
+select pg_temp.actor(1);
+insert into fixture values('group',create_group('Personal pair','Main')::text);
+insert into fixture values('invite',create_invite());
+select pg_temp.actor(2);
+select claim_invite((select val from fixture where key='invite'));
+select pg_temp.actor(1);
+select review_member('71000000-0000-0000-0000-000000000002',true);
+insert into fixture values('goal',create_personal_goal('Camera',100000)::text);
+select is((select visibility from personal_savings_goals where id=pg_temp.id('goal')),'private','New goals default private');
+select is((select owner_id from personal_savings_goals where id=pg_temp.id('goal')),auth.uid(),'Owner derives from auth.uid');
+insert into fixture values('deposit',record_personal_entry(pg_temp.id('goal'),'deposit',10000)::text);
+select is((select amount_centavos from personal_savings_entries where id=pg_temp.id('deposit')),10000::bigint,'Owner records integer centavos');
+select is((select entry_date from personal_savings_entries where id=pg_temp.id('deposit')),hulog_today(),'Default entry date is Manila today');
+select ok((select count(*) from personal_savings_history)>=2,'Owner sees goal and entry audit history');
+select is((select count(*) from history where entity like 'personal_savings%'),0::bigint,'Private snapshots do not enter group history');
+select throws_ok($$insert into personal_savings_goals(group_id,owner_id,title,target_amount_centavos) values(pg_temp.id('group'),auth.uid(),'Bypass',1)$$,'42501',null,'Direct goal writes denied even to owner');
+select throws_ok($$insert into personal_savings_entries(goal_id,kind,amount_centavos) values(pg_temp.id('goal'),'deposit',1)$$,'42501',null,'Direct ledger writes denied');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'withdrawal',10001)$$,'P0001','Personal savings balance out of range','Withdrawal cannot overdraw');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',0)$$,'P0001','Invalid personal savings amount','Zero amount denied');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',1,hulog_today()+1)$$,'P0001','Entry date cannot be in the future','Future dates denied');
+select throws_ok($$select create_personal_goal('Bad',1,'public')$$,'P0001','Invalid visibility','Unknown visibility denied');
+
+select pg_temp.actor(2);
+select is((select count(*) from personal_savings_goals),0::bigint,'Partner cannot read private goals');
+select is((select count(*) from personal_savings_entries),0::bigint,'Partner cannot read private entries');
+select is((select count(*) from personal_savings_history),0::bigint,'Partner cannot read private audit');
+select throws_ok($$select update_personal_goal(pg_temp.id('goal'),p_title=>'Stolen')$$,'P0001','Personal savings owner only','Partner cannot update private goal');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',1)$$,'P0001','Personal savings owner only','Partner cannot record private entry');
+select throws_ok($$select update_personal_entry(pg_temp.id('deposit'),p_amount_centavos=>1)$$,'P0001','Personal savings owner only','Partner cannot edit private entry');
+
+select pg_temp.actor(1);
+select lives_ok($$select update_personal_goal(pg_temp.id('goal'),p_title=>'New camera',p_target_amount_centavos=>200000,p_visibility=>'shared')$$,'Owner edits and shares goal');
+select is((select title from personal_savings_goals where id=pg_temp.id('goal')),'New camera','Updated title persisted');
+select pg_temp.actor(2);
+select is((select count(*) from personal_savings_goals),1::bigint,'Partner reads shared goal');
+select is((select count(*) from personal_savings_entries),1::bigint,'Partner reads shared entries');
+select is((select count(*) from personal_savings_history),0::bigint,'Shared partner still cannot read audit snapshots');
+select throws_ok($$select update_personal_goal(pg_temp.id('goal'),p_visibility=>'private')$$,'P0001','Personal savings owner only','Partner cannot change shared visibility');
+select throws_ok($$select update_personal_goal(pg_temp.id('goal'),p_delete=>true)$$,'P0001','Personal savings owner only','Partner cannot delete shared goal');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',1)$$,'P0001','Personal savings owner only','Partner cannot deposit in shared goal');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'withdrawal',1)$$,'P0001','Personal savings owner only','Partner cannot withdraw from shared goal');
+select throws_ok($$select update_personal_entry(pg_temp.id('deposit'),p_note=>'tampered')$$,'P0001','Personal savings owner only','Partner cannot edit shared entry');
+select throws_ok($$select update_personal_entry(pg_temp.id('deposit'),p_delete=>true)$$,'P0001','Personal savings owner only','Partner cannot delete shared entry');
+insert into fixture values('partner_goal',create_personal_goal('Bea savings',50000)::text);
+select is((select owner_id from personal_savings_goals where id=pg_temp.id('partner_goal')),auth.uid(),'Each group member can create their own goal');
+select pg_temp.actor(1);
+select is((select count(*) from personal_savings_goals where id=pg_temp.id('partner_goal')),0::bigint,'Group creator cannot read the other member private goal');
+
+select pg_temp.actor(3);
+select is((select count(*) from personal_savings_goals),0::bigint,'Non-member sees no goals even shared');
+select is((select count(*) from personal_savings_entries),0::bigint,'Non-member sees no entries');
+select is((select count(*) from personal_savings_history),0::bigint,'Non-member sees no history');
+select throws_ok($$select create_personal_goal('Outsider',1)$$,'P0001','Active membership required','Non-member cannot create');
+select throws_ok($$select update_personal_goal(pg_temp.id('goal'),p_delete=>true)$$,'P0001','Personal savings owner only','Non-member cannot mutate goal');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',1)$$,'P0001','Personal savings owner only','Non-member cannot mutate ledger');
+select throws_ok($$select update_personal_entry(pg_temp.id('deposit'),p_delete=>true)$$,'P0001','Personal savings owner only','Non-member cannot delete entry');
+
+select pg_temp.actor(1);
+select update_personal_goal(pg_temp.id('goal'),p_visibility=>'private');
+select pg_temp.actor(2);
+select is((select count(*) from personal_savings_goals where id=pg_temp.id('goal')),0::bigint,'Shared to private immediately hides goal');
+select is((select count(*) from personal_savings_entries where goal_id=pg_temp.id('goal')),0::bigint,'Shared to private immediately hides entries');
+select pg_temp.actor(1);
+insert into fixture values('withdrawal',record_personal_entry(pg_temp.id('goal'),'withdrawal',2000,hulog_today(),'Cash record only')::text);
+select lives_ok($$select update_personal_entry(pg_temp.id('deposit'),p_amount_centavos=>12000,p_note=>'Corrected')$$,'Owner updates own entry');
+select is((select amount_centavos from personal_savings_entries where id=pg_temp.id('deposit')),12000::bigint,'Entry correction persisted');
+select throws_ok($$select update_personal_entry(pg_temp.id('withdrawal'),p_amount_centavos=>12001)$$,'P0001','Personal savings balance out of range','Edited withdrawal cannot overdraw');
+select throws_ok($$select update_personal_entry(pg_temp.id('deposit'),p_delete=>true)$$,'P0001','Personal savings balance out of range','Deleting a deposit cannot make balance negative');
+select lives_ok($$select update_personal_entry(pg_temp.id('withdrawal'),p_delete=>true)$$,'Owner soft deletes withdrawal');
+select ok((select deleted_at is not null from personal_savings_entries where id=pg_temp.id('withdrawal')),'Deleted entry retained');
+select ok(exists(select 1 from personal_savings_history where entity_id=pg_temp.id('withdrawal') and action='delete'),'Soft deletion audited');
+select update_personal_goal(pg_temp.id('goal'),p_visibility=>'shared');
+select pg_temp.actor(2);
+select is((select count(*) from personal_savings_entries where id=pg_temp.id('withdrawal')),0::bigint,'Partner cannot read deleted entry');
+select pg_temp.actor(1);
+select lives_ok($$select update_personal_goal(pg_temp.id('goal'),p_delete=>true)$$,'Owner soft deletes own goal');
+select ok((select deleted_at is not null from personal_savings_goals where id=pg_temp.id('goal')),'Goal retained for owner history');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',1)$$,'P0001','Personal savings owner only','Deleted goal rejects new entries');
+select pg_temp.actor(2);
+select is((select count(*) from personal_savings_goals where id=pg_temp.id('goal')),0::bigint,'Soft-deleted shared goal hidden from partner');
+select is((select count(*) from personal_savings_entries where goal_id=pg_temp.id('goal')),0::bigint,'Soft-deleted goal entries hidden from partner');
+
+set local role anon;
+select set_config('request.jwt.claim.sub','',true);
+select throws_ok($$select * from personal_savings_goals$$,'42501',null,'Anonymous cannot read goals');
+select throws_ok($$select * from personal_savings_entries$$,'42501',null,'Anonymous cannot read entries');
+select throws_ok($$select * from personal_savings_history$$,'42501',null,'Anonymous cannot read history');
+select throws_ok($$select create_personal_goal('Anon',1)$$,'42501',null,'Anonymous cannot create goals');
+select throws_ok($$select update_personal_goal(pg_temp.id('goal'),p_delete=>true)$$,'42501',null,'Anonymous cannot update goals');
+select throws_ok($$select record_personal_entry(pg_temp.id('goal'),'deposit',1)$$,'42501',null,'Anonymous cannot record entries');
+select throws_ok($$select update_personal_entry(pg_temp.id('deposit'),p_delete=>true)$$,'42501',null,'Anonymous cannot update entries');
+select * from finish();
+rollback;

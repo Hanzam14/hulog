@@ -2,6 +2,67 @@ import { useSyncExternalStore } from "react";
 
 export type Lang = "en" | "tl" | "taglish";
 const taglish = {
+  "Personal savings history": "History ng sariling ipon",
+  Goal: "Goal",
+  "Savings entry": "Record ng ipon",
+  Cancel: "Kanselahin",
+  "Personal savings": "Sariling ipon",
+  "Personal target (₱)": "Target na ipon (₱)",
+  Visibility: "Sino ang makakakita",
+  "Private — only you": "Private — ikaw lang",
+  "Shared — partner can view": "Shared — kita ng partner",
+  "Only you can change this goal or its records.":
+    "Ikaw lang ang puwedeng magbago ng goal at records nito.",
+  "Save goal": "I-save ang goal",
+  "Create personal goal": "Gumawa ng sariling goal",
+  "Edit personal entry": "Baguhin ang record",
+  "Record deposit": "I-record ang dagdag na ipon",
+  "Record withdrawal": "I-record ang bawas sa ipon",
+  "This records money you moved yourself. Hulog does not move money.":
+    "Record lang ito ng perang ikaw ang naglipat. Hindi naglilipat ng pera ang Hulog.",
+  "Delete this personal savings record? It stays in your history.":
+    "Alisin ang record na ito? Mananatili ito sa history mo.",
+  Private: "Private",
+  "Shared read-only": "Shared, tingin lang",
+  "Personal savings by {name}": "Sariling ipon ni {name}",
+  "Personal savings progress": "Progress ng sariling ipon",
+  "Share read-only": "Ipakita sa partner",
+  "Make private": "Gawing private",
+  "Read-only. Only the owner can change these records.":
+    "Tingin lang. Ang may-ari lang ang puwedeng magbago ng records.",
+  "Savings records": "Mga record ng ipon",
+  "No entries yet. Record your first deposit.":
+    "Wala pang record. I-record ang unang dagdag na ipon.",
+  Deposit: "Dagdag sa ipon",
+  Withdrawal: "Bawas sa ipon",
+  "Delete entry": "Alisin ang record",
+  "Manage personal goal": "Ayusin ang goal",
+  "Edit goal": "Baguhin ang goal",
+  "Delete goal": "Alisin ang goal",
+  "On this device only. Sign in to sync personal savings.":
+    "Sa device na ito lang. Mag-sign in para ma-sync ang sariling ipon.",
+  "Your goals sync to your account. Private unless you choose to share.":
+    "Naka-sync sa account mo ang goals. Private maliban kung gusto mong ipakita.",
+  "New personal goal": "Bagong sariling goal",
+  "Use Personal savings on Home for your own goals.":
+    "Sa Sariling ipon sa Home gumawa ng sarili mong goals.",
+  "Invalid personal savings amount":
+    "Maglagay ng halaga mula ₱0.01 hanggang ₱100,000,000.",
+  "Invalid visibility": "Pumili ng private o shared.",
+  "Goal title must be 1 to 60 characters":
+    "Dapat 1 hanggang 60 characters ang title ng goal.",
+  "Entry date cannot be in the future":
+    "Gumamit ng valid date hanggang ngayon sa Manila.",
+  "Note must be at most 140 characters":
+    "Hanggang 140 characters lang ang note.",
+  "Personal savings owner only":
+    "May-ari lang ang puwedeng magbago ng goal na ito.",
+  "Personal savings entry unavailable": "Hindi na available ang record na ito.",
+  "Invalid personal savings entry kind": "Pumili ng dagdag o bawas sa ipon.",
+  "Personal savings balance out of range":
+    "Dapat manatili sa ₱0 hanggang ₱100,000,000 ang balance. Tingnan ang mga bawas bago baguhin ang dagdag.",
+  "Amount (₱)": "Halaga (₱)",
+  "Note (optional)": "Note (opsyonal)",
   "of {amount}": "sa {amount}",
   "Pot progress": "Progress ng ipon",
   "Give to {name}": "Ibigay kay {name}",
@@ -420,6 +481,66 @@ const taglish = {
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
 const en = {
+  "Personal savings history": "Your savings history",
+  Goal: "Goal",
+  "Savings entry": "Savings entry",
+  Cancel: "Cancel",
+  "Personal savings": "Personal savings",
+  "Personal target (₱)": "Target (₱)",
+  Visibility: "Who can see it",
+  "Private — only you": "Private — only you",
+  "Shared — partner can view": "Shared — partner can view",
+  "Only you can change this goal or its records.":
+    "Only you can change this goal or its records.",
+  "Save goal": "Save goal",
+  "Create personal goal": "Create personal goal",
+  "Edit personal entry": "Edit entry",
+  "Record deposit": "Record deposit",
+  "Record withdrawal": "Record withdrawal",
+  "This records money you moved yourself. Hulog does not move money.":
+    "This records money you moved yourself. Hulog does not move money.",
+  "Delete this personal savings record? It stays in your history.":
+    "Delete this savings record? It stays in your history.",
+  Private: "Private",
+  "Shared read-only": "Shared, read-only",
+  "Personal savings by {name}": "Personal savings by {name}",
+  "Personal savings progress": "Savings progress",
+  "Share read-only": "Let partner view",
+  "Make private": "Make private",
+  "Read-only. Only the owner can change these records.":
+    "Read-only. Only the owner can change these records.",
+  "Savings records": "Savings records",
+  "No entries yet. Record your first deposit.":
+    "No entries yet. Record your first deposit.",
+  Deposit: "Deposit",
+  Withdrawal: "Withdrawal",
+  "Delete entry": "Delete entry",
+  "Manage personal goal": "Manage goal",
+  "Edit goal": "Edit goal",
+  "Delete goal": "Delete goal",
+  "On this device only. Sign in to sync personal savings.":
+    "On this device only. Sign in to sync personal savings.",
+  "Your goals sync to your account. Private unless you choose to share.":
+    "Your goals sync to your account. Private unless you choose to share.",
+  "New personal goal": "New personal goal",
+  "Use Personal savings on Home for your own goals.":
+    "Use Personal savings on Home for your own goals.",
+  "Invalid personal savings amount":
+    "Enter an amount from ₱0.01 to ₱100,000,000.",
+  "Invalid visibility": "Choose private or shared.",
+  "Goal title must be 1 to 60 characters":
+    "Goal title must be 1 to 60 characters.",
+  "Entry date cannot be in the future":
+    "Use a valid date up to today in Manila.",
+  "Note must be at most 140 characters": "Keep the note within 140 characters.",
+  "Personal savings owner only": "Only the owner can change this savings goal.",
+  "Personal savings entry unavailable":
+    "This savings entry is no longer available.",
+  "Invalid personal savings entry kind": "Choose deposit or withdrawal.",
+  "Personal savings balance out of range":
+    "The balance must stay between ₱0 and ₱100,000,000. Check later withdrawals before changing a deposit.",
+  "Amount (₱)": "Amount (₱)",
+  "Note (optional)": "Note (optional)",
   "of {amount}": "of {amount}",
   "Pot progress": "Pot progress",
   "Give to {name}": "Give to {name}",
@@ -833,6 +954,65 @@ const en = {
     "No contributions yet. Start saving toward this goal.",
 } satisfies Dictionary;
 const tl = {
+  "Personal savings history": "Kasaysayan ng sariling ipon",
+  Goal: "Layunin",
+  "Savings entry": "Tala ng ipon",
+  Cancel: "Kanselahin",
+  "Personal savings": "Sariling ipon",
+  "Personal target (₱)": "Layunin (₱)",
+  Visibility: "Sino ang makakakita",
+  "Private — only you": "Pribado — ikaw lang",
+  "Shared — partner can view": "Ibinahagi — makikita ng kasama",
+  "Only you can change this goal or its records.":
+    "Ikaw lang ang makakabago sa layunin at mga tala nito.",
+  "Save goal": "I-save ang layunin",
+  "Create personal goal": "Gumawa ng sariling layunin",
+  "Edit personal entry": "Baguhin ang tala",
+  "Record deposit": "Itala ang dagdag na ipon",
+  "Record withdrawal": "Itala ang bawas sa ipon",
+  "This records money you moved yourself. Hulog does not move money.":
+    "Tala ito ng perang ikaw mismo ang naglipat. Hindi naglilipat ng pera ang Hulog.",
+  "Delete this personal savings record? It stays in your history.":
+    "Alisin ang talang ito? Mananatili ito sa kasaysayan mo.",
+  Private: "Pribado",
+  "Shared read-only": "Ibinahagi, makikita lang",
+  "Personal savings by {name}": "Sariling ipon ni {name}",
+  "Personal savings progress": "Pag-usad ng sariling ipon",
+  "Share read-only": "Ipakita sa kasama",
+  "Make private": "Gawing pribado",
+  "Read-only. Only the owner can change these records.":
+    "Makikita lang. Ang may-ari lang ang makakabago sa mga tala.",
+  "Savings records": "Mga tala ng ipon",
+  "No entries yet. Record your first deposit.":
+    "Wala pang tala. Itala ang unang dagdag na ipon.",
+  Deposit: "Dagdag sa ipon",
+  Withdrawal: "Bawas sa ipon",
+  "Delete entry": "Alisin ang tala",
+  "Manage personal goal": "Pamahalaan ang layunin",
+  "Edit goal": "Baguhin ang layunin",
+  "Delete goal": "Alisin ang layunin",
+  "On this device only. Sign in to sync personal savings.":
+    "Sa device na ito lang. Mag-sign in para mai-sync ang sariling ipon.",
+  "Your goals sync to your account. Private unless you choose to share.":
+    "Naka-sync ang mga layunin sa account mo. Pribado maliban kung ibabahagi mo.",
+  "New personal goal": "Bagong sariling layunin",
+  "Use Personal savings on Home for your own goals.":
+    "Gamitin ang Sariling ipon sa Home para sa sarili mong mga layunin.",
+  "Invalid personal savings amount":
+    "Maglagay ng halaga mula ₱0.01 hanggang ₱100,000,000.",
+  "Invalid visibility": "Pumili ng pribado o ibinahagi.",
+  "Goal title must be 1 to 60 characters":
+    "Dapat 1 hanggang 60 karakter ang pamagat.",
+  "Entry date cannot be in the future":
+    "Gumamit ng wastong petsa hanggang ngayon sa Maynila.",
+  "Note must be at most 140 characters": "Hanggang 140 karakter lang ang tala.",
+  "Personal savings owner only": "May-ari lang ang makakabago sa layuning ito.",
+  "Personal savings entry unavailable": "Hindi na magagamit ang talang ito.",
+  "Invalid personal savings entry kind": "Pumili ng dagdag o bawas sa ipon.",
+  "Personal savings balance out of range":
+    "Dapat manatili sa ₱0 hanggang ₱100,000,000 ang balanse. Suriin ang mga bawas bago baguhin ang dagdag.",
+  "Amount (₱)": "Halaga (₱)",
+  "Note (optional)": "Tala (opsyonal)",
   "of {amount}": "sa {amount}",
   "Pot progress": "Laman ng ipon",
   "Give to {name}": "Ibigay kay {name}",

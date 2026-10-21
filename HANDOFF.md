@@ -46,42 +46,44 @@ The owner makes a new request or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `21`
-- Updated: `2026-10-21T00:26:20Z`
-- Status: `PARTIAL - READY FOR DESIGN REVIEW`
+- Revision: `22`
+- Updated: `2026-10-21T01:00:57Z`
+- Status: `PARTIAL - READY FOR CLAUDE REVIEW`
 - Persistence: `commit_pending`
-- Summary: Applied ube sticker pad presentation refresh on design/cute-refresh based on cf32c85. Code checks pass; screenshot set is 23 of 24 requested captures.
-- Authority: Owner explicitly instructed implementation and local branch commit on 2026-10-21; no push, merge or deploy.
+- Summary: Round 2 implemented in design/cute-refresh: configured solo startup ordering and online owner-only personal savings with private/shared visibility. Local checks pass; independent review and hosted smoke remain.
+- Authority: Owner round-2 brief explicitly permits local schema/data/solo/UI edits, requested origin merge and commits. No hosted writes, push, merge to main or deployment authorized.
 
 ### Decisions
 
-- HULOG-CUTE-AUTH-20261021
-- HULOG-CUTE-REVIEW-20261021
+- HULOG-PERSONAL-AUTH-20261021
+- HULOG-PERSONAL-REVIEW-20261021
 
 ### Blockers
 
-- After-Settings-dark capture failed through browser API.
-- Lead Claude Opus review pending.
+- Independent Claude Opus review pending; no builder PASS attestation.
 
 ### Risks and unresolved items
 
-- Browser fixtures cover layout only for NoGroup/update banner/toast; no actual OAuth/update/payout lifecycle exercised.
-- Existing PWA manifest and icon assets retain prior palette under settings exclusion.
-- Missing dark Settings after screenshot
-- Independent Claude Opus review
+- Security/money review pending with Claude Opus
+- No real OAuth or two-device hosted verification
+- Screenshots are browser-scaled native 360x780 exports from 375 CSS viewport
+- Concurrent multi-connection withdrawal stress test not run
+- Independent review and decision rulings
+- Owner hosted migration apply and phone smoke; exact steps in report
 
 ### Evidence and checks
 
-- docs/CUTE_REFRESH_REPORT.md
-- src/palette.test.ts
-- src/theme.test.ts
-- Baseline npm run lint: PASS
-- Baseline npm test: 98 passed
-- Baseline npm run build: PASS
-- Final npm run lint: PASS
-- Final npm test: 100 passed
-- Final npm run build: PASS
-- Check notes omitted: 2; full list: checkpoint revision `21` under `.continuity/checkpoints/`.
+- docs/PERSONAL_SAVINGS_REPORT.md
+- docs/PERSONAL_SAVINGS_CLAIMS.md
+- src/App.solo.test.ts
+- supabase/tests/database/personal_savings.test.sql
+- Integrated baseline lint/build PASS; 117/119 tests initially passed, two merge compatibility checks reconciled and focused v2 24/24 PASS
+- Solo delayed-session baseline regression FAIL; final four auth tests PASS
+- Final npm run lint: exit 0
+- Final npm test: 132 passed, 15 files
+- Final npm run build: exit 0
+- Local pgTAP: 357 assertions across six files PASS, including 60 personal cases
+- Check notes omitted: 4; full list: checkpoint revision `22` under `.continuity/checkpoints/`.
 
 ### Governed artifact correlations
 
@@ -89,5 +91,5 @@ The owner makes a new request or production state changes.
 
 ### Exact next action
 
-Claude Opus review current diff and screenshots; capture missing after-Settings-dark screenshot before completion.
+Claude Opus high-effort review of docs/PERSONAL_SAVINGS_CLAIMS.md, then owner migration apply and two-device/OAuth smoke per report.
 <!-- CONTINUITY_CHECKPOINT_END -->
