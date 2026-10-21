@@ -605,7 +605,7 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
   // Recalculate progress for cycles for all active members
   snapshot.progress = [];
   for (const c of snapshot.cycles) {
-    const isSolo = isSoloCycle(c, activeMembers.length);
+    const isSolo = isSoloCycle(c);
     for (const m of activeMembers) {
       const memberPayments = snapshot.payments.filter(
         (p) =>

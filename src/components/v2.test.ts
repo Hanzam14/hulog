@@ -3,22 +3,38 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Snapshot } from "../data";
-import { setLang } from "../i18n";
+import { setLang, t } from "../i18n";
 import CustodyCard from "./CustodyCard";
 import IponCard from "./IponCard";
 import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
 import Tracker from "../screens/Tracker";
-import { buildSettlementPayload } from "../helpers";
 import Home from "../screens/Home";
 import Propose from "../screens/Propose";
 import { isSoloMode, setSoloMode, setSoloPotMode, loadSoloSnapshot, soloRpc } from "../solo";
+import App from "../App";
+import { buildSettlementPayload, isNavigatorOffline } from "../helpers";
+
+vi.mock("./AppUpdates", () => ({
+  default: () => null,
+  UpdateBanner: () => null,
+}));
+import History from "../screens/History";
+import NoGroup from "../screens/NoGroup";
 
 vi.mock("../data", async () => {
   const actual = await vi.importActual<typeof import("../data")>("../data");
   return {
     ...actual,
     rpc: vi.fn().mockResolvedValue(undefined),
+    supabase: {
+      auth: {
+        getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: vi.fn() } },
+        }),
+      },
+    },
   };
 });
 
@@ -245,6 +261,12 @@ describe("Hulog v2 IponCard & ProposeIpon", () => {
     expect(markup).toContain("₱500.00");
     expect(markup).toContain("sa ₱1,000.00");
     expect(markup).toContain('aria-valuenow="50"');
+    expect(markup).toContain("50%");
+    expect(markup).toContain("On track");
+
+    const behindGoal = { ...goal, expected_steps_today: 8 };
+    const behindMarkup = html(createElement(IponCard, { g: behindGoal, data }));
+    expect(behindMarkup).toContain("Nahuhuli");
   });
 
   it("renders ProposeIpon with mode choices, title input, and options", () => {
@@ -537,6 +559,20 @@ describe("Hulog v2 Tracker", () => {
     );
     expect(taglishMarkup).toContain("<strong>Bayad</strong>");
   });
+
+  it("enforces 44px minimum tap targets and mobile wrapping rules in style.css", async () => {
+    const fs = await import("node:fs");
+    const css = fs.readFileSync("src/style.css", "utf8");
+    expect(css).toMatch(/\.back\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s);
+    expect(css).toMatch(
+      /\.header-bell\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s,
+    );
+    expect(css).toMatch(/\.quiet\s*\{[^}]*min-height:\s*44px;/s);
+    expect(css).toMatch(/nav a\s*\{[^}]*min-height:\s*44px;/s);
+    expect(css).toMatch(
+      /\.celebration-toast\s*\{[^}]*max-width:\s*calc\(100vw - 32px\);/s,
+    );
+  });
 });
 
 describe("Hulog v2 Unified Home Dashboard", () => {
@@ -557,9 +593,150 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(markup).toContain("Mag-ipon");
     expect(markup).toContain("Bagong ipon goal");
   });
+
+  it("renders friendly empty states and next-step actions across History, Tracker, Home/IponDetail, and NoGroup", () => {
+    setLang("en");
+    const data = v2Snapshot();
+    data.cycles = [];
+    data.savingsGoals = [];
+    data.savingsContributions = [];
+    data.abonoEntries = [];
+
+    const historyMarkup = html(
+      createElement(History, { data, user: "a", run, busy: false }),
+    );
+    expect(historyMarkup).toContain("Past rounds will appear here.");
+    expect(historyMarkup).toContain('href="/propose"');
+
+    const trackerMarkup = html(
+      createElement(Tracker, { data, user: "a", run, busy: false }),
+    );
+    expect(trackerMarkup).toContain(
+      "No shared expenses yet. Log a bill or abono above.",
+    );
+    expect(trackerMarkup).toContain("+ Add shared expense");
+
+    const homeMarkup = html(
+      createElement(Home, { data, user: "a", run, busy: false }),
+    );
+    expect(homeMarkup).toContain(
+      "No savings goals yet. Save together for a trip or goal.",
+    );
+    expect(homeMarkup).toContain('href="/ipon/new"');
+
+    const noGroupMarkup = html(
+      createElement(NoGroup, { run, busy: false }),
+    );
+    expect(noGroupMarkup).toContain(
+      "Start a shared pot or paste an invite link from your partner.",
+    );
+    expect(noGroupMarkup).toContain("Create group");
+
+    const dataWithGoal = v2Snapshot();
+    dataWithGoal.savingsContributions = [];
+    const iponDetailMarkup = renderToStaticMarkup(
+      createElement(
+        MemoryRouter,
+        { initialEntries: ["/ipon/goal-1"] },
+        createElement(
+          Routes,
+          {},
+          createElement(Route, {
+            path: "/ipon/:id",
+            element: createElement(IponDetail, {
+              data: dataWithGoal,
+              user: "a",
+              run,
+              busy: false,
+            }),
+          }),
+        ),
+      ),
+    );
+    expect(iponDetailMarkup).toContain(
+      "No contributions yet. Start saving toward this goal.",
+    );
+    expect(iponDetailMarkup).toContain('href="/ipon/goal-1/record"');
+  });
+});
+
+describe("Hulog v2 Loading Skeleton & Offline Banner", () => {
+  it("renders placeholder skeleton blocks and aria-busy while initial session loads", () => {
+    vi.stubGlobal("navigator", { onLine: true });
+    setLang("en");
+    const markup = html(createElement(App));
+    expect(markup).toContain('aria-busy="true"');
+    expect(markup).toContain("Loading…");
+    expect(markup).toContain('class="skeleton skeleton-card"');
+    expect(markup).not.toContain("offline-banner");
+  });
+
+  it("detects navigator offline state and renders translated offline banner", () => {
+    vi.stubGlobal("navigator", { onLine: false });
+    expect(isNavigatorOffline()).toBe(true);
+
+    setLang("en");
+    const enMarkup = html(createElement(App));
+    expect(enMarkup).toContain("offline-banner");
+    expect(enMarkup).toContain(
+      "You&#x27;re offline. Changes won&#x27;t save until you&#x27;re back online.",
+    );
+
+    setLang("tl");
+    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+      "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
+    );
+
+    setLang("taglish");
+    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+      "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
+    );
+
+    vi.stubGlobal("navigator", { onLine: true });
+    expect(isNavigatorOffline()).toBe(false);
+  });
 });
 
 describe("Hulog Solo Mode", () => {
+  it("keeps hosted flexible solo goals free of partner tallies while retaining partner controls", () => {
+    setLang("en");
+    const data = v2Snapshot();
+    const goal = data.savingsGoals![0];
+    Object.assign(goal, {
+      title: "[Solo] AI subscription", goal_mode: "flexible",
+      step_amount_centavos: null, cadence_days: null, num_steps: null,
+      expected_steps_today: 0,
+    });
+    data.savingsProgress = ["a", "b"].map((member_id) => ({
+      goal_id: goal.id, member_id, expected_centavos: goal.target_amount_centavos,
+      confirmed_centavos: 0, pending_centavos: 0, confirmed_steps: 0, pending_steps: 0,
+    }));
+    const card = html(createElement(IponCard, { g: goal, data, user: "b" }));
+    expect(card).toContain("₱0, Observing");
+    expect(card).not.toContain('class="tally');
+    const detail = (user: string) => renderToStaticMarkup(createElement(
+      MemoryRouter, { initialEntries: ["/ipon/goal-1"] },
+      createElement(Routes, {}, createElement(Route, {
+        path: "/ipon/:id",
+        element: createElement(IponDetail, { data, user, run, busy: false }),
+      })),
+    ));
+    goal.status = "proposed";
+    expect(detail("b")).toContain('aria-label="Accept"');
+    expect(detail("b")).toContain('aria-label="Decline"');
+    expect(detail("a")).toContain('aria-label="Cancel proposal"');
+    goal.status = "accepted";
+    data.savingsContributions = [{
+      id: "pending-solo", goal_id: goal.id, member_id: "a", steps: null,
+      amount_centavos: 10000, note: "", status: "pending", was_confirmed: false,
+      created_by: "a", last_edited_by: null, delete_proposed_by: null,
+      created_at: data.today, confirmed_by: null, confirmed_at: null,
+      edited_at: null, deleted_at: null,
+    }];
+    expect(detail("b")).toContain(">Confirm</button>");
+    expect(detail("a")).not.toContain(">Confirm</button>");
+    expect(detail("b")).not.toContain('class="tally');
+  });
   it("enables and disables solo mode in localStorage", () => {
     const store: Record<string, string> = {};
     vi.stubGlobal("localStorage", {
@@ -703,7 +880,8 @@ describe("Hulog Solo Mode", () => {
     expect(updatedGoal?.phase).toBe("withdrawn");
   });
 
-  it("uses active.length for payout preview in Propose screen", () => {
+  it("previews one payer for local standalone rounds and two for partnered rounds", () => {
+    vi.stubGlobal("localStorage", { getItem: () => "true" });
     setLang("en");
     const soloData = v2Snapshot();
     soloData.memberships = [soloData.memberships[0]]; // 1 active member

@@ -11,8 +11,9 @@ import {
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { rpc } from "../data";
-import { addDays, money, parsePesos, shortDate } from "../helpers";
+import { addDays, isSoloGoal, money, parsePesos, shortDate } from "../helpers";
 import { t } from "../i18n";
+import { isSoloMode } from "../solo";
 
 const AMOUNTS = ["50", "100", "300"];
 const STEPS = ["10", "15", "30"];
@@ -25,11 +26,15 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
     data.memberships.filter((m) => m.status === "active").map((m) => m.user_id),
   );
   const isMultiMember = activeMemberIds.size > 1;
+  const local = isSoloMode();
   const [savingScope, setSavingScope] = useState<"shared" | "solo">(
-    isMultiMember ? "shared" : "solo",
+    local && !isMultiMember ? "solo" : "shared",
   );
-  const [mode, setMode] = useState<"matched" | "flexible">("matched");
+  const [selectedMode, setMode] = useState<"matched" | "flexible">("matched");
   const [title, setTitle] = useState("");
+  const soloSaving = savingScope === "solo" || isSoloGoal(title);
+  const hostedSolo = !local && soloSaving;
+  const mode = hostedSolo ? "flexible" : selectedMode;
   const [startDate, setStartDate] = useState(addDays(data.today, 1));
 
   // Matched fields
@@ -63,8 +68,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       const steps = Number(numSteps);
       const cadence = Number(cadenceDays);
       if (steps > 0 && cadence > 0) {
-        const multiplier =
-          savingScope === "solo" ? 1 : activeMemberIds.size || 1;
+        const multiplier = local && soloSaving ? 1 : 2;
         totalTarget = money(stepCentavos * steps * multiplier);
         computedEndDate = addDays(startDate, (steps - 1) * cadence);
       }
@@ -86,15 +90,12 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
     e.preventDefault();
     const trimmedTitle = title.trim();
     if (!trimmedTitle || !walletId) return;
+    const finalTitle = soloSaving && !isSoloGoal(trimmedTitle)
+      ? `[Solo] ${trimmedTitle}`
+      : trimmedTitle;
 
     void run(async () => {
       if (mode === "matched") {
-        const finalTitle =
-          savingScope === "solo"
-            ? /^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
-              ? trimmedTitle
-              : `[Solo] ${trimmedTitle}`
-            : trimmedTitle;
         await rpc("propose_savings_goal", {
           p_title: finalTitle,
           p_goal_mode: "matched",
@@ -103,15 +104,9 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           p_step_amount_centavos: parsePesos(stepAmount),
           p_cadence_days: Number(cadenceDays),
           p_num_steps: Number(numSteps),
-          p_is_solo: savingScope === "solo",
+          ...(local ? { p_is_solo: soloSaving } : {}),
         });
       } else {
-        const finalTitle =
-          savingScope === "solo"
-            ? /^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
-              ? trimmedTitle
-              : `[Solo] ${trimmedTitle}`
-            : trimmedTitle;
         await rpc("propose_savings_goal", {
           p_title: finalTitle,
           p_goal_mode: "flexible",
@@ -119,7 +114,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           p_start_date: startDate,
           p_target_amount_centavos: parsePesos(targetAmount),
           p_end_date: endDate,
-          p_is_solo: savingScope === "solo",
+          ...(local ? { p_is_solo: soloSaving } : {}),
         });
       }
       navigate("/");
@@ -193,6 +188,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           role="radio"
           aria-checked={mode === "matched"}
           aria-pressed={mode === "matched"}
+          disabled={hostedSolo}
           onClick={() => setMode("matched")}
         >
           {t("Matched cadence")}
@@ -204,13 +200,17 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           aria-pressed={mode === "flexible"}
           onClick={() => setMode("flexible")}
         >
-          {savingScope === "solo"
-            ? t("Flexible solo pot")
-            : t("Flexible shared pot")}
+          {soloSaving ? t("Flexible solo pot") : t("Flexible shared pot")}
         </button>
       </div>
 
-      <label style={{ display: "grid", gap: "8px" }}>
+      {hostedSolo && (
+        <p className="meta">
+          {t("Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.")}
+        </p>
+      )}
+
+      <label style={{ display: "grid", gap: "6px" }}>
         <span
           style={{
             color: "var(--soft)",

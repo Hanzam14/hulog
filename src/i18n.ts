@@ -391,6 +391,31 @@ const taglish = {
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Mode ng pot",
   "Flexible solo pot": "Flexible solo pot",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Flexible ang solo goal sa shared pot. Walang nakatakdang hulog ang partner mo; kailangan pa rin niyang tanggapin ang goal at i-confirm ang mga hulog.",
+  "You're offline. Changes won't save until you're back online.":
+    "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
+  Month: "Buwan",
+  "All months": "Lahat ng buwan",
+  "All members": "Lahat ng member",
+  "Print summary": "I-print ang summary",
+  "Total pots": "Kabuuang pot",
+  "Total saved": "Kabuuang ipon",
+  "Outstanding debt": "Natitirang utang",
+  "On track": "On track",
+  Behind: "Nahuhuli",
+  "your turn": "turn mo",
+  "{name}'s turn": "turn ni {name}",
+  "Payout today - {turn}": "Payout ngayon - {turn}",
+  "Payout tomorrow - {turn}": "Payout bukas - {turn}",
+  "Payout in {days} days - {turn}": "Payout sa {days} araw - {turn}",
+  "Payout overdue - {turn}": "Lagpas na ang payout - {turn}",
+  "Start a shared pot or paste an invite link from your partner.":
+    "Gumawa ng ipon group o mag-paste ng invite link mula sa partner mo.",
+  "No ipon goals yet. Save together for a trip or goal.":
+    "Wala pang ipon goal. Mag-ipon nang sabay para sa trip o goal.",
+  "No contributions yet. Start saving toward this goal.":
+    "Wala pang hulog. Simulan na ang pag-iipon para sa goal na 'to.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -781,6 +806,31 @@ const en = {
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Pot mode",
   "Flexible solo pot": "Flexible solo pot",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.",
+  "You're offline. Changes won't save until you're back online.":
+    "You're offline. Changes won't save until you're back online.",
+  Month: "Month",
+  "All months": "All months",
+  "All members": "All members",
+  "Print summary": "Print summary",
+  "Total pots": "Total pots",
+  "Total saved": "Total saved",
+  "Outstanding debt": "Outstanding debt",
+  "On track": "On track",
+  Behind: "Behind",
+  "your turn": "your turn",
+  "{name}'s turn": "{name}'s turn",
+  "Payout today - {turn}": "Payout today - {turn}",
+  "Payout tomorrow - {turn}": "Payout tomorrow - {turn}",
+  "Payout in {days} days - {turn}": "Payout in {days} days - {turn}",
+  "Payout overdue - {turn}": "Payout overdue - {turn}",
+  "Start a shared pot or paste an invite link from your partner.":
+    "Start a shared pot or paste an invite link from your partner.",
+  "No ipon goals yet. Save together for a trip or goal.":
+    "No savings goals yet. Save together for a trip or goal.",
+  "No contributions yet. Start saving toward this goal.":
+    "No contributions yet. Start saving toward this goal.",
 } satisfies Dictionary;
 const tl = {
   "of {amount}": "sa {amount}",
@@ -1175,6 +1225,31 @@ const tl = {
   "Standalone Solo": "Sariling Solo lang",
   "Pot mode": "Mode ng pot",
   "Flexible solo pot": "Maluwag na sariling ipon",
+  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
+    "Walang takdang hulog ang sariling ipon sa pinagsasaluhang pondo. Hindi kailangang maghulog ang partner mo; kailangan pa rin niyang tanggapin ang layunin at kumpirmahin ang mga hulog.",
+  "You're offline. Changes won't save until you're back online.":
+    "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
+  Month: "Buwan",
+  "All months": "Lahat ng buwan",
+  "All members": "Lahat ng miyembro",
+  "Print summary": "I-print ang buod",
+  "Total pots": "Kabuuang ipon sa round",
+  "Total saved": "Kabuuang naipon",
+  "Outstanding debt": "Natitirang utang",
+  "On track": "Nasa ayos",
+  Behind: "Nahuhuli",
+  "your turn": "pagkakataon mo",
+  "{name}'s turn": "pagkakataon ni {name}",
+  "Payout today - {turn}": "Kuha ng ipon ngayon - {turn}",
+  "Payout tomorrow - {turn}": "Kuha ng ipon bukas - {turn}",
+  "Payout in {days} days - {turn}": "Kuha ng ipon sa {days} araw - {turn}",
+  "Payout overdue - {turn}": "Lagpas na ang kuha ng ipon - {turn}",
+  "Start a shared pot or paste an invite link from your partner.":
+    "Gumawa ng grupo sa pag-iipon o mag-paste ng link ng imbitasyon mula sa partner mo.",
+  "No ipon goals yet. Save together for a trip or goal.":
+    "Wala pang layunin sa pag-iipon. Mag-ipon nang sabay para sa lakad o pangarap.",
+  "No contributions yet. Start saving toward this goal.":
+    "Wala pang hulog. Simulan ang pag-iipon para sa layuning ito.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
