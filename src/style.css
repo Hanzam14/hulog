@@ -2237,6 +2237,18 @@ select {
 .change-row > p {
   margin: 0 0 10px 38px;
 }
+/* Compact ledger row: who · what on the left, amount right, date below. */
+.pay-row {
+  padding: 8px 0;
+}
+.pay-row .chip {
+  padding: 1px 6px;
+  font-size: 12px;
+}
+.pay-row .actions {
+  margin: 0 0 0 -8px;
+  gap: 0;
+}
 /* Desktop stays at the tablet width instead of stretching to 1000px. */
 @media (min-width: 1100px) {
   .app {

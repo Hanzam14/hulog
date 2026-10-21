@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { rpc } from "../data";
-import { money } from "../helpers";
+import { money, shortDate } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
@@ -163,33 +163,38 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
         <h2>{t("Payments")}</h2>
         {data.payments
           .filter((p) => p.cycle_id === id)
+          .sort((a, b) => b.created_at.localeCompare(a.created_at))
           .map((p) => (
-            <article className="entry" key={p.id}>
+            <article className="entry pay-row" key={p.id}>
               <div className="row">
-                <strong>
-                  {name(data, p.member_id)} <br /> {p.days} {t("days")}
-                </strong>
-                <span className="chip">
-                  {p.deleted_at
-                    ? t("Deleted")
-                    : p.status === "pending" &&
-                        c.phase === "ended" &&
-                        !p.was_confirmed
-                      ? t("Unconfirmed — not counted")
-                      : label(p.status)}
+                <span>
+                  <b>{name(data, p.member_id)}</b> · {p.days}{" "}
+                  {t(p.days === 1 ? "day" : "days")}
                 </span>
+                <b>{money(p.amount_centavos)}</b>
               </div>
               <p>
-                {money(p.amount_centavos)} <br /> {p.created_at.slice(0, 10)}
+                {shortDate(
+                  new Date(p.created_at).toLocaleDateString("en-CA", {
+                    timeZone: "Asia/Manila",
+                  }),
+                )}
+                {p.status !== "confirmed" || p.deleted_at ? (
+                  <>
+                    {" · "}
+                    <span className="chip">
+                      {p.deleted_at
+                        ? t("Deleted")
+                        : p.status === "pending" &&
+                            c.phase === "ended" &&
+                            !p.was_confirmed
+                          ? t("Unconfirmed — not counted")
+                          : label(p.status)}
+                    </span>
+                  </>
+                ) : null}
+                {p.note && <i> · {p.note}</i>}
               </p>
-              {p.note && (
-                <p
-                  className="meta"
-                  style={{ fontStyle: "italic", marginTop: "4px" }}
-                >
-                  {p.note}
-                </p>
-              )}
               {!p.deleted_at && (
                 <>
                   <div className="actions">

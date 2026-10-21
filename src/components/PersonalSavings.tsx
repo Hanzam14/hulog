@@ -455,29 +455,36 @@ export default function PersonalSavings({
             .filter((h) => h.actor_id === props.user)
             .sort((a, b) => b.id - a.id)
             .map((change) => (
-              <div className="entry" key={change.id}>
-                <b>
-                  {
-                    props.data.personalGoals?.find(
-                      (g) => g.id === change.goal_id,
-                    )?.title
-                  }
-                </b>
+              <div className="entry pay-row" key={change.id}>
+                <div className="row">
+                  <span>
+                    <b>
+                      {
+                        props.data.personalGoals?.find(
+                          (g) => g.id === change.goal_id,
+                        )?.title
+                      }
+                    </b>{" "}
+                    · {label(change.action)}{" "}
+                    {change.entity === "personal_savings_goals"
+                      ? t("Goal")
+                      : t("Savings entry")}
+                  </span>
+                  {typeof change.after?.amount_centavos === "number" && (
+                    <b>{money(change.after.amount_centavos)}</b>
+                  )}
+                </div>
                 <p>
-                  {label(change.action)}{" "}
-                  {change.entity === "personal_savings_goals"
-                    ? t("Goal")
-                    : t("Savings entry")}
-                  <br />
                   {new Date(change.created_at).toLocaleString("en-PH", {
                     timeZone: "Asia/Manila",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
                   })}
+                  {typeof change.after?.note === "string" &&
+                    change.after.note && <i> · {change.after.note}</i>}
                 </p>
-                {typeof change.after?.amount_centavos === "number" && (
-                  <p>{money(change.after.amount_centavos)}</p>
-                )}
-                {typeof change.after?.note === "string" &&
-                  change.after.note && <p>{change.after.note}</p>}
               </div>
             ))}
         </details>
