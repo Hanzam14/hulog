@@ -165,7 +165,8 @@ export default function History({ data, user, run, busy }: ViewProps) {
                     {name(data, r.debtor_id)} → {name(data, r.creditor_id)}
                   </strong>
                   <p>
-                    {money(r.amount_centavos)} ·{" "}
+                    {money(r.amount_centavos)}
+                    <br />
                     {r.deleted_at ? t("Deleted") : label(r.status)}
                   </p>
                   {!r.deleted_at && (

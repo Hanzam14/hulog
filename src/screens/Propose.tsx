@@ -159,8 +159,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
-                  padding: "6px 14px",
+                  gap: "8px",
+                  padding: "4px 12px",
                 }}
               >
                 <Avatar data={data} id={w.holder_id} size="sm" />

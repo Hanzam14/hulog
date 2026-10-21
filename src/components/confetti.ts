@@ -83,7 +83,7 @@ export function celebratePayout(id: string, data: Snapshot) {
     ...data.memberships
       .filter((m) => m.status === "active")
       .map((m) => css.getPropertyValue(`--${tone(data, m.user_id)}`).trim()),
-    "#ffd34d",
+    css.getPropertyValue("--mango").trim(),
     css.getPropertyValue("--ink").trim(),
   ];
   let width = innerWidth,
@@ -138,7 +138,8 @@ export function celebratePayout(id: string, data: Snapshot) {
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.angle);
-      ctx.fillStyle = p.kind === "coin" ? "#ffd34d" : p.color;
+      ctx.fillStyle =
+        p.kind === "coin" ? css.getPropertyValue("--mango").trim() : p.color;
       if (p.kind === "rect")
         ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
       else {
@@ -146,7 +147,7 @@ export function celebratePayout(id: string, data: Snapshot) {
         ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
         ctx.fill();
         if (p.kind === "coin") {
-          ctx.fillStyle = "#2a2320";
+          ctx.fillStyle = css.getPropertyValue("--sticker-ink").trim();
           ctx.font = `${p.size * 0.8}px sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";

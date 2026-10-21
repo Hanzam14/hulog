@@ -462,7 +462,8 @@ describe("Hulog v2 Tracker", () => {
     const markup = html(
       createElement(Tracker, { data, user: "a", run, busy: false }),
     );
-    expect(markup).toContain("Walang utang ang bawat isa ✓");
+    expect(markup).toContain("Walang utang ang bawat isa");
+    expect(markup).not.toContain("✓");
   });
 
   it("renders 50/50 split shared expense details", () => {
@@ -614,7 +615,8 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(trackerMarkup).toContain(
       "No shared expenses yet. Log a bill or abono above.",
     );
-    expect(trackerMarkup).toContain("+ Add shared expense");
+    expect(trackerMarkup).toContain("Add shared expense");
+    expect(trackerMarkup).not.toContain("+ Add shared expense");
 
     const homeMarkup = html(
       createElement(Home, { data, user: "a", run, busy: false }),
@@ -712,7 +714,7 @@ describe("Hulog Solo Mode", () => {
       confirmed_centavos: 0, pending_centavos: 0, confirmed_steps: 0, pending_steps: 0,
     }));
     const card = html(createElement(IponCard, { g: goal, data, user: "b" }));
-    expect(card).toContain("₱0 · Observing");
+    expect(card).toContain("₱0, Observing");
     expect(card).not.toContain('class="tally');
     const detail = (user: string) => renderToStaticMarkup(createElement(
       MemoryRouter, { initialEntries: ["/ipon/goal-1"] },
@@ -776,10 +778,11 @@ describe("Hulog Solo Mode", () => {
     expect(snapshot.cycles[0].pot_centavos).toBe(30000);
 
     // Pre-seeded active Solo Ipon Goal: [Solo] AI Subscription (₱600 / ₱1,200)
-    const soloGoal = snapshot.savingsGoals?.find((g) => g.title === "[Solo] AI Subscription");
+    const soloGoal = snapshot.personalGoals?.find((g) => g.title === "AI Subscription");
     expect(soloGoal).toBeDefined();
     expect(soloGoal?.target_amount_centavos).toBe(120000);
-    expect(soloGoal?.saved_centavos).toBe(60000);
+    expect(snapshot.personalEntries?.filter((e) => e.goal_id === soloGoal?.id && !e.deleted_at).reduce((sum, e) => sum + (e.kind === "deposit" ? e.amount_centavos : -e.amount_centavos), 0)).toBe(60000);
+    expect(soloGoal?.visibility).toBe("shared");
   });
 
   it("can switch to standalone solo mode with 1 member", async () => {
@@ -836,48 +839,20 @@ describe("Hulog Solo Mode", () => {
     expect(cycle?.pot_centavos).toBeDefined();
   });
 
-  it("proposes ipon goal and auto-confirms with 1x matched pool when solo and auto-confirms contributions and withdrawals", async () => {
+  it("records personal goals, deposits and withdrawals without partner confirmation", async () => {
     const store: Record<string, string> = {};
-    vi.stubGlobal("localStorage", {
-      getItem: (k: string) => store[k] ?? null,
-      setItem: (k: string, v: string) => {
-        store[k] = v;
-      },
-    });
-
-    const goalId = await soloRpc("propose_savings_goal", {
-      p_title: "[Solo] Personal Goal",
-      p_goal_mode: "matched",
-      p_start_date: "2026-10-21",
-      p_step_amount_centavos: 10000,
-      p_cadence_days: 1,
-      p_num_steps: 10,
-    });
-
-    const snapshot = await loadSoloSnapshot();
-    const goal = snapshot.savingsGoals?.find((g) => g.id === goalId);
-    expect(goal).toBeDefined();
-    expect(goal?.status).toBe("accepted");
-    // 1x pool: 10000 * 10 * 1 = 100000 centavos
-    expect(goal?.target_amount_centavos).toBe(100000);
-
-    const contribId = await soloRpc("record_savings_contribution", {
-      p_goal_id: goalId,
-      p_steps: 1,
-      p_amount_centavos: 10000,
-      p_note: "first step",
-    });
-
-    const afterContrib = await loadSoloSnapshot();
-    const contrib = afterContrib.savingsContributions?.find((c) => c.id === contribId);
-    expect(contrib?.status).toBe("confirmed");
-    expect(contrib?.was_confirmed).toBe(true);
-
-    await soloRpc("propose_withdraw_goal", { p_goal_id: goalId });
-    const afterWithdraw = await loadSoloSnapshot();
-    const updatedGoal = afterWithdraw.savingsGoals?.find((g) => g.id === goalId);
-    expect(updatedGoal?.withdrawn_at).toBeDefined();
-    expect(updatedGoal?.phase).toBe("withdrawn");
+    vi.stubGlobal("localStorage", { getItem: (k: string) => store[k] ?? null, setItem: (k: string,v: string) => { store[k] = v; } });
+    const goalId = await soloRpc("create_personal_goal", { p_title: "Personal Goal", p_target_amount_centavos: 100000 });
+    const goal = (await loadSoloSnapshot()).personalGoals?.find((g) => g.id === goalId);
+    expect(goal).toMatchObject({ title: "Personal Goal", visibility: "private", owner_id: "solo-user", target_amount_centavos: 100000 });
+    const depositId = await soloRpc("record_personal_entry", { p_goal_id: goalId, p_kind: "deposit", p_amount_centavos: 10000, p_note: "first deposit" });
+    const deposit = (await loadSoloSnapshot()).personalEntries?.find((e) => e.id === depositId);
+    expect(deposit).toMatchObject({ kind: "deposit", amount_centavos: 10000, note: "first deposit", deleted_at: null });
+    const withdrawalId = await soloRpc("record_personal_entry", { p_goal_id: goalId, p_kind: "withdrawal", p_amount_centavos: 2000 });
+    const saved = await loadSoloSnapshot();
+    expect(saved.personalEntries?.find((e) => e.id === withdrawalId)).toMatchObject({ kind: "withdrawal", amount_centavos: 2000 });
+    expect(saved.personalHistory?.filter((h) => h.goal_id === goalId)).toHaveLength(3);
+    expect(saved.personalEntries?.filter((e) => e.goal_id === goalId).reduce((sum,e) => sum + (e.kind === "deposit" ? e.amount_centavos : -e.amount_centavos),0)).toBe(8000);
   });
 
   it("previews one payer for local standalone rounds and two for partnered rounds", () => {

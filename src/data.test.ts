@@ -41,9 +41,9 @@ describe("local solo dispatch", () => {
     });
     const { load, rpc } = await loadData();
     const demo = await load();
-    expect(
-      demo.savingsGoals?.some((g) => g.title === "[Solo] AI Subscription"),
-    ).toBe(true);
+    expect(demo.personalGoals?.some((g) => g.title === "AI Subscription")).toBe(
+      true,
+    );
     const cycleId = await rpc("propose_cycle", {
       p_daily_amount_centavos: 5000,
       p_num_days: 15,
@@ -64,7 +64,7 @@ describe("local solo dispatch", () => {
       is_solo: true,
       target_centavos: 75000,
     });
-    expect(saved.savingsGoals?.find((g) => g.id === goalId)).toMatchObject({
+    expect(saved.personalGoals?.find((g) => g.id === goalId)).toMatchObject({
       target_amount_centavos: 100000,
     });
     expect(
@@ -78,6 +78,24 @@ describe("local solo dispatch", () => {
 });
 
 describe("optionalRows", () => {
+  it("loads synced personal tables and sends personal writes to Supabase outside solo mode", async () => {
+    vi.stubGlobal("localStorage", { getItem: () => null });
+    hosted.rpc.mockResolvedValue({ data: "2026-10-21", error: null });
+    const { load, rpc } = await loadData();
+    const snapshot = await load();
+    expect(hosted.from).toHaveBeenCalledWith("personal_savings_goals");
+    expect(hosted.from).toHaveBeenCalledWith("personal_savings_entries");
+    expect(hosted.from).toHaveBeenCalledWith("personal_savings_history");
+    expect(snapshot.personalGoals).toEqual([]);
+    await rpc("create_personal_goal", {
+      p_title: "Camera",
+      p_target_amount_centavos: 10000,
+    });
+    expect(hosted.rpc).toHaveBeenLastCalledWith("create_personal_goal", {
+      p_title: "Camera",
+      p_target_amount_centavos: 10000,
+    });
+  });
   it("returns rows when the query succeeds", async () => {
     const { optionalRows } = await loadData();
     result.data = [{ id: "w1" }];

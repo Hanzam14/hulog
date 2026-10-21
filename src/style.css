@@ -17,9 +17,8 @@
   color: var(--ink);
   border: 2px solid var(--line);
   border-radius: 12px;
-  padding: 12px 18px;
-  text-align: center;
-  overflow-wrap: anywhere;
+  padding: 12px 16px;
+  white-space: nowrap;
   z-index: 100;
   pointer-events: none;
 }
@@ -41,7 +40,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto 44px;
   gap: 8px;
-  padding: 10px;
+  padding: 8px;
   align-items: center;
 }
 .update-banner > .round {
@@ -56,30 +55,46 @@
 }
 /* A shared sticker planner: dotted paper, inked outlines, one color each. */
 :root {
-  --paper: #fff6d8;
-  --dots: #e8d9a6;
-  --ink: #2a2320;
-  --soft: #6e6152;
+  --paper: #f5efff;
+  --dots: #e2d6fa;
+  --ink: #2b2140;
+  --soft: #6b5e85;
   --card: #ffffff;
+  --card-tint: #fbf8ff;
   --pink: #ff7aa2;
   --pink-deep: #c2386a;
-  --blue: #6ec6ff;
-  --blue-deep: #1f6fa8;
-  --green: #7ed99a;
-  --green-deep: #2b8046;
-  --orange: #ffb36b;
-  --orange-deep: #ad5b19;
+  --blue: #5dbbff;
+  --blue-deep: #1c6ba5;
+  --mango: #ffc94d;
+  --mango-deep: #a86a00;
+  --leaf: #3dbe84;
+  --leaf-deep: #1f7a50;
+  --green: #3dbe84;
+  --green-deep: #1f7a50;
+  --orange: #ffc94d;
+  --orange-deep: #965c00;
   --purple: #b79cff;
   --purple-deep: #6a4bc4;
-  --line: #2a2320;
-  --sticker-ink: #2a2320;
-  --highlight: #fff1b8;
-  --hover-card: #fff9e8;
-  --danger: #b3261e;
-  --tan: #c9b88a;
+  --danger: #c0362c;
+  --sticker-ink: #2b2140;
+  --control-border: #887699;
+  --line: color-mix(in srgb, var(--ink) 18%, transparent);
+  --card-border: var(--line);
+  --highlight-border: var(--line);
+  --highlight: var(--card-tint);
+  --hover-card: var(--card-tint);
+  --inset: var(--card-tint);
+  --nav-surface: var(--card);
+  --action-pink: var(--pink);
+  --tan: color-mix(in srgb, var(--soft) 35%, transparent);
+  --success-tint: color-mix(in srgb, var(--leaf) 12%, var(--card));
+  --danger-tint: color-mix(in srgb, var(--danger) 10%, var(--card));
+  --brand-soft: var(--card-tint);
+  --brand: var(--pink-deep);
   color-scheme: light;
   --display: Fredoka, Nunito, system-ui, sans-serif;
   font-family: var(--font-sans);
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
   background: var(--paper);
@@ -108,17 +123,17 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 4px;
+  padding: 16px 16px 4px;
 }
 .brand {
   color: var(--ink);
   font-family: var(--display);
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 600;
   text-decoration: none;
 }
 .dot {
-  color: var(--pink);
+  color: var(--pink-deep);
 }
 h1,
 h2,
@@ -127,7 +142,7 @@ h3 {
   font-weight: 600;
 }
 h1 {
-  font-size: 30px;
+  font-size: 26px;
   line-height: 1.15;
   margin: 8px 0 0;
 }
@@ -138,23 +153,23 @@ h2 {
 }
 h3 {
   font-size: 17px;
-  margin: 14px 0 6px;
+  margin: 12px 0 4px;
 }
 p {
-  margin: 6px 0 14px;
+  margin: 4px 0 12px;
 }
 main {
   flex: 1;
-  padding: 8px 20px 28px;
+  padding: 8px 16px 24px;
 }
 /* Stickers: white, inked edge, hard offset shadow. */
 section {
-  margin: 18px 0;
-  padding: 18px;
+  margin: 16px 0;
+  padding: 16px;
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 18px;
-  box-shadow: 3px 3px 0 var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
 }
 nav {
   position: sticky;
@@ -163,9 +178,9 @@ nav {
   display: flex;
   justify-content: space-around;
   gap: 4px;
-  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
   background: var(--card);
-  border-top: 2px solid var(--ink);
+  border-top: 1.5px solid var(--line);
 }
 nav a {
   position: relative;
@@ -177,7 +192,7 @@ nav a {
   font-family: var(--display);
   font-size: 15px;
   font-weight: 500;
-  padding: 6px 18px;
+  padding: 4px 16px;
   border: 2px solid transparent;
   border-radius: 999px;
   text-decoration: none;
@@ -192,13 +207,13 @@ button,
   min-height: 44px;
   background: var(--pink);
   color: var(--sticker-ink);
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 14px;
-  box-shadow: 3px 3px 0 var(--line);
+  box-shadow: none;
   font-family: var(--display);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  padding: 10px 18px;
+  padding: 8px 16px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -212,12 +227,12 @@ button,
 }
 button:hover:not(:disabled),
 .button:hover {
-  background: #ff8cb0;
+  background: var(--pink);
 }
 button:active:not(:disabled),
 .button:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 var(--ink);
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 button:disabled {
   opacity: 0.5;
@@ -232,12 +247,13 @@ button:disabled {
 }
 .quiet {
   min-height: 44px;
+  min-height: 44px;
   background: transparent;
   border-color: transparent;
   box-shadow: none;
   color: var(--ink);
-  font-size: 14px;
-  padding: 8px 10px;
+  font-size: 13px;
+  padding: 4px 8px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -261,13 +277,13 @@ a:hover {
 }
 form {
   display: grid;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 12px;
 }
 label {
   display: grid;
   gap: 4px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
 }
 input,
@@ -276,12 +292,12 @@ select {
   min-width: 0;
   min-height: 44px;
   background: var(--card);
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   color: var(--ink);
   font: inherit;
-  font-size: 16px;
+  font-size: 15px;
 }
 input:focus,
 select:focus {
@@ -312,13 +328,13 @@ select:focus {
 /* The pot is the round's hero card. */
 .pot {
   display: grid;
-  gap: 14px;
-  margin: 4px 0 6px;
-  padding: 20px;
+  gap: 12px;
+  margin: 4px 0 4px;
+  padding: 16px;
   background: var(--highlight);
-  border: 2px solid var(--ink);
-  border-radius: 24px;
-  box-shadow: 4px 4px 0 var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
   color: var(--ink);
   font-weight: inherit;
   text-decoration: none;
@@ -336,7 +352,7 @@ section .pot {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px 12px;
+  gap: 4px 12px;
   min-width: 0;
 }
 .pot-top {
@@ -348,7 +364,7 @@ section .pot {
 }
 .pot strong {
   font-family: var(--display);
-  font-size: clamp(32px, 8vw, 48px);
+  font-size: 34px;
   font-weight: 600;
   line-height: 1.05;
 }
@@ -358,11 +374,11 @@ section .pot {
   color: var(--soft);
 }
 .pot-target {
-  font-size: 14px;
+  font-size: 13px;
 }
 .pot-progress {
   height: 14px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 999px;
   overflow: hidden;
   background: var(--card);
@@ -373,7 +389,7 @@ section .pot {
   background: var(--pink);
 }
 .pot-receiver {
-  font-size: 14px;
+  font-size: 13px;
 }
 .pot-receiver b {
   color: var(--ink);
@@ -382,7 +398,7 @@ section .pot {
   justify-content: space-between;
 }
 .pot small {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 section:has(.pot) {
@@ -393,8 +409,8 @@ section:has(.pot) {
 }
 .members {
   display: grid;
-  gap: 14px;
-  padding: 18px 0 4px;
+  gap: 12px;
+  padding: 16px 0 4px;
 }
 .members strong {
   font-family: var(--display);
@@ -405,7 +421,7 @@ section:has(.pot) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
   gap: 4px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 .tally span {
   aspect-ratio: 1;
@@ -413,7 +429,7 @@ section:has(.pot) {
   border: 1.5px dashed var(--tan);
 }
 .tally .paid {
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   background: var(--tone);
 }
 .tally .pending {
@@ -426,12 +442,12 @@ section:has(.pot) {
 .list-row p {
   color: var(--soft);
   font-size: 13px;
-  margin: 2px 0 0;
+  margin: 4px 0 0;
 }
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   margin: 12px 0;
 }
 .entry,
@@ -444,9 +460,9 @@ section:has(.pot) {
   border-bottom: 0;
 }
 .chip {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
-  padding: 2px 10px;
+  padding: 4px 8px;
   border: 1.5px solid var(--ink);
   border-radius: 999px;
   background: var(--highlight);
@@ -457,12 +473,12 @@ section:has(.pot) {
   min-width: 20px;
   height: 20px;
   margin-left: 4px;
-  padding: 0 5px;
+  padding: 0 4px;
   background: var(--blue);
   border: 1.5px solid var(--ink);
   border-radius: 999px;
   color: var(--sticker-ink);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
 }
 .notice {
@@ -472,39 +488,38 @@ section:has(.pot) {
   align-items: center;
   justify-content: space-between;
   gap: 4px 12px;
-  margin: 8px 20px 0;
-  padding: 10px 14px;
-  background: #e2f6c8;
-  border: 2px solid var(--ink);
+  margin: 8px 16px 0;
+  padding: 8px 12px;
+  background: var(--success-tint);
+  border: 1.5px solid var(--line);
   border-radius: 14px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
 .error {
-  background: #ffd9d4;
+  background: var(--danger-tint);
 }
 .notice .quiet {
   color: var(--sticker-ink);
 }
 .welcome h1 {
-  font-size: clamp(34px, 10vw, 48px);
+  font-size: 34px;
   line-height: 1.05;
-  margin: 18px 0 12px;
+  margin: 16px 0 12px;
 }
 .welcome > p {
   color: var(--soft);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
 }
 .welcome figure {
-  margin: 22px 0;
+  margin: 24px 0;
   padding: 16px;
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 18px;
-  box-shadow: 3px 3px 0 var(--line);
-  transform: rotate(-1.2deg);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
 }
 .welcome figure strong {
   font-family: var(--display);
@@ -515,34 +530,34 @@ section:has(.pot) {
 }
 .welcome figcaption {
   color: var(--soft);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 .welcome button {
   width: 100%;
-  padding: 13px;
-  font-size: 18px;
+  padding: 12px;
+  font-size: 17px;
 }
 .invite {
   display: grid;
-  gap: 14px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 16px;
 }
 .invite img {
   max-width: 100%;
   justify-self: center;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 14px;
 }
 .muted,
 footer {
   color: var(--soft);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 footer {
   text-align: center;
-  padding: 18px 20px;
+  padding: 16px 16px;
 }
 details summary {
   cursor: pointer;
@@ -551,11 +566,11 @@ details summary {
 pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  font-size: 12px;
+  font-size: 13px;
   background: var(--hover-card);
   border: 1.5px dashed var(--tan);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 8px 12px;
 }
 progress {
   width: 100%;
@@ -588,9 +603,9 @@ button svg,
   justify-content: center;
   gap: 8px;
   width: 100%;
-  margin: 18px 0 8px;
-  padding: 14px;
-  font-size: 22px;
+  margin: 16px 0 8px;
+  padding: 12px;
+  font-size: 20px;
 }
 .round {
   display: grid;
@@ -602,7 +617,7 @@ button svg,
   border-radius: 50%;
 }
 .round.ok {
-  background: #9be08a;
+  background: var(--leaf);
 }
 .round.no {
   background: var(--card);
@@ -613,7 +628,7 @@ button svg,
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 50%;
   background: var(--card);
   color: var(--ink);
@@ -625,10 +640,10 @@ button svg,
   flex: none;
   width: 40px;
   height: 40px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 50%;
   font-family: var(--display);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   line-height: 1;
   background: var(--tone);
@@ -650,7 +665,7 @@ button svg,
   width: 72px;
   height: 72px;
   font-size: 34px;
-  box-shadow: 3px 3px 0 var(--line);
+  box-shadow: none;
 }
 .member {
   display: grid;
@@ -664,7 +679,7 @@ button svg,
 .empty {
   display: grid;
   justify-items: center;
-  padding: 40px 12px 8px;
+  padding: 32px 12px 8px;
   color: var(--pink-deep);
   text-align: center;
 }
@@ -676,14 +691,14 @@ button svg,
 .confirm-list {
   display: grid;
   gap: 12px;
-  margin: 18px 0;
+  margin: 16px 0;
 }
 .sticker {
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 18px;
-  box-shadow: 3px 3px 0 var(--line);
-  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
+  padding: 12px 12px;
 }
 .confirm {
   display: flex;
@@ -702,20 +717,20 @@ button svg,
 }
 .confirm small {
   color: var(--soft);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
 .tally.mini {
   grid-template-columns: repeat(auto-fill, 12px);
-  gap: 3px;
-  margin-top: 2px;
+  gap: 4px;
+  margin-top: 4px;
 }
 /* Record: big avatar, a stepper, the stickers, one big button. */
 .record {
   display: grid;
   justify-items: center;
-  gap: 18px;
+  gap: 16px;
   padding-top: 4px;
 }
 .record .back {
@@ -729,7 +744,7 @@ button svg,
 .stepper output {
   min-width: 2ch;
   font-family: var(--display);
-  font-size: 64px;
+  font-size: 34px;
   font-weight: 600;
   line-height: 1;
   text-align: center;
@@ -738,12 +753,12 @@ button svg,
   width: 100%;
   grid-template-columns: repeat(auto-fill, 26px);
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   min-height: 26px;
 }
 .amount {
   font-family: var(--display);
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 600;
   line-height: 1;
 }
@@ -752,7 +767,7 @@ button svg,
 }
 /* Propose: tap-to-pick chips instead of a long form. */
 .propose {
-  gap: 18px;
+  gap: 16px;
   margin: 0;
 }
 .propose fieldset {
@@ -764,7 +779,7 @@ button svg,
 .propose legend {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin-bottom: 8px;
   color: var(--soft);
   font-family: var(--display);
@@ -773,7 +788,7 @@ button svg,
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 .chips input {
@@ -797,12 +812,12 @@ button svg,
   display: grid;
   justify-items: center;
   gap: 4px;
-  font-size: 14px;
-  padding: 6px 10px;
+  font-size: 13px;
+  padding: 4px 8px;
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  border-radius: 18px;
+  border-radius: 14px;
 }
 .who:hover:not(:disabled) {
   background: transparent;
@@ -818,7 +833,7 @@ button svg,
 .start {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: var(--soft);
   font-family: var(--display);
   font-weight: 500;
@@ -831,23 +846,23 @@ button svg,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 10px;
+  gap: 8px;
+  padding: 8px;
   background: var(--card);
   border: 2px dashed var(--ink);
-  border-radius: 18px;
+  border-radius: 14px;
 }
 .preview-pot strong {
   font-family: var(--display);
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 600;
 }
 .answer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  margin: 18px 0;
+  gap: 16px;
+  margin: 16px 0;
 }
 .answer .round {
   width: 60px;
@@ -863,18 +878,17 @@ button svg,
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 6px;
-  margin: 20px 0;
-  padding: 24px 16px 20px;
+  gap: 4px;
+  margin: 16px 0;
+  padding: 24px 16px 16px;
   background: var(--highlight);
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 22px;
-  box-shadow: 3px 3px 0 var(--line);
-  transform: rotate(1deg);
+  box-shadow: none;
 }
 .celebrate strong {
   font-family: var(--display);
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 600;
   line-height: 1.1;
 }
@@ -885,7 +899,7 @@ button svg,
 .celebrate .s1 {
   top: 14px;
   left: 18%;
-  color: #f5b301;
+  color: var(--mango-deep);
 }
 .celebrate .s2 {
   top: 34px;
@@ -903,13 +917,13 @@ button svg,
 .duo {
   display: flex;
   justify-content: center;
-  gap: 28px;
-  margin: 18px 0;
+  gap: 24px;
+  margin: 16px 0;
 }
 .duo figure {
   display: grid;
   justify-items: center;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
 }
 .duo figcaption {
@@ -919,8 +933,8 @@ button svg,
 .pot-place {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 14px 0;
+  gap: 8px;
+  margin: 12px 0;
 }
 .pot-place .round {
   width: 44px;
@@ -934,23 +948,22 @@ button svg,
   height: 220px;
   padding: 8px;
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 18px;
-  box-shadow: 3px 3px 0 var(--line);
-  transform: rotate(-2deg);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
 }
 /* Where the pot is kept: one small chip under everything. */
 .place {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   width: fit-content;
-  margin: 22px auto 0;
-  padding: 6px 14px;
+  margin: 24px auto 0;
+  padding: 4px 12px;
   background: var(--card);
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 999px;
-  box-shadow: 2px 2px 0 var(--line);
+  box-shadow: none;
   font-family: var(--display);
   font-size: 15px;
   font-weight: 500;
@@ -960,7 +973,7 @@ button svg,
 }
 .notify {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   margin-top: 24px;
 }
 .notify h2,
@@ -972,13 +985,13 @@ button svg,
 }
 .notify button {
   width: 100%;
-  padding: 12px 18px;
+  padding: 12px 16px;
 }
 .export {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 18px auto 0;
+  gap: 4px;
+  margin: 16px auto 0;
 }
 @media (prefers-reduced-motion: reduce) {
   button,
@@ -987,30 +1000,31 @@ button svg,
   }
 }
 
-/* Warm night paper; member sticker fills keep their original colors. */
+/* Ube night: the same sheets and member colors after dark. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #17130f;
-  --dots: rgba(58, 49, 41, 0.5);
-  --ink: #f4ead9;
-  --soft: #b3a58f;
-  --card: #26201a;
-  --inset: #1d1814;
-  --card-border: #4a3f34;
-  --control-border: #806e56;
-  --nav-surface: #2c251e;
-  --action-pink: #ff8db0;
-  --tan: #7a6a4c;
-  --line: rgba(0, 0, 0, 0.55);
-  --highlight: #3a2f1e;
-  --highlight-border: #6b5530;
-  --hover-card: #382e24;
-  --danger: #ffaaa1;
+  --paper: #1b1526;
+  --dots: #2c2340;
+  --card: #251d35;
+  --card-tint: #2d2440;
+  --ink: #f4eeff;
+  --soft: #b9acd6;
+  --pink: #ff8db0;
+  --blue: #7dc8ff;
+  --mango: #ffd56d;
+  --leaf: #64d59e;
+  --green: #64d59e;
+  --orange: #ffd56d;
+  --purple: #c5aeff;
   --pink-deep: #ff9bbc;
   --blue-deep: #8bd5ff;
-  --green-deep: #9ae4ae;
-  --orange-deep: #ffc693;
+  --mango-deep: #ffd56d;
+  --leaf-deep: #91e1b7;
+  --green-deep: #91e1b7;
+  --orange-deep: #ffd56d;
   --purple-deep: #d0bdff;
+  --danger: #ffaaa1;
+  --control-border: #9582ad;
 }
 .pink {
   --tone: var(--pink);
@@ -1054,7 +1068,7 @@ button svg,
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  gap: 10px;
+  gap: 8px;
 }
 .profile-editor fieldset {
   border: 0;
@@ -1064,8 +1078,8 @@ button svg,
 }
 .profile-editor legend {
   font-weight: 800;
-  font-size: 14px;
-  margin-bottom: 6px;
+  font-size: 13px;
+  margin-bottom: 4px;
 }
 .profile-preview {
   display: grid;
@@ -1079,21 +1093,21 @@ button svg,
   display: flex;
   gap: 4px;
   padding: 4px;
-  border: 2px solid var(--ink);
-  border-radius: 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
   background: var(--card);
 }
 .segmented button {
   flex: 1;
   min-width: 0;
   min-height: 44px;
-  padding: 8px 6px;
+  padding: 8px 4px;
   color: var(--ink);
   background: transparent;
   border-color: transparent;
   box-shadow: none;
   font-size: 15px;
-  border-radius: 10px;
+  border-radius: 14px;
 }
 .segmented button:hover:not(:disabled) {
   background: var(--hover-card);
@@ -1110,7 +1124,7 @@ button svg,
 }
 .emoji-grid button {
   min-height: 48px;
-  padding: 6px;
+  padding: 4px;
   font-size: 26px;
   background: var(--card);
 }
@@ -1148,20 +1162,17 @@ button svg,
   height: 26px;
   line-height: 1;
   color: var(--sticker-ink);
-  font-size: 24px;
+  font-size: 26px;
   border: 2px solid var(--line);
   border-radius: 50%;
-  background: var(
-    --tone,
-    linear-gradient(90deg, var(--pink) 50%, var(--blue) 50%)
-  );
+  background: var(--tone, var(--pink));
 }
 .appearance h2 {
   margin-bottom: 12px;
 }
 .install-hint {
   text-align: center;
-  margin: 18px 0;
+  margin: 16px 0;
 }
 
 @media (min-width: 768px) {
@@ -1175,14 +1186,14 @@ button svg,
     width: min(440px, calc(100% - 40px));
     margin: 16px auto 0;
     padding: 8px 12px;
-    border: 2px solid var(--ink);
+    border: 1.5px solid var(--line);
     border-radius: 999px;
-    box-shadow: 3px 3px 0 var(--line);
+    box-shadow: none;
   }
   .settings-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    gap: 16px;
     align-items: start;
   }
   .settings-grid > section,
@@ -1211,87 +1222,6 @@ button svg,
   font-weight: 800;
 }
 
-/* Dark-only surface and edge hierarchy; light stays on the original rules. */
-:root[data-theme="dark"] :is(
-  section,
-  .sticker,
-  .place,
-  .welcome figure,
-  .invite .qr,
-  .invite img,
-  .celebration-toast,
-  .preview-pot
-) {
-  border-color: var(--card-border);
-}
-:root[data-theme="dark"] :is(.pot, .celebrate, .chip) {
-  border-color: var(--highlight-border);
-}
-:root[data-theme="dark"] .celebrate.done {
-  border-color: var(--card-border);
-}
-:root[data-theme="dark"] .pot {
-  box-shadow: 3px 3px 0 var(--line);
-}
-:root[data-theme="dark"] :where(button, .button, input, select, .segmented, .back, .pot-progress):not(:where(.quiet, .who, .avatar-edit, .segmented button)) {
-  border-color: var(--control-border);
-}
-:root[data-theme="dark"] :is(input, select, .segmented, .pot-progress) {
-  background: var(--inset);
-}
-:root[data-theme="dark"] :where(button, .button):not(:where(.secondary, .quiet, .pick, .who, .avatar-edit, .color-choice, .emoji-grid button, .segmented button, .round.ok, .round.no)) {
-  background: var(--action-pink);
-  border-color: var(--sticker-ink);
-}
-:root[data-theme="dark"] :where(button, .button):not(:where(.secondary, .quiet, .pick, .who, .avatar-edit, .color-choice, .emoji-grid button, .segmented button, .round.ok, .round.no)):hover:not(:disabled) {
-  background: #ffa0bd;
-}
-:root[data-theme="dark"] :is(nav a.active, .segmented button[aria-pressed="true"], .emoji-grid button[aria-pressed="true"]) {
-  background: var(--action-pink);
-  border-color: var(--sticker-ink);
-}
-:root[data-theme="dark"] .pot-progress > span {
-  background: var(--action-pink);
-}
-:root[data-theme="dark"] :is(.avatar, .badge, .tally .paid) {
-  border-color: var(--sticker-ink);
-}
-:root[data-theme="dark"] nav {
-  background: var(--nav-surface);
-  border-color: var(--card-border);
-  box-shadow: 3px 3px 0 var(--line);
-  z-index: 10;
-}
-@supports (backdrop-filter: blur(10px)) {
-  :root[data-theme="dark"] nav {
-    background: rgba(44, 37, 30, 0.96);
-    backdrop-filter: blur(10px);
-  }
-}
-:root[data-theme="dark"] :is(.round.ok, .notice) {
-  background: #263326;
-  color: var(--green-deep);
-  border-color: var(--control-border);
-}
-:root[data-theme="dark"] :is(.round.no, .notice.error) {
-  background: #3b2523;
-  color: var(--danger);
-  border-color: var(--control-border);
-}
-:root[data-theme="dark"] .notice .quiet {
-  color: inherit;
-}
-:root[data-theme="dark"] .round.ok:hover:not(:disabled) {
-  background: #324332;
-}
-:root[data-theme="dark"] .round.no:hover:not(:disabled) {
-  background: #4b302c;
-}
-:root[data-theme="dark"] :is(input:focus, select:focus, :focus-visible) {
-  outline: 2px solid var(--action-pink);
-  outline-offset: 2px;
-}
-
 /* Hulog v2 — Couples Financial Companion (Tactile sticker-notebook styling) */
 .header-actions {
   display: flex;
@@ -1304,13 +1234,15 @@ button svg,
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 50%;
   background: var(--card);
   color: var(--ink);
   text-decoration: none;
-  box-shadow: 2px 2px 0 var(--line);
-  transition: transform 0.08s, box-shadow 0.08s;
+  box-shadow: none;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
   flex-shrink: 0;
 }
 .header-bell:hover {
@@ -1329,10 +1261,10 @@ button svg,
 }
 .custody-ledger {
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 20px;
-  padding: 16px 18px;
-  box-shadow: 3px 3px 0 var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 16px;
+  box-shadow: none;
   margin: 16px 0;
 }
 .custody-header {
@@ -1350,7 +1282,7 @@ button svg,
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
+  padding: 4px 8px;
   background: var(--highlight);
   border-radius: 999px;
   border: 1.5px solid var(--ink);
@@ -1363,7 +1295,7 @@ button svg,
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   font-size: 13px;
   color: var(--soft);
 }
@@ -1372,8 +1304,8 @@ button svg,
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
-  background: rgba(0, 0, 0, 0.04);
+  padding: 4px 8px;
+  background: var(--card-tint);
   border: 1px dashed var(--tan);
   border-radius: 999px;
   font-weight: 600;
@@ -1382,11 +1314,11 @@ button svg,
   overflow-wrap: anywhere;
 }
 .ipon-card {
-  background: #e8f7ee;
+  background: var(--card-tint);
   border-color: var(--ink);
 }
 .ipon-card:hover {
-  background: #def3e6;
+  background: var(--card-tint);
   color: var(--ink);
 }
 .ipon-card .pig {
@@ -1397,8 +1329,8 @@ button svg,
 }
 .ipon-home-section {
   display: grid;
-  gap: 14px;
-  margin: 18px 0;
+  gap: 12px;
+  margin: 16px 0;
 }
 .ipon-home-item {
   display: grid;
@@ -1409,18 +1341,18 @@ button svg,
 }
 .abono-hero {
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 20px;
-  padding: 18px;
-  box-shadow: 3px 3px 0 var(--line);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: none;
   margin: 16px 0;
 }
 .abono-form-card {
   background: var(--card);
-  border: 2px solid var(--ink);
-  border-radius: 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
   padding: 16px;
-  box-shadow: 3px 3px 0 var(--line);
+  box-shadow: none;
   margin: 16px 0;
 }
 .abono-entry {
@@ -1432,7 +1364,7 @@ button svg,
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 .abono-entry .row > div {
   min-width: 0;
@@ -1440,50 +1372,368 @@ button svg,
 }
 .abono-entry .meta {
   color: var(--soft);
-  font-size: 12px;
-  margin-top: 2px;
+  font-size: 13px;
+  margin-top: 4px;
 }
 .wallets-section {
   display: grid;
-  gap: 14px;
-  margin: 18px 0;
+  gap: 12px;
+  margin: 16px 0;
 }
 .wallets-list {
   display: grid;
   gap: 8px;
 }
 
-/* Dark mode overrides for v2 */
-:root[data-theme="dark"] :is(.custody-ledger, .abono-hero, .abono-form-card, .header-bell) {
-  border-color: var(--card-border);
+/* One sheet hierarchy, shared by every screen. */
+header {
+  padding: 16px 16px 4px;
+}
+main {
+  min-width: 0;
+  padding: 8px 16px 32px;
+}
+.welcome {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+}
+section,
+.custody-ledger,
+.abono-hero,
+.abono-form-card,
+.welcome figure,
+.pot,
+.celebrate {
+  border-radius: 22px;
+}
+section {
+  padding: 16px;
+  margin-block: 24px;
+}
+.welcome figure {
+  padding: 16px;
+}
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+}
+h1 {
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+.brand,
+.welcome h1 {
+  font-size: 34px;
+}
+.welcome h1 {
+  margin-top: 24px;
+  line-height: 1.15;
+}
+.welcome > p {
+  font-size: 15px;
+}
+small,
+.chip,
+.badge,
+.muted,
+footer {
+  font-size: 13px;
+}
+input,
+select {
+  min-height: 44px;
+  border-color: var(--control-border);
+}
+button,
+.button {
+  min-height: 44px;
+  min-width: 44px;
+  border-color: var(--sticker-ink);
+}
+button:not(
+  .secondary,
+  .quiet,
+  .pick,
+  .who,
+  .avatar-edit,
+  .color-choice,
+  .round,
+  .segmented button,
+  .emoji-grid button
+),
+.button:not(.secondary, .quiet) {
+  box-shadow: 2px 3px 0 var(--ink);
+}
+.secondary,
+.pick,
+.color-choice,
+.emoji-grid button {
+  border-color: var(--control-border);
+}
+.secondary:active,
+.quiet:active,
+.pick:active,
+.round:active {
+  transform: none;
+}
+.big {
+  font-size: 20px;
+}
+.welcome button {
+  font-size: 17px;
+}
+.welcome button + button {
+  margin-top: 12px;
+}
+.settled-icon {
+  display: block;
+  margin: 0 auto 8px;
+  color: var(--leaf-deep);
+}
+.who:not(.on) .avatar {
+  opacity: 1;
+  border-style: dashed;
+}
+.back,
+.header-bell {
+  width: 44px;
+  height: 44px;
+  border-color: var(--control-border);
+}
+nav {
+  z-index: 10;
+  gap: 4px;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+}
+nav a {
+  min-height: 44px;
+  min-width: 0;
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+}
+nav a.active {
+  border-color: var(--sticker-ink);
+}
+.pot {
+  padding: 16px;
+  gap: 12px;
+  border-color: var(--control-border);
+  box-shadow: 2px 3px 0 var(--ink);
+}
+.pot .pig {
+  color: var(--mango-deep);
+}
+.pot strong,
+.amount,
+.celebrate strong,
+.stepper output {
+  font-size: 34px;
+  line-height: 1.2;
+}
+.pot small {
+  font-size: 13px;
+}
+.pot-progress {
+  height: 12px;
+  border-color: var(--control-border);
+}
+.pot-progress > span {
+  background: var(--mango);
+  border-right: 1.5px solid var(--mango-deep);
+}
+.ipon-card,
+.ipon-card:hover {
   background: var(--card);
+  box-shadow: none;
+  border-color: var(--line);
+}
+.ipon-card .pot-progress > span {
+  background: var(--leaf);
+  border-right-color: var(--leaf-deep);
+}
+.custody-ledger {
+  background: var(--card-tint);
+}
+.custody-wallet-pill {
+  flex-wrap: wrap;
+  border: 0;
+  border-radius: 14px;
+  background: var(--card);
+}
+.sticker,
+.abono-form-card {
+  background: var(--card-tint);
+}
+.place {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.notice {
+  margin-inline: 16px;
   color: var(--ink);
 }
-:root[data-theme="dark"] .header-bell:hover {
-  background: var(--hover-card);
+.notice.error {
+  color: var(--danger);
 }
-:root[data-theme="dark"] .custody-wallet-pill {
-  background: var(--highlight);
-  border-color: var(--highlight-border);
-  color: var(--ink);
+.notice .quiet {
+  color: inherit;
 }
-:root[data-theme="dark"] .pot-custody small {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--card-border);
-  color: var(--soft);
+.celebration-toast {
+  max-width: calc(100% - 32px);
+  white-space: normal;
+  border-radius: 14px;
+  border-color: var(--mango-deep);
 }
-:root[data-theme="dark"] .ipon-card {
-  background: #1b2f23;
-  border-color: #355840;
+.celebrate {
+  background: var(--card-tint);
 }
-:root[data-theme="dark"] .ipon-card:hover {
-  background: #21392b;
+:focus-visible,
+input:focus,
+select:focus {
+  outline: 3px solid var(--blue-deep);
+  outline-offset: 2px;
 }
-:root[data-theme="dark"] .ipon-card .pig {
-  color: var(--green-deep);
+.members,
+.member,
+.record,
+.pot-amount {
+  min-width: 0;
 }
-:root[data-theme="dark"] .ipon-card .pot-progress > span {
-  background: var(--green-deep);
+.settings-grid > *,
+.entry,
+.confirm,
+.custody-wallet-pill {
+  overflow-wrap: anywhere;
+}
+.segmented {
+  border-color: var(--line);
+  border-radius: 14px;
+}
+.segmented button {
+  border-radius: 12px;
+}
+.tally {
+  grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+  gap: 4px;
+}
+.tally span {
+  position: relative;
+  border: 1.5px dashed var(--tan);
+  transform: rotate(var(--coin-rotation, 0deg));
+}
+.tally .paid {
+  background: var(--tone);
+  border: 1.5px solid var(--sticker-ink);
+  color: var(--sticker-ink);
+}
+.tally .paid::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border: 1px solid transparent;
+  border-top-color: var(--card);
+  border-left-color: var(--card);
+  border-radius: 50%;
+}
+.tally .paid::after {
+  content: "₱";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+}
+.tally.mini .paid::after {
+  content: none;
+}
+.tally .pending {
+  background: transparent;
+  border: 1.5px dashed var(--tone-deep);
+}
+.tally-sheet {
+  padding: 16px;
+  margin-block: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--control-border);
+  border-radius: 22px;
+  box-shadow: 2px 3px 0 var(--ink);
+}
+.tally-sheet .members {
+  padding-top: 0;
+}
+.personal-savings {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.personal-savings > .meta {
+  margin-bottom: 16px;
+}
+.personal-goal {
+  margin-bottom: 16px;
+  overflow-wrap: anywhere;
+}
+.personal-goal h3 {
+  margin: 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 160px;
+}
+.personal-goal h3 svg {
+  flex: none;
+}
+.personal-visibility,
+.personal-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.personal-goal .actions {
+  margin: 0;
+}
+.personal-goal .actions > button {
+  flex: 1 1 120px;
+}
+.personal-form {
+  background: var(--card-tint);
+  padding: 16px;
+  border-radius: 14px;
+  margin: 0;
+  min-width: 0;
+}
+.personal-goal details summary,
+.personal-history > summary {
+  min-height: 44px;
+  padding-block: 8px;
+}
+.personal-entry-amount {
+  font-family: var(--display);
+}
+.tally .stamped {
+  animation: coin-stamp 220ms ease-out;
+}
+@keyframes coin-stamp {
+  from {
+    scale: 1.35;
+    opacity: 0.5;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tally .stamped {
+    animation: none;
+  }
 }
 .offline-banner {
   background: var(--highlight);
@@ -1495,12 +1745,7 @@ button svg,
   margin: 12px 0 18px;
 }
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--hover-card) 25%,
-    var(--dots) 50%,
-    var(--hover-card) 75%
-  );
+  background: var(--card-tint);
   background-size: 200% 100%;
   border: 2px dashed var(--tan);
   border-radius: 16px;
@@ -1539,16 +1784,9 @@ button svg,
   border-color: var(--highlight-border);
 }
 :root[data-theme="dark"] .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--card) 25%,
-    var(--hover-card) 50%,
-    var(--card) 75%
-  );
-  background-size: 200% 100%;
+  background: var(--card-tint);
   border-color: var(--card-border);
 }
-
 
 @media print {
   body {
@@ -1570,4 +1808,277 @@ button svg,
   }
 }
 
+/* Round 3 design fixes */
+html {
+  scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+main {
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
 
+/* Coin stickers are the signature: big enough to read, wrapped evenly. */
+.tally {
+  --coin: 28px;
+  grid-template-columns: repeat(var(--coin-cols, auto-fill), var(--coin));
+  justify-content: start;
+  gap: 4px;
+}
+.tally span {
+  width: var(--coin);
+  height: var(--coin);
+}
+.tally .paid::after {
+  font-size: 14px;
+}
+.tally.mini {
+  --coin: 12px;
+  grid-template-columns: repeat(auto-fill, var(--coin));
+}
+.tally.preview {
+  --coin: 28px;
+  width: 100%;
+  grid-template-columns: repeat(var(--coin-cols, auto-fill), var(--coin));
+  justify-content: center;
+  min-height: var(--coin);
+  margin: 0;
+}
+.welcome figure .tally {
+  margin-bottom: 12px;
+}
+.member {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+.members {
+  gap: 16px;
+}
+.member-who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+}
+.member .tally {
+  margin: 0;
+}
+
+/* Where our money is: a plain two-level list. */
+.custody-wallets,
+.custody-split {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.custody-wallet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 15px;
+}
+.custody-wallet-row strong {
+  font-family: var(--display);
+  font-weight: 600;
+}
+.custody-split {
+  margin: 4px 0 4px 24px;
+}
+.custody-split li {
+  color: var(--soft);
+  font-size: 13px;
+}
+
+/* Ipon goal card: one chip at most, meta as plain lines, action inside. */
+.ipon-item {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+}
+.ipon-item > .ipon-card,
+.ipon-item > .ipon-card:hover {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.ipon-item .pot-top {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ipon-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+}
+.ipon-ring span {
+  position: absolute;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+.ipon-head {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+.ipon-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ipon-title {
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ipon-title-row .chip {
+  flex: none;
+  font-weight: 700;
+}
+.ipon-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+.ipon-amounts strong {
+  font-size: 26px;
+}
+.ipon-meta {
+  display: grid;
+  gap: 4px;
+}
+.ipon-meta p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ipon-meta svg {
+  flex: none;
+}
+.ipon-member-amount {
+  font-size: 15px;
+}
+.ipon-quick-btn {
+  width: 100%;
+  justify-self: stretch;
+}
+
+/* Personal savings: badge always top right, two short actions on one line. */
+.personal-goal > .row {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+.personal-goal h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.personal-visibility {
+  flex: none;
+  max-width: 55%;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+}
+.personal-goal > .actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.personal-goal > .actions > button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 8px;
+  white-space: nowrap;
+}
+
+/* Tracker: one sheet for status, add button and empty state. */
+.abono-sheet {
+  padding: 16px;
+  border-radius: 22px;
+}
+.abono-add {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1.5px dashed var(--dots);
+}
+.abono-empty {
+  margin: 12px 0 0;
+  color: var(--soft);
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Disabled controls look disabled and never lift. */
+:root:root button:disabled,
+:root:root .button[aria-disabled="true"] {
+  background: color-mix(in srgb, var(--soft) 14%, var(--card));
+  color: var(--soft);
+  border-color: var(--control-border);
+  border-style: dashed;
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+:root:root .quiet:disabled,
+:root:root .round:disabled {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Settings: archive is a normal small button; link-like actions keep 44px. */
+.wallets-section .row {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.wallets-section .row > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.wallet-actions {
+  flex: none;
+  flex-wrap: nowrap;
+  margin: 0 0 0 auto;
+  gap: 0;
+}
+.wallet-archive {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+a.muted {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.quiet {
+  min-width: 44px;
+  min-height: 44px;
+}

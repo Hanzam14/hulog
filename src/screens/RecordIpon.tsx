@@ -64,8 +64,7 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
     );
   }
 
-  const set = (n: number) =>
-    setSteps(Math.min(remainingSteps, Math.max(1, n)));
+  const set = (n: number) => setSteps(Math.min(remainingSteps, Math.max(1, n)));
   const stepAmount = g.step_amount_centavos ?? 0;
 
   const submitMatched = () => {
@@ -111,11 +110,11 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
           <span
             className="chip"
             style={{
-              fontSize: "11px",
-              padding: "1px 8px",
+              fontSize: "13px",
+              padding: "4px 8px",
               fontWeight: 600,
-              background: "var(--brand-soft, #fdf2f8)",
-              color: "var(--brand, #db2777)",
+              background: "var(--brand-soft)",
+              color: "var(--brand)",
               border: "1px solid currentColor",
             }}
           >
@@ -174,13 +173,13 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
               width: "100%",
               maxWidth: "320px",
               display: "grid",
-              gap: "6px",
+              gap: "8px",
             }}
           >
             <span
               style={{
                 color: "var(--soft)",
-                fontSize: "14px",
+                fontSize: "13px",
                 fontWeight: 500,
               }}
             >
@@ -214,13 +213,13 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
                 width: "100%",
                 maxWidth: "320px",
                 display: "grid",
-                gap: "6px",
+                gap: "8px",
               }}
             >
               <span
                 style={{
                   color: "var(--soft)",
-                  fontSize: "14px",
+                  fontSize: "13px",
                   fontWeight: 500,
                 }}
               >
@@ -244,13 +243,13 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
               width: "100%",
               maxWidth: "320px",
               display: "grid",
-              gap: "6px",
+              gap: "8px",
             }}
           >
             <span
               style={{
                 color: "var(--soft)",
-                fontSize: "14px",
+                fontSize: "13px",
                 fontWeight: 500,
               }}
             >

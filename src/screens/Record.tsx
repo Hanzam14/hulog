@@ -3,10 +3,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
-import { byNewest, closed, name, tone } from "../components/shared";
+import { byNewest, closed, heldByText, name, tone } from "../components/shared";
 import { rpc } from "../data";
 import { money } from "../helpers";
 import Avatar from "../components/Avatar";
+import Tally from "../components/Tally";
 
 /** Log today's hulog: pick how many days, see the stickers, send. */
 export default function Record({ data, user, run, busy }: ViewProps) {
@@ -35,7 +36,10 @@ export default function Record({ data, user, run, busy }: ViewProps) {
       <Link to="/" className="back" aria-label={t("Back")}>
         <IconArrowLeft />
       </Link>
-      <Avatar data={data} id={user} size="lg" />
+      <div className="member-who">
+        <Avatar data={data} id={user} size="sm" />
+        <strong>{name(data, user)}</strong>
+      </div>
       <div className="stepper">
         <button
           type="button"
@@ -57,20 +61,21 @@ export default function Record({ data, user, run, busy }: ViewProps) {
           <IconPlus />
         </button>
       </div>
-      <div className={`tally ${tone(data, user)} preview`} aria-hidden="true">
-        {Array.from({ length: days }, (_, i) => (
-          <span key={i} className="paid" />
-        ))}
-      </div>
+      <Tally
+        label={name(data, user)}
+        paid={days}
+        pending={0}
+        total={days}
+        tone={tone(data, user)}
+        className="preview"
+        decorative
+      />
       <strong className="amount">
         {money(days * c.daily_amount_centavos)}
       </strong>
       {c.holder_id && c.wallet_label && (
         <p className="meta" style={{ textAlign: "center", margin: "4px 0" }}>
-          {t("Held by {name} · {wallet}", {
-            name: name(data, c.holder_id).trim().split(/\s+/)[0],
-            wallet: c.wallet_label,
-          })}
+          {heldByText(data, c.holder_id, c.wallet_label, user)}
         </p>
       )}
       <input

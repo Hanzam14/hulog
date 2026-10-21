@@ -19,6 +19,7 @@ import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
 import CustodyCard from "../components/CustodyCard";
 import IponCard from "../components/IponCard";
+import PersonalSavings from "../components/PersonalSavings";
 import { isSoloMode, setSoloMode, setSoloPotMode } from "../solo";
 import { isSoloCycle } from "../helpers";
 
@@ -71,24 +72,26 @@ export default function Home(props: ViewProps) {
             role="radio"
             aria-checked={active.length > 1}
             aria-pressed={active.length > 1}
+            aria-label={t("Partnered Pot (with Solo & Shared goals)")}
             onClick={() => {
               setSoloPotMode("partnered", user);
               void run(async () => {});
             }}
           >
-            {t("Partnered Pot (with Solo & Shared goals)")}
+            {t("Together")}
           </button>
           <button
             type="button"
             role="radio"
             aria-checked={active.length <= 1}
             aria-pressed={active.length <= 1}
+            aria-label={t("Standalone Solo")}
             onClick={() => {
               setSoloPotMode("standalone", user);
               void run(async () => {});
             }}
           >
-            {t("Standalone Solo")}
+            {t("Solo")}
           </button>
         </div>
       )}
@@ -99,7 +102,9 @@ export default function Home(props: ViewProps) {
           <p>
             {isSoloMode()
               ? t("Start a round to begin tracking your savings.")
-              : t("Invite your partner from the group tab, then start a round.")}
+              : t(
+                  "Invite your partner from the group tab, then start a round.",
+                )}
           </p>
 
           {!isSoloMode() && active.length < 2 && (
@@ -117,8 +122,6 @@ export default function Home(props: ViewProps) {
               {t("Switch to solo mode")}
             </button>
           )}
-
-
         </div>
       ) : (
         <>
@@ -139,7 +142,7 @@ export default function Home(props: ViewProps) {
           {c.status === "proposed" ? (
             <Proposal c={c} user={user} run={run} busy={busy} />
           ) : (
-            <div className="members">
+            <div className="members tally-sheet">
               {data.progress
                 .filter((p) => p.cycle_id === c.id)
                 .map((p) => {
@@ -148,17 +151,12 @@ export default function Home(props: ViewProps) {
                   const isObserving = isSolo && !isSaver;
                   return (
                     <div className="member" key={p.member_id}>
-                      <Avatar data={data} id={p.member_id} />
+                      <div className="member-who">
+                        <Avatar data={data} id={p.member_id} size="sm" />
+                        <strong>{name(data, p.member_id)}</strong>
+                      </div>
                       {isObserving ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <strong>{name(data, p.member_id)}</strong>
-                          <span
-                            className="chip"
-                            style={{ fontSize: "11px", alignSelf: "flex-start" }}
-                          >
-                            {t("₱0 · Observing")}
-                          </span>
-                        </div>
+                        <span className="meta">{t("₱0 · Observing")}</span>
                       ) : (
                         <Tally
                           label={name(data, p.member_id)}
@@ -175,7 +173,7 @@ export default function Home(props: ViewProps) {
           )}
           {c.status === "accepted" && !closed(c) && (
             <Link className="button big" to="/hulog">
-              <IconPlus aria-hidden="true" /> {t("hulog")}
+              <IconPlus aria-hidden="true" /> {t("hulog!")}
             </Link>
           )}
           <Payout c={c} data={data} user={user} run={run} busy={busy} />
@@ -187,6 +185,7 @@ export default function Home(props: ViewProps) {
         </Link>
       )}
 
+      <PersonalSavings {...props} />
       <div className="ipon-home-section">
         <div className="row">
           <h2>{t("Ipon goals")}</h2>
@@ -198,17 +197,23 @@ export default function Home(props: ViewProps) {
         )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
-            <IponCard g={g} data={data} user={user} />
-            {g.status === "accepted" &&
-              !g.withdrawn_at &&
-              !g.withdraw_proposed_by && (
-                <Link
-                  className="button secondary ipon-quick-btn"
-                  to={`/ipon/${g.id}/record`}
-                >
-                  <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
-                </Link>
-              )}
+            <IponCard
+              g={g}
+              data={data}
+              user={user}
+              action={
+                g.status === "accepted" &&
+                !g.withdrawn_at &&
+                !g.withdraw_proposed_by ? (
+                  <Link
+                    className="button ipon-quick-btn"
+                    to={`/ipon/${g.id}/record`}
+                  >
+                    <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
+                  </Link>
+                ) : undefined
+              }
+            />
           </div>
         ))}
         {activeGoals.length < 3 && (
@@ -370,9 +375,7 @@ export default function Home(props: ViewProps) {
                 })}
                 disabled={busy}
                 onClick={() =>
-                  void run(() =>
-                    rpc("confirm_abono_entry", { p_id: ae.id }),
-                  )
+                  void run(() => rpc("confirm_abono_entry", { p_id: ae.id }))
                 }
               >
                 <IconCheck />

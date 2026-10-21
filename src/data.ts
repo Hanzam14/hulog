@@ -224,6 +224,42 @@ export interface Snapshot {
   savingsProgress?: SavingsMemberProgress[];
   abonoEntries?: AbonoEntry[];
   abonoSummary?: AbonoSummary[];
+  personalGoals?: PersonalGoal[];
+  personalEntries?: PersonalEntry[];
+  personalHistory?: PersonalHistory[];
+}
+export interface PersonalHistory {
+  id: number;
+  goal_id: string;
+  actor_id: string;
+  entity: string;
+  entity_id: string;
+  action: string;
+  before: Record<string, unknown> | null;
+  after: Record<string, unknown> | null;
+  created_at: string;
+}
+export interface PersonalGoal {
+  id: string;
+  group_id: string;
+  owner_id: string;
+  title: string;
+  target_amount_centavos: number;
+  visibility: "private" | "shared";
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+export interface PersonalEntry {
+  id: string;
+  goal_id: string;
+  kind: "deposit" | "withdrawal";
+  amount_centavos: number;
+  entry_date: string;
+  note: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 export async function rpc(
   name: string,
@@ -248,7 +284,8 @@ async function rows<T>(
       .select(columns)
       .order(order)
       .range(offset, offset + 999);
-    if (error) throw Object.assign(new Error(error.message), { code: error.code });
+    if (error)
+      throw Object.assign(new Error(error.message), { code: error.code });
     all.push(...(data as T[]));
     if (data.length < 1000) return all;
   }
@@ -288,6 +325,9 @@ export async function load(): Promise<Snapshot> {
     savingsProgress,
     abonoEntries,
     abonoSummary,
+    personalGoals,
+    personalEntries,
+    personalHistory,
   ] = await Promise.all([
     rows<Profile>(
       "profiles",
@@ -310,6 +350,9 @@ export async function load(): Promise<Snapshot> {
     optionalRows<SavingsMemberProgress>("savings_member_progress", "goal_id"),
     optionalRows<AbonoEntry>("abono_entries", "id"),
     optionalRows<AbonoSummary>("abono_summary", "debtor_id"),
+    optionalRows<PersonalGoal>("personal_savings_goals", "id"),
+    optionalRows<PersonalEntry>("personal_savings_entries", "id"),
+    optionalRows<PersonalHistory>("personal_savings_history", "id"),
   ]);
   return {
     profiles,
@@ -329,5 +372,8 @@ export async function load(): Promise<Snapshot> {
     savingsProgress,
     abonoEntries,
     abonoSummary,
+    personalGoals,
+    personalEntries,
+    personalHistory,
   };
 }

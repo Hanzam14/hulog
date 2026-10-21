@@ -76,7 +76,8 @@ export default function Changes({
         <section key={h.id}>
           <div className="row">
             <strong>
-              {name(data, h.actor_id)} · {label(h.action)} {label(h.entity)}
+              {name(data, h.actor_id)} <br /> {label(h.action)}{" "}
+              {label(h.entity)}
             </strong>
             {h.unread && <span className="badge">{t("New")}</span>}
           </div>

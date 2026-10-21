@@ -1,4 +1,11 @@
-import { t, useLanguage, label, languageSnapshot, type Key, type Lang } from "./i18n";
+import {
+  t,
+  useLanguage,
+  label,
+  languageSnapshot,
+  type Key,
+  type Lang,
+} from "./i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
@@ -34,9 +41,13 @@ import {
 
 export default function App() {
   const language = useLanguage();
-  const [session, setSession] = useState<Session | null>(() => (isSoloMode() ? getSoloSession() : null));
+  const [session, setSession] = useState<Session | null>(() =>
+    isSoloMode() ? getSoloSession() : null,
+  );
   const languageReadyUser = useRef<string | null>(null);
-  const lastLanguageAttempt = useRef<{ userId: string; language: Lang } | null>(null);
+  const lastLanguageAttempt = useRef<{ userId: string; language: Lang } | null>(
+    null,
+  );
   const [ready, setReady] = useState(() => isSoloMode() || !supabase);
   const [data, setData] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
@@ -86,7 +97,9 @@ export default function App() {
         const row = Array.isArray(rawPrefs) ? rawPrefs[0] : rawPrefs;
         if (
           row &&
-          (row.language === "en" || row.language === "tl" || row.language === "taglish")
+          (row.language === "en" ||
+            row.language === "tl" ||
+            row.language === "taglish")
         )
           serverLanguage = row.language;
       } catch {
@@ -140,10 +153,11 @@ export default function App() {
     setData(next);
   }, [session]);
   useEffect(() => {
-    if (isSoloMode() || !supabase) return;
+    if (!supabase) return;
     let alive = true;
+    let authEventSeen = false;
     supabase.auth.getSession().then(({ data: result, error: authError }) => {
-      if (alive) {
+      if (alive && !authEventSeen && !isSoloMode()) {
         setSession(result.session);
         setReady(true);
         if (authError) setError(authError.message);
@@ -151,6 +165,7 @@ export default function App() {
     });
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, next) => {
+        authEventSeen = true;
         if (!isSoloMode()) {
           setSession(next);
           setData(null);
@@ -166,14 +181,16 @@ export default function App() {
   useEffect(() => {
     if (!session) return;
     let alive = true;
-    const reload = () =>
-      load()
+    const reload = () => {
+      const local = isSoloMode();
+      return load()
         .then((next) => {
-          if (alive) setData(next);
+          if (alive && local === isSoloMode()) setData(next);
         })
         .catch((e) => {
-          if (alive) setError(String(e.message));
+          if (alive && local === isSoloMode()) setError(String(e.message));
         });
+    };
     void reload();
     const timer = window.setInterval(() => {
       void reload();
@@ -417,7 +434,10 @@ export default function App() {
               path="/join/:token"
               element={<Join run={run} busy={busy} />}
             />
-            <Route path="*" element={<NoGroup run={run} busy={busy} user={session.user.id} />} />
+            <Route
+              path="*"
+              element={<NoGroup run={run} busy={busy} user={session.user.id} />}
+            />
           </Routes>
         </main>
       ) : (
