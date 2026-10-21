@@ -32,9 +32,11 @@
 
 ## Human judgment
 
-- Model may decide: scoped local source, test, and documentation changes.
-- Human decides: hosted project creation, live cloud writes, OAuth secrets,
-  deployment, external publication, and money movement.
+- Model may decide: scoped local source, test, and documentation changes, and
+  (after checks and reviews pass) push/merge to main, applying the task's new
+  migrations to hosted Supabase, and the Vercel deploy (see `AGENTS.md`).
+- Human decides: hosted project creation, destructive or data-rewriting cloud
+  writes, OAuth secrets, external publication, and money movement.
 - Stop conditions: unclear authority, failed declared checks, credential access,
   or a live service boundary.
 
@@ -45,8 +47,9 @@ Live use; owner-reported two-phone smoke PASS on 2026-10-07. See `HANDOFF.md` fo
 ## Boundaries
 
 Hulog records money; it never holds or moves money. Keep credentials and runtime
-data out of Git. Do not mutate hosted Supabase, Google OAuth, or Vercel without
-the owner's explicit request. The deployed application and hosted data remain
+data out of Git. Beyond the standing approval in `AGENTS.md` (verified pushes,
+new migrations, Vercel deploys), do not mutate hosted Supabase, Google OAuth, or
+Vercel without the owner's explicit request. The deployed application and hosted data remain
 owner-managed; this repository is the source of truth.
 
 ## Success criteria

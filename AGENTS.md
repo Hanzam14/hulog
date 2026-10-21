@@ -19,7 +19,7 @@ unrelated changes and keep credentials, local runtime data, and `.env` private.
   "runtime": {"kind": "python", "candidates": [["python"]], "probe_argv": ["--version"]},
   "preflight": {"argv": ["npm.cmd", "run", "lint"], "timeout_seconds": 120, "expected_exit": 0, "expected_contains": "eslint"},
   "verify": {"argv": ["npm.cmd", "test"], "timeout_seconds": 180, "expected_exit": 0, "expected_contains": "passed"},
-  "write_policy": "A direct task authorizes ordinary reversible local code, tests, and documentation. Production deployment, cloud writes, credential access, external sends, and money movement require separate confirmation."
+  "write_policy": "A direct task authorizes ordinary reversible local code, tests, and documentation, and, once required checks and reviews pass, committing, pushing and merging to main, applying the task's new migrations to hosted Supabase, and the resulting Vercel deploy. Destructive or data-deleting cloud operations, credential access, OAuth or provider settings, paid services, external sends, and money movement require separate confirmation."
 }
 ```
 <!-- ICM_EXECUTION_END -->
@@ -36,8 +36,13 @@ unrelated changes and keep credentials, local runtime data, and `.env` private.
   360px usability. Never add a production test clock or weaken tests.
 - Keep `.env`, service credentials, and generated/runtime data out of Git.
   Do not add dependencies or features without a concrete in-scope need.
-- No push, cloud project mutation, paid service, or deployment unless the owner
-  explicitly requests that action. Never write outside this repository.
+- Standing approval (owner, 2026-10-21): once required checks and reviews
+  pass, commit, push, merge to main, apply the task's new migrations to hosted
+  Supabase (`npx supabase db push`, dry run first; migrations before the push
+  that deploys), and let Vercel deploy, without asking; then report. Still ask
+  before force-push, deleting branches or data, destructive or data-rewriting
+  cloud SQL, hosted `db reset`, OAuth/provider/credential changes, paid
+  services, and external sends. Never write outside this repository.
 
 ## Shared quality loop
 

@@ -118,11 +118,6 @@ export default function History({ data, user, run, busy }: ViewProps) {
       {filteredCycles.map((c) => (
         <section key={c.id}>
           <CycleCard c={c} data={data} user={user} />
-          {c.payout_state && (
-            <p>
-              <span className="chip">{label(c.payout_state)}</span>
-            </p>
-          )}
           {c.status === "accepted" &&
             data.progress
               .filter(
