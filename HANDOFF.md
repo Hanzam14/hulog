@@ -48,12 +48,12 @@ The owner reports the two-phone check, or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `25`
-- Updated: `2026-10-21T02:23:20Z`
-- Status: `PARTIAL - SIMPLIFY UI READY FOR OWNER LOOK`
+- Revision: `26`
+- Updated: `2026-10-21T02:48:28Z`
+- Status: `PARTIAL - PR #12 OPEN, OWNER LOOKING`
 - Persistence: `commit_pending`
-- Summary: Simplified UI built on local branch design/simplify (c45dc70 + fix 56c1d28): Home = pending checks, round + one primary button, single Ipon section; mode toggle, custody card, pot location and sign-out moved to Group; nav labels visible; empty History shows only the empty line. Not pushed, not merged, not deployed.
-- Authority: Owner chat 2026-10-21: simplify/deslopify the UX/UI, 'go ahead'. No push/deploy authorized.
+- Summary: Owner reported 2026-10-21 that private vs shared personal goals work on real phones (two-phone check PASS, owner-reported). PR #12 (design/simplify) open: simplified UI plus a9b604b (custom select chevron 16px from edge; single 560px column on desktop; Group single column). Not merged or deployed to production.
+- Authority: Owner chat 2026-10-21: simplify UI, push and open PR, fix dropdown arrow and wide-layout look.
 
 ### Decisions
 
@@ -65,19 +65,16 @@ The owner reports the two-phone check, or production state changes.
 
 ### Risks and unresolved items
 
-- Not checked on a real phone or with a pending confirmation or both goal kinds present
-- Group 2-column desktop layout not checked
-- Builder: Sonnet subagent (Codex usage limit hit); Opus lead review
-- Owner looks at the new UI; then push design/simplify and open a PR
-- Earlier: two-phone private vs shared personal goal check still pending
+- Simplified UI not yet seen by owner on a phone; pending-confirmation and both-goal-kinds states not screenshotted
+- Owner reviews PR #12 Vercel preview and decides to merge
 
 ### Evidence and checks
 
 - docs/SIMPLIFY_REPORT.md
 - docs/simplify-shots/
-- task-briefs/simplify-ui-20261021.md
-- Lead rerun on 56c1d28: npm run lint clean; npm test 136/136 (16 files); npm run build OK
-- Lead reviewed 360x780 screenshots in docs/simplify-shots/ and test diffs (layout-only assertion moves; custody amount now asserted in Group)
+- Worker rerun on a9b604b: lint clean, npm test 136/136 (16 files), build OK
+- Lead measured at 1280px: .app 560px, settings-grid one column, no overflow in main
+- Worker zoom at 375px: select chevron about 25px inside the right border
 
 ### Governed artifact correlations
 
@@ -85,5 +82,5 @@ The owner reports the two-phone check, or production state changes.
 
 ### Exact next action
 
-Owner reviews the simplified UI (screenshots or local dev); on approval push design/simplify and open a PR.
+Owner checks PR #12 preview on a phone and merges if happy.
 <!-- CONTINUITY_CHECKPOINT_END -->
