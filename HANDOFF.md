@@ -6,29 +6,31 @@
 
 ## Last verified
 
-- Date: 2026-10-07
-- Production is live on Vercel for `eb84788` (`main`); Vercel reported success.
-- English, Tagalog, and Taglish language choice is live. Push notifications follow each recipient's selected language. Hosted migrations `20261007000200_mutual_confirm` and `20261007000300_notification_language` are applied, and the `notify` function is deployed.
-- Owner-reported two-phone smoke PASS: partner confirmed the owner hulog; give-payout hand-off works; language choice and notification in the chosen language work.
-- Checks: lint PASS, 69 tests PASS, and build PASS. Local pgTAP: 183 assertions PASS before migration `20261007000300_notification_language` was applied.
-- Reviews: Sol SQL reviewed by Claude Opus; UI/i18n reviewed by Sonnet; Luna fixes and final UI received Claude Opus review, including screenshot review.
+- Date: 2026-10-21
+- PR #10 (cute "ube sticker pad" refresh, personal savings in a group, solo-mode sign-in fix) squash-merged to `main` as `fd96253`; Vercel production status for `fd96253` reported success.
+- PR #11 (prettier formatting only; lint clean, vitest 135/135) merged to `main` as `c090d47`.
+- Checks on `e833f9e` (PR #10 head) rerun by the Claude Opus lead: lint clean, 135/135 tests, build OK. Local pgTAP 357 assertions PASS (builder-reported).
+- Review: Claude Opus pre-merge review PASS, posted on PR #10.
+- Migration `20261021000100_personal_savings` applied to hosted Supabase project `hulog` (2026-10-21, by a Claude session on owner request); read-only checks confirmed 3 tables with RLS and 4 RPCs.
+- Old remote branches (antigravity/*, design/cute-refresh, fix/iponcard-nesting, tally, redesign) deleted on owner request.
+- Earlier live features (2026-10-07): language choice, push notifications in the chosen language, mutual confirm; owner-reported two-phone smoke PASS then.
 
 ## Active brief
 
-`none`
+`none` (completed briefs: `task-briefs/cute-refresh-20261021.md`, `task-briefs/personal-savings-20261021.md`, `task-briefs/design-fixes-r3-20261021.md`)
 
 ## Current state
 
-`main` at `eb84788` is deployed and the listed features are live in production. The two-phone smoke test passed per the owner's 2026-10-07 report. Hulog is in live use.
+`main` at `c090d47` is deployed (`fd96253` production status success; `c090d47` is formatting only). Personal savings are live online now that the migration is applied.
 
 ## Current phase
 
-Live use.
+Live use; owner two-phone check of personal goals pending.
 
 ## Assumptions and unknowns
 
-- Production deployment, hosted migration/function state, prior checks, and reviews above are owner-provided close-out facts; this task did not access hosted services or rerun the full test/build/database suites.
-- The two-phone smoke result is owner-reported: partner hulog confirmation, give-payout hand-off, language choice, and notification in the chosen language all worked.
+- No two-phone check of private vs shared personal goals has been done yet.
+- `git stash@{0}` holds a stale, diverged continuity chain from the deleted `antigravity/solo-mode` branch; it was not committed.
 - Hulog records money and does not hold, transfer, or pay out funds.
 
 ## Human decision needed
@@ -37,53 +39,41 @@ Live use.
 
 ## Next action
 
-None pending - live use; reopen for new owner requests.
+Owner runs a two-phone check: a private goal stays hidden from the partner, a shared goal shows read-only.
 
 ## Revalidate when
 
-The owner makes a new request or production state changes.
+The owner reports the two-phone check, or production state changes.
 
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `22`
-- Updated: `2026-10-21T01:00:57Z`
-- Status: `PARTIAL - READY FOR CLAUDE REVIEW`
+- Revision: `24`
+- Updated: `2026-10-21T02:02:49Z`
+- Status: `COMPLETED - LIVE, TWO-PHONE CHECK PENDING`
 - Persistence: `commit_pending`
-- Summary: Round 2 implemented in design/cute-refresh: configured solo startup ordering and online owner-only personal savings with private/shared visibility. Local checks pass; independent review and hosted smoke remain.
-- Authority: Owner round-2 brief explicitly permits local schema/data/solo/UI edits, requested origin merge and commits. No hosted writes, push, merge to main or deployment authorized.
+- Summary: PR #10 merged (fd96253) and deployed; personal-savings migration applied to hosted Supabase (read-only checks: 3 tables with RLS, 4 RPCs); old remote branches deleted; PR #11 prettier formatting merged as c090d47. Local checkout moved from deleted antigravity/solo-mode to main; a diverged local continuity chain was stashed, not committed.
+- Authority: Owner chat 2026-10-21: apply migration, delete merged branches; this session: commit continuity files and switch local checkout to main.
 
 ### Decisions
 
-- HULOG-PERSONAL-AUTH-20261021
-- HULOG-PERSONAL-REVIEW-20261021
+- None.
 
 ### Blockers
 
-- Independent Claude Opus review pending; no builder PASS attestation.
+- None.
 
 ### Risks and unresolved items
 
-- Security/money review pending with Claude Opus
-- No real OAuth or two-device hosted verification
-- Screenshots are browser-scaled native 360x780 exports from 375 CSS viewport
-- Concurrent multi-connection withdrawal stress test not run
-- Independent review and decision rulings
-- Owner hosted migration apply and phone smoke; exact steps in report
+- Private vs shared personal goals not yet confirmed on two real phones
+- git stash@{0} holds the stale antigravity/solo-mode continuity chain (its own checkpoints 21-22); drop once no longer needed
 
 ### Evidence and checks
 
+- HANDOFF.md
 - docs/PERSONAL_SAVINGS_REPORT.md
-- docs/PERSONAL_SAVINGS_CLAIMS.md
-- src/App.solo.test.ts
-- supabase/tests/database/personal_savings.test.sql
-- Integrated baseline lint/build PASS; 117/119 tests initially passed, two merge compatibility checks reconciled and focused v2 24/24 PASS
-- Solo delayed-session baseline regression FAIL; final four auth tests PASS
-- Final npm run lint: exit 0
-- Final npm test: 132 passed, 15 files
-- Final npm run build: exit 0
-- Local pgTAP: 357 assertions across six files PASS, including 60 personal cases
-- Check notes omitted: 4; full list: checkpoint revision `22` under `.continuity/checkpoints/`.
+- project_continuity.py verify on main: PASS (revision 22, metadata 37) before checkpoint
+- git log origin/main: c090d47 (#11) on top of fd96253 (#10)
 
 ### Governed artifact correlations
 
@@ -91,5 +81,5 @@ The owner makes a new request or production state changes.
 
 ### Exact next action
 
-Claude Opus high-effort review of docs/PERSONAL_SAVINGS_CLAIMS.md, then owner migration apply and two-device/OAuth smoke per report.
+Owner runs a two-phone check: a private goal stays hidden from the partner, a shared goal shows read-only.
 <!-- CONTINUITY_CHECKPOINT_END -->
