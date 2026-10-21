@@ -1,9 +1,22 @@
+import { useState } from "react";
 import { t, label } from "../i18n";
 import type { Snapshot } from "../data";
 import { rpc } from "../data";
 import type { Run } from "../components/shared";
 import { name } from "../components/shared";
-import { money } from "../helpers";
+import { money, shortDate } from "../helpers";
+import Avatar from "../components/Avatar";
+
+const PAGE = 20;
+const manilaDay = (at: string | Date) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila" }).format(
+    new Date(at),
+  );
+const manilaTime = (at: string) =>
+  new Intl.DateTimeFormat("en-PH", {
+    timeStyle: "short",
+    timeZone: "Asia/Manila",
+  }).format(new Date(at));
 
 export default function Changes({
   data,
@@ -14,6 +27,7 @@ export default function Changes({
   run: Run;
   busy: boolean;
 }) {
+  const [limit, setLimit] = useState(PAGE);
   const fields: Record<string, string> = {
     name: t("Group name"),
     pot_location: t("Pot held at"),
@@ -60,49 +74,83 @@ export default function Changes({
             : key.endsWith("_at")
               ? t("Yes")
               : label(String(v));
+  const recent = [...data.changes].reverse();
+  const shown = recent.slice(0, limit);
+  // Group the visible changes by Manila calendar day, newest first.
+  const days: { day: string; items: typeof shown }[] = [];
+  for (const h of shown) {
+    const day = manilaDay(h.created_at);
+    if (days.at(-1)?.day === day) days.at(-1)!.items.push(h);
+    else days.push({ day, items: [h] });
+  }
+  const yesterday = manilaDay(
+    new Date(new Date(`${data.today}T12:00:00+08:00`).getTime() - 864e5),
+  );
+  const dayTitle = (day: string) =>
+    day === data.today
+      ? t("Today")
+      : day === yesterday
+        ? t("Yesterday")
+        : shortDate(day);
   return (
     <>
       <div className="row">
         <h1>{t("Changes")}</h1>
-        <button
-          className="secondary"
-          disabled={busy}
-          onClick={() => run(() => rpc("mark_history_seen"))}
-        >
-          {t("Mark read")}
-        </button>
+        {recent.some((h) => h.unread) && (
+          <button
+            className="quiet"
+            disabled={busy}
+            onClick={() => run(() => rpc("mark_history_seen"))}
+          >
+            {t("Mark read")}
+          </button>
+        )}
       </div>
-      {[...data.changes].reverse().map((h) => (
-        <section key={h.id}>
-          <div className="row">
-            <strong>
-              {name(data, h.actor_id)} <br /> {label(h.action)}{" "}
-              {label(h.entity)}
-            </strong>
-            {h.unread && <span className="badge">{t("New")}</span>}
-          </div>
-          <p>
-            {new Intl.DateTimeFormat("en-PH", {
-              dateStyle: "medium",
-              timeStyle: "short",
-              timeZone: "Asia/Manila",
-            }).format(new Date(h.created_at))}{" "}
-            {t("Manila")}
-          </p>
-          <details>
-            <summary>{t("What changed")}</summary>
-            {Object.entries(fields)
-              .filter(([key]) => h.before?.[key] !== h.after?.[key])
-              .map(([key, label]) => (
-                <p key={key}>
-                  <strong>{label}</strong>
-                  <br />
-                  {value(key, h.before?.[key])} → {value(key, h.after?.[key])}
-                </p>
-              ))}
-          </details>
+      {recent.length === 0 && (
+        <div className="empty">
+          <p>{t("No changes yet.")}</p>
+        </div>
+      )}
+      {days.map(({ day, items }) => (
+        <section key={day} className="change-day">
+          <h2 className="section-label">{dayTitle(day)}</h2>
+          {items.map((h) => (
+            <details key={h.id} className="change-row">
+              <summary>
+                <Avatar data={data} id={h.actor_id} size="sm" />
+                <span className="change-what">
+                  <b>{name(data, h.actor_id).trim().split(/\s+/)[0]}</b>{" "}
+                  {label(h.action)} {label(h.entity)}
+                </span>
+                {h.unread && (
+                  <span className="change-new" aria-label={t("New")} />
+                )}
+                <time className="meta" dateTime={h.created_at}>
+                  {manilaTime(h.created_at)}
+                </time>
+              </summary>
+              {Object.entries(fields)
+                .filter(([key]) => h.before?.[key] !== h.after?.[key])
+                .map(([key, label]) => (
+                  <p key={key}>
+                    <strong>{label}</strong>
+                    <br />
+                    {value(key, h.before?.[key])} →{" "}
+                    {value(key, h.after?.[key])}
+                  </p>
+                ))}
+            </details>
+          ))}
         </section>
       ))}
+      {recent.length > limit && (
+        <button
+          className="secondary big"
+          onClick={() => setLimit((n) => n + PAGE)}
+        >
+          {t("Show more")}
+        </button>
+      )}
     </>
   );
 }

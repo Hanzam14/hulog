@@ -2201,6 +2201,42 @@ select {
   margin: 0;
   text-align: center;
 }
+/* Changes: one card per day, one line per change. */
+.change-day {
+  padding-block: 8px;
+}
+.change-day > .section-label {
+  margin: 4px 0 4px;
+}
+.change-row + .change-row {
+  border-top: 1px dashed var(--line);
+}
+.change-row > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+.change-row > summary::-webkit-details-marker {
+  display: none;
+}
+.change-what {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.change-new {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pink, #ff7aa2);
+  flex-shrink: 0;
+}
+.change-row > p {
+  margin: 0 0 10px 38px;
+}
 /* Desktop stays at the tablet width instead of stretching to 1000px. */
 @media (min-width: 1100px) {
   .app {
