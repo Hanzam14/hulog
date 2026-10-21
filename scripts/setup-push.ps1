@@ -2,7 +2,7 @@
 # It makes the VAPID keys and the cron secret, stores them as Supabase Edge Function
 # secrets, deploys `notify`, and copies the cron SQL to your clipboard.
 # Private values are never printed or written to the repo.
-param([string]$ProjectRef = 'zvavdpxlmbskbumxntfi')
+param([Parameter(Mandatory = $true)][string]$ProjectRef)
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
 

@@ -142,7 +142,7 @@ Also test: invite reuse fails; expired and revoked invites fail; concurrent clai
 
 ## 9. Deliverables
 
-- Repo at `C:\Projects\Hulog`: `README.md` (what it is, MIT), `LICENSE` (MIT), `SETUP.md` (create Supabase project, enable Google provider + redirect URLs, run migrations, env vars, deploy to Vercel, VAPID keys for v1.1, iOS home-screen note), `AGENTS.md` (startup, commands, rules summary pointing to this spec), `.env.example`, `supabase/` migrations + tests, `src/`.
+- Repo: `README.md` (what it is, MIT), `LICENSE` (MIT), `SETUP.md` (create Supabase project, enable Google provider + redirect URLs, run migrations, env vars, deploy to Vercel, VAPID keys for v1.1, iOS home-screen note), `AGENTS.md` (startup, commands, rules summary pointing to this spec), `.env.example`, `supabase/` migrations + tests, `src/`.
 - Local git repo with commits; no remote.
 
 ## 10. Hulog v2 — Couples Financial Companion (Custody, Ipon Goals & Abono Tracker)

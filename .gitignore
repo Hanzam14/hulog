@@ -8,3 +8,15 @@ coverage/
 supabase/.temp/
 supabase/.branches/
 .scratch/
+
+# Agent and process files stay local (not part of the public repo)
+AGENTS.md
+CLAUDE.md
+CONTEXT.md
+HANDOFF.md
+.agents/
+.claude/
+.continuity/
+task-briefs/
+docs/*_REPORT.md
+docs/*_CLAIMS.md
