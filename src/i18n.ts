@@ -2,6 +2,11 @@ import { useSyncExternalStore } from "react";
 
 export type Lang = "en" | "tl" | "taglish";
 const taglish = {
+  Expenses: "Gastos",
+  Grupo: "Grupo",
+  App: "App",
+  More: "Iba pa",
+  "Split expenses": "Hatian sa gastos",
   "Personal savings history": "History ng sariling ipon",
   Goal: "Goal",
   "Savings entry": "Record ng ipon",
@@ -490,6 +495,11 @@ const taglish = {
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
 const en = {
+  Expenses: "Expenses",
+  Grupo: "Group",
+  App: "App",
+  More: "More",
+  "Split expenses": "Split expenses",
   "Personal savings history": "Your savings history",
   Goal: "Goal",
   "Savings entry": "Savings entry",
@@ -972,6 +982,11 @@ const en = {
   "Take out savings": "Take out",
 } satisfies Dictionary;
 const tl = {
+  Expenses: "Gastos",
+  Grupo: "Grupo",
+  App: "App",
+  More: "Iba pa",
+  "Split expenses": "Hatian sa gastos",
   "Personal savings history": "Kasaysayan ng sariling ipon",
   Goal: "Layunin",
   "Savings entry": "Tala ng ipon",
