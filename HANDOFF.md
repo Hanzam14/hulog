@@ -48,18 +48,17 @@ The owner reports the two-phone check, or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `29`
-- Updated: `2026-10-21T04:12:49Z`
-- Status: `completed, not merged`
+- Revision: `30`
+- Updated: `2026-10-21T04:38:19Z`
+- Status: `COMPLETED - SESSION CLOSED`
 - Persistence: `commit_pending`
-- Summary: Close round early (SPEC rule 8a) on branch feat/close-early-round (commit 00a9589): close_cycle_early RPC moves end_date to yesterday when every active member's days are confirmed; round settles today and payout is available. Not merged, not pushed, migration not applied to hosted Supabase.
-- Authority: Owner request 2026-10-21 via linked session: option to close a full pot early; owner 'well do it' for review + 360px check.
+- Summary: Close round early (SPEC rule 8a) is live: main 6a9a7df merged and pushed, hosted migration 20261021000200_close_cycle_early applied (remote up to date), Vercel deploy success. Follow-up 978d479 (deployed): History payout-state chip removed; Hulog AGENTS.md/CONTEXT.md adopt the owner's standing approval to push, merge, apply new hosted migrations and deploy verified work without asking.
+- Authority: Owner chat 2026-10-21: 'well do it', 'well do that', 'fix this as well just remove it', 'close this out'.
 
 ### Decisions
 
-- Either active member closes in one tap (no proposal) because a full pot is already mutually confirmed.
-- end_date = today-1 with planned_end_date kept, so all phase/payout/debt rules stay unchanged.
-- Closing early is irreversible.
+- Either active member closes a full open round in one tap (no proposal); end_date = today-1 with planned_end_date kept; irreversible.
+- Project rules now allow push/merge/hosted new-migration apply/Vercel deploy after checks and reviews pass; destructive cloud SQL, hosted db reset, OAuth/credential changes, paid services and external sends still need the owner.
 
 ### Blockers
 
@@ -67,22 +66,23 @@ The owner reports the two-phone check, or production state changes.
 
 ### Risks and unresolved items
 
-- Hosted migration 20261021000200_close_cycle_early not applied.
-- Owner phone check pending.
-- In solo/demo mode the payout showed 'Natanggap na' immediately after close (solo-only display, not investigated).
-- Merge decision pending with owner.
+- Owner phone check of close-early on the real full round pending.
+- sol-review.ps1 Claims-mode host preflight fails for Hulog (npm.cmd path resolution); the rule edit has a diff-mode review only.
+- Solo/demo mode showed the payout as received right after early close (demo-only, not investigated).
+- None
 
 ### Evidence and checks
 
 - docs/SPEC.md
 - supabase/migrations/20261021000200_close_cycle_early.sql
 - supabase/tests/database/close_early.test.sql
-- npm run lint clean
-- npm test 145/145 (18 files)
-- npm run build OK
-- local supabase test db 384 assertions PASS (7 files, new close_early.test.sql 27)
-- Sol (gpt-6.1-sol, high) diff review: no actionable defects
-- 360px browser check in solo mode: one 'Isara na ang round' link only when pot full, no horizontal scroll, closes to Settling, no console errors
+- AGENTS.md
+- CONTEXT.md
+- 978d479: npm run lint clean, npm test 145/145, npm run build OK
+- close-early: local supabase test db 384 assertions PASS; Sol (gpt-6.1-sol, high) diff review no defects; 360px solo browser check PASS
+- Rule edit: Sol (gpt-6.1-sol, medium) diff-mode review, only finding was a stale local launch.json entry (removed); Claims-mode review not run because sol-review.ps1 host preflight failed (npm.cmd resolved node_modules\npm under the repo)
+- supabase db push --dry-run after apply: Remote database is up to date
+- Vercel status success for 6a9a7df and 978d479
 
 ### Governed artifact correlations
 
@@ -90,5 +90,5 @@ The owner reports the two-phone check, or production state changes.
 
 ### Exact next action
 
-Owner decides to merge feat/close-early-round, then apply migration 20261021000200 to hosted Supabase and deploy.
+None pending - owner tries 'Isara na ang round' on the full round on a phone.
 <!-- CONTINUITY_CHECKPOINT_END -->
