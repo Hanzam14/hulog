@@ -48,12 +48,12 @@ The owner reports the two-phone check, or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `24`
-- Updated: `2026-10-21T02:02:49Z`
-- Status: `COMPLETED - LIVE, TWO-PHONE CHECK PENDING`
+- Revision: `25`
+- Updated: `2026-10-21T02:23:20Z`
+- Status: `PARTIAL - SIMPLIFY UI READY FOR OWNER LOOK`
 - Persistence: `commit_pending`
-- Summary: PR #10 merged (fd96253) and deployed; personal-savings migration applied to hosted Supabase (read-only checks: 3 tables with RLS, 4 RPCs); old remote branches deleted; PR #11 prettier formatting merged as c090d47. Local checkout moved from deleted antigravity/solo-mode to main; a diverged local continuity chain was stashed, not committed.
-- Authority: Owner chat 2026-10-21: apply migration, delete merged branches; this session: commit continuity files and switch local checkout to main.
+- Summary: Simplified UI built on local branch design/simplify (c45dc70 + fix 56c1d28): Home = pending checks, round + one primary button, single Ipon section; mode toggle, custody card, pot location and sign-out moved to Group; nav labels visible; empty History shows only the empty line. Not pushed, not merged, not deployed.
+- Authority: Owner chat 2026-10-21: simplify/deslopify the UX/UI, 'go ahead'. No push/deploy authorized.
 
 ### Decisions
 
@@ -65,15 +65,19 @@ The owner reports the two-phone check, or production state changes.
 
 ### Risks and unresolved items
 
-- Private vs shared personal goals not yet confirmed on two real phones
-- git stash@{0} holds the stale antigravity/solo-mode continuity chain (its own checkpoints 21-22); drop once no longer needed
+- Not checked on a real phone or with a pending confirmation or both goal kinds present
+- Group 2-column desktop layout not checked
+- Builder: Sonnet subagent (Codex usage limit hit); Opus lead review
+- Owner looks at the new UI; then push design/simplify and open a PR
+- Earlier: two-phone private vs shared personal goal check still pending
 
 ### Evidence and checks
 
-- HANDOFF.md
-- docs/PERSONAL_SAVINGS_REPORT.md
-- project_continuity.py verify on main: PASS (revision 22, metadata 37) before checkpoint
-- git log origin/main: c090d47 (#11) on top of fd96253 (#10)
+- docs/SIMPLIFY_REPORT.md
+- docs/simplify-shots/
+- task-briefs/simplify-ui-20261021.md
+- Lead rerun on 56c1d28: npm run lint clean; npm test 136/136 (16 files); npm run build OK
+- Lead reviewed 360x780 screenshots in docs/simplify-shots/ and test diffs (layout-only assertion moves; custody amount now asserted in Group)
 
 ### Governed artifact correlations
 
@@ -81,5 +85,5 @@ The owner reports the two-phone check, or production state changes.
 
 ### Exact next action
 
-Owner runs a two-phone check: a private goal stays hidden from the partner, a shared goal shows read-only.
+Owner reviews the simplified UI (screenshots or local dev); on approval push design/simplify and open a PR.
 <!-- CONTINUITY_CHECKPOINT_END -->
