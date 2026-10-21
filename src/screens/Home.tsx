@@ -49,6 +49,12 @@ export default function Home(props: ViewProps) {
     )
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
+  const hasPersonal = (data.personalGoals ?? []).some(
+    (g) => !g.deleted_at && (g.owner_id === user || g.visibility === "shared"),
+  );
+  const partner = data.memberships.find(
+    (m) => m.status === "active" && m.user_id !== user,
+  );
   return (
     <>
       <h1 className="sr-only">{group.name}</h1>
@@ -293,6 +299,9 @@ export default function Home(props: ViewProps) {
 
       <section className="ipon-home-section">
         <h2 className="section-label">{t("Ipon")}</h2>
+        {activeGoals.length > 0 && hasPersonal && (
+          <h3 className="sub-label">{t("Ipon goals")}</h3>
+        )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
             <IponCard
@@ -316,11 +325,16 @@ export default function Home(props: ViewProps) {
         ))}
         <PersonalSavings
           {...props}
+          siblingGoals={activeGoals.length > 0}
           trailing={
             activeGoals.length < 3 ? (
               <Link className="button quiet" to="/ipon/new">
                 <IconSparkles size={18} aria-hidden="true" />{" "}
-                {t("New ipon goal")}
+                {partner
+                  ? t("With {name}", {
+                      name: name(data, partner.user_id).trim().split(/\s+/)[0],
+                    })
+                  : t("With partner")}
               </Link>
             ) : undefined
           }

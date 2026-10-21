@@ -2115,9 +2115,29 @@ nav a {
   gap: 8px;
   justify-content: center;
 }
-.ipon-add-row .quiet,
-.ipon-add-row .button {
+.ipon-add-row > .quiet,
+.ipon-add-row > .button.quiet {
   flex: 1 1 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  text-decoration: none;
+}
+.ipon-home-section > section {
+  margin: 0;
+  padding: 0;
+}
+.ipon-home-section > h2.section-label {
+  margin-top: 4px;
+}
+.sub-label {
+  margin: 4px 0 0;
+  font-size: 15px;
 }
 .settings-grid > .settings-title {
   grid-column: 1 / -1;
