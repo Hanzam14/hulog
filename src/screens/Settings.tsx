@@ -4,7 +4,6 @@ import {
   IconCheck,
   IconCopy,
   IconDownload,
-  IconMapPin,
   IconQrcode,
   IconShare,
   IconTrash,
@@ -113,68 +112,6 @@ export default function Settings({
           busy={busy}
           close={() => setEditingProfile(false)}
         />
-      )}
-      {owner && (
-        <form
-          className="group-name"
-          key={group.name}
-          onSubmit={(event) => {
-            event.preventDefault();
-            const fields = new FormData(event.currentTarget);
-            void run(() =>
-              rpc("update_group", {
-                p_name: fields.get("group-name"),
-                p_pot_location: group.pot_location,
-              }),
-            );
-          }}
-        >
-          <label>
-            {t("Pangalan ng grupo")}
-            <input name="group-name" defaultValue={group.name} required />
-          </label>
-          <button
-            className="round"
-            aria-label={t("Save group name")}
-            disabled={busy}
-          >
-            <IconCheck />
-          </button>
-        </form>
-      )}
-      {owner ? (
-        <form
-          className="pot-place"
-          key={group.pot_location}
-          onSubmit={(e) => {
-            e.preventDefault();
-            const f = new FormData(e.currentTarget);
-            void run(() =>
-              rpc("update_group", {
-                p_name: group.name,
-                p_pot_location: f.get("pot"),
-              }),
-            );
-          }}
-        >
-          <IconMapPin aria-hidden="true" />
-          <input
-            name="pot"
-            aria-label={t("Pot held at")}
-            placeholder={t("where's the pot?")}
-            defaultValue={group.pot_location}
-          />
-          <button className="round" aria-label={t("Save")} disabled={busy}>
-            <IconCheck />
-          </button>
-        </form>
-      ) : (
-        group.pot_location && (
-          <p className="place">
-            <IconMapPin size={16} aria-label={t("Pot held at")} />{" "}
-            {group.pot_location}
-          </p>
-        )
       )}
       <CustodyCard data={data} />
       <WalletsSettings data={data} user={user} run={run} busy={busy} />
