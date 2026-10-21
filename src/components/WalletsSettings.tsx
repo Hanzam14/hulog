@@ -144,19 +144,22 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
         })}
       </div>
 
-      <form onSubmit={handleAdd} style={{ marginTop: "16px" }}>
-        <input
-          value={newLabel}
-          onChange={(e) => setNewLabel(e.target.value)}
-          placeholder={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
-          aria-label={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
-          maxLength={40}
-          required
-        />
-        <button type="submit" disabled={busy || !newLabel.trim()}>
-          <IconPlus size={16} aria-hidden="true" /> {t("Add wallet")}
-        </button>
-      </form>
+      <details className="wallet-add">
+        <summary>{t("Add wallet")}</summary>
+        <form onSubmit={handleAdd}>
+          <input
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            placeholder={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
+            aria-label={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
+            maxLength={40}
+            required
+          />
+          <button type="submit" disabled={busy || !newLabel.trim()}>
+            <IconPlus size={16} aria-hidden="true" /> {t("Add wallet")}
+          </button>
+        </form>
+      </details>
     </section>
   );
 }

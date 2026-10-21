@@ -88,12 +88,33 @@ vi.mock("./update", () => ({
   subscribeUpdate: () => () => {},
   updateSnapshot: () => ({ needRefresh: false }),
 }));
-type Props = { children?: ReactNode; onClick?: () => void };
+type Props = {
+  children?: ReactNode;
+  element?: ReactNode;
+  onClick?: () => void;
+  onSignOut?: () => void;
+};
 function nodes(node: ReactNode): ReactElement<Props>[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as ReactElement<Props>;
-  return [element, ...nodes(element.props.children)];
+  // Route elements hold their screen in the `element` prop.
+  return [
+    element,
+    ...nodes(element.props.children),
+    ...nodes(element.props.element),
+  ];
+}
+// Sign out is a header button before a group loads and a Group-screen action after.
+function signOutAction(tree: ReactNode): (() => void) | undefined {
+  const all = nodes(tree);
+  const header = all.find(
+    (node) =>
+      node.type === "button" && text(node.props.children) === "Sign out",
+  );
+  return (
+    header?.props.onClick ?? all.find((n) => n.props.onSignOut)?.props.onSignOut
+  );
 }
 function text(node: ReactNode): string {
   if (Array.isArray(node)) return node.map(text).join("");
@@ -151,11 +172,15 @@ async function app() {
     render();
   };
   const click = async (label: string) => {
-    const button = nodes(tree).find(
-      (node) => node.type === "button" && text(node.props.children) === label,
-    );
-    expect(button, label).toBeDefined();
-    button!.props.onClick!();
+    const action =
+      label === "Sign out"
+        ? signOutAction(tree)
+        : nodes(tree).find(
+            (node) =>
+              node.type === "button" && text(node.props.children) === label,
+          )?.props.onClick;
+    expect(action, label).toBeDefined();
+    action!();
     await flush();
   };
   render();
@@ -166,9 +191,12 @@ async function app() {
     click,
     flush,
     hasButton: (label: string) =>
-      nodes(tree).some(
-        (node) => node.type === "button" && text(node.props.children) === label,
-      ),
+      label === "Sign out"
+        ? signOutAction(tree) !== undefined
+        : nodes(tree).some(
+            (node) =>
+              node.type === "button" && text(node.props.children) === label,
+          ),
   };
 }
 describe("configured Supabase solo entry", () => {

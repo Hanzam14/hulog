@@ -301,7 +301,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
 
   return (
     <>
-      <h1>{t("Shared expenses & Abono")}</h1>
+      <h1>{t("Split expenses")}</h1>
 
       {/* Hero Net Abono Balance Card */}
       <section className="abono-hero abono-sheet">

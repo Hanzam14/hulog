@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import {
   IconEye,
   IconLock,
@@ -10,7 +10,6 @@ import type { PersonalEntry, PersonalGoal } from "../data";
 import { rpc } from "../data";
 import { money, parsePesos, shortDate } from "../helpers";
 import { t, label } from "../i18n";
-import { isSoloMode } from "../solo";
 import { personalBalance } from "../personal";
 import { name, type Run, type ViewProps } from "./shared";
 
@@ -252,28 +251,6 @@ export function PersonalGoalCard({
       </div>
       {owner ? (
         <>
-          <button
-            className="secondary personal-share"
-            disabled={busy}
-            onClick={() =>
-              void run(() =>
-                rpc("update_personal_goal", {
-                  p_goal_id: goal.id,
-                  p_visibility:
-                    goal.visibility === "private" ? "shared" : "private",
-                }),
-              )
-            }
-          >
-            {goal.visibility === "private" ? (
-              <IconEye size={18} aria-hidden="true" />
-            ) : (
-              <IconLock size={18} aria-hidden="true" />
-            )}
-            {goal.visibility === "private"
-              ? t("Share read-only")
-              : t("Make private")}
-          </button>
           <div className="actions">
             <button
               aria-label={t("Record deposit")}
@@ -371,6 +348,28 @@ export function PersonalGoalCard({
       {owner && (
         <details>
           <summary>{t("Manage personal goal")}</summary>
+          <button
+            className="secondary personal-share"
+            disabled={busy}
+            onClick={() =>
+              void run(() =>
+                rpc("update_personal_goal", {
+                  p_goal_id: goal.id,
+                  p_visibility:
+                    goal.visibility === "private" ? "shared" : "private",
+                }),
+              )
+            }
+          >
+            {goal.visibility === "private" ? (
+              <IconEye size={18} aria-hidden="true" />
+            ) : (
+              <IconLock size={18} aria-hidden="true" />
+            )}
+            {goal.visibility === "private"
+              ? t("Share read-only")
+              : t("Make private")}
+          </button>
           <div className="actions">
             <button
               className="secondary"
@@ -400,7 +399,10 @@ export function PersonalGoalCard({
     </article>
   );
 }
-export default function PersonalSavings(props: ViewProps) {
+export default function PersonalSavings({
+  trailing,
+  ...props
+}: ViewProps & { trailing?: ReactNode }) {
   const [creating, setCreating] = useState(false);
   const goals = (props.data.personalGoals ?? []).filter(
     (g) =>
@@ -412,14 +414,7 @@ export default function PersonalSavings(props: ViewProps) {
       id="personal-savings"
       aria-labelledby="personal-savings-title"
     >
-      <h2 id="personal-savings-title">{t("Personal savings")}</h2>
-      <p className="meta">
-        {isSoloMode()
-          ? t("On this device only. Sign in to sync personal savings.")
-          : t(
-              "Your goals sync to your account. Private unless you choose to share.",
-            )}
-      </p>
+      <h3 id="personal-savings-title">{t("Personal savings")}</h3>
       {goals.map((goal) => (
         <PersonalGoalCard key={goal.id} goal={goal} {...props} />
       ))}
@@ -430,13 +425,16 @@ export default function PersonalSavings(props: ViewProps) {
           close={() => setCreating(false)}
         />
       ) : (
-        <button
-          className="secondary"
-          disabled={props.busy}
-          onClick={() => setCreating(true)}
-        >
-          <IconPlus size={18} aria-hidden="true" /> {t("New personal goal")}
-        </button>
+        <div className="ipon-add-row">
+          <button
+            className="quiet"
+            disabled={props.busy}
+            onClick={() => setCreating(true)}
+          >
+            <IconPlus size={18} aria-hidden="true" /> {t("New personal goal")}
+          </button>
+          {trailing}
+        </div>
       )}
       {(props.data.personalHistory ?? []).some(
         (h) => h.actor_id === props.user,

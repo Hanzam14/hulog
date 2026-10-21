@@ -303,9 +303,11 @@ export default function App() {
                 )}
               </NavLink>
             )}
-            <button className="quiet" disabled={busy} onClick={signOut}>
-              {t("Sign out")}
-            </button>
+            {!(own && own.status === "active") && (
+              <button className="quiet" disabled={busy} onClick={signOut}>
+                {t("Sign out")}
+              </button>
+            )}
           </div>
         )}
       </header>
@@ -445,19 +447,19 @@ export default function App() {
           <nav>
             <NavLink to="/" end>
               <IconHome aria-hidden="true" />
-              <span className="sr-only">{t("Home")}</span>
+              <span className="nav-label">{t("Home")}</span>
             </NavLink>
             <NavLink to="/tracker">
               <IconReceipt2 aria-hidden="true" />
-              <span className="sr-only">{t("Tracker")}</span>
+              <span className="nav-label">{t("Expenses")}</span>
             </NavLink>
             <NavLink to="/history">
               <IconCalendar aria-hidden="true" />
-              <span className="sr-only">{t("History")}</span>
+              <span className="nav-label">{t("History")}</span>
             </NavLink>
             <NavLink to="/settings">
               <IconUsers aria-hidden="true" />
-              <span className="sr-only">{t("Group")}</span>
+              <span className="nav-label">{t("Grupo")}</span>
             </NavLink>
           </nav>
           <main>
@@ -573,6 +575,7 @@ export default function App() {
                     user={session.user.id}
                     run={run}
                     busy={busy}
+                    onSignOut={() => void signOut()}
                   />
                 }
               />
