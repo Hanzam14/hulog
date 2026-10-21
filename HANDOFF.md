@@ -48,12 +48,12 @@ The owner reports the two-phone check, or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `26`
-- Updated: `2026-10-21T02:48:28Z`
-- Status: `PARTIAL - PR #12 OPEN, OWNER LOOKING`
+- Revision: `27`
+- Updated: `2026-10-21T03:05:35Z`
+- Status: `COMPLETED - SIMPLIFIED UI ON MAIN`
 - Persistence: `commit_pending`
-- Summary: Owner reported 2026-10-21 that private vs shared personal goals work on real phones (two-phone check PASS, owner-reported). PR #12 (design/simplify) open: simplified UI plus a9b604b (custom select chevron 16px from edge; single 560px column on desktop; Group single column). Not merged or deployed to production.
-- Authority: Owner chat 2026-10-21: simplify UI, push and open PR, fix dropdown arrow and wide-layout look.
+- Summary: PR #12 (simplified UI) merged by owner as 78fe55f; follow-ups pushed to main: select chevron 16px in, desktop width 760px (not phone column, not 1000px) with two-column Group, More section as one card, removed redundant round status chip and payout countdown line, Changes tab grouped by day with one line per change and Show more (20 at a time). main at c7be40a.
+- Authority: Owner chat 2026-10-21: merge PR #12, then fix desktop layout, update card, cancelled chip/countdown, and make Changes less cramped.
 
 ### Decisions
 
@@ -65,16 +65,15 @@ The owner reports the two-phone check, or production state changes.
 
 ### Risks and unresolved items
 
-- Simplified UI not yet seen by owner on a phone; pending-confirmation and both-goal-kinds states not screenshotted
-- Owner reviews PR #12 Vercel preview and decides to merge
+- Changes tab with real history not seen in a browser (local demo has none); covered by server-render tests only
+- Vercel production deploy of latest main not checked by the lead
 
 ### Evidence and checks
 
+- src/screens/changes.test.ts
 - docs/SIMPLIFY_REPORT.md
-- docs/simplify-shots/
-- Worker rerun on a9b604b: lint clean, npm test 136/136 (16 files), build OK
-- Lead measured at 1280px: .app 560px, settings-grid one column, no overflow in main
-- Worker zoom at 375px: select chevron about 25px inside the right border
+- Worker on c7be40a: lint clean, npm test 139/139 (17 files) incl. 3 new Changes tests, build OK
+- Lead measured 1280px: app 760px, Group grid two columns, no overflow; More-card buttons equal 149x63 at 375px
 
 ### Governed artifact correlations
 
@@ -82,5 +81,5 @@ The owner reports the two-phone check, or production state changes.
 
 ### Exact next action
 
-Owner checks PR #12 preview on a phone and merges if happy.
+Owner uses the live app; report any screen that still feels cluttered.
 <!-- CONTINUITY_CHECKPOINT_END -->
