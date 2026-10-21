@@ -2169,12 +2169,9 @@ select {
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
-/* One calm phone-width column on every screen size. */
-.app,
-.welcome {
-  --container-width: 560px;
-  max-width: 560px;
-}
-.settings-grid {
-  grid-template-columns: minmax(0, 1fr);
+/* Desktop stays at the tablet width instead of stretching to 1000px. */
+@media (min-width: 1100px) {
+  .app {
+    --container-width: 760px;
+  }
 }
