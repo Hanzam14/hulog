@@ -2160,7 +2160,7 @@ details.reminder-time > summary {
   padding-block: 10px;
   cursor: pointer;
 }
-/* Keep the native dropdown arrow off the rounded edge. */
+/* Own chevron, 16px in from the rounded edge (native arrow hugs it). */
 select {
   appearance: none;
   -webkit-appearance: none;
