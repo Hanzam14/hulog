@@ -50,8 +50,8 @@ describe("display helpers", () => {
     expect(addDays("2028-02-28", 1)).toBe("2028-02-29");
   });
   it("labels phases", () => {
-    expect(phaseDisplay("open", 1)).toBe("Open · 1 day left");
-    expect(phaseDisplay("open", 15)).toBe("Open · 15 days left");
+    expect(phaseDisplay("open", 1)).toBe("Open, 1 day left");
+    expect(phaseDisplay("open", 15)).toBe("Open, 15 days left");
     expect(phaseDisplay("settling", 0)).toContain("last day");
     expect(phaseDisplay("ended", 0)).toBe("Ended");
     expect(phaseDisplay("completed", 0)).toBe("Goal reached ✓");
@@ -120,17 +120,17 @@ describe("solo helpers", () => {
 
     const goal = { title: "[Solo] AI Subscription", proposed_by: "user-1" };
     expect(getSoloBadgeText(goal, mockData, "user-1")).toBe(
-      "Solo · You (Partner can view)",
+      "Solo, You (Partner can view)",
     );
     expect(getSoloBadgeText(goal, mockData, "user-2")).toBe(
-      "Solo · Angelo — visible to partner",
+      "Solo, Angelo — visible to partner",
     );
 
     const singleData = {
       memberships: [{ user_id: "user-1", status: "active" }],
       profiles: [{ id: "user-1", display_name: "You", nickname: "You" }],
     };
-    expect(getSoloBadgeText(goal, singleData, "user-1")).toBe("Solo · You");
+    expect(getSoloBadgeText(goal, singleData, "user-1")).toBe("Solo, You");
   });
 
   it("detects solo rounds and builds solo cycle badge text", () => {
@@ -154,10 +154,10 @@ describe("solo helpers", () => {
     };
     expect(isSoloCycle(soloCycle, 2)).toBe(true);
     expect(getSoloCycleBadgeText(soloCycle, mockData, "user-1")).toBe(
-      "Solo · You (Partner can view)",
+      "Solo, You (Partner can view)",
     );
     expect(getSoloCycleBadgeText(soloCycle, mockData, "user-2")).toBe(
-      "Solo · Angelo — visible to partner",
+      "Solo, Angelo — visible to partner",
     );
 
     const duoCycle = {

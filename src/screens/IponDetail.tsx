@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import {
-  IconArrowLeft,
-  IconCheck,
-  IconPlus,
-  IconX,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import Avatar from "../components/Avatar";
 import IponCard from "../components/IponCard";
 import Tally from "../components/Tally";
@@ -35,9 +30,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
   }
 
   const activeMemberIds = new Set(
-    data.memberships
-      .filter((m) => m.status === "active")
-      .map((m) => m.user_id),
+    data.memberships.filter((m) => m.status === "active").map((m) => m.user_id),
   );
   const activeWallets = (data.wallets ?? []).filter(
     (w) => !w.archived_at && activeMemberIds.has(w.holder_id),
@@ -48,7 +41,9 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
   const hasPendingOrDelete = contributions.some(
-    (c) => !c.deleted_at && (c.status === "pending" || Boolean(c.delete_proposed_by)),
+    (c) =>
+      !c.deleted_at &&
+      (c.status === "pending" || Boolean(c.delete_proposed_by)),
   );
 
   return (
@@ -64,7 +59,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
         <Link to="/" className="back" aria-label={t("Back")}>
           <IconArrowLeft />
         </Link>
-        <h1 style={{ margin: 0, fontSize: "22px" }}>{t("Ipon detail")}</h1>
+        <h1 style={{ margin: 0, fontSize: "20px" }}>{t("Ipon detail")}</h1>
       </div>
 
       <section>
@@ -75,7 +70,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
             className="sticker notice"
             style={{
               margin: "12px 0",
-              padding: "10px 14px",
+              padding: "8px 12px",
               fontSize: "13px",
               color: "var(--ink)",
               lineHeight: 1.4,
@@ -201,7 +196,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                             <div>
                               <span
                                 className="chip"
-                                style={{ fontSize: "11px", margin: "4px 0" }}
+                                style={{ fontSize: "13px", margin: "4px 0" }}
                               >
                                 {t("₱0 · Observing")}
                               </span>
@@ -224,7 +219,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
 
             {/* Wallet move proposal UI */}
             {activeWallets.length > 1 && (
-              <div style={{ margin: "14px 0" }}>
+              <div style={{ margin: "12px 0" }}>
                 {g.pending_wallet_id ? (
                   <div
                     className="sticker confirm"
@@ -232,7 +227,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      gap: "10px",
+                      gap: "8px",
                     }}
                   >
                     <div>
@@ -358,7 +353,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
             )}
 
             {/* Two-step withdrawal / close goal UI */}
-            <div style={{ margin: "14px 0" }}>
+            <div style={{ margin: "12px 0" }}>
               {g.withdraw_proposed_by ? (
                 <div
                   className="sticker confirm"
@@ -366,7 +361,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    gap: "10px",
+                    gap: "8px",
                     padding: "12px",
                   }}
                 >
@@ -452,14 +447,17 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
           contributions.map((c) => {
             const isOwner = (c.last_edited_by ?? c.created_by) === user;
             const canConfirm =
-              c.status === "pending" && !c.deleted_at && !isOwner && !g.withdrawn_at;
+              c.status === "pending" &&
+              !c.deleted_at &&
+              !isOwner &&
+              !g.withdrawn_at;
             return (
               <article className="entry" key={c.id}>
                 <div className="row">
                   <strong>
                     {name(data, c.member_id)}
                     {c.steps
-                      ? ` · ${t("{steps} hulogs", { steps: c.steps })}`
+                      ? `, ${t("{steps} hulogs", { steps: c.steps })}`
                       : ""}
                   </strong>
                   <span className="chip">
@@ -471,9 +469,10 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   </span>
                 </div>
                 <p>
-                  {money(c.amount_centavos)} ·{" "}
+                  {money(c.amount_centavos)}
+                  <br />
                   {shortDate(c.created_at.slice(0, 10))}
-                  {c.note ? ` · ${c.note}` : ""}
+                  {c.note ? `, ${c.note}` : ""}
                 </p>
 
                 {!c.deleted_at && !g.withdrawn_at && (
@@ -596,13 +595,10 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                                 disabled={busy}
                                 onClick={() =>
                                   void run(() =>
-                                    rpc(
-                                      "respond_delete_savings_contribution",
-                                      {
-                                        p_id: c.id,
-                                        p_action: "decline",
-                                      },
-                                    ),
+                                    rpc("respond_delete_savings_contribution", {
+                                      p_id: c.id,
+                                      p_action: "decline",
+                                    }),
                                   )
                                 }
                               >
@@ -613,13 +609,10 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                                 disabled={busy}
                                 onClick={() =>
                                   void run(() =>
-                                    rpc(
-                                      "respond_delete_savings_contribution",
-                                      {
-                                        p_id: c.id,
-                                        p_action: "accept",
-                                      },
-                                    ),
+                                    rpc("respond_delete_savings_contribution", {
+                                      p_id: c.id,
+                                      p_action: "accept",
+                                    }),
                                   )
                                 }
                               >
@@ -632,13 +625,10 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                               disabled={busy}
                               onClick={() =>
                                 void run(() =>
-                                  rpc(
-                                    "respond_delete_savings_contribution",
-                                    {
-                                      p_id: c.id,
-                                      p_action: "cancel",
-                                    },
-                                  ),
+                                  rpc("respond_delete_savings_contribution", {
+                                    p_id: c.id,
+                                    p_action: "cancel",
+                                  }),
                                 )
                               }
                             >

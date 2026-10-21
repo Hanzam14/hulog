@@ -51,11 +51,7 @@ export default function IponCard({
   const activeMembers = data.memberships.filter((m) => m.status === "active");
 
   return (
-    <Link
-      to={`/ipon/${g.id}`}
-      className="pot ipon-card"
-      aria-label={g.title}
-    >
+    <Link to={`/ipon/${g.id}`} className="pot ipon-card" aria-label={g.title}>
       <div className="pot-top" style={{ alignItems: "flex-start" }}>
         <IconTarget className="pig" size={44} aria-hidden="true" />
         <div className="pot-amount" style={{ flex: 1, minWidth: 0 }}>
@@ -72,7 +68,7 @@ export default function IponCard({
             <span
               style={{
                 fontFamily: "var(--display)",
-                fontSize: "18px",
+                fontSize: "20px",
                 fontWeight: 700,
                 color: "var(--ink)",
                 wordBreak: "break-word",
@@ -84,7 +80,7 @@ export default function IponCard({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
+                gap: "8px",
                 flexWrap: "wrap",
               }}
             >
@@ -92,11 +88,11 @@ export default function IponCard({
                 <span
                   className="chip"
                   style={{
-                    fontSize: "11px",
-                    padding: "1px 8px",
+                    fontSize: "13px",
+                    padding: "4px 8px",
                     fontWeight: 600,
-                    background: "var(--brand-soft, #fdf2f8)",
-                    color: "var(--brand, #db2777)",
+                    background: "var(--brand-soft)",
+                    color: "var(--brand)",
                     border: "1px solid currentColor",
                   }}
                 >
@@ -105,7 +101,7 @@ export default function IponCard({
               )}
               <span
                 className="chip"
-                style={{ fontSize: "11px", padding: "1px 8px" }}
+                style={{ fontSize: "13px", padding: "4px 8px" }}
               >
                 {g.goal_mode === "matched"
                   ? cadenceDisplay(g.cadence_days)
@@ -152,7 +148,9 @@ export default function IponCard({
         </span>
       </div>
       {((g.goal_mode === "matched" && g.status === "accepted" && g.num_steps) ||
-        (isSoloGoal(g) && g.status === "accepted" && activeMembers.length > 1)) && (
+        (isSoloGoal(g) &&
+          g.status === "accepted" &&
+          activeMembers.length > 1)) && (
         <div className="members" style={{ padding: "4px 0 0" }}>
           {memberItems.map((p) => {
             const isSolo = isSoloGoal(g);
@@ -172,13 +170,19 @@ export default function IponCard({
               <div className="member" key={p.member_id}>
                 <Avatar data={data} id={p.member_id} size="sm" />
                 {isObserving ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
                     <span style={{ fontSize: "13px", fontWeight: 500 }}>
                       {name(data, p.member_id).trim().split(/\s+/)[0]}
                     </span>
                     <span
                       className="chip"
-                      style={{ fontSize: "10px", padding: "1px 6px" }}
+                      style={{ fontSize: "13px", padding: "4px 4px" }}
                     >
                       {t("₱0 · Observing")}
                     </span>
@@ -192,7 +196,13 @@ export default function IponCard({
                     tone={tone(data, p.member_id)}
                   />
                 ) : (
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
                     <span style={{ fontSize: "13px", fontWeight: 500 }}>
                       {name(data, p.member_id).trim().split(/\s+/)[0]}
                     </span>

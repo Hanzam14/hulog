@@ -94,7 +94,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
           paddingBottom: "10px",
         }}
       >
-        <h2 style={{ margin: 0, fontSize: "19px" }}>
+        <h2 style={{ margin: 0, fontSize: "20px" }}>
           {t("Where our money is")}
         </h2>
         <strong
@@ -107,7 +107,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
           {money(totalActive)}
         </strong>
       </div>
-      <div style={{ display: "grid", gap: "14px" }}>
+      <div style={{ display: "grid", gap: "12px" }}>
         {holderIds.map((holderId) => {
           const holderWallets = unifiedWallets.filter(
             (item) => item.holder_id === holderId,
@@ -135,14 +135,14 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                   {!holderActive && (
                     <span
                       className="chip"
-                      style={{ fontSize: "11px", padding: "1px 8px" }}
+                      style={{ fontSize: "13px", padding: "4px 8px" }}
                     >
                       {t("Former member")}
                     </span>
                   )}
                 </div>
                 <strong
-                  style={{ fontFamily: "var(--display)", fontSize: "16px" }}
+                  style={{ fontFamily: "var(--display)", fontSize: "15px" }}
                 >
                   {money(holderTotal)}
                 </strong>
@@ -152,7 +152,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
-                  gap: "6px 8px",
+                  gap: "4px 8px",
                 }}
               >
                 {holderWallets.map((item) => (
@@ -163,10 +163,10 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "4px",
-                      padding: "3px 10px",
+                      padding: "4px 8px",
                       background: "var(--highlight)",
                       borderRadius: "999px",
-                      border: "1.5px solid var(--ink)",
+                      border: "1.5px solid var(--line)",
                       fontSize: "13px",
                     }}
                   >
@@ -176,11 +176,12 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                       <span
                         style={{
                           color: "var(--soft)",
-                          fontSize: "11px",
-                          marginLeft: "2px",
+                          fontSize: "13px",
+                          marginLeft: "4px",
                         }}
                       >
-                        ({t("Paluwagan")}: {money(item.paluwagan_centavos)} ·{" "}
+                        ({t("Paluwagan")}: {money(item.paluwagan_centavos)}
+                        <br />
                         {t("Ipon")}: {money(item.ipon_centavos)})
                       </span>
                     )}

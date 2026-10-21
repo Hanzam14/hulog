@@ -99,7 +99,9 @@ export default function Home(props: ViewProps) {
           <p>
             {isSoloMode()
               ? t("Start a round to begin tracking your savings.")
-              : t("Invite your partner from the group tab, then start a round.")}
+              : t(
+                  "Invite your partner from the group tab, then start a round.",
+                )}
           </p>
 
           {!isSoloMode() && active.length < 2 && (
@@ -117,8 +119,6 @@ export default function Home(props: ViewProps) {
               {t("Switch to solo mode")}
             </button>
           )}
-
-
         </div>
       ) : (
         <>
@@ -126,7 +126,7 @@ export default function Home(props: ViewProps) {
           {c.status === "proposed" ? (
             <Proposal c={c} user={user} run={run} busy={busy} />
           ) : (
-            <div className="members">
+            <div className="members tally-sheet">
               {data.progress
                 .filter((p) => p.cycle_id === c.id)
                 .map((p) => {
@@ -137,11 +137,20 @@ export default function Home(props: ViewProps) {
                     <div className="member" key={p.member_id}>
                       <Avatar data={data} id={p.member_id} />
                       {isObserving ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "4px",
+                          }}
+                        >
                           <strong>{name(data, p.member_id)}</strong>
                           <span
                             className="chip"
-                            style={{ fontSize: "11px", alignSelf: "flex-start" }}
+                            style={{
+                              fontSize: "13px",
+                              alignSelf: "flex-start",
+                            }}
                           >
                             {t("₱0 · Observing")}
                           </span>
@@ -162,7 +171,7 @@ export default function Home(props: ViewProps) {
           )}
           {c.status === "accepted" && !closed(c) && (
             <Link className="button big" to="/hulog">
-              <IconPlus aria-hidden="true" /> {t("hulog")}
+              <IconPlus aria-hidden="true" /> {t("hulog!")}
             </Link>
           )}
           <Payout c={c} data={data} user={user} run={run} busy={busy} />
@@ -352,9 +361,7 @@ export default function Home(props: ViewProps) {
                 })}
                 disabled={busy}
                 onClick={() =>
-                  void run(() =>
-                    rpc("confirm_abono_entry", { p_id: ae.id }),
-                  )
+                  void run(() => rpc("confirm_abono_entry", { p_id: ae.id }))
                 }
               >
                 <IconCheck />

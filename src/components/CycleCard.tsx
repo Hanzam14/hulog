@@ -36,16 +36,19 @@ export default function CycleCard({
     >
       <div className="pot-top">
         <IconPigMoney className="pig" size={44} aria-hidden="true" />
-        <div className="pot-amount" style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          className="pot-amount"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
           {soloBadge && (
             <span
               className="chip"
               style={{
-                fontSize: "11px",
-                padding: "1px 8px",
+                fontSize: "13px",
+                padding: "4px 8px",
                 fontWeight: 600,
-                background: "var(--brand-soft, #fdf2f8)",
-                color: "var(--brand, #db2777)",
+                background: "var(--brand-soft)",
+                color: "var(--brand)",
                 border: "1px solid currentColor",
                 marginBottom: "4px",
                 alignSelf: "flex-start",
@@ -54,7 +57,14 @@ export default function CycleCard({
               {soloBadge}
             </span>
           )}
-          <div style={{ display: "flex", alignItems: "baseline", gap: "8px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: "8px",
+              flexWrap: "wrap",
+            }}
+          >
             <strong>{money(c.pot_centavos)}</strong>
             <span className="pot-target">
               {t("of {amount}", { amount: money(c.target_centavos) })}
@@ -90,7 +100,8 @@ export default function CycleCard({
       <div className="pot-bottom">
         <small>{phaseDisplay(c.phase, c.days_left)}</small>
         <small>
-          {money(c.daily_amount_centavos)} × {c.num_days} ·{" "}
+          {money(c.daily_amount_centavos)} × {c.num_days}
+          <br />
           {shortDate(c.start_date)} → {shortDate(c.end_date)}
         </small>
       </div>

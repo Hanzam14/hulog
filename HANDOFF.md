@@ -46,30 +46,42 @@ The owner makes a new request or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `20`
-- Updated: `2026-10-07T06:19:05Z`
-- Status: `COMPLETED - CONTEXT ALIGNMENT`
+- Revision: `21`
+- Updated: `2026-10-21T00:26:20Z`
+- Status: `PARTIAL - READY FOR DESIGN REVIEW`
 - Persistence: `commit_pending`
-- Summary: CONTEXT.md now states live use and declares task-briefs; handoff has required active-brief, assumptions and Checks labels. Owner-reported phone smoke evidence retained.
-- Authority: Owner explicit finish/reseal/activate/commit/push authorization in chat, 2026-10-07.
+- Summary: Applied ube sticker pad presentation refresh on design/cute-refresh based on cf32c85. Code checks pass; screenshot set is 23 of 24 requested captures.
+- Authority: Owner explicitly instructed implementation and local branch commit on 2026-10-21; no push, merge or deploy.
 
 ### Decisions
 
-- HULOG-LIVE-CONTEXT-COMPLETE-20261007
+- HULOG-CUTE-AUTH-20261021
+- HULOG-CUTE-REVIEW-20261021
 
 ### Blockers
 
-- None.
+- After-Settings-dark capture failed through browser API.
+- Lead Claude Opus review pending.
 
 ### Risks and unresolved items
 
-- Two-phone smoke is owner-reported; no hosted services accessed.
+- Browser fixtures cover layout only for NoGroup/update banner/toast; no actual OAuth/update/payout lifecycle exercised.
+- Existing PWA manifest and icon assets retain prior palette under settings exclusion.
+- Missing dark Settings after screenshot
+- Independent Claude Opus review
 
 ### Evidence and checks
 
-- CONTEXT.md
-- HANDOFF.md
-- npm.cmd run lint: PASS (baseline and final).
+- docs/CUTE_REFRESH_REPORT.md
+- src/palette.test.ts
+- src/theme.test.ts
+- Baseline npm run lint: PASS
+- Baseline npm test: 98 passed
+- Baseline npm run build: PASS
+- Final npm run lint: PASS
+- Final npm test: 100 passed
+- Final npm run build: PASS
+- Check notes omitted: 2; full list: checkpoint revision `21` under `.continuity/checkpoints/`.
 
 ### Governed artifact correlations
 
@@ -77,5 +89,5 @@ The owner makes a new request or production state changes.
 
 ### Exact next action
 
-Commit and push the checked documentation; independent Claude claims review covers the paired JVC activation.
+Claude Opus review current diff and screenshots; capture missing after-Settings-dark screenshot before completion.
 <!-- CONTINUITY_CHECKPOINT_END -->

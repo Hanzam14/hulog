@@ -42,7 +42,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   let total: string;
   try {
     // A round always has two people paying, even before the partner joins.
-    const multiplier = isSoloRound ? 1 : (active.length || 1);
+    const multiplier = isSoloRound ? 1 : active.length || 1;
     total = money(parsePesos(amount) * Number(days) * multiplier);
   } catch {
     total = "";
@@ -72,19 +72,23 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
       </Link>
       <h1 className="sr-only">{t("New round")}</h1>
       {isMultiMember && (
-        <fieldset style={{ border: "none", padding: 0, margin: "0 0 14px 0" }}>
+        <fieldset style={{ border: "none", padding: 0, margin: "0 0 12px 0" }}>
           <legend
             style={{
               color: "var(--soft)",
               fontFamily: "var(--display)",
               fontWeight: 500,
-              fontSize: "14px",
-              marginBottom: "6px",
+              fontSize: "13px",
+              marginBottom: "4px",
             }}
           >
             {t("Who is saving?")}
           </legend>
-          <div className="segmented" role="radiogroup" aria-label={t("Who is saving?")}>
+          <div
+            className="segmented"
+            role="radiogroup"
+            aria-label={t("Who is saving?")}
+          >
             <button
               type="button"
               role="radio"
@@ -112,7 +116,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
               style={{
                 fontSize: "13px",
                 color: "var(--soft)",
-                margin: "6px 2px 0",
+                margin: "4px 4px 0",
                 lineHeight: 1.4,
               }}
             >
@@ -210,8 +214,8 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
-                  padding: "6px 14px",
+                  gap: "8px",
+                  padding: "4px 12px",
                 }}
               >
                 <Avatar data={data} id={w.holder_id} size="sm" />

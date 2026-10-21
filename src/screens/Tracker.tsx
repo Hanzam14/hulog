@@ -1,12 +1,16 @@
 import { useState } from "react";
+import { IconCircleCheck } from "@tabler/icons-react";
 import { t, label } from "../i18n";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
-import { buildSettlementPayload, money, parsePesos, splitHalfCentavos } from "../helpers";
-
-
+import {
+  buildSettlementPayload,
+  money,
+  parsePesos,
+  splitHalfCentavos,
+} from "../helpers";
 
 function AbonoEditRow({
   entry,
@@ -86,8 +90,8 @@ function AbonoEditRow({
             <legend
               style={{
                 fontWeight: 800,
-                fontSize: "14px",
-                marginBottom: "6px",
+                fontSize: "13px",
+                marginBottom: "4px",
               }}
             >
               {t("Who paid?")}
@@ -310,7 +314,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </figure>
               <span
                 style={{
-                  fontSize: "24px",
+                  fontSize: "26px",
                   alignSelf: "center",
                   color: "var(--soft)",
                 }}
@@ -325,7 +329,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
             </div>
 
             <div style={{ textAlign: "center", margin: "12px 0 8px" }}>
-              <strong style={{ fontSize: "18px", display: "block" }}>
+              <strong style={{ fontSize: "20px", display: "block" }}>
                 {t("{debtor} owes {creditor} {amount}", {
                   debtor: name(data, activeDebt.debtor_id),
                   creditor: name(data, activeDebt.creditor_id),
@@ -407,17 +411,11 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
           </div>
         ) : (
           <div style={{ textAlign: "center", padding: "12px 0" }}>
-            <span
-              style={{
-                fontSize: "32px",
-                display: "block",
-                marginBottom: "8px",
-              }}
-              role="img"
+            <IconCircleCheck
+              size={34}
               aria-hidden="true"
-            >
-              ✓
-            </span>
+              className="settled-icon"
+            />
             <strong>{t("All settled up ✓")}</strong>
           </div>
         )}
@@ -463,8 +461,8 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               <legend
                 style={{
                   fontWeight: 800,
-                  fontSize: "14px",
-                  marginBottom: "6px",
+                  fontSize: "13px",
+                  marginBottom: "4px",
                 }}
               >
                 {t("Who paid?")}
@@ -500,18 +498,10 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
             </label>
 
             <div className="chips">
-              <button
-                type="button"
-                className="pick"
-                onClick={handleSplitHalf}
-              >
+              <button type="button" className="pick" onClick={handleSplitHalf}>
                 {t("50/50 split")}
               </button>
-              <button
-                type="button"
-                className="pick"
-                onClick={handleSplitFull}
-              >
+              <button type="button" className="pick" onClick={handleSplitFull}>
                 {t("Full amount (100%)")}
               </button>
             </div>
@@ -571,7 +561,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "10px",
+                    gap: "8px",
                   }}
                 >
                   <Avatar data={data} id={e.from_member} size="sm" />
@@ -583,7 +573,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     </strong>
                     <p>
                       {e.kind === "expense"
-                        ? `${name(data, e.to_member)} · ${t(
+                        ? `${name(data, e.to_member)}, ${t(
                             "Owes {amount} of {total}",
                             {
                               amount: money(e.owed_amount_centavos),
@@ -593,13 +583,13 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                         : `${name(data, e.from_member)} → ${name(
                             data,
                             e.to_member,
-                          )} · ${t("Paid {amount} settlement", {
+                          )}, ${t("Paid {amount} settlement", {
                             amount: money(e.owed_amount_centavos),
                           })}`}
                     </p>
                     <p className="meta">
                       {e.entry_date}
-                      {e.note ? ` · ${e.note}` : ""}
+                      {e.note ? `, ${e.note}` : ""}
                     </p>
                   </div>
                 </div>
@@ -675,41 +665,21 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                       </button>
                     )}
 
-                    {e.delete_proposed_by &&
-                      e.delete_proposed_by !== user && (
-                        <>
-                          <button
-                            disabled={busy}
-                            onClick={() =>
-                              run(() =>
-                                rpc("respond_delete_abono_entry", {
-                                  p_id: e.id,
-                                  p_action: "accept",
-                                }),
-                              )
-                            }
-                          >
-                            {t("Confirm delete")}
-                          </button>
-                          <button
-                            className="quiet"
-                            disabled={busy}
-                            onClick={() =>
-                              run(() =>
-                                rpc("respond_delete_abono_entry", {
-                                  p_id: e.id,
-                                  p_action: "decline",
-                                }),
-                              )
-                            }
-                          >
-                            {t("Cancel delete")}
-                          </button>
-                        </>
-                      )}
-
-                    {e.delete_proposed_by &&
-                      e.delete_proposed_by === user && (
+                    {e.delete_proposed_by && e.delete_proposed_by !== user && (
+                      <>
+                        <button
+                          disabled={busy}
+                          onClick={() =>
+                            run(() =>
+                              rpc("respond_delete_abono_entry", {
+                                p_id: e.id,
+                                p_action: "accept",
+                              }),
+                            )
+                          }
+                        >
+                          {t("Confirm delete")}
+                        </button>
                         <button
                           className="quiet"
                           disabled={busy}
@@ -717,14 +687,32 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                             run(() =>
                               rpc("respond_delete_abono_entry", {
                                 p_id: e.id,
-                                p_action: "cancel",
+                                p_action: "decline",
                               }),
                             )
                           }
                         >
                           {t("Cancel delete")}
                         </button>
-                      )}
+                      </>
+                    )}
+
+                    {e.delete_proposed_by && e.delete_proposed_by === user && (
+                      <button
+                        className="quiet"
+                        disabled={busy}
+                        onClick={() =>
+                          run(() =>
+                            rpc("respond_delete_abono_entry", {
+                              p_id: e.id,
+                              p_action: "cancel",
+                            }),
+                          )
+                        }
+                      >
+                        {t("Cancel delete")}
+                      </button>
+                    )}
                   </div>
 
                   {editingId === e.id && (

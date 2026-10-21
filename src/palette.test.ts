@@ -25,6 +25,31 @@ function contrast(first: string, second: string) {
   return (values[0] + 0.05) / (values[1] + 0.05);
 }
 describe("planner text contrast", () => {
+  it.each([light, dark])(
+    "keeps body text and controls legible on every sheet",
+    (palette) => {
+      for (const surface of ["paper", "card", "card-tint"]) {
+        for (const text of [
+          "ink",
+          "soft",
+          "pink-deep",
+          "blue-deep",
+          "green-deep",
+          "orange-deep",
+          "purple-deep",
+          "danger",
+        ]) {
+          expect(
+            contrast(value(palette, text), value(palette, surface)),
+            `${text} on ${surface}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+        expect(
+          contrast(value(palette, "control-border"), value(palette, surface)),
+        ).toBeGreaterThanOrEqual(3);
+      }
+    },
+  );
   it.each(["pink", "blue", "green", "orange", "purple"])(
     "%s text meets 4.5:1 on white and dark cards",
     (color) => {

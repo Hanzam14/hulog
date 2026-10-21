@@ -22,9 +22,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
   const navigate = useNavigate();
 
   const activeMemberIds = new Set(
-    data.memberships
-      .filter((m) => m.status === "active")
-      .map((m) => m.user_id),
+    data.memberships.filter((m) => m.status === "active").map((m) => m.user_id),
   );
   const isMultiMember = activeMemberIds.size > 1;
   const [savingScope, setSavingScope] = useState<"shared" | "solo">(
@@ -65,7 +63,8 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       const steps = Number(numSteps);
       const cadence = Number(cadenceDays);
       if (steps > 0 && cadence > 0) {
-        const multiplier = savingScope === "solo" ? 1 : (activeMemberIds.size || 1);
+        const multiplier =
+          savingScope === "solo" ? 1 : activeMemberIds.size || 1;
         totalTarget = money(stepCentavos * steps * multiplier);
         computedEndDate = addDays(startDate, (steps - 1) * cadence);
       }
@@ -92,9 +91,9 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       if (mode === "matched") {
         const finalTitle =
           savingScope === "solo"
-            ? (/^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
-                ? trimmedTitle
-                : `[Solo] ${trimmedTitle}`)
+            ? /^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
+              ? trimmedTitle
+              : `[Solo] ${trimmedTitle}`
             : trimmedTitle;
         await rpc("propose_savings_goal", {
           p_title: finalTitle,
@@ -109,9 +108,9 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       } else {
         const finalTitle =
           savingScope === "solo"
-            ? (/^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
-                ? trimmedTitle
-                : `[Solo] ${trimmedTitle}`)
+            ? /^\[Solo(?::\s*[^]]+)?\]/i.test(trimmedTitle)
+              ? trimmedTitle
+              : `[Solo] ${trimmedTitle}`
             : trimmedTitle;
         await rpc("propose_savings_goal", {
           p_title: finalTitle,
@@ -135,19 +134,23 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       <h1 className="sr-only">{t("New ipon goal")}</h1>
 
       {isMultiMember && (
-        <fieldset style={{ border: "none", padding: 0, margin: "0 0 14px 0" }}>
+        <fieldset style={{ border: "none", padding: 0, margin: "0 0 12px 0" }}>
           <legend
             style={{
               color: "var(--soft)",
               fontFamily: "var(--display)",
               fontWeight: 500,
-              fontSize: "14px",
-              marginBottom: "6px",
+              fontSize: "13px",
+              marginBottom: "4px",
             }}
           >
             {t("Who is saving?")}
           </legend>
-          <div className="segmented" role="radiogroup" aria-label={t("Who is saving?")}>
+          <div
+            className="segmented"
+            role="radiogroup"
+            aria-label={t("Who is saving?")}
+          >
             <button
               type="button"
               role="radio"
@@ -172,7 +175,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
               style={{
                 fontSize: "13px",
                 color: "var(--soft)",
-                margin: "6px 2px 0",
+                margin: "4px 4px 0",
                 lineHeight: 1.4,
               }}
             >
@@ -201,11 +204,13 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
           aria-pressed={mode === "flexible"}
           onClick={() => setMode("flexible")}
         >
-          {savingScope === "solo" ? t("Flexible solo pot") : t("Flexible shared pot")}
+          {savingScope === "solo"
+            ? t("Flexible solo pot")
+            : t("Flexible shared pot")}
         </button>
       </div>
 
-      <label style={{ display: "grid", gap: "6px" }}>
+      <label style={{ display: "grid", gap: "8px" }}>
         <span
           style={{
             color: "var(--soft)",
@@ -310,7 +315,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
         </>
       ) : (
         <>
-          <label style={{ display: "grid", gap: "6px" }}>
+          <label style={{ display: "grid", gap: "8px" }}>
             <span
               style={{
                 color: "var(--soft)",
@@ -344,7 +349,7 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
       )}
 
       {activeWallets.length > 0 && (
-        <label style={{ display: "grid", gap: "6px" }}>
+        <label style={{ display: "grid", gap: "8px" }}>
           <span
             style={{
               color: "var(--soft)",
