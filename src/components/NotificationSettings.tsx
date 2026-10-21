@@ -125,31 +125,34 @@ export default function NotificationSettings() {
   return (
     <section className="notify">
       <h2>{t("Notifications")}</h2>
-      <label>
-        {t("Reminder time (Manila)")}
-        <input
-          type="time"
-          value={prefs.reminder_time}
-          onChange={(event) =>
-            setPrefs({ ...prefs, reminder_time: event.target.value })
+      <details className="reminder-time">
+        <summary>{t("Reminder time (Manila)")}</summary>
+        <label>
+          <input
+            aria-label={t("Reminder time (Manila)")}
+            type="time"
+            value={prefs.reminder_time}
+            onChange={(event) =>
+              setPrefs({ ...prefs, reminder_time: event.target.value })
+            }
+          />
+        </label>
+        <button
+          className="secondary"
+          disabled={busy}
+          onClick={() =>
+            void savePrefs(prefs)
+              .then(() => setMessage("Reminder time saved."))
+              .catch((error) =>
+                setMessage(
+                  error instanceof Error ? error.message : String(error),
+                ),
+              )
           }
-        />
-      </label>
-      <button
-        className="secondary"
-        disabled={busy}
-        onClick={() =>
-          void savePrefs(prefs)
-            .then(() => setMessage("Reminder time saved."))
-            .catch((error) =>
-              setMessage(
-                error instanceof Error ? error.message : String(error),
-              ),
-            )
-        }
-      >
-        {t("Save reminder time")}
-      </button>
+        >
+          {t("Save reminder time")}
+        </button>
+      </details>
       {iosHelp ? (
         <p role="note">
           {t(

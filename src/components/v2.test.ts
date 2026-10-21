@@ -10,6 +10,7 @@ import ProposeIpon from "../screens/ProposeIpon";
 import IponDetail from "../screens/IponDetail";
 import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
+import Settings from "../screens/Settings";
 import Propose from "../screens/Propose";
 import {
   isSoloMode,
@@ -21,6 +22,7 @@ import {
 import App from "../App";
 import { buildSettlementPayload, isNavigatorOffline } from "../helpers";
 
+vi.mock("./InstallSettings", () => ({ default: () => null }));
 vi.mock("./AppUpdates", () => ({
   default: () => null,
   UpdateBanner: () => null,
@@ -587,22 +589,22 @@ describe("Hulog v2 Tracker", () => {
 });
 
 describe("Hulog v2 Unified Home Dashboard", () => {
-  it("renders CustodyCard and active Ipon goals section with quick Mag-ipon action", () => {
+  it("renders the Ipon section with quick Mag-ipon action and keeps custody/mode controls off Home", () => {
     setLang("taglish");
     const data = v2Snapshot();
     const markup = html(
       createElement(Home, { data, user: "a", run, busy: false }),
     );
 
-    // CustodyCard rendered on Home
-    expect(markup).toContain("Nasaan ang pera natin");
-    expect(markup).toContain("₱3,750.00");
+    // CustodyCard moved to Group
+    expect(markup).not.toContain("Nasaan ang pera natin");
 
-    // Ipon goals section rendered on Home
-    expect(markup).toContain("Ipon goals");
+    // Ipon section rendered on Home
+    expect(markup).toContain("Ipon");
     expect(markup).toContain("Japan Trip");
     expect(markup).toContain("Mag-ipon");
-    expect(markup).toContain("Bagong ipon goal");
+    expect(markup).toContain("Kasama si ");
+    expect(markup).toContain("Para sa akin");
   });
 
   it("renders friendly empty states and next-step actions across History, Tracker, Home/IponDetail, and NoGroup", () => {
@@ -617,7 +619,10 @@ describe("Hulog v2 Unified Home Dashboard", () => {
       createElement(History, { data, user: "a", run, busy: false }),
     );
     expect(historyMarkup).toContain("Past rounds will appear here.");
-    expect(historyMarkup).toContain('href="/propose"');
+    // Empty History shows only the empty-state line: no filters, totals or CTA.
+    expect(historyMarkup).not.toContain('href="/propose"');
+    expect(historyMarkup).not.toContain("Print summary");
+    expect(historyMarkup).not.toContain("history-filters");
 
     const trackerMarkup = html(
       createElement(Tracker, { data, user: "a", run, busy: false }),
@@ -630,9 +635,6 @@ describe("Hulog v2 Unified Home Dashboard", () => {
 
     const homeMarkup = html(
       createElement(Home, { data, user: "a", run, busy: false }),
-    );
-    expect(homeMarkup).toContain(
-      "No savings goals yet. Save together for a trip or goal.",
     );
     expect(homeMarkup).toContain('href="/ipon/new"');
 
@@ -975,7 +977,7 @@ describe("Hulog Solo Mode", () => {
     expect(duoMarkup).toContain("₱1,500.00");
   });
 
-  it("renders solo mode empty state and exit button on Home screen when solo", () => {
+  it("renders solo mode empty state on Home and the exit button in Group when solo", () => {
     const store: Record<string, string> = { "hulog-solo-mode": "true" };
     vi.stubGlobal("localStorage", {
       getItem: (k: string) => store[k] ?? null,
@@ -995,6 +997,36 @@ describe("Hulog Solo Mode", () => {
     // Solo empty state without partner-waiting blocker
     expect(markup).toContain("Start a round to begin tracking your savings.");
     expect(markup).not.toContain("Invite your partner from the group tab");
-    expect(markup).toContain("Exit solo mode");
+    expect(markup).not.toContain("Exit solo mode");
+    expect(markup).not.toContain("Switch to solo mode");
+    const group = html(
+      createElement(Settings, { data: soloData, user: "a", run, busy: false }),
+    );
+    expect(group).toContain("Exit solo mode");
+  });
+  it("moves the Together/Solo toggle and custody card from Home to Group", () => {
+    const store: Record<string, string> = { "hulog-solo-mode": "true" };
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+    setLang("en");
+    const data = v2Snapshot();
+    const home = html(
+      createElement(Home, { data, user: "a", run, busy: false }),
+    );
+    expect(home).not.toContain("Together");
+    expect(home).not.toContain("Pot mode");
+    expect(home).not.toContain("Where is our money");
+    expect(home).not.toContain("custody-ledger");
+    const group = html(
+      createElement(Settings, { data, user: "a", run, busy: false }),
+    );
+    expect(group).toContain("Pot mode");
+    expect(group).toContain("Together");
+    expect(group).toContain("custody-ledger");
+    expect(group).toContain("₱3,750.00");
   });
 });

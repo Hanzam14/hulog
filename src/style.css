@@ -2082,3 +2082,81 @@ a.muted {
   min-width: 44px;
   min-height: 44px;
 }
+
+/* Simplify pass */
+.section-label {
+  margin: 20px 0 8px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+.home-waiting {
+  margin-bottom: 8px;
+}
+.home-waiting .section-label {
+  margin-top: 4px;
+}
+nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 8px;
+}
+.nav-label {
+  font-size: 12px;
+  line-height: 1.1;
+}
+.ipon-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.ipon-add-row > .quiet,
+.ipon-add-row > .button.quiet {
+  flex: 1 1 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  text-decoration: none;
+}
+.ipon-home-section > section {
+  margin: 0;
+  padding: 0;
+}
+.ipon-home-section > h2.section-label {
+  margin-top: 4px;
+}
+.sub-label {
+  margin: 4px 0 0;
+  font-size: 15px;
+}
+.settings-grid > .settings-title {
+  grid-column: 1 / -1;
+  margin: 12px 0 0;
+}
+.settings-grid > .solo-mode-settings,
+.settings-grid > .segmented,
+.settings-grid > .custody-ledger,
+.settings-grid > .quiet {
+  grid-column: 1 / -1;
+}
+.settings-grid > .quiet {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+}
+details.wallet-add > summary,
+details.reminder-time > summary {
+  min-height: 44px;
+  padding-block: 10px;
+  cursor: pointer;
+}
