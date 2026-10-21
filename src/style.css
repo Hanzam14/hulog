@@ -2169,6 +2169,38 @@ select {
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
+/* "More": one card — CSV and update side by side, version and sign out below. */
+.more-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+.more-card .app-updates {
+  display: contents;
+}
+.more-card .export,
+.more-card .app-updates > button {
+  width: 100%;
+  margin: 0;
+  justify-self: stretch;
+  align-self: stretch;
+}
+.more-card .export {
+  grid-column: 1;
+  grid-row: 1;
+}
+.more-card .app-updates > button {
+  grid-column: 2;
+  grid-row: 1;
+}
+.more-card .app-version,
+.more-card .update-result,
+.more-card > .quiet {
+  grid-column: 1 / -1;
+  margin: 0;
+  text-align: center;
+}
 /* Desktop stays at the tablet width instead of stretching to 1000px. */
 @media (min-width: 1100px) {
   .app {

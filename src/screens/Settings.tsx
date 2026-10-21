@@ -375,19 +375,21 @@ export default function Settings({
       <InstallSettings />
       <NotificationSettings />
       <h2 className="section-label settings-title">{t("More")}</h2>
-      <button
-        className="secondary export"
-        disabled={busy}
-        onClick={() => run(exportCsv)}
-      >
-        <IconDownload size={18} aria-hidden="true" /> {t("CSV")}
-      </button>
-      <AppUpdates />
-      {onSignOut && (
-        <button className="quiet" disabled={busy} onClick={onSignOut}>
-          {t("Sign out")}
+      <section className="more-card">
+        <button
+          className="secondary export"
+          disabled={busy}
+          onClick={() => run(exportCsv)}
+        >
+          <IconDownload size={18} aria-hidden="true" /> {t("CSV")}
         </button>
-      )}
+        <AppUpdates />
+        {onSignOut && (
+          <button className="quiet" disabled={busy} onClick={onSignOut}>
+            {t("Sign out")}
+          </button>
+        )}
+      </section>
     </div>
   );
 }
