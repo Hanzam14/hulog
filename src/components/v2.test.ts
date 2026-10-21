@@ -11,7 +11,13 @@ import IponDetail from "../screens/IponDetail";
 import Tracker from "../screens/Tracker";
 import Home from "../screens/Home";
 import Propose from "../screens/Propose";
-import { isSoloMode, setSoloMode, setSoloPotMode, loadSoloSnapshot, soloRpc } from "../solo";
+import {
+  isSoloMode,
+  setSoloMode,
+  setSoloPotMode,
+  loadSoloSnapshot,
+  soloRpc,
+} from "../solo";
 import App from "../App";
 import { buildSettlementPayload, isNavigatorOffline } from "../helpers";
 
@@ -29,7 +35,9 @@ vi.mock("../data", async () => {
     rpc: vi.fn().mockResolvedValue(undefined),
     supabase: {
       auth: {
-        getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+        getSession: vi
+          .fn()
+          .mockResolvedValue({ data: { session: null }, error: null }),
         onAuthStateChange: vi.fn().mockReturnValue({
           data: { subscription: { unsubscribe: vi.fn() } },
         }),
@@ -443,7 +451,9 @@ describe("Hulog v2 Tracker", () => {
 
     // Debt banner shows who owes whom in Taglish
     const debtorMarkup = renderTrackerFor("a");
-    expect(debtorMarkup).toContain("May utang si Ana Cruz kay Ben Santos na ₱500.00");
+    expect(debtorMarkup).toContain(
+      "May utang si Ana Cruz kay Ben Santos na ₱500.00",
+    );
     // Debtor 'a' sees Bayaran (Settle)
     expect(debtorMarkup).toContain("Bayaran (Settle)");
     expect(debtorMarkup).not.toContain("Natanggap ko (Record settlement)");
@@ -626,9 +636,7 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     );
     expect(homeMarkup).toContain('href="/ipon/new"');
 
-    const noGroupMarkup = html(
-      createElement(NoGroup, { run, busy: false }),
-    );
+    const noGroupMarkup = html(createElement(NoGroup, { run, busy: false }));
     expect(noGroupMarkup).toContain(
       "Start a shared pot or paste an invite link from your partner.",
     );
@@ -685,12 +693,16 @@ describe("Hulog v2 Loading Skeleton & Offline Banner", () => {
     );
 
     setLang("tl");
-    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+    expect(
+      t("You're offline. Changes won't save until you're back online."),
+    ).toBe(
       "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
     );
 
     setLang("taglish");
-    expect(t("You're offline. Changes won't save until you're back online.")).toBe(
+    expect(
+      t("You're offline. Changes won't save until you're back online."),
+    ).toBe(
       "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
     );
 
@@ -705,36 +717,70 @@ describe("Hulog Solo Mode", () => {
     const data = v2Snapshot();
     const goal = data.savingsGoals![0];
     Object.assign(goal, {
-      title: "[Solo] AI subscription", goal_mode: "flexible",
-      step_amount_centavos: null, cadence_days: null, num_steps: null,
+      title: "[Solo] AI subscription",
+      goal_mode: "flexible",
+      step_amount_centavos: null,
+      cadence_days: null,
+      num_steps: null,
       expected_steps_today: 0,
     });
     data.savingsProgress = ["a", "b"].map((member_id) => ({
-      goal_id: goal.id, member_id, expected_centavos: goal.target_amount_centavos,
-      confirmed_centavos: 0, pending_centavos: 0, confirmed_steps: 0, pending_steps: 0,
+      goal_id: goal.id,
+      member_id,
+      expected_centavos: goal.target_amount_centavos,
+      confirmed_centavos: 0,
+      pending_centavos: 0,
+      confirmed_steps: 0,
+      pending_steps: 0,
     }));
     const card = html(createElement(IponCard, { g: goal, data, user: "b" }));
     expect(card).toContain("₱0, Observing");
     expect(card).not.toContain('class="tally');
-    const detail = (user: string) => renderToStaticMarkup(createElement(
-      MemoryRouter, { initialEntries: ["/ipon/goal-1"] },
-      createElement(Routes, {}, createElement(Route, {
-        path: "/ipon/:id",
-        element: createElement(IponDetail, { data, user, run, busy: false }),
-      })),
-    ));
+    const detail = (user: string) =>
+      renderToStaticMarkup(
+        createElement(
+          MemoryRouter,
+          { initialEntries: ["/ipon/goal-1"] },
+          createElement(
+            Routes,
+            {},
+            createElement(Route, {
+              path: "/ipon/:id",
+              element: createElement(IponDetail, {
+                data,
+                user,
+                run,
+                busy: false,
+              }),
+            }),
+          ),
+        ),
+      );
     goal.status = "proposed";
     expect(detail("b")).toContain('aria-label="Accept"');
     expect(detail("b")).toContain('aria-label="Decline"');
     expect(detail("a")).toContain('aria-label="Cancel proposal"');
     goal.status = "accepted";
-    data.savingsContributions = [{
-      id: "pending-solo", goal_id: goal.id, member_id: "a", steps: null,
-      amount_centavos: 10000, note: "", status: "pending", was_confirmed: false,
-      created_by: "a", last_edited_by: null, delete_proposed_by: null,
-      created_at: data.today, confirmed_by: null, confirmed_at: null,
-      edited_at: null, deleted_at: null,
-    }];
+    data.savingsContributions = [
+      {
+        id: "pending-solo",
+        goal_id: goal.id,
+        member_id: "a",
+        steps: null,
+        amount_centavos: 10000,
+        note: "",
+        status: "pending",
+        was_confirmed: false,
+        created_by: "a",
+        last_edited_by: null,
+        delete_proposed_by: null,
+        created_at: data.today,
+        confirmed_by: null,
+        confirmed_at: null,
+        edited_at: null,
+        deleted_at: null,
+      },
+    ];
     expect(detail("b")).toContain(">Confirm</button>");
     expect(detail("a")).not.toContain(">Confirm</button>");
     expect(detail("b")).not.toContain('class="tally');
@@ -778,10 +824,21 @@ describe("Hulog Solo Mode", () => {
     expect(snapshot.cycles[0].pot_centavos).toBe(30000);
 
     // Pre-seeded active Solo Ipon Goal: [Solo] AI Subscription (₱600 / ₱1,200)
-    const soloGoal = snapshot.personalGoals?.find((g) => g.title === "AI Subscription");
+    const soloGoal = snapshot.personalGoals?.find(
+      (g) => g.title === "AI Subscription",
+    );
     expect(soloGoal).toBeDefined();
     expect(soloGoal?.target_amount_centavos).toBe(120000);
-    expect(snapshot.personalEntries?.filter((e) => e.goal_id === soloGoal?.id && !e.deleted_at).reduce((sum, e) => sum + (e.kind === "deposit" ? e.amount_centavos : -e.amount_centavos), 0)).toBe(60000);
+    expect(
+      snapshot.personalEntries
+        ?.filter((e) => e.goal_id === soloGoal?.id && !e.deleted_at)
+        .reduce(
+          (sum, e) =>
+            sum +
+            (e.kind === "deposit" ? e.amount_centavos : -e.amount_centavos),
+          0,
+        ),
+    ).toBe(60000);
     expect(soloGoal?.visibility).toBe("shared");
   });
 
@@ -841,18 +898,62 @@ describe("Hulog Solo Mode", () => {
 
   it("records personal goals, deposits and withdrawals without partner confirmation", async () => {
     const store: Record<string, string> = {};
-    vi.stubGlobal("localStorage", { getItem: (k: string) => store[k] ?? null, setItem: (k: string,v: string) => { store[k] = v; } });
-    const goalId = await soloRpc("create_personal_goal", { p_title: "Personal Goal", p_target_amount_centavos: 100000 });
-    const goal = (await loadSoloSnapshot()).personalGoals?.find((g) => g.id === goalId);
-    expect(goal).toMatchObject({ title: "Personal Goal", visibility: "private", owner_id: "solo-user", target_amount_centavos: 100000 });
-    const depositId = await soloRpc("record_personal_entry", { p_goal_id: goalId, p_kind: "deposit", p_amount_centavos: 10000, p_note: "first deposit" });
-    const deposit = (await loadSoloSnapshot()).personalEntries?.find((e) => e.id === depositId);
-    expect(deposit).toMatchObject({ kind: "deposit", amount_centavos: 10000, note: "first deposit", deleted_at: null });
-    const withdrawalId = await soloRpc("record_personal_entry", { p_goal_id: goalId, p_kind: "withdrawal", p_amount_centavos: 2000 });
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+    const goalId = await soloRpc("create_personal_goal", {
+      p_title: "Personal Goal",
+      p_target_amount_centavos: 100000,
+    });
+    const goal = (await loadSoloSnapshot()).personalGoals?.find(
+      (g) => g.id === goalId,
+    );
+    expect(goal).toMatchObject({
+      title: "Personal Goal",
+      visibility: "private",
+      owner_id: "solo-user",
+      target_amount_centavos: 100000,
+    });
+    const depositId = await soloRpc("record_personal_entry", {
+      p_goal_id: goalId,
+      p_kind: "deposit",
+      p_amount_centavos: 10000,
+      p_note: "first deposit",
+    });
+    const deposit = (await loadSoloSnapshot()).personalEntries?.find(
+      (e) => e.id === depositId,
+    );
+    expect(deposit).toMatchObject({
+      kind: "deposit",
+      amount_centavos: 10000,
+      note: "first deposit",
+      deleted_at: null,
+    });
+    const withdrawalId = await soloRpc("record_personal_entry", {
+      p_goal_id: goalId,
+      p_kind: "withdrawal",
+      p_amount_centavos: 2000,
+    });
     const saved = await loadSoloSnapshot();
-    expect(saved.personalEntries?.find((e) => e.id === withdrawalId)).toMatchObject({ kind: "withdrawal", amount_centavos: 2000 });
-    expect(saved.personalHistory?.filter((h) => h.goal_id === goalId)).toHaveLength(3);
-    expect(saved.personalEntries?.filter((e) => e.goal_id === goalId).reduce((sum,e) => sum + (e.kind === "deposit" ? e.amount_centavos : -e.amount_centavos),0)).toBe(8000);
+    expect(
+      saved.personalEntries?.find((e) => e.id === withdrawalId),
+    ).toMatchObject({ kind: "withdrawal", amount_centavos: 2000 });
+    expect(
+      saved.personalHistory?.filter((h) => h.goal_id === goalId),
+    ).toHaveLength(3);
+    expect(
+      saved.personalEntries
+        ?.filter((e) => e.goal_id === goalId)
+        .reduce(
+          (sum, e) =>
+            sum +
+            (e.kind === "deposit" ? e.amount_centavos : -e.amount_centavos),
+          0,
+        ),
+    ).toBe(8000);
   });
 
   it("previews one payer for local standalone rounds and two for partnered rounds", () => {
@@ -897,5 +998,3 @@ describe("Hulog Solo Mode", () => {
     expect(markup).toContain("Exit solo mode");
   });
 });
-
-
