@@ -48,12 +48,12 @@ The owner reports the two-phone check, or production state changes.
 <!-- CONTINUITY_CHECKPOINT_START -->
 ## Continuity checkpoint
 
-- Revision: `27`
-- Updated: `2026-10-21T03:05:35Z`
-- Status: `COMPLETED - SIMPLIFIED UI ON MAIN`
+- Revision: `28`
+- Updated: `2026-10-21T03:13:44Z`
+- Status: `COMPLETED - SESSION CLOSED`
 - Persistence: `commit_pending`
-- Summary: PR #12 (simplified UI) merged by owner as 78fe55f; follow-ups pushed to main: select chevron 16px in, desktop width 760px (not phone column, not 1000px) with two-column Group, More section as one card, removed redundant round status chip and payout countdown line, Changes tab grouped by day with one line per change and Show more (20 at a time). main at c7be40a.
-- Authority: Owner chat 2026-10-21: merge PR #12, then fix desktop layout, update card, cancelled chip/countdown, and make Changes less cramped.
+- Summary: Simplified UI live on main (f306f2a): PR #12 plus follow-ups (select chevron, 760px desktop width, More card, no redundant round chip/countdown, Changes grouped by day with Show more, unused group-name and pot-location fields removed from Group). Owner reported two-phone private/shared personal goals PASS.
+- Authority: Owner chat 2026-10-21: UI simplification follow-ups; 'close this out'.
 
 ### Decisions
 
@@ -65,15 +65,17 @@ The owner reports the two-phone check, or production state changes.
 
 ### Risks and unresolved items
 
-- Changes tab with real history not seen in a browser (local demo has none); covered by server-render tests only
-- Vercel production deploy of latest main not checked by the lead
+- Changes tab with real history only covered by server-render tests
+- Create-group form (NoGroup) still asks for group name and pot location
+- Optional: drop git stash@{0} (stale antigravity/solo-mode continuity chain)
+- Optional: delete merged remote branch design/simplify
+- Untracked .claude/launch.json (local dev preview config)
 
 ### Evidence and checks
 
-- src/screens/changes.test.ts
 - docs/SIMPLIFY_REPORT.md
-- Worker on c7be40a: lint clean, npm test 139/139 (17 files) incl. 3 new Changes tests, build OK
-- Lead measured 1280px: app 760px, Group grid two columns, no overflow; More-card buttons equal 149x63 at 375px
+- src/screens/changes.test.ts
+- main f306f2a: npm run lint clean, npm test 139/139 (17 files), npm run build OK
 
 ### Governed artifact correlations
 
@@ -81,5 +83,5 @@ The owner reports the two-phone check, or production state changes.
 
 ### Exact next action
 
-Owner uses the live app; report any screen that still feels cluttered.
+None pending - live use; owner reports any screen that still feels cluttered.
 <!-- CONTINUITY_CHECKPOINT_END -->
