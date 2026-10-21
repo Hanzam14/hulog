@@ -3,7 +3,7 @@ import { useState, useSyncExternalStore } from "react";
 import {
   clearInstallPrompt,
   installSnapshot,
-  isIosSafariOutsideHomeScreen,
+  isIosOutsideHomeScreen,
   subscribeInstall,
 } from "../install";
 
@@ -15,7 +15,7 @@ export default function InstallSettings() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   if (standalone) return null;
-  if (isIosSafariOutsideHomeScreen())
+  if (isIosOutsideHomeScreen())
     return <p className="install-hint">{t("Share → Add to Home Screen")}</p>;
   if (!prompt && !message) return null;
   return (

@@ -1,7 +1,7 @@
 import { t, label } from "../i18n";
 import { useEffect, useState } from "react";
 import { rpc, supabase } from "../data";
-import { isIosSafariOutsideHomeScreen } from "../install";
+import { isIosOutsideHomeScreen } from "../install";
 
 type Preferences = { reminder_time: string; enabled: boolean };
 const defaults: Preferences = { reminder_time: "20:00", enabled: false };
@@ -18,7 +18,7 @@ export default function NotificationSettings() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const iosHelp =
-    typeof navigator !== "undefined" && isIosSafariOutsideHomeScreen();
+    typeof navigator !== "undefined" && isIosOutsideHomeScreen();
   const supported =
     typeof window !== "undefined" &&
     "Notification" in window &&

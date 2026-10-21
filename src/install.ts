@@ -8,16 +8,12 @@ export function isStandalone() {
     (navigator as Navigator & { standalone?: boolean }).standalone === true
   );
 }
-export function isIosSafariOutsideHomeScreen() {
+export function isIosOutsideHomeScreen() {
   const ios =
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  return (
-    ios &&
-    !isStandalone() &&
-    /Safari/.test(navigator.userAgent) &&
-    !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent)
-  );
+  // Since iOS 16.4, Chrome, Edge and Firefox can also Add to Home Screen.
+  return ios && !isStandalone();
 }
 let state: { prompt: InstallPrompt | null; standalone: boolean } = {
   prompt: null,
