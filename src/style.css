@@ -2054,17 +2054,24 @@ main {
 
 /* Settings: archive is a normal small button; link-like actions keep 44px. */
 .wallets-section .row {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
 }
+.wallets-section .row > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+  flex-wrap: wrap;
+}
 .wallet-actions {
+  flex: none;
+  flex-wrap: nowrap;
   margin: 0 0 0 auto;
+  gap: 0;
 }
 .wallet-archive {
+  min-width: 44px;
   min-height: 44px;
-  padding: 4px 12px;
-  font-size: 13px;
-  text-decoration: none;
+  padding: 0;
 }
 a.muted {
   display: inline-flex;

@@ -36,7 +36,10 @@ export default function Record({ data, user, run, busy }: ViewProps) {
       <Link to="/" className="back" aria-label={t("Back")}>
         <IconArrowLeft />
       </Link>
-      <Avatar data={data} id={user} size="lg" />
+      <div className="member-who">
+        <Avatar data={data} id={user} size="sm" />
+        <strong>{name(data, user)}</strong>
+      </div>
       <div className="stepper">
         <button
           type="button"

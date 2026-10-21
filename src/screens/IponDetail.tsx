@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { IconArrowLeft, IconCheck, IconPlus, IconX } from "@tabler/icons-react";
-import Avatar from "../components/Avatar";
 import IponCard from "../components/IponCard";
-import Tally from "../components/Tally";
 import type { ViewProps } from "../components/shared";
-import { name, tone } from "../components/shared";
+import { name } from "../components/shared";
 import { rpc } from "../data";
 import { isSoloGoal, money, parsePesos, shortDate } from "../helpers";
 import { label, t } from "../i18n";
@@ -176,38 +174,6 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
               >
                 <IconPlus aria-hidden="true" /> {t("Mag-ipon")}
               </Link>
-            )}
-
-            {/* Per-member sticker tallies for matched goals */}
-            {g.goal_mode === "matched" && (
-              <div className="members">
-                {(data.savingsProgress ?? [])
-                  .filter((p) => p.goal_id === g.id)
-                  .map((p) => {
-                    const isSolo = isSoloGoal(g);
-                    const isSaver = !isSolo || p.member_id === g.proposed_by;
-                    const isObserving = isSolo && !isSaver;
-                    return (
-                      <div className="member" key={p.member_id}>
-                        <div className="member-who">
-                          <Avatar data={data} id={p.member_id} size="sm" />
-                          <strong>{name(data, p.member_id)}</strong>
-                        </div>
-                        {isObserving ? (
-                          <span className="meta">{t("₱0 · Observing")}</span>
-                        ) : (
-                          <Tally
-                            label={name(data, p.member_id)}
-                            paid={p.confirmed_steps}
-                            pending={p.pending_steps}
-                            total={g.num_steps ?? 1}
-                            tone={tone(data, p.member_id)}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
             )}
 
             {/* Wallet move proposal UI */}
