@@ -8,9 +8,11 @@ import {
 } from "@tabler/icons-react";
 import type { PersonalEntry, PersonalGoal } from "../data";
 import { rpc } from "../data";
+import { personalSeries } from "../growth";
 import { money, parsePesos, shortDate } from "../helpers";
 import { t, label } from "../i18n";
 import { personalBalance } from "../personal";
+import GrowthChart from "./GrowthChart";
 import { name, type Run, type ViewProps } from "./shared";
 
 export function GoalForm({
@@ -249,6 +251,11 @@ export function PersonalGoalCard({
       >
         <span style={{ width: `${progress}%` }} />
       </div>
+      <GrowthChart
+        series={personalSeries(data, user, goal.id)}
+        tone="green"
+        targetCentavos={goal.target_amount_centavos}
+      />
       {owner ? (
         <>
           <div className="actions">

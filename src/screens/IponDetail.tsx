@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { IconArrowLeft, IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import GrowthChart from "../components/GrowthChart";
 import IponCard from "../components/IponCard";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { rpc } from "../data";
+import { iponSeries } from "../growth";
 import { isSoloGoal, money, parsePesos, shortDate } from "../helpers";
 import { label, t } from "../i18n";
 
@@ -62,6 +64,11 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
 
       <section>
         <IponCard g={g} data={data} user={user} />
+        <GrowthChart
+          series={iponSeries(data, g.id)}
+          tone="green"
+          targetCentavos={g.target_amount_centavos}
+        />
 
         {isSoloGoal(g) && (
           <div

@@ -34,6 +34,9 @@ const taglish = {
   "Shared read-only": "Shared, tingin lang",
   "Personal savings by {name}": "Sariling ipon ni {name}",
   "Personal savings progress": "Progress ng sariling ipon",
+  "{amount} saved since {date}": "{amount} ang naipon mula {date}",
+  "{amount} of {target} saved since {date}":
+    "{amount} sa {target} ang naipon mula {date}",
   "Share read-only": "Ipakita sa partner",
   "Make private": "Gawing private",
   "Read-only. Only the owner can change these records.":
@@ -568,6 +571,9 @@ const en = {
   "Shared read-only": "Shared, read-only",
   "Personal savings by {name}": "Personal savings by {name}",
   "Personal savings progress": "Savings progress",
+  "{amount} saved since {date}": "{amount} saved since {date}",
+  "{amount} of {target} saved since {date}":
+    "{amount} of {target} saved since {date}",
   "Share read-only": "Let partner view",
   "Make private": "Make private",
   "Read-only. Only the owner can change these records.":
@@ -1096,6 +1102,9 @@ const tl = {
   "Shared read-only": "Ibinahagi, makikita lang",
   "Personal savings by {name}": "Sariling ipon ni {name}",
   "Personal savings progress": "Pag-usad ng sariling ipon",
+  "{amount} saved since {date}": "{amount} ang naipon mula {date}",
+  "{amount} of {target} saved since {date}":
+    "{amount} sa {target} ang naipon mula {date}",
   "Share read-only": "Ipakita sa kasama",
   "Make private": "Gawing pribado",
   "Read-only. Only the owner can change these records.":
