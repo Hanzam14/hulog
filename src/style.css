@@ -2322,3 +2322,47 @@ select {
   font-weight: 600;
   text-decoration: none;
 }
+
+/* Savings growth chart: one compact SVG block, no animation. */
+.growth-chart {
+  margin: 12px 0 0;
+}
+.growth-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  overflow: visible;
+}
+.growth-chart .growth-zero {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.growth-chart .growth-target {
+  stroke: var(--soft);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+.growth-chart .growth-line {
+  fill: none;
+  stroke: var(--tone-deep, var(--ink));
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.growth-chart .growth-dot {
+  fill: var(--tone, var(--ink));
+  stroke: var(--tone-deep, var(--ink));
+  stroke-width: 2;
+}
+.growth-chart figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--soft);
+}
+.growth-chart figcaption b {
+  color: var(--ink);
+}
