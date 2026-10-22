@@ -20,6 +20,7 @@ import { getSoloSession, isSoloMode, setSoloMode } from "./solo";
 import Propose from "./screens/Propose";
 import Detail from "./screens/Detail";
 import History from "./screens/History";
+import Recap from "./screens/Recap";
 import Changes from "./screens/Changes";
 import Settings from "./screens/Settings";
 import Record from "./screens/Record";
@@ -558,6 +559,17 @@ export default function App() {
                 path="/history"
                 element={
                   <History
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/recap"
+                element={
+                  <Recap
                     data={data}
                     user={session.user.id}
                     run={run}
