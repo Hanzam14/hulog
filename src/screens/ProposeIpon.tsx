@@ -116,7 +116,31 @@ export default function ProposeIpon({ data, user, run, busy }: ViewProps) {
   };
 
   if (activeMemberIds.size < 2)
-    return <PersonalSavings data={data} user={user} run={run} busy={busy} />;
+    return (
+      <PersonalSavings
+        data={data}
+        user={user}
+        run={run}
+        busy={busy}
+        header={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginBottom: "8px",
+            }}
+          >
+            <Link to="/" className="back" aria-label={t("Back")}>
+              <IconArrowLeft />
+            </Link>
+            <h1 style={{ margin: 0, fontSize: "20px" }}>
+              {t("Personal savings")}
+            </h1>
+          </div>
+        }
+      />
+    );
 
   return (
     <form className="propose" onSubmit={submit}>

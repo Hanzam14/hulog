@@ -161,10 +161,18 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
                   alignItems: "center",
                   gap: "8px",
                   padding: "4px 12px",
+                  maxWidth: "100%",
                 }}
               >
                 <Avatar data={data} id={w.holder_id} size="sm" />
-                <span>
+                <span
+                  style={{
+                    minWidth: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {w.label} ({name(data, w.holder_id).trim().split(/\s+/)[0]})
                 </span>
               </button>

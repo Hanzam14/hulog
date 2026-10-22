@@ -1,5 +1,5 @@
 import { t, label } from "../i18n";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconX } from "@tabler/icons-react";
 import { rpc } from "../data";
 import type { Profile } from "../data";
@@ -16,6 +16,23 @@ export default function ProfileEditor({
 }: ViewProps & { close: () => void }) {
   const own = data.profiles.find((p) => p.id === user)!;
   const [nickname, setNickname] = useState(own.nickname ?? "");
+  const nicknameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    nicknameInputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [close]);
   const [kind, setKind] = useState(own.avatar_kind);
   const [emoji, setEmoji] = useState(own.avatar_emoji ?? emojis[0]);
   const [color, setColor] = useState(own.color);
@@ -71,6 +88,7 @@ export default function ProfileEditor({
         <label>
           {t("Nickname")}
           <input
+            ref={nicknameInputRef}
             value={nickname}
             placeholder={own.display_name}
             maxLength={24}

@@ -214,6 +214,8 @@ function AbonoEditRow({
 }
 
 export default function Tracker({ data, user, run, busy }: ViewProps) {
+  const activeMembers = data.memberships.filter((m) => m.status === "active");
+  const hasPartner = activeMembers.length >= 2;
   const partnerId =
     data.memberships.find((m) => m.status === "active" && m.user_id !== user)
       ?.user_id ?? user;
@@ -328,8 +330,8 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </figure>
             </div>
 
-            <div style={{ textAlign: "center", margin: "12px 0 8px" }}>
-              <strong style={{ fontSize: "20px", display: "block" }}>
+            <div style={{ textAlign: "center", margin: "12px 0 8px", overflowWrap: "anywhere" }}>
+              <strong style={{ fontSize: "20px", display: "block", overflowWrap: "anywhere" }}>
                 {t("{debtor} owes {creditor} {amount}", {
                   debtor: name(data, activeDebt.debtor_id),
                   creditor: name(data, activeDebt.creditor_id),
@@ -338,7 +340,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </strong>
             </div>
 
-            {remaining > 0 && (
+            {hasPartner && remaining > 0 && (
               <div style={{ textAlign: "center", marginTop: "12px" }}>
                 <button
                   disabled={busy}
@@ -352,7 +354,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </div>
             )}
 
-            {showSettle && remaining > 0 && (
+            {hasPartner && showSettle && remaining > 0 && (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -420,7 +422,11 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
           </div>
         )}
         <div className="abono-add">
-          {!showAdd ? (
+          {!hasPartner ? (
+            <p className="meta" style={{ textAlign: "center", margin: "16px 0" }}>
+              {t("Invite your partner to track shared expenses and abono.")}
+            </p>
+          ) : !showAdd ? (
             <button
               type="button"
               className="secondary"
@@ -643,14 +649,22 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                       <button
                         className="quiet danger"
                         disabled={busy}
-                        onClick={() =>
-                          run(() =>
-                            rpc("edit_abono_entry", {
-                              p_id: e.id,
-                              p_delete: true,
-                            }),
-                          )
-                        }
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              t(
+                                "Delete this expense record? The change stays in history.",
+                              ),
+                            )
+                          ) {
+                            run(() =>
+                              rpc("edit_abono_entry", {
+                                p_id: e.id,
+                                p_delete: true,
+                              }),
+                            );
+                          }
+                        }}
                       >
                         {t("Delete")}
                       </button>
@@ -660,14 +674,22 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                       <button
                         className="quiet danger"
                         disabled={busy}
-                        onClick={() =>
-                          run(() =>
-                            rpc("edit_abono_entry", {
-                              p_id: e.id,
-                              p_delete: true,
-                            }),
-                          )
-                        }
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              t(
+                                "Delete this expense record? The change stays in history.",
+                              ),
+                            )
+                          ) {
+                            run(() =>
+                              rpc("edit_abono_entry", {
+                                p_id: e.id,
+                                p_delete: true,
+                              }),
+                            );
+                          }
+                        }}
                       >
                         {t("Propose delete")}
                       </button>

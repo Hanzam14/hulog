@@ -78,6 +78,8 @@
   --danger: #c0362c;
   --sticker-ink: #2b2140;
   --control-border: #887699;
+  --button-border: var(--sticker-ink);
+  --button-shadow: var(--ink);
   --line: color-mix(in srgb, var(--ink) 18%, transparent);
   --card-border: var(--line);
   --highlight-border: var(--line);
@@ -1025,6 +1027,8 @@ button svg,
   --purple-deep: #d0bdff;
   --danger: #ffaaa1;
   --control-border: #9582ad;
+  --button-border: var(--control-border);
+  --button-shadow: rgba(0, 0, 0, 0.45);
 }
 .pink {
   --tone: var(--pink);
@@ -1477,7 +1481,7 @@ button,
 .button {
   min-height: 44px;
   min-width: 44px;
-  border-color: var(--sticker-ink);
+  border-color: var(--button-border, var(--sticker-ink));
 }
 button:not(
   .secondary,
@@ -1491,7 +1495,7 @@ button:not(
   .emoji-grid button
 ),
 .button:not(.secondary, .quiet) {
-  box-shadow: 2px 3px 0 var(--ink);
+  box-shadow: 2px 3px 0 var(--button-shadow, var(--ink));
 }
 .secondary,
 .pick,
@@ -1908,6 +1912,17 @@ main {
   align-items: baseline;
   gap: 8px;
   font-size: 15px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.custody-wallet-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.custody-wallet-row strong {
+  font-family: var(--display);
+  font-weight: 600;
+  flex-shrink: 0;
 }
 .custody-wallet-row strong {
   font-family: var(--display);
