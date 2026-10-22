@@ -11,6 +11,7 @@ import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
 import GivePayout from "../components/GivePayout";
 import CloseEarly from "../components/CloseEarly";
+import RoundCalendar from "../components/RoundCalendar";
 
 export default function Detail({ data, user, run, busy }: ViewProps) {
   const { id } = useParams();
@@ -161,6 +162,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
           </div>
         )}
       </section>
+      <RoundCalendar c={c} data={data} user={user} />
       <section>
         <h2>{t("Payments")}</h2>
         {data.payments
