@@ -537,6 +537,18 @@ const taglish = {
   "Abono spent": "Abono: nagastos",
   "Abono settled": "Abono: na-settle",
   "Shared ipon saved": "Shared ipon: naipon",
+  "Round calendar": "Kalendaryo ng round",
+  "Whose days": "Kaninong mga araw",
+  Paid: "Paid",
+  Pending: "Pending",
+  Missed: "Kulang",
+  Upcoming: "Darating",
+  "Paid {count}": "Paid {count}",
+  "Pending {count}": "Pending {count}",
+  "Missed {count}": "Kulang {count}",
+  "Upcoming {count}": "Darating {count}",
+  "Days fill in order from the start date, not by the date paid.":
+    "Sunod-sunod ang pagpuno ng araw mula sa simula, hindi ayon sa petsa ng bayad.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1072,6 +1084,18 @@ const en = {
   "Abono spent": "Abono spent",
   "Abono settled": "Abono settled",
   "Shared ipon saved": "Shared savings saved",
+  "Round calendar": "Round calendar",
+  "Whose days": "Whose days",
+  Paid: "Paid",
+  Pending: "Pending",
+  Missed: "Missed",
+  Upcoming: "Upcoming",
+  "Paid {count}": "Paid {count}",
+  "Pending {count}": "Pending {count}",
+  "Missed {count}": "Missed {count}",
+  "Upcoming {count}": "Upcoming {count}",
+  "Days fill in order from the start date, not by the date paid.":
+    "Days fill in order from the start date, not by the date paid.",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1610,6 +1634,18 @@ const tl = {
   "Abono spent": "Abono: nagastos",
   "Abono settled": "Abono: naayos na",
   "Shared ipon saved": "Shared ipon: naipon",
+  "Round calendar": "Kalendaryo ng round",
+  "Whose days": "Kaninong mga araw",
+  Paid: "Bayad",
+  Pending: "Naghihintay",
+  Missed: "Kulang",
+  Upcoming: "Darating",
+  "Paid {count}": "Bayad {count}",
+  "Pending {count}": "Naghihintay {count}",
+  "Missed {count}": "Kulang {count}",
+  "Upcoming {count}": "Darating {count}",
+  "Days fill in order from the start date, not by the date paid.":
+    "Sunod-sunod ang pagpuno ng araw mula sa simula, hindi ayon sa petsa ng bayad.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

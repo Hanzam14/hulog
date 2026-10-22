@@ -2378,3 +2378,129 @@ select {
   background: var(--card-tint);
   border-color: var(--mango-deep);
 }
+
+/* Round calendar (spec 10.9): one compact, read-only month grid. */
+.round-cal {
+  --cal-gap: 3px;
+}
+.round-cal .cal-toggle {
+  margin: 12px 0 8px;
+}
+.cal-grid {
+  margin-top: 12px;
+}
+.cal-head,
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--cal-gap);
+}
+.cal-head span {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--soft);
+  padding-bottom: 4px;
+}
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  min-width: 0;
+  padding: 2px 0;
+  border: 1.5px dashed var(--tan);
+  border-radius: 8px;
+  color: var(--soft);
+  line-height: 1.1;
+}
+.cal-day small {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.cal-day b {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 600;
+}
+.cal-day svg {
+  display: block;
+}
+.cal-day.paid {
+  background: var(--tone);
+  border: 1.5px solid var(--line);
+  color: var(--sticker-ink);
+}
+.cal-day.pending {
+  background: var(--card);
+  border: 2px solid var(--tone);
+  color: var(--ink);
+}
+.cal-day.missed {
+  background: var(--danger-tint);
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+}
+.cal-day.today {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+.cal-legend li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cal-key {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px dashed var(--tan);
+  border-radius: 6px;
+  color: var(--soft);
+  line-height: 1;
+}
+.cal-key.paid {
+  background: var(--tone);
+  border: 1.5px solid var(--line);
+  color: var(--sticker-ink);
+}
+.cal-key.pending {
+  background: var(--card);
+  border: 2px solid var(--tone);
+  color: var(--ink);
+}
+.cal-key.missed {
+  background: var(--danger-tint);
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+}
+.cal-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--soft);
+}
+.cal-dot {
+  display: block;
+  height: 14px;
+  font-size: 14px;
+  line-height: 14px;
+}
+.round-cal .cal-toggle button[aria-pressed="true"],
+.round-cal .cal-toggle button[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--pink);
+  color: var(--sticker-ink);
+  border-color: var(--line);
+}
