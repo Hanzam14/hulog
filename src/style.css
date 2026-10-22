@@ -2366,3 +2366,15 @@ select {
 .growth-chart figcaption b {
   color: var(--ink);
 }
+/* Quiet streak chip next to a member's name (spec 10.8). */
+.member-who {
+  flex-wrap: wrap;
+}
+.streak-chip {
+  flex: none;
+  font-size: 12px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  background: var(--card-tint);
+  border-color: var(--mango-deep);
+}
