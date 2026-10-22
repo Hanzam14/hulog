@@ -1,5 +1,7 @@
 # Hulog
 
+## Purpose
+
 A mobile-first PWA for tracking a two-person paluwagan (rotating savings) and
 shared savings goals. Live at **https://hulog.vercel.app** and in daily use.
 
@@ -35,7 +37,7 @@ Vercel hosting.
 - Payment, membership, and cycle rules are covered by Vitest unit tests and a
   pgTAP SQL test suite in `supabase/tests/`.
 
-## Run locally
+## 60-second start
 
 Follow [`SETUP.md`](SETUP.md), copy `.env.example` to `.env`, then:
 
@@ -46,6 +48,27 @@ npm run dev
 
 Checks: `npm run lint`, `npm test`, `npm run build`, and the local SQL suite
 described in `SETUP.md`.
+
+## Current truth
+
+[`docs/SPEC.md`](docs/SPEC.md) owns product requirements; source and migrations
+in this repository own implementation. [`SETUP.md`](SETUP.md) documents setup
+and manual verification. A deployed version may differ from a local checkout.
+
+## Work map
+
+| Task | Start here |
+|---|---|
+| Product behavior | [`docs/SPEC.md`](docs/SPEC.md) |
+| UI and application logic | `src/` |
+| Database migrations and SQL tests | `supabase/` |
+| Local setup and manual checks | [`SETUP.md`](SETUP.md) |
+
+## Boundaries
+
+Hulog records money; it never holds, transfers, or pays out money. Keep `.env`,
+credentials, and local runtime data private. See [`SETUP.md`](SETUP.md) before
+changing hosted configuration or running database setup commands.
 
 ## License
 
