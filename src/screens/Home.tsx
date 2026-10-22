@@ -11,6 +11,7 @@ import Proposal from "../components/Proposal";
 import Payout from "../components/Payout";
 import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
+import StreakChip from "../components/StreakChip";
 import IponCard from "../components/IponCard";
 import PersonalSavings from "../components/PersonalSavings";
 import { isSoloMode } from "../solo";
@@ -253,6 +254,9 @@ export default function Home(props: ViewProps) {
                       <div className="member-who">
                         <Avatar data={data} id={p.member_id} size="sm" />
                         <strong>{name(data, p.member_id)}</strong>
+                        {!isObserving && (
+                          <StreakChip data={data} memberId={p.member_id} />
+                        )}
                       </div>
                       {isObserving ? (
                         <span className="meta">{t("₱0 · Observing")}</span>

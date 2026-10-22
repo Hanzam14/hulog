@@ -254,3 +254,20 @@ Hulog v2 expands the app from a single-mode paluwagan tracker into a read-only c
 - **Personal goals**: a chart appears only for goals the viewer can see: the viewer's own goals, and a partner's goal only while `visibility = 'shared'`. The client filters by owner and visibility as well as relying on RLS; a partner's private goal yields no series. The balance is cumulative deposits minus withdrawals by `entry_date`, non-deleted entries only, with no floor applied, so the chart shows the real recorded balance.
 - **Chart**: hand-rolled SVG with no charting dependency, responsive down to 360px. It shows the first and last date, the current amount, and an accessible text summary ("₱X of ₱Y saved since <date>"). The y-axis spans from the lower of zero and the lowest balance up to the higher of the target and the peak. It is hidden when there are fewer than 2 data points, and it never animates.
 - Amounts are integer centavos throughout. Hulog records movements the user already made; a chart never moves money.
+
+### 10.8 Streaks and goal celebration (owner decisions, 2026-10-23)
+
+- **Read-only and client-side**: streaks and celebrations are derived from data the viewer can already read under RLS. They add no table, view, RPC or notification, and work in offline solo mode. Amounts stay integer centavos; Hulog records movements the user already made and never moves money.
+- **Paluwagan streak**: for an active member, the number of consecutive most-recent **ended** cycles (phase `ended`, ordered by `end_date` descending, then `created_at`) that the member finished clean. Counting starts at the latest ended cycle the member took part in and stops at the first cycle that was not clean.
+  - **Clean** = the member's `member_progress` row for that cycle has `debt_centavos = 0` (the §3 derived debt, repayments included) **and** `confirmed_days >= num_days` (every day paid and confirmed). So a receiver who left days unpaid, or a debtor who only cleared the debt later through repayment, did not finish a full round.
+  - A cycle with debt, or with days short, breaks the streak. Cycles the member took part in without a clean finish are never skipped.
+  - **Skipped, never breaking**: ended cycles the member was not part of, meaning there is no `member_progress` row for the member, or the cycle is a solo round (`is_solo`) saved by someone else (the observer's row there carries no real obligation).
+  - Open, upcoming, settling, proposed and declined cycles are ignored. Being behind in the open round neither adds to nor breaks the streak, and no "on track" flag is shown.
+- **Streak chip**: on the current round's member list on Home, a small chip `🔥 N rounds na buo` appears next to a member's name only when the streak is 2 or more. It is informational: no notification, no nag, no chip for solo-round observers.
+- **Goal celebration**: the first time a viewer sees a goal reached on a device, show a confetti burst and the line `Naabot na! 🎉` once.
+  - **Shared ipon goal** reached = accepted, not withdrawn, `target_amount_centavos > 0` and confirmed `saved_centavos >= target_amount_centavos`. Pending contributions never count.
+  - **Personal goal** reached = the viewer owns the goal, it is not deleted, and the owner's balance (§10.5) is at least the target. A partner's personal goal, shared or private, never celebrates for the viewer.
+  - **Memory**: per goal per device in `localStorage` under `hulog-goal-celebrated:<id>` (`ipon-<goal id>` or `personal-<goal id>`), plus session memory, so blocked storage still cannot repeat it within a session. Every storage access is try/catch.
+  - **Already reached before this shipped**: no seeding. A goal that is already reached celebrates once on first view. Ipon goals that the earlier payout-style burst already celebrated (ids `ipon-<id>` in `hulog-confetti-seen`) are treated as seen, so those do not repeat.
+  - **Reduced motion** (`prefers-reduced-motion: reduce`): no confetti. Only the `Naabot na! 🎉` text badge shows, once.
+  - Shown wherever the goal card renders (Home, ipon goal page, personal goal card); the burst is non-blocking and ignores pointer events.

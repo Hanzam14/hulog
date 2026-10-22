@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { IconWallet } from "@tabler/icons-react";
 import type { SavingsGoal, Snapshot } from "../data";
@@ -13,7 +13,7 @@ import {
 } from "../helpers";
 import { t } from "../i18n";
 import Avatar from "./Avatar";
-import { celebratePayout } from "./confetti";
+import { useGoalCelebration } from "./useGoalCelebration";
 import Tally from "./Tally";
 import { heldByText, name, tone } from "./shared";
 
@@ -29,16 +29,12 @@ export default function IponCard({
   user?: string;
   action?: ReactNode;
 }) {
-  const { percent: progress, paceLabel, reachedTarget } = iponGoalProgress(g);
+  const { percent: progress, paceLabel } = iponGoalProgress(g);
   const radius = 18;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  useEffect(() => {
-    if (reachedTarget && g.status === "accepted") {
-      celebratePayout(`ipon-${g.id}`, data);
-    }
-  }, [reachedTarget, g.id, g.status, data]);
+  useGoalCelebration(data, { kind: "ipon", goal: g }, user);
 
   const progressItems = (data.savingsProgress ?? []).filter(
     (p) => p.goal_id === g.id,

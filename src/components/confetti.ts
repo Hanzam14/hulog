@@ -1,6 +1,7 @@
 import type { Snapshot } from "../data";
 import { tone } from "./shared";
 import { t } from "../i18n";
+import { hasCelebrated, markCelebrated } from "../streaks";
 
 const key = "hulog-confetti-seen";
 const sessionSeen = new Set<string>();
@@ -48,6 +49,8 @@ export function claimCelebration(
 }
 
 let removeBurst: (() => void) | undefined;
+const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 export function celebratePayout(id: string, data: Snapshot) {
   // Accessing window.localStorage itself can throw in private/blocked contexts.
   const storage: StorageLike = {
@@ -55,20 +58,42 @@ export function celebratePayout(id: string, data: Snapshot) {
     setItem: (name, value) => window.localStorage.setItem(name, value),
   };
   if (!claimCelebration(id, storage)) return;
+  celebrate(data, t("Natanggap na! 🎉"), false);
+}
+/** One-time "Naabot na!" for a reached goal (spec 10.8); the id is remembered per device. */
+export function celebrateGoal(id: string, data: Snapshot) {
+  if (hasCelebrated(id)) return;
+  markCelebrated(id);
+  celebrate(data, t("Naabot na! 🎉"), true);
+}
+function showToast(message: string) {
+  const sticker = document.createElement("div");
+  sticker.className = "celebration-toast";
+  sticker.setAttribute("role", "status");
+  sticker.textContent = message;
+  document.body.append(sticker);
+  const timer = window.setTimeout(() => sticker.remove(), 2200);
+  return () => {
+    clearTimeout(timer);
+    sticker.remove();
+  };
+}
+/** Reduced motion shows the text only; otherwise a confetti burst, with the text when asked. */
+function celebrate(data: Snapshot, message: string, alwaysText: boolean) {
   removeBurst?.();
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    const sticker = document.createElement("div");
-    sticker.className = "celebration-toast";
-    sticker.setAttribute("role", "status");
-    sticker.textContent = t("Natanggap na! 🎉");
-    document.body.append(sticker);
-    const timer = window.setTimeout(() => sticker.remove(), 2200);
-    removeBurst = () => {
-      clearTimeout(timer);
-      sticker.remove();
-    };
+  removeBurst = undefined;
+  if (prefersReducedMotion()) {
+    removeBurst = showToast(message);
     return;
   }
+  const stopToast = alwaysText ? showToast(message) : undefined;
+  const stopBurst = burst(data);
+  removeBurst = () => {
+    stopToast?.();
+    stopBurst?.();
+  };
+}
+function burst(data: Snapshot): (() => void) | undefined {
   const canvas = document.createElement("canvas");
   canvas.className = "confetti-canvas";
   canvas.setAttribute("aria-hidden", "true");
@@ -76,7 +101,7 @@ export function celebratePayout(id: string, data: Snapshot) {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     canvas.remove();
-    return;
+    return undefined;
   }
   const css = getComputedStyle(document.documentElement);
   const colors = [
@@ -117,7 +142,6 @@ export function celebratePayout(id: string, data: Snapshot) {
     window.removeEventListener("resize", resize);
     canvas.remove();
   };
-  removeBurst = cleanup;
   const draw = (now: number) => {
     const elapsed = now - start;
     if (elapsed >= 2200) {
@@ -158,4 +182,5 @@ export function celebratePayout(id: string, data: Snapshot) {
     }
   };
   frame = requestAnimationFrame(draw);
+  return cleanup;
 }

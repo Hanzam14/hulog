@@ -251,6 +251,8 @@ const taglish = {
   "I-update": "I-update",
   "Isara ang update notice": "Isara ang update notice",
   "Natanggap na! 🎉": "Natanggap na! 🎉",
+  "Naabot na! 🎉": "Naabot na! 🎉",
+  "🔥 {count} rounds na buo": "🔥 {count} rounds na buo",
   "Round details": "Detalye ng round",
   "Share → Add to Home Screen": "Share → Add to Home Screen",
   "Hindi ma-install ngayon. Subukan ulit sa browser menu.":
@@ -786,6 +788,8 @@ const en = {
   "I-update": "Update",
   "Isara ang update notice": "Dismiss update notice",
   "Natanggap na! 🎉": "Received! 🎉",
+  "Naabot na! 🎉": "Goal reached! 🎉",
+  "🔥 {count} rounds na buo": "🔥 {count} full rounds",
   "Round details": "Round details",
   "Share → Add to Home Screen": "Share → Add to Home Screen",
   "Hindi ma-install ngayon. Subukan ulit sa browser menu.":
@@ -1321,6 +1325,8 @@ const tl = {
   "I-update": "I-update",
   "Isara ang update notice": "Isara ang abiso ng update",
   "Natanggap na! 🎉": "Natanggap na! 🎉",
+  "Naabot na! 🎉": "Naabot na! 🎉",
+  "🔥 {count} rounds na buo": "🔥 {count} round na buo",
   "Round details": "Detalye ng round",
   "Share → Add to Home Screen": "I-share → Idagdag sa Home Screen",
   "Hindi ma-install ngayon. Subukan ulit sa browser menu.":

@@ -13,6 +13,7 @@ import { money, parsePesos, shortDate } from "../helpers";
 import { t, label } from "../i18n";
 import { personalBalance } from "../personal";
 import GrowthChart from "./GrowthChart";
+import { useGoalCelebration } from "./useGoalCelebration";
 import { name, type Run, type ViewProps } from "./shared";
 
 export function GoalForm({
@@ -194,6 +195,7 @@ export function PersonalGoalCard({
         : t("Shared read-only");
   const balance = personalBalance(entries, goal.id);
   const progress = Math.min(100, (balance / goal.target_amount_centavos) * 100);
+  useGoalCelebration(data, { kind: "personal", goal }, user);
   const [editingGoal, setEditingGoal] = useState(false);
   const [recording, setRecording] = useState<PersonalEntry["kind"] | null>(
     null,
