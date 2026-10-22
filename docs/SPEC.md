@@ -234,3 +234,15 @@ Hulog v2 expands the app from a single-mode paluwagan tracker into a read-only c
 - Offline solo mode uses the same personal-goal UI and owner ledger on the device, clearly labelled as local-only. Existing local `[Solo]` goals migrate once, preserving IDs, notes, balances and prior shared visibility. New goals default private. Switching offline preview modes preserves personal records. Offline preview data is not automatically uploaded or merged into an online account.
 - Hulog records movements the user already made; recording a deposit or withdrawal never moves money.
 
+
+### 10.6 Monthly recap (owner decisions, 2026-10-22)
+
+- **Month**: a calendar month in Asia/Manila. The default is the current Manila month (`hulog_today()`). Previous/next arrows move one month; the picker cannot go later than the current month, and the earliest month is the month of the group's earliest record (or the current month when there is none).
+- **Read-only and client-side**: the recap is derived from data the viewer can already read under RLS. It adds no table, view or RPC, and works in offline solo mode.
+- **Confirmed only**: only confirmed, non-deleted records count. Pending records are shown only as a count ("N pa pending") and are never added to totals.
+- **Paluwagan**: payments are dated by the Manila date of `confirmed_at`, falling back to `created_at` (the same Manila date convention the cycle screen uses for a payment); show the total and the per-member split. Payouts are cycles whose `received_at` Manila date falls in the month, each valued at that cycle's pot with its receiver.
+- **Abono**: expenses by `entry_date` (total spent and how much each member paid) and settlements by `entry_date` (total settled).
+- **Shared ipon**: confirmed contributions dated like payments (Manila date of `confirmed_at`, fallback `created_at`): total and per goal.
+- **Personal savings**: shown only to the viewer, for the viewer's own goals plus a partner's goals with `visibility = 'shared'`. Net = deposits − withdrawals by `entry_date`. A partner's private goals never appear: RLS already blocks them, and the client also filters by owner and visibility.
+- **Share card**: a PNG drawn on a canvas with the month, the group name and GROUP figures only (paluwagan paid and payouts, abono spent and settled, shared ipon saved). Personal savings are never on the card. It is shared with the Web Share API as a file when `navigator.canShare({ files })` is true, otherwise downloaded. Nothing is uploaded.
+- Amounts are integer centavos throughout and are shown with the existing peso formatter. Hulog records movements the user already made; the recap never moves money.

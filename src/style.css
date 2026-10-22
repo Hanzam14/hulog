@@ -2282,3 +2282,43 @@ select {
     --container-width: 760px;
   }
 }
+
+/* Monthly recap */
+.recap-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+}
+.recap-month strong {
+  font-family: var(--display);
+  font-size: 20px;
+  text-align: center;
+}
+.recap-block .meta {
+  margin: 8px 0 0;
+}
+.recap-block .list-row {
+  padding: 8px 0;
+}
+.recap-total {
+  font-family: var(--display);
+  font-size: 20px;
+}
+.recap-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  margin: 12px 0 0;
+  padding: 10px 16px;
+  background: var(--card);
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  font-family: var(--display);
+  font-weight: 600;
+  text-decoration: none;
+}

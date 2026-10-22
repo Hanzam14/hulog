@@ -1,6 +1,7 @@
 import { t, label } from "../i18n";
 import { useState } from "react";
-import { IconSparkles } from "@tabler/icons-react";
+import { Link } from "react-router-dom";
+import { IconChevronRight, IconSparkles } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name } from "../components/shared";
 import { rpc } from "../data";
@@ -48,6 +49,10 @@ export default function History({ data, user, run, busy }: ViewProps) {
 
   return (
     <>
+      <Link to="/recap" className="recap-link no-print">
+        {t("Monthly recap")}
+        <IconChevronRight size={20} aria-hidden="true" />
+      </Link>
       <div className="row">
         <h1>{t("Past pots & debts")}</h1>
         {hasHistory && (
