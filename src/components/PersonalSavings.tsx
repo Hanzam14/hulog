@@ -24,13 +24,21 @@ export function GoalForm({
   run: Run;
   close: () => void;
 }) {
+  const [error, setError] = useState<string | null>(null);
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const rawTitle = String(form.get("title") ?? "");
+    const title = rawTitle.trim();
+    if (!title || title.length > 60) {
+      setError(t("Goal title must be 1 to 60 characters"));
+      return;
+    }
+    setError(null);
     void run(async () => {
       await rpc(goal ? "update_personal_goal" : "create_personal_goal", {
         ...(goal ? { p_goal_id: goal.id } : {}),
-        p_title: form.get("title"),
+        p_title: title,
         p_target_amount_centavos: parsePesos(String(form.get("target"))),
         p_visibility: form.get("visibility"),
       });
@@ -39,6 +47,11 @@ export function GoalForm({
   };
   return (
     <form onSubmit={submit} className="personal-form">
+      {error && (
+        <div role="alert" className="notice error">
+          {error}
+        </div>
+      )}
       <label>
         {t("Goal title")}
         <input
@@ -191,7 +204,10 @@ export function PersonalGoalCard({
           : t("Visible to partner")
         : t("Shared read-only");
   const balance = personalBalance(entries, goal.id);
-  const progress = Math.min(100, (balance / goal.target_amount_centavos) * 100);
+  const progress =
+    goal.target_amount_centavos > 0
+      ? Math.min(100, Math.max(0, (balance / goal.target_amount_centavos) * 100))
+      : 0;
   const [editingGoal, setEditingGoal] = useState(false);
   const [recording, setRecording] = useState<PersonalEntry["kind"] | null>(
     null,
@@ -402,8 +418,13 @@ export function PersonalGoalCard({
 export default function PersonalSavings({
   trailing,
   siblingGoals,
+  header,
   ...props
-}: ViewProps & { trailing?: ReactNode; siblingGoals?: boolean }) {
+}: ViewProps & {
+  trailing?: ReactNode;
+  siblingGoals?: boolean;
+  header?: ReactNode;
+}) {
   const [creating, setCreating] = useState(false);
   const goals = (props.data.personalGoals ?? []).filter(
     (g) =>
@@ -415,12 +436,15 @@ export default function PersonalSavings({
       id="personal-savings"
       aria-labelledby="personal-savings-title"
     >
+      {header}
       <h3
         id="personal-savings-title"
         className={
-          siblingGoals === undefined || (siblingGoals && goals.length > 0)
-            ? undefined
-            : "sr-only"
+          header
+            ? "sr-only"
+            : siblingGoals === undefined || (siblingGoals && goals.length > 0)
+              ? undefined
+              : "sr-only"
         }
       >
         {t("Personal savings")}

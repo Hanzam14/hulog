@@ -239,6 +239,14 @@ export default function History({ data, user, run, busy }: ViewProps) {
                           />
                         </label>
                         <button disabled={busy}>{t("Save correction")}</button>
+                        <button
+                          type="button"
+                          className="quiet"
+                          disabled={busy}
+                          onClick={() => setEditing(null)}
+                        >
+                          {t("Cancel")}
+                        </button>
                       </form>
                     )}
                   </>
@@ -254,7 +262,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
         </div>
       )}
       {hasHistory && filteredCycles.length === 0 && (
-        <p>{t("Past cycles will appear here.")}</p>
+        <p className="muted">{t("No cycles match.")}</p>
       )}
       {pastGoals.length > 0 && (
         <section>

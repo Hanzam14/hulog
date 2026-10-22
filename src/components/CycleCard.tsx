@@ -32,7 +32,6 @@ export default function CycleCard({
     <Link
       to={`/cycles/${c.id}`}
       className="pot"
-      aria-label={t("Round details")}
     >
       <div className="pot-top">
         <IconPigMoney className="pig" size={44} aria-hidden="true" />

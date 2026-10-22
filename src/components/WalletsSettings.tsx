@@ -41,6 +41,7 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
   };
 
   const handleArchive = (w: Wallet) => () => {
+    if (!window.confirm(t("Archive this wallet?"))) return;
     void run(() =>
       rpc("update_wallet", {
         p_id: w.id,
@@ -54,7 +55,12 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
     <section className="wallets-section">
       <h2>{t("Wallets & accounts")}</h2>
       <div className="wallets-list">
-        {wallets.map((w) => {
+        {wallets.length === 0 ? (
+          <p className="meta" style={{ margin: "8px 0" }}>
+            {t("No wallets yet.")}
+          </p>
+        ) : (
+          wallets.map((w) => {
           const isOwner = w.holder_id === user;
           const isEditing = editingId === w.id;
 
@@ -141,7 +147,7 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
               )}
             </article>
           );
-        })}
+        }))}
       </div>
 
       <details className="wallet-add">

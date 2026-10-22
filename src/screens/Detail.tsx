@@ -2,6 +2,7 @@ import { t, label } from "../i18n";
 import PendingPaymentActions from "../components/PendingPaymentActions";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { IconArrowLeft } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { rpc } from "../data";
@@ -42,7 +43,19 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
 
   return (
     <>
-      <h1>{t("Cycle detail")}</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "8px",
+        }}
+      >
+        <Link to="/" className="back" aria-label={t("Back")}>
+          <IconArrowLeft />
+        </Link>
+        <h1 style={{ margin: 0, fontSize: "20px" }}>{t("Cycle detail")}</h1>
+      </div>
       <section>
         <CycleCard c={c} data={data} user={user} />
         <GivePayout c={c} data={data} user={user} run={run} busy={busy} />
@@ -163,10 +176,13 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
       </section>
       <section>
         <h2>{t("Payments")}</h2>
-        {data.payments
-          .filter((p) => p.cycle_id === id)
-          .sort((a, b) => b.created_at.localeCompare(a.created_at))
-          .map((p) => (
+        {data.payments.filter((p) => p.cycle_id === id).length === 0 ? (
+          <p className="muted">{t("No payments yet.")}</p>
+        ) : (
+          data.payments
+            .filter((p) => p.cycle_id === id)
+            .sort((a, b) => b.created_at.localeCompare(a.created_at))
+            .map((p) => (
             <article className="entry pay-row" key={p.id}>
               <div className="row">
                 <span>
@@ -278,12 +294,20 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                         />
                       </label>
                       <button disabled={busy}>{t("Save correction")}</button>
+                      <button
+                        type="button"
+                        className="quiet"
+                        disabled={busy}
+                        onClick={() => setEditing(null)}
+                      >
+                        {t("Cancel")}
+                      </button>
                     </form>
                   )}
                 </>
               )}
             </article>
-          ))}
+          )))}
       </section>
       <Payout c={c} data={data} user={user} run={run} busy={busy} />
     </>

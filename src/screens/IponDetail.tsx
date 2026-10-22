@@ -275,6 +275,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                       >
                         <select
                           name="wallet_id"
+                          aria-label={t("Select wallet")}
                           defaultValue={
                             activeWallets.find((w) => w.id !== g.wallet_id)?.id
                           }
@@ -459,7 +460,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                               if (
                                 window.confirm(
                                   t(
-                                    "Delete this payment record? The change stays in history.",
+                                    "Delete this contribution record? The change stays in history.",
                                   ),
                                 )
                               )
@@ -516,7 +517,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                             if (
                               window.confirm(
                                 t(
-                                  "Delete this payment record? The change stays in history.",
+                                  "Delete this contribution record? The change stays in history.",
                                 ),
                               )
                             )
@@ -542,7 +543,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                               if (
                                 window.confirm(
                                   t(
-                                    "Delete this payment record? The change stays in history.",
+                                    "Delete this contribution record? The change stays in history.",
                                   ),
                                 )
                               )

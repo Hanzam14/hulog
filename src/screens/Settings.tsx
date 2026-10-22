@@ -47,11 +47,20 @@ export default function Settings({
       ["payments", fresh.payments],
       ["repayments", fresh.repayments],
     ];
+    const myPersonalGoals = (fresh.personalGoals ?? []).filter(
+      (g) => g.owner_id === user,
+    );
+    const myGoalIds = new Set(myPersonalGoals.map((g) => g.id));
+    const myPersonalEntries = (fresh.personalEntries ?? []).filter((e) =>
+      myGoalIds.has(e.goal_id),
+    );
     const optionalTables: [string, unknown[]][] = [
       ["wallets", fresh.wallets ?? []],
       ["savings-goals", fresh.savingsGoals ?? []],
       ["savings-contributions", fresh.savingsContributions ?? []],
       ["abono-entries", fresh.abonoEntries ?? []],
+      ["personal-goals", myPersonalGoals],
+      ["personal-entries", myPersonalEntries],
     ];
     const tables = [
       ...coreTables,
@@ -71,6 +80,7 @@ export default function Settings({
       a.download = `hulog-${file}.csv`;
       a.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      await new Promise((r) => setTimeout(r, 200));
     }
   };
   const share = () =>
@@ -110,7 +120,13 @@ export default function Settings({
           user={user}
           run={run}
           busy={busy}
-          close={() => setEditingProfile(false)}
+          close={() => {
+            setEditingProfile(false);
+            if (typeof document !== "undefined") {
+              const btn = document.querySelector<HTMLButtonElement>(".avatar-edit");
+              btn?.focus();
+            }
+          }}
         />
       )}
       <CustodyCard data={data} />
@@ -150,7 +166,7 @@ export default function Settings({
           {t("On this device only. Sign in to sync personal savings.")}
         </p>
       )}
-      {active.length < 2 && (
+      {(isSoloMode() || active.length < 2) && (
         <div className="solo-mode-settings">
           {isSoloMode() ? (
             <button

@@ -1,7 +1,7 @@
 import {
   t,
   useLanguage,
-  label,
+  formatError,
   languageSnapshot,
   type Key,
   type Lang,
@@ -203,7 +203,10 @@ export default function App() {
       window.removeEventListener("focus", reload);
     };
   }, [session]);
+  const inFlightRef = useRef(false);
   const run: Run = async (action, options) => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     setBusy(true);
     setError("");
     setSuccess(null);
@@ -218,7 +221,17 @@ export default function App() {
         setSuccess({ message: "Saved. Salamat!" });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+      try {
+        if (isSoloMode()) {
+          await refresh();
+        } else if (supabase && (await supabase.auth.getSession()).data.session) {
+          await refresh();
+        }
+      } catch {
+        // best-effort refresh; errors swallowed
+      }
     } finally {
+      inFlightRef.current = false;
       setBusy(false);
     }
   };
@@ -321,7 +334,7 @@ export default function App() {
       )}
       {error && (
         <div role="alert" className="notice error">
-          {label(error)}
+          {formatError(error)}
           <button className="quiet" onClick={() => setError("")}>
             {t("Dismiss")}
           </button>

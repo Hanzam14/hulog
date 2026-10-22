@@ -82,7 +82,7 @@ export default function IponCard({
       : "";
 
   const card = (
-    <Link to={`/ipon/${g.id}`} className="pot ipon-card" aria-label={g.title}>
+    <Link to={`/ipon/${g.id}`} className="pot ipon-card">
       <div className="pot-top">
         <div className="ipon-ring" aria-hidden="true">
           <svg width="44" height="44" viewBox="0 0 44 44">

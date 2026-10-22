@@ -34,11 +34,26 @@ export default function Home(props: ViewProps) {
       sc.status === "pending" &&
       (sc.last_edited_by ?? sc.created_by) !== user,
   );
+  const deleteProposedContributions = (data.savingsContributions ?? []).filter(
+    (sc) =>
+      !sc.deleted_at &&
+      sc.delete_proposed_by &&
+      sc.delete_proposed_by !== user,
+  );
   const pendingAbono = (data.abonoEntries ?? []).filter(
     (ae) =>
       !ae.deleted_at &&
       ae.status === "pending" &&
       (ae.last_edited_by ?? ae.created_by) !== user,
+  );
+  const deleteProposedAbono = (data.abonoEntries ?? []).filter(
+    (ae) =>
+      !ae.deleted_at &&
+      ae.delete_proposed_by &&
+      ae.delete_proposed_by !== user,
+  );
+  const pendingRepayments = (data.repayments ?? []).filter(
+    (r) => !r.deleted_at && r.status === "pending" && r.creditor_id === user,
   );
 
   const activeGoals = (data.savingsGoals ?? [])
@@ -60,7 +75,10 @@ export default function Home(props: ViewProps) {
       <h1 className="sr-only">{group.name}</h1>
       {(waiting.length > 0 ||
         pendingContributions.length > 0 ||
-        pendingAbono.length > 0) && (
+        deleteProposedContributions.length > 0 ||
+        pendingAbono.length > 0 ||
+        deleteProposedAbono.length > 0 ||
+        pendingRepayments.length > 0) && (
         <section className="home-waiting">
           <h2 className="section-label">{t("Waiting for your check")}</h2>
           <div className="confirm-list">
@@ -138,7 +156,7 @@ export default function Home(props: ViewProps) {
                       if (
                         window.confirm(
                           t(
-                            "Delete this payment record? The change stays in history.",
+                            "Delete this contribution record? The change stays in history.",
                           ),
                         )
                       )
@@ -171,6 +189,56 @@ export default function Home(props: ViewProps) {
               );
             })}
 
+            {deleteProposedContributions.map((sc) => {
+              const goal = (data.savingsGoals ?? []).find(
+                (g) => g.id === sc.goal_id,
+              );
+              return (
+                <div className="sticker confirm" key={sc.id}>
+                  <Avatar data={data} id={sc.delete_proposed_by!} />
+                  <div>
+                    <strong>{money(sc.amount_centavos)}</strong>
+                    <Link to={`/ipon/${sc.goal_id}`} className="muted">
+                      {goal?.title ?? t("Ipon detail")}
+                    </Link>
+                    <small>{t("Deletion requested")}</small>
+                  </div>
+                  <button
+                    className="round no"
+                    aria-label={t("Cancel delete")}
+                    title={t("Cancel delete")}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_delete_savings_contribution", {
+                          p_id: sc.id,
+                          p_action: "decline",
+                        }),
+                      )
+                    }
+                  >
+                    <IconX />
+                  </button>
+                  <button
+                    className="round ok"
+                    aria-label={t("Confirm delete")}
+                    title={t("Confirm delete")}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_delete_savings_contribution", {
+                          p_id: sc.id,
+                          p_action: "accept",
+                        }),
+                      )
+                    }
+                  >
+                    <IconCheck />
+                  </button>
+                </div>
+              );
+            })}
+
             {pendingAbono.map((ae) => (
               <div className="sticker confirm" key={ae.id}>
                 <Avatar data={data} id={ae.from_member} />
@@ -192,7 +260,7 @@ export default function Home(props: ViewProps) {
                     if (
                       window.confirm(
                         t(
-                          "Delete this payment record? The change stays in history.",
+                          "Delete this expense record? The change stays in history.",
                         ),
                       )
                     )
@@ -215,6 +283,100 @@ export default function Home(props: ViewProps) {
                   disabled={busy}
                   onClick={() =>
                     void run(() => rpc("confirm_abono_entry", { p_id: ae.id }))
+                  }
+                >
+                  <IconCheck />
+                </button>
+              </div>
+            ))}
+
+            {deleteProposedAbono.map((ae) => (
+              <div className="sticker confirm" key={ae.id}>
+                <Avatar data={data} id={ae.delete_proposed_by!} />
+                <div>
+                  <strong>{money(ae.owed_amount_centavos)}</strong>
+                  <Link to="/tracker" className="muted">
+                    {ae.description} ({t("Tracker")})
+                  </Link>
+                  <small>{t("Deletion requested")}</small>
+                </div>
+                <button
+                  className="round no"
+                  aria-label={t("Cancel delete")}
+                  title={t("Cancel delete")}
+                  disabled={busy}
+                  onClick={() =>
+                    void run(() =>
+                      rpc("respond_delete_abono_entry", {
+                        p_id: ae.id,
+                        p_action: "decline",
+                      }),
+                    )
+                  }
+                >
+                  <IconX />
+                </button>
+                <button
+                  className="round ok"
+                  aria-label={t("Confirm delete")}
+                  title={t("Confirm delete")}
+                  disabled={busy}
+                  onClick={() =>
+                    void run(() =>
+                      rpc("respond_delete_abono_entry", {
+                        p_id: ae.id,
+                        p_action: "accept",
+                      }),
+                    )
+                  }
+                >
+                  <IconCheck />
+                </button>
+              </div>
+            ))}
+
+            {pendingRepayments.map((r) => (
+              <div className="sticker confirm" key={r.id}>
+                <Avatar data={data} id={r.debtor_id} />
+                <div>
+                  <strong>{money(r.amount_centavos)}</strong>
+                  <Link to="/history" className="muted">
+                    {t("Debt repayment")} ({name(data, r.debtor_id)})
+                  </Link>
+                  <small>{name(data, r.debtor_id)}</small>
+                </div>
+                <button
+                  className="round no"
+                  aria-label={t("Decline {name}'s {amount}", {
+                    name: name(data, r.debtor_id),
+                    amount: money(r.amount_centavos),
+                  })}
+                  disabled={busy}
+                  onClick={() => {
+                    if (
+                      window.confirm(t("Delete this repayment record?"))
+                    )
+                      void run(() =>
+                        rpc("edit_repayment", {
+                          p_id: r.id,
+                          p_delete: true,
+                        }),
+                      );
+                  }}
+                >
+                  <IconX />
+                </button>
+                <button
+                  className="round ok"
+                  aria-label={t("Confirm {name}'s {amount}", {
+                    name: name(data, r.debtor_id),
+                    amount: money(r.amount_centavos),
+                  })}
+                  disabled={busy}
+                  onClick={() =>
+                    void run(() =>
+                      rpc("confirm_repayment", { p_id: r.id }),
+                    )
                   }
                 >
                   <IconCheck />
@@ -288,6 +450,11 @@ export default function Home(props: ViewProps) {
         <h2 className="section-label">{t("Ipon")}</h2>
         {activeGoals.length > 0 && hasPersonal && (
           <h3 className="sub-label">{t("Ipon goals")}</h3>
+        )}
+        {activeGoals.length === 0 && (
+          <p className="meta" style={{ textAlign: "center", margin: "8px 0" }}>
+            {t("No ipon goals yet. Save together for a trip or goal.")}
+          </p>
         )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">

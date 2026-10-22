@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react";
 import Avatar from "../components/Avatar";
@@ -43,6 +43,7 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
       : "0",
   );
   const [note, setNote] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   if (!g) {
     return (
@@ -67,30 +68,46 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
   const set = (n: number) => setSteps(Math.min(remainingSteps, Math.max(1, n)));
   const stepAmount = g.step_amount_centavos ?? 0;
 
-  const submitMatched = () => {
-    void run(async () => {
-      await rpc("record_savings_contribution", {
-        p_goal_id: g.id,
-        p_steps: steps,
-        p_note: note.trim(),
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (busy) return;
+    if (g.goal_mode === "matched") {
+      if (remainingSteps <= 0 || steps <= 0 || steps > remainingSteps) return;
+      void run(async () => {
+        await rpc("record_savings_contribution", {
+          p_goal_id: g.id,
+          p_steps: steps,
+          p_note: note.trim(),
+        });
+        navigate(`/ipon/${g.id}`);
       });
-      navigate(`/ipon/${g.id}`);
-    });
-  };
-
-  const submitFlexible = () => {
-    void run(async () => {
-      await rpc("record_savings_contribution", {
-        p_goal_id: g.id,
-        p_amount_centavos: parsePesos(amount),
-        p_note: note.trim(),
+    } else {
+      if (remainingCentavos <= 0) return;
+      if (!amount.trim()) {
+        setError(t("Enter a positive amount."));
+        return;
+      }
+      let parsedCentavos: number;
+      try {
+        parsedCentavos = parsePesos(amount);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+        return;
+      }
+      setError(null);
+      void run(async () => {
+        await rpc("record_savings_contribution", {
+          p_goal_id: g.id,
+          p_amount_centavos: parsedCentavos,
+          p_note: note.trim(),
+        });
+        navigate(`/ipon/${g.id}`);
       });
-      navigate(`/ipon/${g.id}`);
-    });
+    }
   };
 
   return (
-    <div className="record">
+    <form className="record" onSubmit={handleSubmit}>
       <Link to={`/ipon/${g.id}`} className="back" aria-label={t("Back")}>
         <IconArrowLeft />
       </Link>
@@ -120,6 +137,12 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
           >
             {getSoloBadgeText(g, data, user)}
           </span>
+        </div>
+      )}
+
+      {error && (
+        <div role="alert" className="notice error">
+          {error}
         </div>
       )}
 
@@ -195,8 +218,8 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
 
           <button
             className="big"
+            type="submit"
             disabled={busy || remainingSteps <= 0 || steps > remainingSteps}
-            onClick={submitMatched}
           >
             {t("Record ipon")}
           </button>
@@ -265,13 +288,13 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
 
           <button
             className="big"
+            type="submit"
             disabled={busy || remainingCentavos <= 0}
-            onClick={submitFlexible}
           >
             {t("Record ipon")}
           </button>
         </>
       )}
-    </div>
+    </form>
   );
 }

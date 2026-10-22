@@ -5,6 +5,7 @@ import type {
   Membership,
   Payment,
   Profile,
+  Repayment,
   Snapshot,
   Wallet,
   SavingsGoal,
@@ -24,6 +25,23 @@ import {
 const SOLO_MODE_KEY = "hulog-solo-mode";
 const SOLO_SNAPSHOT_KEY = "hulog-solo-snapshot";
 const SOLO_POT_MODE_KEY = "hulog-solo-pot-mode";
+const SOLO_DEMO_GOAL_SEEDED_KEY = "hulog-demo-goal-seeded";
+
+function isDemoGoalSeeded(): boolean {
+  try {
+    return localStorage.getItem(SOLO_DEMO_GOAL_SEEDED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function markDemoGoalSeeded(): void {
+  try {
+    localStorage.setItem(SOLO_DEMO_GOAL_SEEDED_KEY, "true");
+  } catch {
+    // Storage restricted
+  }
+}
 
 function generateId(): string {
   if (
@@ -81,6 +99,12 @@ export function setSoloPotMode(
     snap.personalGoals = previous.personalGoals;
     snap.personalEntries = previous.personalEntries;
     snap.personalHistory = previous.personalHistory;
+    // Tolerant of storage failure: if previously deleted/migrated, do not re-inject into savingsGoals
+    if (!previous.savingsGoals?.some((g) => g.id === "demo-solo-ai-goal")) {
+      snap.savingsGoals = (snap.savingsGoals ?? []).filter(
+        (g) => g.id !== "demo-solo-ai-goal",
+      );
+    }
   }
   saveRawSoloSnapshot(snap);
   return snap;
@@ -330,6 +354,11 @@ export function createInitialSoloSnapshot(
     },
   ];
 
+  const shouldSeedGoal = !isDemoGoalSeeded();
+  if (shouldSeedGoal) {
+    markDemoGoalSeeded();
+  }
+
   // Active Solo Ipon Goal: [Solo] AI Subscription (₱600 / ₱1,200)
   const soloGoalId = "demo-solo-ai-goal";
   const soloGoalStartDate = addDays(today, -5);
@@ -367,47 +396,51 @@ export function createInitialSoloSnapshot(
     created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
   };
 
-  const savingsContributions: SavingsContribution[] = [
-    {
-      id: "demo-sc-ai-1",
-      goal_id: soloGoalId,
-      member_id: uid,
-      steps: null,
-      amount_centavos: soloGoalSaved,
-      note: "First half for Claude Pro",
-      status: "confirmed",
-      was_confirmed: true,
-      created_by: uid,
-      last_edited_by: null,
-      delete_proposed_by: null,
-      created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
-      confirmed_by: uid,
-      confirmed_at: new Date(Date.now() - 4 * 86400000).toISOString(),
-      edited_at: null,
-      deleted_at: null,
-    },
-  ];
+  const savingsContributions: SavingsContribution[] = shouldSeedGoal
+    ? [
+        {
+          id: "demo-sc-ai-1",
+          goal_id: soloGoalId,
+          member_id: uid,
+          steps: null,
+          amount_centavos: soloGoalSaved,
+          note: "First half for Claude Pro",
+          status: "confirmed",
+          was_confirmed: true,
+          created_by: uid,
+          last_edited_by: null,
+          delete_proposed_by: null,
+          created_at: new Date(Date.now() - 4 * 86400000).toISOString(),
+          confirmed_by: uid,
+          confirmed_at: new Date(Date.now() - 4 * 86400000).toISOString(),
+          edited_at: null,
+          deleted_at: null,
+        },
+      ]
+    : [];
 
-  const savingsProgress: SavingsMemberProgress[] = [
-    {
-      goal_id: soloGoalId,
-      member_id: uid,
-      expected_centavos: soloGoalTarget,
-      confirmed_centavos: soloGoalSaved,
-      pending_centavos: 0,
-      confirmed_steps: 1,
-      pending_steps: 0,
-    },
-    {
-      goal_id: soloGoalId,
-      member_id: partnerId,
-      expected_centavos: 0,
-      confirmed_centavos: 0,
-      pending_centavos: 0,
-      confirmed_steps: 0,
-      pending_steps: 0,
-    },
-  ];
+  const savingsProgress: SavingsMemberProgress[] = shouldSeedGoal
+    ? [
+        {
+          goal_id: soloGoalId,
+          member_id: uid,
+          expected_centavos: soloGoalTarget,
+          confirmed_centavos: soloGoalSaved,
+          pending_centavos: 0,
+          confirmed_steps: 1,
+          pending_steps: 0,
+        },
+        {
+          goal_id: soloGoalId,
+          member_id: partnerId,
+          expected_centavos: 0,
+          confirmed_centavos: 0,
+          pending_centavos: 0,
+          confirmed_steps: 0,
+          pending_steps: 0,
+        },
+      ]
+    : [];
 
   const custody: CustodyItem[] = [
     {
@@ -418,8 +451,8 @@ export function createInitialSoloSnapshot(
       archived_at: null,
       holder_active: true,
       paluwagan_centavos: 30000,
-      ipon_centavos: 60000,
-      total_centavos: 90000,
+      ipon_centavos: shouldSeedGoal ? 60000 : 0,
+      total_centavos: shouldSeedGoal ? 90000 : 30000,
     },
     {
       wallet_id: "partner-wallet",
@@ -447,7 +480,7 @@ export function createInitialSoloSnapshot(
     today,
     wallets: [wallet, partnerWallet],
     custody,
-    savingsGoals: [soloGoal],
+    savingsGoals: shouldSeedGoal ? [soloGoal] : [],
     savingsContributions,
     savingsProgress,
     abonoEntries: [],
@@ -597,10 +630,15 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     snapshot = createInitialSoloSnapshot(undefined, currentMode);
   } else if (currentMode === "partnered" && snapshot.memberships.length < 2) {
     // Upgrade existing single-member solo snapshot to default partnered demo pot
+    const prev = snapshot;
     snapshot = createInitialSoloSnapshot(
-      snapshot.memberships[0]?.user_id,
+      prev.memberships[0]?.user_id,
       "partnered",
     );
+    migratePersonalSavings(prev);
+    snapshot.personalGoals = prev.personalGoals;
+    snapshot.personalEntries = prev.personalEntries;
+    snapshot.personalHistory = prev.personalHistory;
   }
 
   const today = getManilaToday();
@@ -634,9 +672,17 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     );
     c.phase = phase;
     c.days_left = daysLeft;
-    if (phase === "settling" || phase === "ended") {
-      c.payout_state = "Received";
-      if (!c.received_at) c.received_at = new Date().toISOString();
+    if (c.status === "accepted" && (phase === "settling" || phase === "ended")) {
+      const wallet = snapshot.wallets?.find((w) => w.id === c.wallet_id);
+      const holderId =
+        wallet?.holder_id ?? c.holder_id ?? snapshot.groups[0]?.owner_id;
+      if (c.receiver_id === holderId || c.received_at) {
+        c.payout_state = "Received";
+      } else {
+        c.payout_state = "Waiting for Got it";
+      }
+    } else {
+      c.payout_state = null;
     }
 
     const confirmedPayments = snapshot.payments.filter(
@@ -663,6 +709,34 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
       const confirmedDays = memberPayments.reduce((sum, p) => sum + p.days, 0);
       const isSaver = isSolo ? m.user_id === c.receiver_id : true;
       const expectedDays = isSaver ? c.num_days : 0;
+      let debtCentavos = 0;
+      if (
+        c.status === "accepted" &&
+        today > c.end_date &&
+        m.user_id !== c.receiver_id &&
+        !isSolo
+      ) {
+        const confirmedPaid = memberPayments.reduce(
+          (sum, p) => sum + p.amount_centavos,
+          0,
+        );
+        const confirmedRepayments = (snapshot.repayments ?? [])
+          .filter(
+            (r) =>
+              r.cycle_id === c.id &&
+              r.debtor_id === m.user_id &&
+              !r.deleted_at &&
+              r.status === "confirmed",
+          )
+          .reduce((sum, r) => sum + r.amount_centavos, 0);
+        debtCentavos = Math.max(
+          0,
+          c.num_days * c.daily_amount_centavos -
+            confirmedPaid -
+            confirmedRepayments,
+        );
+      }
+
       snapshot.progress.push({
         cycle_id: c.id,
         member_id: m.user_id,
@@ -670,7 +744,7 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
         confirmed_days: confirmedDays,
         pending_days: 0,
         pending_count: 0,
-        debt_centavos: 0,
+        debt_centavos: debtCentavos,
       });
     }
   }
@@ -945,14 +1019,24 @@ export async function soloRpc(
         if (args.p_delete) {
           payment.deleted_at = new Date().toISOString();
         } else {
-          if (args.p_days !== undefined) {
-            payment.days = Number(args.p_days);
+          const daysSpecified =
+            args.p_days !== undefined && args.p_days !== null;
+          const newDays = daysSpecified ? Number(args.p_days) : payment.days;
+          const daysChanged = daysSpecified && newDays !== payment.days;
+
+          if (daysChanged) {
+            payment.days = newDays;
             const cycle = snapshot.cycles.find(
               (c) => c.id === payment.cycle_id,
             );
             if (cycle) {
               payment.amount_centavos =
                 payment.days * cycle.daily_amount_centavos;
+            }
+            if (payment.status === "confirmed") {
+              payment.status = "pending";
+              delete (payment as unknown as Record<string, unknown>).confirmed_by;
+              delete (payment as unknown as Record<string, unknown>).confirmed_at;
             }
           }
           if (args.p_note !== undefined) {
@@ -987,7 +1071,12 @@ export async function soloRpc(
     case "give_payout": {
       const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
       if (cycle) {
-        cycle.receiver_id = uid;
+        const otherMember = snapshot.memberships.find(
+          (m) => m.status === "active" && m.user_id !== uid,
+        );
+        if (otherMember) {
+          cycle.receiver_id = otherMember.user_id;
+        }
       }
       saveRawSoloSnapshot(snapshot);
       return true;
@@ -1012,22 +1101,52 @@ export async function soloRpc(
 
     case "propose_cycle_wallet": {
       const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
-      const wallet = (snapshot.wallets ?? []).find(
+      const targetWallet = (snapshot.wallets ?? []).find(
         (w) => w.id === args.p_wallet_id,
       );
-      if (cycle && wallet) {
-        cycle.wallet_id = wallet.id;
-        cycle.holder_id = wallet.holder_id;
-        cycle.wallet_label = wallet.label;
-        cycle.pending_wallet_id = null;
-        cycle.wallet_proposed_by = null;
+      if (cycle && targetWallet) {
+        const curWallet = (snapshot.wallets ?? []).find(
+          (w) => w.id === cycle.wallet_id,
+        );
+        const curHolder = curWallet?.holder_id ?? cycle.holder_id;
+        if (targetWallet.holder_id === curHolder && uid === curHolder) {
+          cycle.wallet_id = targetWallet.id;
+          cycle.holder_id = targetWallet.holder_id;
+          cycle.wallet_label = targetWallet.label;
+          cycle.pending_wallet_id = null;
+          cycle.wallet_proposed_by = null;
+        } else {
+          cycle.pending_wallet_id = targetWallet.id;
+          cycle.wallet_proposed_by = uid;
+        }
       }
       saveRawSoloSnapshot(snapshot);
       return true;
     }
 
-    case "respond_cycle_wallet":
+    case "respond_cycle_wallet": {
+      const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
+      if (cycle) {
+        const action = args.p_action as string;
+        if (action === "accept") {
+          const targetWallet = (snapshot.wallets ?? []).find(
+            (w) => w.id === cycle.pending_wallet_id,
+          );
+          if (targetWallet) {
+            cycle.wallet_id = targetWallet.id;
+            cycle.holder_id = targetWallet.holder_id;
+            cycle.wallet_label = targetWallet.label;
+          }
+          cycle.pending_wallet_id = null;
+          cycle.wallet_proposed_by = null;
+        } else if (action === "decline" || action === "cancel") {
+          cycle.pending_wallet_id = null;
+          cycle.wallet_proposed_by = null;
+        }
+      }
+      saveRawSoloSnapshot(snapshot);
       return true;
+    }
 
     case "propose_savings_goal": {
       const title = ((args.p_title as string) || "").trim();
@@ -1177,6 +1296,25 @@ export async function soloRpc(
       return true;
     }
 
+    case "respond_delete_savings_contribution": {
+      const sc = (snapshot.savingsContributions ?? []).find(
+        (c) => c.id === args.p_id,
+      );
+      if (sc) {
+        const action = args.p_action as string;
+        if (action === "confirm" || action === "accept") {
+          sc.deleted_at = new Date().toISOString();
+          sc.delete_proposed_by = null;
+          sc.edited_at = new Date().toISOString();
+        } else if (action === "decline" || action === "cancel") {
+          sc.delete_proposed_by = null;
+          sc.edited_at = new Date().toISOString();
+        }
+      }
+      saveRawSoloSnapshot(snapshot);
+      return true;
+    }
+
     case "propose_withdraw_goal": {
       const goal = (snapshot.savingsGoals ?? []).find(
         (g) => g.id === args.p_goal_id,
@@ -1195,8 +1333,17 @@ export async function soloRpc(
         (g) => g.id === args.p_goal_id,
       );
       if (goal) {
-        goal.withdrawn_by = uid;
-        goal.withdrawn_at = new Date().toISOString();
+        const action = args.p_action as string;
+        if (action === "cancel" || action === "decline") {
+          goal.withdraw_proposed_by = null;
+        } else if (action === "confirm" || action === "accept") {
+          goal.withdrawn_at = new Date().toISOString();
+          goal.withdrawn_by = uid;
+          goal.withdraw_proposed_by = null;
+          goal.pending_wallet_id = null;
+          goal.wallet_proposed_by = null;
+          goal.phase = "withdrawn";
+        }
       }
       saveRawSoloSnapshot(snapshot);
       return true;
@@ -1206,22 +1353,54 @@ export async function soloRpc(
       const goal = (snapshot.savingsGoals ?? []).find(
         (g) => g.id === args.p_goal_id,
       );
-      const wallet = (snapshot.wallets ?? []).find(
+      const targetWallet = (snapshot.wallets ?? []).find(
         (w) => w.id === args.p_wallet_id,
       );
-      if (goal && wallet) {
-        goal.wallet_id = wallet.id;
-        goal.holder_id = wallet.holder_id;
-        goal.wallet_label = wallet.label;
-        goal.pending_wallet_id = null;
-        goal.wallet_proposed_by = null;
+      if (goal && targetWallet) {
+        const curWallet = (snapshot.wallets ?? []).find(
+          (w) => w.id === goal.wallet_id,
+        );
+        const curHolder = curWallet?.holder_id ?? goal.holder_id;
+        if (targetWallet.holder_id === curHolder && uid === curHolder) {
+          goal.wallet_id = targetWallet.id;
+          goal.holder_id = targetWallet.holder_id;
+          goal.wallet_label = targetWallet.label;
+          goal.pending_wallet_id = null;
+          goal.wallet_proposed_by = null;
+        } else {
+          goal.pending_wallet_id = targetWallet.id;
+          goal.wallet_proposed_by = uid;
+        }
       }
       saveRawSoloSnapshot(snapshot);
       return true;
     }
 
-    case "respond_goal_wallet":
+    case "respond_goal_wallet": {
+      const goal = (snapshot.savingsGoals ?? []).find(
+        (g) => g.id === args.p_goal_id,
+      );
+      if (goal) {
+        const action = args.p_action as string;
+        if (action === "accept") {
+          const targetWallet = (snapshot.wallets ?? []).find(
+            (w) => w.id === goal.pending_wallet_id,
+          );
+          if (targetWallet) {
+            goal.wallet_id = targetWallet.id;
+            goal.holder_id = targetWallet.holder_id;
+            goal.wallet_label = targetWallet.label;
+          }
+          goal.pending_wallet_id = null;
+          goal.wallet_proposed_by = null;
+        } else if (action === "decline" || action === "cancel") {
+          goal.pending_wallet_id = null;
+          goal.wallet_proposed_by = null;
+        }
+      }
+      saveRawSoloSnapshot(snapshot);
       return true;
+    }
 
     case "record_abono_entry": {
       const kind = (args.p_kind as "expense" | "settlement") || "expense";
@@ -1304,10 +1483,117 @@ export async function soloRpc(
       return true;
     }
 
-    case "record_repayment":
-    case "confirm_repayment":
-    case "edit_repayment":
+    case "record_repayment": {
+      const cycleId = args.p_cycle_id as string;
+      const debtorId = args.p_debtor_id as string;
+      const amountCentavos = Number(args.p_amount_centavos);
+      const cycle = snapshot.cycles.find((c) => c.id === cycleId);
+      if (!cycle) throw new Error("Cycle not found");
+      if (cycle.status !== "accepted" || today <= cycle.end_date) {
+        throw new Error("Cycle must be closed");
+      }
+      if (debtorId === cycle.receiver_id) {
+        throw new Error("Debtor cannot be receiver");
+      }
+
+      const confirmedPaid = snapshot.payments
+        .filter(
+          (p) =>
+            p.cycle_id === cycle.id &&
+            p.member_id === debtorId &&
+            !p.deleted_at &&
+            p.status === "confirmed",
+        )
+        .reduce((sum, p) => sum + p.amount_centavos, 0);
+      const existingRepayments = (snapshot.repayments ?? [])
+        .filter(
+          (r) =>
+            r.cycle_id === cycle.id &&
+            r.debtor_id === debtorId &&
+            !r.deleted_at,
+        )
+        .reduce((sum, r) => sum + r.amount_centavos, 0);
+      const expected = cycle.num_days * cycle.daily_amount_centavos;
+      const remaining = Math.max(0, expected - confirmedPaid - existingRepayments);
+      if (
+        isNaN(amountCentavos) ||
+        amountCentavos <= 0 ||
+        amountCentavos > remaining
+      ) {
+        throw new Error("Repayment exceeds cap or is invalid");
+      }
+
+      const repayment: Repayment = {
+        id: generateId(),
+        cycle_id: cycle.id,
+        debtor_id: debtorId,
+        creditor_id: cycle.receiver_id,
+        amount_centavos: amountCentavos,
+        status: "pending",
+        was_confirmed: false,
+        deleted_at: null,
+      };
+      snapshot.repayments = snapshot.repayments ?? [];
+      snapshot.repayments.push(repayment);
+      saveRawSoloSnapshot(snapshot);
+      return repayment.id;
+    }
+
+    case "confirm_repayment": {
+      const repayment = (snapshot.repayments ?? []).find(
+        (r) => r.id === args.p_id,
+      );
+      if (repayment) {
+        repayment.status = "confirmed";
+        repayment.was_confirmed = true;
+      }
+      saveRawSoloSnapshot(snapshot);
       return true;
+    }
+
+    case "edit_repayment": {
+      const repayment = (snapshot.repayments ?? []).find(
+        (r) => r.id === args.p_id,
+      );
+      if (repayment) {
+        if (args.p_delete) {
+          repayment.deleted_at = new Date().toISOString();
+        } else if (args.p_amount_centavos !== undefined) {
+          const newAmount = Number(args.p_amount_centavos);
+          const cycle = snapshot.cycles.find((c) => c.id === repayment.cycle_id);
+          if (!cycle) throw new Error("Cycle not found");
+          const confirmedPaid = snapshot.payments
+            .filter(
+              (p) =>
+                p.cycle_id === cycle.id &&
+                p.member_id === repayment.debtor_id &&
+                !p.deleted_at &&
+                p.status === "confirmed",
+            )
+            .reduce((sum, p) => sum + p.amount_centavos, 0);
+          const otherRepayments = (snapshot.repayments ?? [])
+            .filter(
+              (r) =>
+                r.cycle_id === cycle.id &&
+                r.debtor_id === repayment.debtor_id &&
+                !r.deleted_at &&
+                r.id !== repayment.id,
+            )
+            .reduce((sum, r) => sum + r.amount_centavos, 0);
+          const expected = cycle.num_days * cycle.daily_amount_centavos;
+          const remaining = Math.max(0, expected - confirmedPaid - otherRepayments);
+          if (isNaN(newAmount) || newAmount <= 0 || newAmount > remaining) {
+            throw new Error("Repayment exceeds cap or is invalid");
+          }
+          if (newAmount !== repayment.amount_centavos) {
+            repayment.amount_centavos = newAmount;
+            repayment.status = "pending";
+          }
+        }
+      }
+      saveRawSoloSnapshot(snapshot);
+      return true;
+    }
 
     default:
       return null;

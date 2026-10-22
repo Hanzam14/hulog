@@ -7,11 +7,13 @@ export function money(centavos: number): string {
 }
 export function parsePesos(value: string): number {
   if (!/^\d+(\.\d{1,2})?$/.test(value.trim()))
-    throw new Error("Enter pesos with up to two decimal places.");
+    throw new Error(t("Enter pesos with up to two decimal places."));
   const [whole, fraction = ""] = value.trim().split(".");
   const result = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
-  if (!Number.isSafeInteger(result) || result <= 0)
-    throw new Error("Enter a positive amount.");
+  if (!Number.isSafeInteger(result) || result > 10_000_000_000)
+    throw new Error(t("Amount is too large."));
+  if (result <= 0)
+    throw new Error(t("Enter a positive amount."));
   return result;
 }
 export function addDays(date: string, days: number): string {
