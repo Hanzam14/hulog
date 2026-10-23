@@ -8,18 +8,15 @@ import { rpc, type AbonoEntry } from "../data";
 import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import { ProofRefField, ProofRefLine } from "../components/ProofRef";
 import { cleanProofRef, editAbonoArgs } from "../proofRef";
+import SplitPicker from "../components/SplitPicker";
+import { NO_SPLIT, owedFieldText, shareLabel, type SplitState } from "../split";
 import {
   dismissSuggestion,
   readDismissed,
   recurringSuggestions,
   type RecurringSuggestion,
 } from "../recurring";
-import {
-  buildSettlementPayload,
-  money,
-  parsePesos,
-  splitHalfCentavos,
-} from "../helpers";
+import { buildSettlementPayload, money, parsePesos } from "../helpers";
 
 function AbonoEditRow({
   entry,
@@ -49,6 +46,8 @@ function AbonoEditRow({
   );
   const [entryDate, setEntryDate] = useState(entry.entry_date);
   const [note, setNote] = useState(entry.note ?? "");
+  const [split, setSplit] = useState<SplitState>(NO_SPLIT);
+  const owedText = owedFieldText(total, split, fromMember === user, owed);
   // Only the creator can change the reference, and only while it is pending.
   const canEditRef = entry.created_by === user && entry.status === "pending";
   const [proofRef, setProofRef] = useState(entry.proof_ref ?? "");
@@ -59,7 +58,7 @@ function AbonoEditRow({
       const ref = canEditRef ? cleanProofRef(proofRef) : undefined;
       if (isExpense) {
         const totalCents = parsePesos(total);
-        const owedCents = parsePesos(owed);
+        const owedCents = parsePesos(owedText, true);
         const toMember = fromMember === user ? partnerId : user;
         await rpc(
           "edit_abono_entry",
@@ -148,44 +147,27 @@ function AbonoEditRow({
               onChange={(e) => setTotal(e.target.value)}
             />
           </label>
-          <div className="chips">
-            <button
-              type="button"
-              className="pick"
-              onClick={() => {
-                try {
-                  const c = parsePesos(total);
-                  setOwed((splitHalfCentavos(c) / 100).toFixed(2));
-                } catch {
-                  /* empty */
-                }
-              }}
-            >
-              {t("50/50 split")}
-            </button>
-            <button
-              type="button"
-              className="pick"
-              onClick={() => {
-                try {
-                  const c = parsePesos(total);
-                  setOwed((c / 100).toFixed(2));
-                } catch {
-                  /* empty */
-                }
-              }}
-            >
-              {t("Full amount (100%)")}
-            </button>
-          </div>
+          <SplitPicker
+            split={split}
+            onChange={setSplit}
+            otherName={name(data, fromMember === user ? partnerId : user)}
+            otherIsMe={fromMember !== user}
+          />
           <label>
-            {t("Partner's share (₱)")}
+            {shareLabel(
+              fromMember !== user,
+              name(data, fromMember === user ? partnerId : user),
+              "₱",
+            )}
             <input
               type="text"
               inputMode="decimal"
               required
-              value={owed}
-              onChange={(e) => setOwed(e.target.value)}
+              value={owedText}
+              onChange={(e) => {
+                setSplit(NO_SPLIT);
+                setOwed(e.target.value);
+              }}
             />
           </label>
         </>
@@ -268,6 +250,8 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   const [fromMember, setFromMember] = useState(user);
   const [total, setTotal] = useState("");
   const [owed, setOwed] = useState("");
+  const [split, setSplit] = useState<SplitState>(NO_SPLIT);
+  const owedText = owedFieldText(total, split, fromMember === user, owed);
   const [entryDate, setEntryDate] = useState(data.today);
   const [note, setNote] = useState("");
   const [proofRef, setProofRef] = useState("");
@@ -305,7 +289,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
     const totalCentavos = parsePesos(total);
-    const owedCentavos = parsePesos(owed);
+    const owedCentavos = parsePesos(owedText, true);
     const toMember = fromMember === user ? partnerId : user;
     void run(async () => {
       const ref = cleanProofRef(proofRef);
@@ -328,6 +312,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       setDescription("");
       setTotal("");
       setOwed("");
+      setSplit(NO_SPLIT);
       setNote("");
       setProofRef("");
       setEntryDate(data.today);
@@ -344,29 +329,11 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     setFromMember(s.payerId);
     setTotal((s.totalCentavos / 100).toFixed(2));
     setOwed((s.owedCentavos / 100).toFixed(2));
+    setSplit(NO_SPLIT);
     setEntryDate(data.today);
     setNote("");
     setProofRef("");
     setShowAdd(true);
-  };
-
-  const handleSplitHalf = () => {
-    try {
-      const totalCentavos = parsePesos(total);
-      const half = splitHalfCentavos(totalCentavos);
-      setOwed((half / 100).toFixed(2));
-    } catch {
-      // Ignore if total is invalid
-    }
-  };
-
-  const handleSplitFull = () => {
-    try {
-      const totalCentavos = parsePesos(total);
-      setOwed((totalCentavos / 100).toFixed(2));
-    } catch {
-      // Ignore if total is invalid
-    }
   };
 
   return (
@@ -608,32 +575,29 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                 />
               </label>
 
-              <div className="chips">
-                <button
-                  type="button"
-                  className="pick"
-                  onClick={handleSplitHalf}
-                >
-                  {t("50/50 split")}
-                </button>
-                <button
-                  type="button"
-                  className="pick"
-                  onClick={handleSplitFull}
-                >
-                  {t("Full amount (100%)")}
-                </button>
-              </div>
+              <SplitPicker
+                split={split}
+                onChange={setSplit}
+                otherName={name(data, fromMember === user ? partnerId : user)}
+                otherIsMe={fromMember !== user}
+              />
 
               <label>
-                {t("Partner's share (₱)")}
+                {shareLabel(
+                  fromMember !== user,
+                  name(data, fromMember === user ? partnerId : user),
+                  "₱",
+                )}
                 <input
                   type="text"
                   inputMode="decimal"
                   required
                   placeholder="0.00"
-                  value={owed}
-                  onChange={(e) => setOwed(e.target.value)}
+                  value={owedText}
+                  onChange={(e) => {
+                    setSplit(NO_SPLIT);
+                    setOwed(e.target.value);
+                  }}
                 />
               </label>
 
@@ -701,13 +665,16 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     </strong>
                     <p>
                       {e.kind === "expense"
-                        ? `${name(data, e.to_member)}, ${t(
-                            "Owes {amount} of {total}",
-                            {
-                              amount: money(e.owed_amount_centavos),
-                              total: money(e.total_amount_centavos),
-                            },
-                          )}`
+                        ? `${name(data, e.to_member)}, ${
+                            e.owed_amount_centavos === 0
+                              ? t("Owes nothing of {total}", {
+                                  total: money(e.total_amount_centavos),
+                                })
+                              : t("Owes {amount} of {total}", {
+                                  amount: money(e.owed_amount_centavos),
+                                  total: money(e.total_amount_centavos),
+                                })
+                          }`
                         : `${name(data, e.from_member)} → ${name(
                             data,
                             e.to_member,

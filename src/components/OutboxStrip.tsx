@@ -22,7 +22,10 @@ function describe(item: OutboxItem, data: ViewProps["data"]): string {
       : daysText;
   }
   const description = String(item.args.p_description ?? "").trim();
-  const owed = Number(item.args.p_owed_amount_centavos) || 0;
+  const owed =
+    Number(item.args.p_owed_amount_centavos) ||
+    Number(item.args.p_total_amount_centavos) ||
+    0;
   return `${description ? `${description} · ` : ""}${money(owed)}`;
 }
 

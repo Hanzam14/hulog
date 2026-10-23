@@ -11,7 +11,7 @@ import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
 import PendingPaymentActions from "../components/PendingPaymentActions";
 import { ProofRefLine } from "../components/ProofRef";
-import { money, shortDate } from "../helpers";
+import { abonoAmount, money, shortDate } from "../helpers";
 import { rpc } from "../data";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
@@ -188,10 +188,13 @@ export default function Home(props: ViewProps) {
               <div className="sticker confirm" key={ae.id}>
                 <Avatar data={data} id={ae.from_member} />
                 <div>
-                  <strong>{money(ae.owed_amount_centavos)}</strong>
+                  <strong>{money(abonoAmount(ae))}</strong>
                   <Link to="/tracker" className="muted">
                     {ae.description} ({t("Tracker")})
                   </Link>
+                  {ae.owed_amount_centavos === 0 && (
+                    <small>{t("Nothing owed")}</small>
+                  )}
                   {ae.note && <small>{ae.note}</small>}
                   <ProofRefLine value={ae.proof_ref} />
                 </div>
@@ -199,7 +202,7 @@ export default function Home(props: ViewProps) {
                   className="round no"
                   aria-label={t("Decline {name}'s {amount}", {
                     name: name(data, ae.from_member),
-                    amount: money(ae.owed_amount_centavos),
+                    amount: money(abonoAmount(ae)),
                   })}
                   disabled={busy}
                   onClick={() => {
@@ -224,7 +227,7 @@ export default function Home(props: ViewProps) {
                   className="round ok"
                   aria-label={t("Confirm {name}'s {amount}", {
                     name: name(data, ae.from_member),
-                    amount: money(ae.owed_amount_centavos),
+                    amount: money(abonoAmount(ae)),
                   })}
                   disabled={busy}
                   onClick={() =>

@@ -228,6 +228,26 @@ describe("recurringSuggestions", () => {
     expect(s.owedCentavos).toBe(25000);
   });
 
+  it("pre-fills a past all-mine split as 0", () => {
+    const [s] = recurringSuggestions(
+      [
+        entry({
+          entry_date: "2026-08-05",
+          total_amount_centavos: 100000,
+          owed_amount_centavos: 0,
+        }),
+        entry({
+          entry_date: "2026-09-05",
+          total_amount_centavos: 100000,
+          owed_amount_centavos: 0,
+        }),
+      ],
+      today,
+    );
+    expect(s.owedCentavos).toBe(0);
+    expect(s.totalCentavos).toBe(100000);
+  });
+
   it("uses the newest spelling and shows at most three, most regular first", () => {
     const bills = ["Kuryente", "Tubig", "Internet", "Netflix"].flatMap(
       (description, i) => [
@@ -297,6 +317,9 @@ describe("median and share maths", () => {
     expect(scaleShare(100, 1, 1000)).toBe(1);
     expect(scaleShare(100, 100, 100)).toBe(100);
     expect(scaleShare(500, 1, 0)).toBe(500);
+    // A past "all mine" (share 0) stays 0 instead of becoming 1 centavo.
+    expect(scaleShare(100000, 0, 100000)).toBe(0);
+    expect(scaleShare(100000, 0, 50000)).toBe(0);
   });
 });
 

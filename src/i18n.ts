@@ -420,7 +420,6 @@ const taglish = {
   "Total receipt (₱)": "Kabuuang resibo (₱)",
   "Partner's share (₱)": "Hati ng partner (₱)",
   "50/50 split": "Hating kapatid (50/50)",
-  "Full amount (100%)": "Buong halaga (100%)",
   "Who paid?": "Sino ang nagbayad?",
   "I paid": "Ako ang nagbayad",
   "{name} paid": "Si {name} ang nagbayad",
@@ -621,8 +620,18 @@ const taglish = {
   "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
   "Ref no. (optional)": "Ref no. (opsyonal)",
   "e.g. GCash or Maya ref no.": "hal. GCash o Maya ref no.",
-  "Ref no. only — never your account number or PIN": "Ref no. lang — huwag ilagay ang account number o PIN",
+  "Ref no. only — never your account number or PIN":
+    "Ref no. lang — huwag ilagay ang account number o PIN",
   "Ref {ref}": "Ref {ref}",
+  "All mine": "Ako lahat",
+  "All theirs": "Siya lahat",
+  "Custom %": "Custom %",
+  "{name}'s share (%)": "Bahagi ni {name} (%)",
+  "Owes nothing of {total}": "Walang utang sa {total}",
+  "Nothing owed": "Walang utang",
+  "{name}'s share (₱)": "Bahagi ni {name} (₱)",
+  "Your share (₱)": "Bahagi mo (₱)",
+  "Your share (%)": "Bahagi mo (%)",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1041,7 +1050,6 @@ const en = {
   "Total receipt (₱)": "Total receipt (₱)",
   "Partner's share (₱)": "Partner's share (₱)",
   "50/50 split": "50/50 split",
-  "Full amount (100%)": "Full amount (100%)",
   "Who paid?": "Who paid?",
   "I paid": "I paid",
   "{name} paid": "{name} paid",
@@ -1241,8 +1249,18 @@ const en = {
   "Skip {name} this month": "Skip {name} this month",
   "Ref no. (optional)": "Ref no. (optional)",
   "e.g. GCash or Maya ref no.": "e.g. GCash or Maya ref no.",
-  "Ref no. only — never your account number or PIN": "Ref no. only — never your account number or PIN",
+  "Ref no. only — never your account number or PIN":
+    "Ref no. only — never your account number or PIN",
   "Ref {ref}": "Ref {ref}",
+  "All mine": "All mine",
+  "All theirs": "All theirs",
+  "Custom %": "Custom %",
+  "{name}'s share (%)": "{name}'s share (%)",
+  "Owes nothing of {total}": "Owes nothing of {total}",
+  "Nothing owed": "Nothing owed",
+  "{name}'s share (₱)": "{name}'s share (₱)",
+  "Your share (₱)": "Your share (₱)",
+  "Your share (%)": "Your share (%)",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1664,7 +1682,6 @@ const tl = {
   "Total receipt (₱)": "Kabuuang resibo (₱)",
   "Partner's share (₱)": "Hati ng partner (₱)",
   "50/50 split": "Hating 50/50",
-  "Full amount (100%)": "Buong halaga (100%)",
   "Who paid?": "Sino ang nagbayad?",
   "I paid": "Ako ang nagbayad",
   "{name} paid": "Si {name} ang nagbayad",
@@ -1865,8 +1882,18 @@ const tl = {
   "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
   "Ref no. (optional)": "Ref no. (opsyonal)",
   "e.g. GCash or Maya ref no.": "hal. GCash o Maya ref no.",
-  "Ref no. only — never your account number or PIN": "Ref no. lang — huwag ilagay ang account number o PIN",
+  "Ref no. only — never your account number or PIN":
+    "Ref no. lang — huwag ilagay ang account number o PIN",
   "Ref {ref}": "Ref {ref}",
+  "All mine": "Akin lahat",
+  "All theirs": "Kanya lahat",
+  "Custom %": "Sariling %",
+  "{name}'s share (%)": "Bahagi ni {name} (%)",
+  "Owes nothing of {total}": "Walang utang sa {total}",
+  "Nothing owed": "Walang utang",
+  "{name}'s share (₱)": "Bahagi ni {name} (₱)",
+  "Your share (₱)": "Bahagi mo (₱)",
+  "Your share (%)": "Bahagi mo (%)",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

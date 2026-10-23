@@ -98,4 +98,35 @@ describe("solo mode and the outbox", () => {
       (await loadSoloSnapshot()).payments.find((p) => p.id === bare)!.proof_ref,
     ).toBeNull();
   });
+
+  it("records a shared expense with a zero share in the solo ledger", async () => {
+    const store: Record<string, string> = { "hulog-solo-mode": "true" };
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+    const id = (await soloRpc("record_abono_entry", {
+      p_kind: "expense",
+      p_description: "All mine",
+      p_total_amount_centavos: 24500,
+      p_owed_amount_centavos: 0,
+    })) as string;
+    const entry = (await loadSoloSnapshot()).abonoEntries?.find(
+      (e) => e.id === id,
+    );
+    expect(entry).toMatchObject({
+      total_amount_centavos: 24500,
+      owed_amount_centavos: 0,
+    });
+    await soloRpc("edit_abono_entry", {
+      p_id: id,
+      p_owed_amount_centavos: 3300,
+    });
+    const edited = (await loadSoloSnapshot()).abonoEntries?.find(
+      (e) => e.id === id,
+    );
+    expect(edited?.owed_amount_centavos).toBe(3300);
+  });
 });
