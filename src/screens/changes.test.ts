@@ -98,4 +98,63 @@ describe("Changes screen", () => {
     expect(read).not.toContain("Mark read");
     expect(read).not.toContain("change-new");
   });
+
+  it("localizes payout withdrawal corrections and their fields", () => {
+    const correction = {
+      ...change(2, "2026-10-17T10:00:00+08:00"),
+      entity: "payout_withdrawals",
+      action: "update",
+      before: {
+        amount_centavos: 50000,
+        withdrawal_date: "2026-10-16",
+        note: "Cash for her",
+        voided_at: null,
+        voided_by: null,
+      },
+      after: {
+        amount_centavos: 50000,
+        withdrawal_date: "2026-10-16",
+        note: "Cash for her",
+        voided_at: "2026-10-17T10:00:00+08:00",
+        voided_by: "a",
+      },
+    } satisfies Change;
+    const recorded = {
+      ...change(1, "2026-10-16T10:00:00+08:00"),
+      entity: "payout_withdrawals",
+      action: "insert",
+      before: null,
+      after: {
+        amount_centavos: 50000,
+        withdrawal_date: "2026-10-16",
+        note: "Cash for her",
+        created_by: "a",
+      },
+    } satisfies Change;
+    const markup = render([recorded, correction]);
+
+    expect(markup).toContain("updated pot withdrawal");
+    expect(markup).not.toContain("payout_withdrawals");
+    expect(markup).toContain("Withdrawal date");
+    expect(markup).toContain("Oct 16");
+    expect(markup).toContain("Voided");
+    expect(markup).toContain("Corrected by");
+    expect(markup).not.toContain("Recorded by");
+    expect(markup).toContain("Ana Cruz");
+    expect(markup).toContain("Cash for her");
+  });
+
+  it("does not repeat created_by as a detail on ordinary payment history", () => {
+    const payment = {
+      ...change(1, "2026-10-17T10:00:00+08:00"),
+      entity: "payment",
+      action: "insert",
+      before: null,
+      after: { amount_centavos: 50000, created_by: "a" },
+    } satisfies Change;
+    const markup = render([payment]);
+
+    expect(markup).toContain("Ana Cruz");
+    expect(markup).not.toContain("Recorded by");
+  });
 });

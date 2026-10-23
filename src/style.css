@@ -913,6 +913,55 @@ button svg,
 .celebrate.done {
   background: var(--card);
 }
+.celebrate.has-payout-details .s3 {
+  display: none;
+}
+.payout-balances,
+.payout-withdrawal-history,
+.payout-withdrawal-form {
+  width: min(100%, 440px);
+}
+.payout-balances {
+  display: grid;
+  gap: 4px;
+  color: var(--soft);
+  text-align: center;
+}
+.celebrate .payout-balances strong {
+  font-size: inherit;
+  font-weight: 700;
+}
+.payout-withdrawal-form {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+.payout-withdrawal-form details {
+  padding: 8px 0;
+}
+.payout-withdrawal-form summary {
+  cursor: pointer;
+  color: var(--soft);
+  font-size: 14px;
+}
+.payout-withdrawal-form details label {
+  margin-top: 8px;
+}
+.payout-withdrawal-history .entry {
+  padding: 8px 0;
+}
+.payout-withdrawal-history .entry p {
+  margin: 4px 0;
+  color: var(--soft);
+}
+.payout-withdrawal-history .payout-withdrawal-voided .row > strong {
+  color: var(--soft);
+  text-decoration: line-through;
+}
+.payout-withdrawal-voided-label {
+  color: var(--soft);
+  font-size: 12px;
+}
 /* Group: the two of us, where the pot is, and the invite QR sticker. */
 .duo {
   display: flex;

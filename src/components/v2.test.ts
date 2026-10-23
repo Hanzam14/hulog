@@ -824,9 +824,15 @@ describe("Hulog Solo Mode", () => {
     expect(snapshot.custody?.length).toBe(2);
 
     // Pre-seeded shared cycle
-    expect(snapshot.cycles.length).toBe(1);
+    expect(snapshot.cycles.length).toBe(2);
     expect(snapshot.cycles[0].target_centavos).toBe(150000);
     expect(snapshot.cycles[0].pot_centavos).toBe(30000);
+    expect(snapshot.cycles[1]).toMatchObject({
+      id: "demo-completed-held-cycle",
+      phase: "ended",
+      payout_state: "Waiting for Got it",
+      held_centavos: 150000,
+    });
 
     // Pre-seeded active Solo Ipon Goal: [Solo] AI Subscription (₱600 / ₱1,200)
     const soloGoal = snapshot.personalGoals?.find(
@@ -845,6 +851,104 @@ describe("Hulog Solo Mode", () => {
         ),
     ).toBe(60000);
     expect(soloGoal?.visibility).toBe("shared");
+  });
+
+  it("records, caps, voids, and preserves solo demo pot withdrawals", async () => {
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v;
+      },
+    });
+    const before = await loadSoloSnapshot();
+    const oldCycle = before.cycles.find(
+      (c) => c.id === "demo-completed-held-cycle",
+    )!;
+    const currentCycle = before.cycles.find(
+      (c) => c.id === "demo-shared-cycle",
+    )!;
+    await expect(
+      soloRpc("record_payout_withdrawal", {
+        p_cycle_id: oldCycle.id,
+        p_amount_centavos: 100,
+        p_withdrawal_date: "2000-01-01",
+      }),
+    ).rejects.toThrow("Withdrawal date cannot be before the cycle start date");
+    const withdrawalId = await soloRpc("record_payout_withdrawal", {
+      p_cycle_id: oldCycle.id,
+      p_amount_centavos: 25000,
+      p_withdrawal_date: before.today,
+      p_note: "cash for her",
+    });
+    const after = await loadSoloSnapshot();
+    expect(
+      after.payoutWithdrawals?.find((entry) => entry.id === withdrawalId),
+    ).toMatchObject({
+      amount_centavos: 25000,
+      note: "cash for her",
+    });
+    expect(after.cycles.find((c) => c.id === oldCycle.id)).toMatchObject({
+      pot_centavos: 150000,
+      withdrawn_centavos: 25000,
+      held_centavos: 125000,
+      payout_state: "Waiting for Got it",
+    });
+    expect(
+      after.cycles.find((c) => c.id === currentCycle.id)?.pot_centavos,
+    ).toBe(30000);
+    expect(
+      after.custody?.find((row) => row.wallet_id === oldCycle.wallet_id)
+        ?.paluwagan_centavos,
+    ).toBe(155000);
+    await expect(
+      soloRpc("record_payout_withdrawal", {
+        p_cycle_id: oldCycle.id,
+        p_amount_centavos: 125001,
+      }),
+    ).rejects.toThrow("Withdrawal exceeds the remaining held amount");
+    await soloRpc("void_payout_withdrawal", { p_id: withdrawalId });
+    expect(
+      (await loadSoloSnapshot()).cycles.find((c) => c.id === oldCycle.id)
+        ?.held_centavos,
+    ).toBe(150000);
+    const fullWithdrawalId = await soloRpc("record_payout_withdrawal", {
+      p_cycle_id: oldCycle.id,
+      p_amount_centavos: 150000,
+    });
+    const fullyWithdrawn = await loadSoloSnapshot();
+    expect(
+      fullyWithdrawn.custody?.find(
+        (row) => row.wallet_id === oldCycle.wallet_id,
+      )?.paluwagan_centavos,
+    ).toBe(30000);
+    await soloRpc("void_payout_withdrawal", { p_id: fullWithdrawalId });
+    const restored = await loadSoloSnapshot();
+    expect(
+      restored.custody?.find((row) => row.wallet_id === oldCycle.wallet_id)
+        ?.paluwagan_centavos,
+    ).toBe(180000);
+    const beforeReceiptId = await soloRpc("record_payout_withdrawal", {
+      p_cycle_id: oldCycle.id,
+      p_amount_centavos: 1000,
+    });
+    await soloRpc("receive_payout", { p_id: oldCycle.id });
+    expect(
+      (await loadSoloSnapshot()).cycles.find((c) => c.id === oldCycle.id),
+    ).toMatchObject({ payout_state: "Received", held_centavos: 0 });
+    await expect(
+      soloRpc("void_payout_withdrawal", { p_id: beforeReceiptId }),
+    ).rejects.toThrow(
+      "Withdrawal cannot be corrected after the remaining payout is acknowledged",
+    );
+    await expect(
+      soloRpc("record_payout_withdrawal", {
+        p_cycle_id: currentCycle.id,
+        p_amount_centavos: 100,
+      }),
+    ).rejects.toThrow(
+      "Only an unreceived completed cycle can record a withdrawal",
+    );
   });
 
   it("can switch to standalone solo mode with 1 member", async () => {

@@ -46,6 +46,7 @@ export default function Settings({
       ["cycles", fresh.cycles],
       ["payments", fresh.payments],
       ["repayments", fresh.repayments],
+      ["payout-withdrawals", fresh.payoutWithdrawals ?? []],
     ];
     const optionalTables: [string, unknown[]][] = [
       ["wallets", fresh.wallets ?? []],

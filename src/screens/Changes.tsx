@@ -41,6 +41,9 @@ export default function Changes({
     receiver_id: t("Receiver"),
     deleted_at: t("Deleted"),
     received_at: t("Received"),
+    withdrawal_date: t("Withdrawal date"),
+    voided_at: t("Voided"),
+    voided_by: t("Corrected by"),
     closed_early_by: t("Closed early by"),
     used_at: t("Invite used"),
     revoked_at: t("Invite revoked"),
@@ -73,16 +76,20 @@ export default function Changes({
         : [
               "receiver_id",
               "holder_id",
+              "voided_by",
               "closed_early_by",
               "from_member",
               "to_member",
             ].includes(key)
           ? name(data, String(v))
-          : key === "wallet_id"
-            ? ((data.wallets ?? []).find((w) => w.id === v)?.label ?? String(v))
-            : key.endsWith("_at")
-              ? t("Yes")
-              : label(String(v));
+          : key === "withdrawal_date"
+            ? shortDate(String(v))
+            : key === "wallet_id"
+              ? ((data.wallets ?? []).find((w) => w.id === v)?.label ??
+                String(v))
+              : key.endsWith("_at")
+                ? t("Yes")
+                : label(String(v));
   const recent = [...data.changes].reverse();
   const shown = recent.slice(0, limit);
   // Group the visible changes by Manila calendar day, newest first.
