@@ -1,4 +1,5 @@
 import { t } from "./i18n";
+import { cleanProofRef } from "./proofRef";
 export function money(centavos: number): string {
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -244,7 +245,10 @@ export function buildSettlementPayload(args: {
   amountCentavos: number;
   entryDate: string;
   note: string;
+  /** Optional e-wallet reference number (SPEC 10.14). */
+  proofRef?: string;
 }) {
+  const proofRef = cleanProofRef(args.proofRef);
   return {
     p_kind: "settlement" as const,
     p_from_member: args.debtorId,
@@ -254,6 +258,7 @@ export function buildSettlementPayload(args: {
     p_owed_amount_centavos: args.amountCentavos,
     p_entry_date: args.entryDate,
     p_note: args.note.trim(),
+    ...(proofRef ? { p_proof_ref: proofRef } : {}),
   };
 }
 
@@ -286,9 +291,7 @@ export function getSoloBadgeText(
   const isOwner = !goal.proposed_by || goal.proposed_by === currentUserId;
 
   if (isOwner) {
-    return isMultiMember
-      ? t("Solo · You (Partner can view)")
-      : t("Solo · You");
+    return isMultiMember ? t("Solo · You (Partner can view)") : t("Solo · You");
   }
 
   const ownerProfile = (data.profiles ?? []).find(
@@ -300,14 +303,12 @@ export function getSoloBadgeText(
   return t("Solo · {name} — visible to partner", { name: firstName });
 }
 
-export function isSoloCycle(
-  c: {
-    target_centavos: number;
-    daily_amount_centavos: number;
-    num_days: number;
-    is_solo?: boolean;
-  },
-): boolean {
+export function isSoloCycle(c: {
+  target_centavos: number;
+  daily_amount_centavos: number;
+  num_days: number;
+  is_solo?: boolean;
+}): boolean {
   return c.is_solo === true;
 }
 
@@ -333,9 +334,7 @@ export function getSoloCycleBadgeText(
   const isOwner = !c.receiver_id || c.receiver_id === currentUserId;
 
   if (isOwner) {
-    return isMultiMember
-      ? t("Solo · You (Partner can view)")
-      : t("Solo · You");
+    return isMultiMember ? t("Solo · You (Partner can view)") : t("Solo · You");
   }
 
   const ownerProfile = (data.profiles ?? []).find(

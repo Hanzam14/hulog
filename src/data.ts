@@ -61,6 +61,9 @@ export interface Payment {
   days: number;
   amount_centavos: number;
   note?: string;
+  /** Optional e-wallet reference number (SPEC 10.14). */
+  proof_ref?: string | null;
+  created_by?: string;
   status: string;
   was_confirmed: boolean;
   created_at: string;
@@ -183,6 +186,8 @@ export interface AbonoEntry {
   owed_amount_centavos: number;
   entry_date: string;
   note: string;
+  /** Optional e-wallet reference number (SPEC 10.14). */
+  proof_ref?: string | null;
   status: string;
   was_confirmed: boolean;
   created_by: string;

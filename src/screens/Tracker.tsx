@@ -6,6 +6,8 @@ import { name } from "../components/shared";
 import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
 import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
+import { ProofRefField, ProofRefLine } from "../components/ProofRef";
+import { cleanProofRef, editAbonoArgs } from "../proofRef";
 import {
   dismissSuggestion,
   readDismissed,
@@ -47,33 +49,49 @@ function AbonoEditRow({
   );
   const [entryDate, setEntryDate] = useState(entry.entry_date);
   const [note, setNote] = useState(entry.note ?? "");
+  // Only the creator can change the reference, and only while it is pending.
+  const canEditRef = entry.created_by === user && entry.status === "pending";
+  const [proofRef, setProofRef] = useState(entry.proof_ref ?? "");
 
   const handleSubmit = (ev: React.FormEvent) => {
     ev.preventDefault();
     void run(async () => {
+      const ref = canEditRef ? cleanProofRef(proofRef) : undefined;
       if (isExpense) {
         const totalCents = parsePesos(total);
         const owedCents = parsePesos(owed);
         const toMember = fromMember === user ? partnerId : user;
-        await rpc("edit_abono_entry", {
-          p_id: entry.id,
-          p_from_member: fromMember,
-          p_to_member: toMember,
-          p_description: desc.trim(),
-          p_total_amount_centavos: totalCents,
-          p_owed_amount_centavos: owedCents,
-          p_entry_date: entryDate,
-          p_note: note.trim(),
-        });
+        await rpc(
+          "edit_abono_entry",
+          editAbonoArgs(
+            {
+              p_id: entry.id,
+              p_from_member: fromMember,
+              p_to_member: toMember,
+              p_description: desc.trim(),
+              p_total_amount_centavos: totalCents,
+              p_owed_amount_centavos: owedCents,
+              p_entry_date: entryDate,
+              p_note: note.trim(),
+            },
+            ref,
+          ),
+        );
       } else {
         const amt = parsePesos(owed);
-        await rpc("edit_abono_entry", {
-          p_id: entry.id,
-          p_total_amount_centavos: amt,
-          p_owed_amount_centavos: amt,
-          p_entry_date: entryDate,
-          p_note: note.trim(),
-        });
+        await rpc(
+          "edit_abono_entry",
+          editAbonoArgs(
+            {
+              p_id: entry.id,
+              p_total_amount_centavos: amt,
+              p_owed_amount_centavos: amt,
+              p_entry_date: entryDate,
+              p_note: note.trim(),
+            },
+            ref,
+          ),
+        );
       }
       onDone();
     });
@@ -194,15 +212,15 @@ function AbonoEditRow({
         />
       </label>
       <label>
-        {t("Note or ref # (optional)")}
+        {t("Note (optional)")}
         <input
           type="text"
           maxLength={140}
-          placeholder={t("e.g. GCash ref #1234")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
       </label>
+      {canEditRef && <ProofRefField value={proofRef} onChange={setProofRef} />}
       <div className="actions">
         <button disabled={busy} type="submit">
           {t("Save correction")}
@@ -235,6 +253,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   const [showSettle, setShowSettle] = useState(false);
   const [settleAmount, setSettleAmount] = useState("");
   const [settleNote, setSettleNote] = useState("");
+  const [settleRef, setSettleRef] = useState("");
 
   const remaining = activeDebt
     ? Math.max(
@@ -251,6 +270,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   const [owed, setOwed] = useState("");
   const [entryDate, setEntryDate] = useState(data.today);
   const [note, setNote] = useState("");
+  const [proofRef, setProofRef] = useState("");
 
   // Edit entry state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -288,6 +308,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     const owedCentavos = parsePesos(owed);
     const toMember = fromMember === user ? partnerId : user;
     void run(async () => {
+      const ref = cleanProofRef(proofRef);
       const result = await submitRecord(user, {
         kind: "abono",
         args: {
@@ -299,6 +320,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
           p_owed_amount_centavos: owedCentavos,
           p_entry_date: entryDate || data.today,
           p_note: note.trim(),
+          ...(ref ? { p_proof_ref: ref } : {}),
         },
         id: addRequestId.current,
       });
@@ -307,6 +329,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       setTotal("");
       setOwed("");
       setNote("");
+      setProofRef("");
       setEntryDate(data.today);
       setShowAdd(false);
       return result;
@@ -323,6 +346,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     setOwed((s.owedCentavos / 100).toFixed(2));
     setEntryDate(data.today);
     setNote("");
+    setProofRef("");
     setShowAdd(true);
   };
 
@@ -412,12 +436,14 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                         amountCentavos: amt,
                         entryDate: data.today,
                         note: settleNote,
+                        proofRef: settleRef,
                       }),
                       id: settleRequestId.current,
                     });
                     settleRequestId.current = newRequestId();
                     setShowSettle(false);
                     setSettleNote("");
+                    setSettleRef("");
                     return result;
                   });
                 }}
@@ -433,15 +459,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   />
                 </label>
                 <label>
-                  {t("Note or ref # (optional)")}
+                  {t("Note (optional)")}
                   <input
                     type="text"
                     maxLength={140}
-                    placeholder={t("e.g. GCash ref #1234")}
                     value={settleNote}
                     onChange={(e) => setSettleNote(e.target.value)}
                   />
                 </label>
+                <ProofRefField value={settleRef} onChange={setSettleRef} />
                 <div className="actions">
                   <button disabled={busy} type="submit">
                     {offline
@@ -623,15 +649,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </label>
 
               <label>
-                {t("Note or ref # (optional)")}
+                {t("Note (optional)")}
                 <input
                   type="text"
                   maxLength={140}
-                  placeholder={t("e.g. GCash ref #1234")}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                 />
               </label>
+              <ProofRefField value={proofRef} onChange={setProofRef} />
 
               <button disabled={busy} type="submit">
                 {offline ? t("Save for now (offline)") : t("Record expense")}
@@ -693,6 +719,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                       {e.entry_date}
                       {e.note ? `, ${e.note}` : ""}
                     </p>
+                    <ProofRefLine value={e.proof_ref} />
                   </div>
                 </div>
                 <span className="chip">

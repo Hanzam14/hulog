@@ -6,6 +6,8 @@ import type { ViewProps } from "../components/shared";
 import { byNewest, closed, heldByText, name, tone } from "../components/shared";
 import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import { money } from "../helpers";
+import { cleanProofRef } from "../proofRef";
+import { ProofRefField } from "../components/ProofRef";
 import Avatar from "../components/Avatar";
 import Tally from "../components/Tally";
 
@@ -14,6 +16,7 @@ export default function Record({ data, user, run, busy }: ViewProps) {
   const navigate = useNavigate();
   const [days, setDays] = useState(1);
   const [note, setNote] = useState("");
+  const [proofRef, setProofRef] = useState("");
   const offline = useQueueingOffline();
   // One key per attempt: a double tap or a retry is recognised by the server.
   const requestId = useRef(newRequestId());
@@ -86,10 +89,13 @@ export default function Record({ data, user, run, busy }: ViewProps) {
         maxLength={140}
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        placeholder={t("e.g. GCash ref #1234")}
-        aria-label={t("Note or ref # (optional)")}
+        aria-label={t("Note (optional)")}
+        placeholder={t("Note (optional)")}
         style={{ textAlign: "center", maxWidth: "320px", margin: "8px auto" }}
       />
+      <div style={{ maxWidth: "320px", margin: "8px auto", width: "100%" }}>
+        <ProofRefField value={proofRef} onChange={setProofRef} />
+      </div>
       <button
         className="big"
         disabled={busy}
@@ -99,6 +105,7 @@ export default function Record({ data, user, run, busy }: ViewProps) {
               p_cycle_id: string;
               p_days: number;
               p_note?: string;
+              p_proof_ref?: string;
             } = {
               p_cycle_id: c.id,
               p_days: days,
@@ -107,6 +114,8 @@ export default function Record({ data, user, run, busy }: ViewProps) {
             if (trimmed) {
               payload.p_note = trimmed;
             }
+            const ref = cleanProofRef(proofRef);
+            if (ref) payload.p_proof_ref = ref;
             const result = await submitRecord(user, {
               kind: "payment",
               args: payload,

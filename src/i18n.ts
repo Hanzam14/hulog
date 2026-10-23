@@ -619,6 +619,10 @@ const taglish = {
   "Recurring suggestion": "{what} ~{amount} — i-record?",
   "Huwag na": "Huwag na",
   "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
+  "Ref no. (optional)": "Ref no. (opsyonal)",
+  "e.g. GCash or Maya ref no.": "hal. GCash o Maya ref no.",
+  "Ref no. only — never your account number or PIN": "Ref no. lang — huwag ilagay ang account number o PIN",
+  "Ref {ref}": "Ref {ref}",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1235,6 +1239,10 @@ const en = {
   "Recurring suggestion": "{what} ~{amount} — record it?",
   "Huwag na": "Skip",
   "Skip {name} this month": "Skip {name} this month",
+  "Ref no. (optional)": "Ref no. (optional)",
+  "e.g. GCash or Maya ref no.": "e.g. GCash or Maya ref no.",
+  "Ref no. only — never your account number or PIN": "Ref no. only — never your account number or PIN",
+  "Ref {ref}": "Ref {ref}",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1855,6 +1863,10 @@ const tl = {
   "Recurring suggestion": "{what} ~{amount} — i-record?",
   "Huwag na": "Huwag na",
   "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
+  "Ref no. (optional)": "Ref no. (opsyonal)",
+  "e.g. GCash or Maya ref no.": "hal. GCash o Maya ref no.",
+  "Ref no. only — never your account number or PIN": "Ref no. lang — huwag ilagay ang account number o PIN",
+  "Ref {ref}": "Ref {ref}",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

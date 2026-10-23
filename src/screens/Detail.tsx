@@ -5,6 +5,9 @@ import { Link, useParams } from "react-router-dom";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import { rpc } from "../data";
+import type { Payment } from "../data";
+import { ProofRefField, ProofRefLine } from "../components/ProofRef";
+import { cleanProofRef, editPaymentArgs } from "../proofRef";
 import { money, shortDate } from "../helpers";
 import CycleCard from "../components/CycleCard";
 import Proposal from "../components/Proposal";
@@ -17,6 +20,9 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
   const { id } = useParams();
   const c = data.cycles.find((cycle) => cycle.id === id);
   const [editing, setEditing] = useState<string | null>(null);
+  // Only the creator can change the reference, and only while it is pending.
+  const canEditRef = (p: Payment) =>
+    p.created_by === user && p.status === "pending";
   if (!c)
     return (
       <p>
@@ -199,6 +205,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                 ) : null}
                 {p.note && <i> · {p.note}</i>}
               </p>
+              <ProofRefLine value={p.proof_ref} />
               {!p.deleted_at && (
                 <>
                   <div className="actions">
@@ -253,7 +260,14 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                             p_days: newDays,
                             p_note: noteVal,
                           };
-                          await rpc("edit_payment", payload);
+                          // Only the creator can change it, and only while pending.
+                          const ref = canEditRef(p)
+                            ? cleanProofRef(f.get("proof_ref"))
+                            : undefined;
+                          await rpc(
+                            "edit_payment",
+                            editPaymentArgs(payload, ref),
+                          );
                           setEditing(null);
                         });
                       }}
@@ -270,15 +284,20 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                         />
                       </label>
                       <label>
-                        {t("Note or ref # (optional)")}
+                        {t("Note (optional)")}
                         <input
                           name="note"
                           type="text"
                           maxLength={140}
                           defaultValue={p.note ?? ""}
-                          placeholder={t("e.g. GCash ref #1234")}
                         />
                       </label>
+                      {canEditRef(p) && (
+                        <ProofRefField
+                          name="proof_ref"
+                          defaultValue={p.proof_ref ?? ""}
+                        />
+                      )}
                       <button disabled={busy}>{t("Save correction")}</button>
                     </form>
                   )}

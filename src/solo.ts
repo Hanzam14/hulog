@@ -15,6 +15,7 @@ import type {
   SavingsMemberProgress,
 } from "./data";
 import { addDays, isSoloCycle, isSoloGoal } from "./helpers";
+import { cleanProofRef, PROOF_REF_LOCKED } from "./proofRef";
 import {
   migratePersonalSavings,
   personalRpc,
@@ -944,6 +945,8 @@ export async function soloRpc(
         days,
         amount_centavos: amountCentavos,
         note: ((args.p_note as string) || "").trim(),
+        proof_ref: cleanProofRef(args.p_proof_ref),
+        created_by: uid,
         status: "confirmed",
         was_confirmed: true,
         created_at: new Date().toISOString(),
@@ -961,7 +964,7 @@ export async function soloRpc(
         if (args.p_delete) {
           payment.deleted_at = new Date().toISOString();
         } else {
-          if (args.p_days !== undefined) {
+          if (args.p_days !== undefined && args.p_days !== null) {
             payment.days = Number(args.p_days);
             const cycle = snapshot.cycles.find(
               (c) => c.id === payment.cycle_id,
@@ -971,8 +974,18 @@ export async function soloRpc(
                 payment.days * cycle.daily_amount_centavos;
             }
           }
-          if (args.p_note !== undefined) {
+          if (args.p_note !== undefined && args.p_note !== null) {
             payment.note = ((args.p_note as string) || "").trim();
+          }
+          if (args.p_proof_ref !== undefined && args.p_proof_ref !== null) {
+            const ref = cleanProofRef(args.p_proof_ref);
+            // Same rule as the server: only the creator, only while pending.
+            if (
+              ref !== (payment.proof_ref ?? null) &&
+              (payment.created_by !== uid || payment.status !== "pending")
+            )
+              throw new Error(PROOF_REF_LOCKED);
+            payment.proof_ref = ref;
           }
         }
       }
@@ -1255,6 +1268,7 @@ export async function soloRpc(
         owed_amount_centavos: owedAmount,
         entry_date: (args.p_entry_date as string) || today,
         note: ((args.p_note as string) || "").trim(),
+        proof_ref: cleanProofRef(args.p_proof_ref),
         status: "confirmed",
         was_confirmed: true,
         created_by: uid,
@@ -1294,16 +1308,27 @@ export async function soloRpc(
         if (args.p_delete) {
           entry.deleted_at = new Date().toISOString();
         } else {
-          if (args.p_total_amount_centavos !== undefined)
+          const given = (key: string) =>
+            args[key] !== undefined && args[key] !== null;
+          if (given("p_total_amount_centavos"))
             entry.total_amount_centavos = Number(args.p_total_amount_centavos);
-          if (args.p_owed_amount_centavos !== undefined)
+          if (given("p_owed_amount_centavos"))
             entry.owed_amount_centavos = Number(args.p_owed_amount_centavos);
-          if (args.p_description !== undefined)
+          if (given("p_description"))
             entry.description = (args.p_description as string).trim();
-          if (args.p_note !== undefined)
-            entry.note = (args.p_note as string).trim();
-          if (args.p_entry_date !== undefined)
+          if (given("p_note")) entry.note = (args.p_note as string).trim();
+          if (given("p_entry_date"))
             entry.entry_date = args.p_entry_date as string;
+          if (args.p_proof_ref !== undefined && args.p_proof_ref !== null) {
+            const ref = cleanProofRef(args.p_proof_ref);
+            // Same rule as the server: only the creator, only while pending.
+            if (
+              ref !== (entry.proof_ref ?? null) &&
+              (entry.created_by !== uid || entry.status !== "pending")
+            )
+              throw new Error(PROOF_REF_LOCKED);
+            entry.proof_ref = ref;
+          }
         }
       }
       saveRawSoloSnapshot(snapshot);

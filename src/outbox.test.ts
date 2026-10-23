@@ -66,6 +66,66 @@ describe("submitRecord", () => {
     expect(outboxItems("u1")).toEqual([]);
   });
 
+  it("carries the proof reference only when there is one", async () => {
+    mocks.rpc.mockResolvedValue("id");
+    const { submitRecord, outboxItems } = await load();
+    await submitRecord("u1", {
+      kind: "payment",
+      args: { ...payment, p_proof_ref: "  GC 1234-ABCD " },
+      id: KEY_A,
+    });
+    expect(mocks.rpc).toHaveBeenLastCalledWith("record_payment", {
+      p_cycle_id: "cycle-1",
+      p_days: 2,
+      p_proof_ref: "GC 1234-ABCD",
+      p_note: "",
+      p_client_request_id: KEY_A,
+    });
+    // A blank reference is left out, so the server picks the original form.
+    await submitRecord("u1", {
+      kind: "payment",
+      args: { ...payment, p_proof_ref: "   " },
+      id: KEY_A,
+    });
+    expect(mocks.rpc.mock.lastCall?.[1]).not.toHaveProperty("p_proof_ref");
+    await submitRecord("u1", {
+      kind: "abono",
+      args: { p_kind: "expense", p_proof_ref: "MAYA 9999" },
+      id: KEY_A,
+    });
+    expect(mocks.rpc).toHaveBeenLastCalledWith("record_abono_entry", {
+      p_kind: "expense",
+      p_proof_ref: "MAYA 9999",
+      p_entry_date: null,
+      p_note: "",
+      p_client_request_id: KEY_A,
+    });
+    expect(outboxItems("u1")).toEqual([]);
+  });
+
+  it("keeps the reference on a queued record and sends it on retry", async () => {
+    stubNavigator(false);
+    const { submitRecord, outboxItems, flushOutbox } = await load();
+    await submitRecord("u1", {
+      kind: "payment",
+      args: { ...payment, p_proof_ref: "GC 1234-ABCD" },
+      id: KEY_A,
+    });
+    expect(outboxItems("u1")[0].args).toMatchObject({
+      p_proof_ref: "GC 1234-ABCD",
+    });
+    stubNavigator(true);
+    mocks.rpc.mockResolvedValue("payment-id");
+    await flushOutbox("u1");
+    expect(mocks.rpc).toHaveBeenCalledWith(
+      "record_payment",
+      expect.objectContaining({
+        p_proof_ref: "GC 1234-ABCD",
+        p_client_request_id: KEY_A,
+      }),
+    );
+  });
+
   it("queues without calling the server while the browser is offline", async () => {
     stubNavigator(false);
     const { submitRecord, outboxItems } = await load();
