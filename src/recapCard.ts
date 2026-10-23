@@ -1,4 +1,10 @@
-import { monthLabel, shareLines, type Recap, type ShareLine } from "./recap";
+import {
+  isYearKey,
+  periodLabel,
+  shareLines,
+  type Recap,
+  type ShareLine,
+} from "./recap";
 import { t } from "./i18n";
 
 // Light-palette values copied from src/style.css (:root). Canvas cannot read
@@ -48,10 +54,10 @@ function roundRect(
   ctx.closePath();
 }
 
-/** Draw the group-only recap card. `lines` come from shareLines(). */
+/** Draw the group-only recap card for a month ("2026-10") or a year ("2026"). `lines` come from shareLines(). */
 export function drawRecapCard(
   ctx: CanvasRenderingContext2D,
-  month: string,
+  period: string,
   groupName: string,
   lines: ShareLine[],
 ) {
@@ -78,7 +84,7 @@ export function drawRecapCard(
 
   ctx.fillStyle = COLORS.ink;
   ctx.font = `600 96px ${DISPLAY}`;
-  ctx.fillText(fit(ctx, monthLabel(month), inner), left, 300);
+  ctx.fillText(fit(ctx, periodLabel(period), inner), left, 300);
   ctx.fillStyle = COLORS.soft;
   ctx.font = `700 44px ${BODY}`;
   ctx.fillText(fit(ctx, groupName, inner), left, 372);
@@ -87,7 +93,11 @@ export function drawRecapCard(
     ctx.fillStyle = COLORS.soft;
     ctx.font = `700 52px ${BODY}`;
     ctx.fillText(
-      fit(ctx, t("Recap quiet month"), inner),
+      fit(
+        ctx,
+        isYearKey(period) ? t("Recap quiet year") : t("Recap quiet month"),
+        inner,
+      ),
       left,
       HEIGHT / 2 + 40,
     );
@@ -137,7 +147,7 @@ export async function renderRecapBlob(recap: Recap): Promise<Blob | null> {
   return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }
 
-export const recapFileName = (month: string) => `hulog-recap-${month}.png`;
+export const recapFileName = (period: string) => `hulog-recap-${period}.png`;
 
 export type ShareResult = "shared" | "downloaded" | "cancelled";
 
@@ -156,7 +166,7 @@ export async function shareRecap(recap: Recap): Promise<ShareResult> {
     try {
       await navigator.share({
         files: [file],
-        title: `Hulog · ${monthLabel(recap.month)}`,
+        title: `Hulog · ${periodLabel(recap.month)}`,
       });
       return "shared";
     } catch (error) {

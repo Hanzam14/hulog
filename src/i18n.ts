@@ -606,6 +606,15 @@ const taglish = {
   "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.":
     "Offline ka. Naka-save sa phone ang hulog at gastos at ma-sync mamaya. Kailangan ng internet ang ibang changes.",
   "Request id already used": "Naipadala na ang request na ito.",
+  "Yearly recap": "Recap ng taon",
+  "Recap period": "Saklaw ng recap",
+  "Recap by month": "Buwan",
+  "Recap by year": "Taon",
+  "Previous year": "Nakaraang taon",
+  "Next year": "Susunod na taon",
+  "Recap quiet year": "Walang galaw ngayong taon",
+  "Recap each month": "Bawat buwan",
+  "Recap best month": "Pinakamalaki: {month} · {amount}",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1209,6 +1218,15 @@ const en = {
   "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.":
     "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.",
   "Request id already used": "This request was already used.",
+  "Yearly recap": "Yearly recap",
+  "Recap period": "Recap period",
+  "Recap by month": "Month",
+  "Recap by year": "Year",
+  "Previous year": "Previous year",
+  "Next year": "Next year",
+  "Recap quiet year": "Nothing moved this year",
+  "Recap each month": "Each month",
+  "Recap best month": "Best month: {month} · {amount}",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1816,6 +1834,15 @@ const tl = {
   "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.":
     "Wala kang internet. Ise-save sa phone ang hulog at gastos at ma-sync mamaya. Kailangan ng internet ang ibang pagbabago.",
   "Request id already used": "Nagamit na ang request na ito.",
+  "Yearly recap": "Buod ng taon",
+  "Recap period": "Saklaw ng buod",
+  "Recap by month": "Buwan",
+  "Recap by year": "Taon",
+  "Previous year": "Nakaraang taon",
+  "Next year": "Susunod na taon",
+  "Recap quiet year": "Walang galaw ngayong taon",
+  "Recap each month": "Bawat buwan",
+  "Recap best month": "Pinakamalaki: {month} · {amount}",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
