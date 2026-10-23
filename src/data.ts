@@ -42,6 +42,8 @@ export interface Cycle {
   status: string;
   phase: string;
   pot_centavos: number;
+  withdrawn_centavos?: number;
+  held_centavos?: number;
   target_centavos: number;
   payout_state: string | null;
   received_at: string | null;
@@ -78,6 +80,18 @@ export interface Repayment {
   status: string;
   was_confirmed: boolean;
   deleted_at: string | null;
+}
+export interface PayoutWithdrawal {
+  id: string;
+  group_id: string;
+  cycle_id: string;
+  amount_centavos: number;
+  withdrawal_date: string;
+  note: string;
+  created_by: string;
+  created_at: string;
+  voided_by: string | null;
+  voided_at: string | null;
 }
 export interface Progress {
   cycle_id: string;
@@ -213,6 +227,7 @@ export interface Snapshot {
   cycles: Cycle[];
   payments: Payment[];
   repayments: Repayment[];
+  payoutWithdrawals?: PayoutWithdrawal[];
   progress: Progress[];
   changes: Change[];
   invites: {
@@ -347,6 +362,7 @@ export async function load(): Promise<Snapshot> {
     cycles,
     payments,
     repayments,
+    payoutWithdrawals,
     progress,
     changes,
     invites,
@@ -373,6 +389,7 @@ export async function load(): Promise<Snapshot> {
     rows<Cycle>("cycle_summary", "id"),
     rows<Payment>("payments", "id"),
     rows<Repayment>("repayments", "id"),
+    optionalRows<PayoutWithdrawal>("payout_withdrawals", "withdrawal_date"),
     rows<Progress>("member_progress", "cycle_id"),
     rows<Change>("history_changes", "id"),
     rows<Snapshot["invites"][number]>("invites", "id"),
@@ -396,6 +413,7 @@ export async function load(): Promise<Snapshot> {
     cycles,
     payments,
     repayments,
+    payoutWithdrawals,
     progress,
     changes,
     invites,

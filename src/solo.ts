@@ -4,6 +4,7 @@ import type {
   Group,
   Membership,
   Payment,
+  PayoutWithdrawal,
   Profile,
   Snapshot,
   Wallet,
@@ -285,6 +286,19 @@ export function createInitialSoloSnapshot(
     is_solo: false,
   };
 
+  const completedCycle: Cycle = {
+    ...sharedCycle,
+    id: "demo-completed-held-cycle",
+    start_date: addDays(today, -30),
+    end_date: addDays(today, -16),
+    phase: "ended",
+    pot_centavos: sharedTarget,
+    payout_state: "Waiting for Got it",
+    received_at: null,
+    days_left: 0,
+    created_at: new Date(Date.now() - 31 * 86400000).toISOString(),
+  };
+
   const payments: Payment[] = [
     {
       id: "pay-demo-1",
@@ -311,6 +325,32 @@ export function createInitialSoloSnapshot(
       deleted_at: null,
     },
   ];
+  payments.push(
+    {
+      id: "pay-demo-completed-1",
+      cycle_id: completedCycle.id,
+      member_id: uid,
+      days: sharedNumDays,
+      amount_centavos: sharedDailyAmount * sharedNumDays,
+      note: "Completed demo pot",
+      status: "confirmed",
+      was_confirmed: true,
+      created_at: new Date(Date.now() - 20 * 86400000).toISOString(),
+      deleted_at: null,
+    },
+    {
+      id: "pay-demo-completed-2",
+      cycle_id: completedCycle.id,
+      member_id: partnerId,
+      days: sharedNumDays,
+      amount_centavos: sharedDailyAmount * sharedNumDays,
+      note: "Completed demo pot",
+      status: "confirmed",
+      was_confirmed: true,
+      created_at: new Date(Date.now() - 19 * 86400000).toISOString(),
+      deleted_at: null,
+    },
+  );
 
   const progress: Progress[] = [
     {
@@ -441,8 +481,9 @@ export function createInitialSoloSnapshot(
     profiles: [profile, partnerProfile],
     groups: [group],
     memberships: [membership, partnerMembership],
-    cycles: [sharedCycle],
+    cycles: [sharedCycle, completedCycle],
     payments,
+    payoutWithdrawals: [],
     repayments: [],
     progress,
     changes: [],
@@ -644,11 +685,6 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     );
     c.phase = phase;
     c.days_left = daysLeft;
-    if (phase === "settling" || phase === "ended") {
-      c.payout_state = "Received";
-      if (!c.received_at) c.received_at = new Date().toISOString();
-    }
-
     const confirmedPayments = snapshot.payments.filter(
       (p) => p.cycle_id === c.id && !p.deleted_at && p.status === "confirmed",
     );
@@ -656,6 +692,25 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
       (sum, p) => sum + p.amount_centavos,
       0,
     );
+    const activeWithdrawals = (snapshot.payoutWithdrawals ?? []).filter(
+      (entry) => entry.cycle_id === c.id && !entry.voided_at,
+    );
+    c.withdrawn_centavos = activeWithdrawals.reduce(
+      (sum, entry) => sum + entry.amount_centavos,
+      0,
+    );
+    c.held_centavos = Math.max(0, c.pot_centavos - c.withdrawn_centavos);
+    if (phase === "settling" || phase === "ended") {
+      if (c.received_at || c.receiver_id === c.holder_id) {
+        c.payout_state = "Received";
+        if (!c.received_at) c.received_at = new Date().toISOString();
+      } else if (c.pot_centavos > 0 && c.withdrawn_centavos >= c.pot_centavos) {
+        c.payout_state = "Received";
+      } else {
+        c.payout_state = "Waiting for Got it";
+      }
+      if (c.payout_state === "Received") c.held_centavos = 0;
+    }
   }
 
   // Recalculate progress for cycles for all active members
@@ -741,7 +796,7 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
   snapshot.custody = activeWallets.map((w) => {
     const paluwaganCentavos = snapshot.cycles
       .filter((c) => c.wallet_id === w.id && c.payout_state !== "Received")
-      .reduce((sum, c) => sum + c.pot_centavos, 0);
+      .reduce((sum, c) => sum + (c.held_centavos ?? c.pot_centavos), 0);
 
     const iponCentavos = (snapshot.savingsGoals ?? [])
       .filter((g) => g.wallet_id === w.id && !g.withdrawn_at)
@@ -1009,6 +1064,115 @@ export async function soloRpc(
         cycle.payout_state = "Received";
         cycle.received_at = new Date().toISOString();
       }
+      saveRawSoloSnapshot(snapshot);
+      return true;
+    }
+
+    case "record_payout_withdrawal": {
+      const cycle = snapshot.cycles.find((c) => c.id === args.p_cycle_id);
+      if (
+        !cycle ||
+        cycle.status !== "accepted" ||
+        (cycle.phase !== "settling" && cycle.phase !== "ended") ||
+        cycle.received_at
+      ) {
+        throw new Error(
+          "Only an unreceived completed cycle can record a withdrawal",
+        );
+      }
+      const holderId =
+        cycle.holder_id ??
+        (snapshot.wallets ?? []).find((w) => w.id === cycle.wallet_id)
+          ?.holder_id;
+      const activeIds = snapshot.memberships
+        .filter((m) => m.status === "active")
+        .map((m) => m.user_id);
+      if (
+        !holderId ||
+        holderId === cycle.receiver_id ||
+        !activeIds.includes(uid) ||
+        !activeIds.includes(holderId) ||
+        !activeIds.includes(cycle.receiver_id) ||
+        (uid !== holderId && uid !== cycle.receiver_id)
+      ) {
+        throw new Error(
+          "Only the active holder or receiver can record this withdrawal",
+        );
+      }
+      const amount = args.p_amount_centavos;
+      if (!Number.isSafeInteger(amount) || Number(amount) <= 0) {
+        throw new Error(
+          "Withdrawal amount must be a positive integer number of centavos",
+        );
+      }
+      const note = String(args.p_note ?? "");
+      if (note.length > 140)
+        throw new Error("Note cannot exceed 140 characters");
+      const entryDate = String(args.p_withdrawal_date || today);
+      if (entryDate > today)
+        throw new Error("Withdrawal date cannot be in the future");
+      if (entryDate < cycle.start_date)
+        throw new Error(
+          "Withdrawal date cannot be before the cycle start date",
+        );
+      const withdrawn = (snapshot.payoutWithdrawals ?? [])
+        .filter((entry) => entry.cycle_id === cycle.id && !entry.voided_at)
+        .reduce((sum, entry) => sum + entry.amount_centavos, 0);
+      const confirmedPot = snapshot.payments
+        .filter(
+          (p) =>
+            p.cycle_id === cycle.id &&
+            !p.deleted_at &&
+            p.status === "confirmed",
+        )
+        .reduce((sum, p) => sum + p.amount_centavos, 0);
+      if (Number(amount) > Math.max(0, confirmedPot - withdrawn)) {
+        throw new Error("Withdrawal exceeds the remaining held amount");
+      }
+      const entry: PayoutWithdrawal = {
+        id: generateId(),
+        group_id: cycle.group_id,
+        cycle_id: cycle.id,
+        amount_centavos: Number(amount),
+        withdrawal_date: entryDate,
+        note,
+        created_by: uid,
+        created_at: new Date().toISOString(),
+        voided_by: null,
+        voided_at: null,
+      };
+      snapshot.payoutWithdrawals ??= [];
+      snapshot.payoutWithdrawals.push(entry);
+      saveRawSoloSnapshot(snapshot);
+      return entry.id;
+    }
+
+    case "void_payout_withdrawal": {
+      const entry = (snapshot.payoutWithdrawals ?? []).find(
+        (w) => w.id === args.p_id,
+      );
+      if (!entry) throw new Error("Withdrawal not in your group");
+      const cycle = snapshot.cycles.find((c) => c.id === entry.cycle_id);
+      const holderId =
+        cycle?.holder_id ??
+        (snapshot.wallets ?? []).find((w) => w.id === cycle?.wallet_id)
+          ?.holder_id;
+      if (
+        !cycle ||
+        !holderId ||
+        (uid !== holderId && uid !== cycle.receiver_id)
+      ) {
+        throw new Error(
+          "Only the active holder or receiver can correct this withdrawal",
+        );
+      }
+      if (cycle.received_at)
+        throw new Error(
+          "Withdrawal cannot be corrected after the remaining payout is acknowledged",
+        );
+      if (entry.voided_at) throw new Error("Withdrawal is already voided");
+      entry.voided_at = new Date().toISOString();
+      entry.voided_by = uid;
       saveRawSoloSnapshot(snapshot);
       return true;
     }

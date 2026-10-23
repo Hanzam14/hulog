@@ -87,11 +87,20 @@ export default function CycleCard({
         <Avatar data={data} id={c.receiver_id} size="sm" />
         <b>{name(data, c.receiver_id).trim().split(/\s+/)[0]}</b>
       </div>
-      {c.holder_id && c.wallet_label && (
+      {c.payout_state === "Received" ? (
         <div className="pot-custody">
-          <small>{heldByText(data, c.holder_id, c.wallet_label, user)}</small>
+          <small>{t("No amount remains held")}</small>
         </div>
-      )}
+      ) : c.holder_id && c.wallet_label ? (
+        <div className="pot-custody">
+          <small>
+            {heldByText(data, c.holder_id, c.wallet_label, user)}
+            {c.phase === "settling" || c.phase === "ended"
+              ? ` · ${t("Still held")}: ${money(c.held_centavos ?? c.pot_centavos)}`
+              : ""}
+          </small>
+        </div>
+      ) : null}
       <div className="pot-bottom">
         <small>{phaseDisplay(c.phase, c.days_left)}</small>
         <small>
