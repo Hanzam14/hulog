@@ -1,7 +1,13 @@
 import { t, label } from "../i18n";
 import type { ViewProps } from "./shared";
 import { money } from "../helpers";
-import { flushOutbox, discardItem, useOffline, useOutbox } from "../outbox";
+import {
+  flushOutbox,
+  discardItem,
+  retryItem,
+  useOffline,
+  useOutbox,
+} from "../outbox";
 import type { OutboxItem } from "../outbox";
 import { isSoloMode } from "../solo";
 
@@ -59,6 +65,22 @@ export default function OutboxStrip({ data, user, run, busy }: ViewProps) {
               {item.error ? `: ${label(item.error)}` : ""}
             </small>
           </div>
+          <button
+            type="button"
+            className="quiet"
+            disabled={busy || offline}
+            onClick={() => {
+              retryItem(user, item.id);
+              void run(
+                async () => {
+                  await flushOutbox(user);
+                },
+                { showSuccess: false },
+              );
+            }}
+          >
+            {t("Try again")}
+          </button>
           <button
             type="button"
             className="quiet"

@@ -2,9 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   rpc: vi.fn(),
+  sessionUser: { value: "u1" as string | null },
   solo: { value: false },
 }));
-vi.mock("./data", () => ({ rpc: mocks.rpc }));
+vi.mock("./data", () => ({
+  rpc: mocks.rpc,
+  sessionUserId: async () => mocks.sessionUser.value,
+}));
 vi.mock("./solo", () => ({ isSoloMode: () => mocks.solo.value }));
 
 const KEY_A = "11111111-1111-4111-8111-111111111111";
@@ -35,6 +39,7 @@ async function load() {
 beforeEach(() => {
   mocks.rpc.mockReset();
   mocks.solo.value = false;
+  mocks.sessionUser.value = "u1";
   stubStorage();
   stubNavigator(true);
 });
@@ -239,6 +244,48 @@ describe("flushOutbox", () => {
       "queued",
       "queued",
     ]);
+  });
+
+  it.each(["PGRST002", "57014", "40001", "08006", "53300", "42501"])(
+    "treats temporary server code %s as retryable, not a rule failure",
+    async (code) => {
+      const mod = await queueTwo();
+      mocks.rpc.mockRejectedValue(serverError("temporary", code));
+      expect(await mod.flushOutbox("u1")).toEqual({ sent: 0, failed: 0 });
+      expect(mod.outboxItems("u1").map((i) => i.state)).toEqual([
+        "queued",
+        "queued",
+      ]);
+    },
+  );
+
+  it("sends nothing when the live session is not the queue owner", async () => {
+    const mod = await queueTwo();
+    mocks.sessionUser.value = "someone-else";
+    expect(await mod.flushOutbox("u1")).toEqual({ sent: 0, failed: 0 });
+    mocks.sessionUser.value = null;
+    expect(await mod.flushOutbox("u1")).toEqual({ sent: 0, failed: 0 });
+    expect(mocks.rpc).not.toHaveBeenCalled();
+    expect(mod.outboxItems("u1").map((i) => i.state)).toEqual([
+      "queued",
+      "queued",
+    ]);
+  });
+
+  it("retryItem puts a failed item back in the queue with the same key", async () => {
+    const mod = await queueTwo();
+    mocks.rpc
+      .mockRejectedValueOnce(serverError("Payment window closed"))
+      .mockResolvedValueOnce("ok");
+    await mod.flushOutbox("u1");
+    mod.retryItem("u1", KEY_A);
+    expect(mod.outboxItems("u1")).toMatchObject([
+      { id: KEY_A, state: "queued" },
+    ]);
+    expect(mod.outboxItems("u1")[0]).not.toHaveProperty("error");
+    mocks.rpc.mockResolvedValue("ok");
+    expect(await mod.flushOutbox("u1")).toEqual({ sent: 1, failed: 0 });
+    expect(mocks.rpc.mock.calls.at(-1)?.[1].p_client_request_id).toBe(KEY_A);
   });
 
   it("does nothing while offline", async () => {

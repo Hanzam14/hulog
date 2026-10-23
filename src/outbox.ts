@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { rpc } from "./data";
+import { rpc, sessionUserId } from "./data";
 import { isNavigatorOffline } from "./helpers";
 import { isSoloMode } from "./solo";
 
@@ -72,10 +72,18 @@ function hasServerCode(error: unknown): boolean {
   const code = (error as { code?: unknown } | null)?.code;
   return typeof code === "string" && /^([0-9A-Z]{5}|PGRST\d{3})$/.test(code);
 }
-/** The session was not valid yet; the same request can be retried safely. */
-function isAuthCode(error: unknown): boolean {
+/**
+ * Not a rule error: a temporary server or connection problem, or a session
+ * that is not valid right now. The same request can be retried safely.
+ */
+function isRetryableCode(error: unknown): boolean {
   const code = (error as { code?: unknown } | null)?.code;
-  return typeof code === "string" && /^PGRST30[123]$/.test(code);
+  return (
+    typeof code === "string" &&
+    /^(PGRST30[123]|PGRST00[0-3]|08[0-9A-Z]{3}|40001|40P01|53[0-9A-Z]{3}|57[0-9A-Z]{3}|42501)$/.test(
+      code,
+    )
+  );
 }
 /** The request may or may not have reached the server: retry with the same key. */
 export function isNetworkError(error: unknown): boolean {
@@ -301,6 +309,9 @@ export function flushOutbox(userId: string): Promise<FlushResult> {
     for (;;) {
       const next = read(userId).find((item) => item.state === "queued");
       if (!next) break;
+      // Never send under another account (or none): the server takes the
+      // actor from the live session, not from this queue's owner.
+      if ((await sessionUserId()) !== userId) break;
       patch(userId, next.id, { state: "sending" });
       try {
         await rpc(
@@ -310,7 +321,7 @@ export function flushOutbox(userId: string): Promise<FlushResult> {
         mutate(userId, (items) => items.filter((item) => item.id !== next.id));
         result.sent += 1;
       } catch (error) {
-        if (hasServerCode(error) && !isAuthCode(error)) {
+        if (hasServerCode(error) && !isRetryableCode(error)) {
           patch(userId, next.id, {
             state: "failed",
             error: error instanceof Error ? error.message : String(error),
@@ -324,6 +335,23 @@ export function flushOutbox(userId: string): Promise<FlushResult> {
     }
     return result;
   }, none);
+}
+
+/** Put a failed item back in the queue; it keeps its id, so a retry cannot double-record. */
+export function retryItem(userId: string, id: string) {
+  mutate(userId, (items) =>
+    items.map((item) =>
+      item.id === id && item.state === "failed"
+        ? {
+            id: item.id,
+            kind: item.kind,
+            args: item.args,
+            createdAt: item.createdAt,
+            state: "queued",
+          }
+        : item,
+    ),
+  );
 }
 
 /** Remove an item the user chose to throw away (never one being sent). */

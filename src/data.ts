@@ -277,6 +277,16 @@ export interface PersonalEntry {
   updated_at: string;
   deleted_at: string | null;
 }
+/** The signed-in user right now, or null when there is no live session. */
+export async function sessionUserId(): Promise<string | null> {
+  if (!supabase) return null;
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data.session?.user.id ?? null;
+  } catch {
+    return null;
+  }
+}
 export async function rpc(
   name: string,
   args?: Record<string, unknown>,
