@@ -549,6 +549,49 @@ const taglish = {
   "Upcoming {count}": "Darating {count}",
   "Days fill in order from the start date, not by the date paid.":
     "Sunod-sunod ang pagpuno ng araw mula sa simula, hindi ayon sa petsa ng bayad.",
+  "Gusto natin": "Gusto natin",
+  "{count} still wanted": "{count} pa ang gusto",
+  "Nothing on the wishlist yet": "Wala pa sa listahan",
+  "Add to wishlist": "Idagdag sa listahan",
+  "Edit {title}": "Baguhin ang {title}",
+  "Delete {title}": "Alisin ang {title}",
+  "What do you want?": "Ano ang gusto ninyo?",
+  "Price (₱)": "Presyo (₱)",
+  "Link to a shared ipon goal (optional)":
+    "I-link sa shared na ipon goal (opsyonal)",
+  "No linked goal": "Walang link",
+  "Only shared ipon goals can be linked. Personal savings stay private.":
+    "Shared na ipon goals lang ang puwedeng i-link. Pribado ang sariling ipon.",
+  "Add item": "Idagdag",
+  "Save item": "I-save",
+  "Still wanted": "Gusto pa",
+  "Nabili na": "Nabili na",
+  "Mark as bought": "Nabili na",
+  "Undo bought": "Bawiin ang nabili",
+  "Added by {name}": "Idinagdag ni {name}",
+  "Bought by {name} · {date}": "Nabili ni {name} · {date}",
+  "{saved} of {price}": "{saved} ng {price}",
+  "{saved} of {price} — kaya na!": "{saved} ng {price} — kaya na!",
+  "Saved toward this item": "Naipon para dito",
+  "Delete this wishlist item? The change stays in history.":
+    "Alisin ito sa listahan? Mananatili ang pagbabago sa history.",
+  "Hulog only records this. Buying is your own action outside the app.":
+    "Record lang ito sa Hulog. Kayo mismo ang bibili, hindi dito sa app.",
+  "Goal: {title}": "Goal: {title}",
+  wishlist_items: "item sa listahan",
+  bought: "nabili na",
+  wanted: "gusto pa",
+  "Wishlist title must be 1 to 60 characters":
+    "Dapat 1 hanggang 60 characters ang pangalan ng item.",
+  "Invalid wishlist price":
+    "Maglagay ng presyo mula ₱0.01 hanggang ₱100,000,000.",
+  "Linked goal must be an active shared ipon goal in your group":
+    "Pumili ng aktibong shared na ipon goal ninyo.",
+  "Maximum of 30 wishlist items reached":
+    "Puno na ang listahan (30 items). Mag-alis muna ng isa.",
+  "Bought items cannot be edited":
+    "Hindi na mababago ang nabili na. Bawiin muna.",
+  "Wishlist item unavailable": "Wala na ang item na ito.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1096,6 +1139,48 @@ const en = {
   "Upcoming {count}": "Upcoming {count}",
   "Days fill in order from the start date, not by the date paid.":
     "Days fill in order from the start date, not by the date paid.",
+  "Gusto natin": "Our wishlist",
+  "{count} still wanted": "{count} still wanted",
+  "Nothing on the wishlist yet": "Nothing on the wishlist yet",
+  "Add to wishlist": "Add to wishlist",
+  "Edit {title}": "Edit {title}",
+  "Delete {title}": "Delete {title}",
+  "What do you want?": "What do you want?",
+  "Price (₱)": "Price (₱)",
+  "Link to a shared ipon goal (optional)":
+    "Link to a shared ipon goal (optional)",
+  "No linked goal": "No linked goal",
+  "Only shared ipon goals can be linked. Personal savings stay private.":
+    "Only shared ipon goals can be linked. Personal savings stay private.",
+  "Add item": "Add item",
+  "Save item": "Save item",
+  "Still wanted": "Still wanted",
+  "Nabili na": "Bought",
+  "Mark as bought": "Mark bought",
+  "Undo bought": "Undo bought",
+  "Added by {name}": "Added by {name}",
+  "Bought by {name} · {date}": "Bought by {name} · {date}",
+  "{saved} of {price}": "{saved} of {price}",
+  "{saved} of {price} — kaya na!": "{saved} of {price} — you can afford it!",
+  "Saved toward this item": "Saved toward this item",
+  "Delete this wishlist item? The change stays in history.":
+    "Remove this from the wishlist? The change stays in history.",
+  "Hulog only records this. Buying is your own action outside the app.":
+    "Hulog only records this. Buying is your own action outside the app.",
+  "Goal: {title}": "Goal: {title}",
+  wishlist_items: "wishlist item",
+  bought: "bought",
+  wanted: "wanted",
+  "Wishlist title must be 1 to 60 characters":
+    "The item name must be 1 to 60 characters.",
+  "Invalid wishlist price": "Enter a price from ₱0.01 to ₱100,000,000.",
+  "Linked goal must be an active shared ipon goal in your group":
+    "Pick an active shared ipon goal from your group.",
+  "Maximum of 30 wishlist items reached":
+    "The wishlist is full (30 items). Remove one to add another.",
+  "Bought items cannot be edited":
+    "Bought items cannot be edited. Undo bought first.",
+  "Wishlist item unavailable": "This item is no longer available.",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1646,6 +1731,49 @@ const tl = {
   "Upcoming {count}": "Darating {count}",
   "Days fill in order from the start date, not by the date paid.":
     "Sunod-sunod ang pagpuno ng araw mula sa simula, hindi ayon sa petsa ng bayad.",
+  "Gusto natin": "Gusto natin",
+  "{count} still wanted": "{count} pa ang gusto",
+  "Nothing on the wishlist yet": "Wala pa sa listahan",
+  "Add to wishlist": "Idagdag sa listahan",
+  "Edit {title}": "Baguhin ang {title}",
+  "Delete {title}": "Alisin ang {title}",
+  "What do you want?": "Ano ang gusto ninyo?",
+  "Price (₱)": "Presyo (₱)",
+  "Link to a shared ipon goal (optional)":
+    "I-link sa shared na ipon goal (opsyonal)",
+  "No linked goal": "Walang link",
+  "Only shared ipon goals can be linked. Personal savings stay private.":
+    "Mga shared na ipon goal lang ang puwedeng i-link. Pribado ang sariling ipon.",
+  "Add item": "Idagdag",
+  "Save item": "I-save ang item",
+  "Still wanted": "Gusto pa",
+  "Nabili na": "Nabili na",
+  "Mark as bought": "Nabili na",
+  "Undo bought": "Bawiin ang nabili",
+  "Added by {name}": "Idinagdag ni {name}",
+  "Bought by {name} · {date}": "Nabili ni {name} · {date}",
+  "{saved} of {price}": "{saved} ng {price}",
+  "{saved} of {price} — kaya na!": "{saved} ng {price} — kaya na!",
+  "Saved toward this item": "Naipon para dito",
+  "Delete this wishlist item? The change stays in history.":
+    "Alisin ito sa listahan? Mananatili ang pagbabago sa history.",
+  "Hulog only records this. Buying is your own action outside the app.":
+    "Record lang ito sa Hulog. Kayo mismo ang bibili, hindi sa app.",
+  "Goal: {title}": "Goal: {title}",
+  wishlist_items: "item sa listahan",
+  bought: "nabili na",
+  wanted: "gusto pa",
+  "Wishlist title must be 1 to 60 characters":
+    "Dapat 1 hanggang 60 karakter ang pangalan ng item.",
+  "Invalid wishlist price":
+    "Maglagay ng presyo mula ₱0.01 hanggang ₱100,000,000.",
+  "Linked goal must be an active shared ipon goal in your group":
+    "Pumili ng aktibong shared na ipon goal ninyo.",
+  "Maximum of 30 wishlist items reached":
+    "Puno na ang listahan (30 items). Mag-alis muna ng isa.",
+  "Bought items cannot be edited":
+    "Hindi na mababago ang nabili na. Bawiin muna.",
+  "Wishlist item unavailable": "Wala na ang item na ito.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

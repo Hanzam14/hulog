@@ -227,6 +227,22 @@ export interface Snapshot {
   personalGoals?: PersonalGoal[];
   personalEntries?: PersonalEntry[];
   personalHistory?: PersonalHistory[];
+  wishlistItems?: WishlistItem[];
+}
+export interface WishlistItem {
+  id: string;
+  group_id: string;
+  title: string;
+  price_centavos: number;
+  note: string | null;
+  linked_goal_id: string | null;
+  added_by: string;
+  status: "wanted" | "bought";
+  bought_by: string | null;
+  bought_at: string | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }
 export interface PersonalHistory {
   id: number;
@@ -328,6 +344,7 @@ export async function load(): Promise<Snapshot> {
     personalGoals,
     personalEntries,
     personalHistory,
+    wishlistItems,
   ] = await Promise.all([
     rows<Profile>(
       "profiles",
@@ -353,6 +370,7 @@ export async function load(): Promise<Snapshot> {
     optionalRows<PersonalGoal>("personal_savings_goals", "id"),
     optionalRows<PersonalEntry>("personal_savings_entries", "id"),
     optionalRows<PersonalHistory>("personal_savings_history", "id"),
+    optionalRows<WishlistItem>("wishlist_items", "created_at"),
   ]);
   return {
     profiles,
@@ -375,5 +393,6 @@ export async function load(): Promise<Snapshot> {
     personalGoals,
     personalEntries,
     personalHistory,
+    wishlistItems,
   };
 }

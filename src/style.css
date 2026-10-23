@@ -2504,3 +2504,63 @@ select {
   color: var(--sticker-ink);
   border-color: var(--line);
 }
+
+/* Wishlist: compact rows, no new colours. */
+.recap-link .wish-count {
+  display: block;
+  font-weight: 600;
+}
+.wish-section {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+.wish-section > .section-label {
+  margin-bottom: 0;
+}
+.wish-item {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.wish-item h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.wish-item.bought h3 {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+.wish-item p {
+  margin: 0;
+}
+.wish-price {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.wish-note {
+  overflow-wrap: anywhere;
+}
+.wish-progress {
+  display: grid;
+  gap: 4px;
+}
+.wish-ready {
+  color: var(--leaf-deep);
+  font-weight: 800;
+}
+.wish-actions {
+  margin: 0;
+}
+.wish-actions > button:first-child {
+  flex: 1 1 140px;
+}
+.wish-form {
+  display: grid;
+  gap: 12px;
+}

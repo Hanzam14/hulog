@@ -86,7 +86,9 @@ describe("optionalRows", () => {
     expect(hosted.from).toHaveBeenCalledWith("personal_savings_goals");
     expect(hosted.from).toHaveBeenCalledWith("personal_savings_entries");
     expect(hosted.from).toHaveBeenCalledWith("personal_savings_history");
+    expect(hosted.from).toHaveBeenCalledWith("wishlist_items");
     expect(snapshot.personalGoals).toEqual([]);
+    expect(snapshot.wishlistItems).toEqual([]);
     await rpc("create_personal_goal", {
       p_title: "Camera",
       p_target_amount_centavos: 10000,
@@ -94,6 +96,14 @@ describe("optionalRows", () => {
     expect(hosted.rpc).toHaveBeenLastCalledWith("create_personal_goal", {
       p_title: "Camera",
       p_target_amount_centavos: 10000,
+    });
+    await rpc("add_wishlist_item", {
+      p_title: "Rice cooker",
+      p_price_centavos: 250000,
+    });
+    expect(hosted.rpc).toHaveBeenLastCalledWith("add_wishlist_item", {
+      p_title: "Rice cooker",
+      p_price_centavos: 250000,
     });
   });
   it("returns rows when the query succeeds", async () => {
