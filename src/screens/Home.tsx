@@ -20,6 +20,7 @@ import Avatar from "../components/Avatar";
 import StreakChip from "../components/StreakChip";
 import IponCard from "../components/IponCard";
 import PersonalSavings from "../components/PersonalSavings";
+import OutboxStrip from "../components/OutboxStrip";
 import { isSoloMode } from "../solo";
 import { isSoloCycle } from "../helpers";
 import { liveWishlist, wantedCount } from "../wishlist";
@@ -67,6 +68,7 @@ export default function Home(props: ViewProps) {
   return (
     <>
       <h1 className="sr-only">{group.name}</h1>
+      <OutboxStrip {...props} />
       {(waiting.length > 0 ||
         pendingContributions.length > 0 ||
         pendingAbono.length > 0) && (

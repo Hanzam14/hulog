@@ -12,6 +12,7 @@ import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { load, rpc, supabase } from "./data";
 import type { Snapshot } from "./data";
 import { isNavigatorOffline } from "./helpers";
+import { flushOutbox, isQueuedResult } from "./outbox";
 import type { Run } from "./components/shared";
 import Join from "./screens/Join";
 import NoGroup from "./screens/NoGroup";
@@ -191,7 +192,9 @@ export default function App() {
           if (alive && local === isSoloMode()) setData(next);
         })
         .catch((e) => {
-          if (alive && local === isSoloMode()) setError(String(e.message));
+          // Offline polls are expected to fail; the offline banner says so.
+          if (alive && local === isSoloMode() && !isNavigatorOffline())
+            setError(String(e.message));
         });
     };
     void reload();
@@ -205,19 +208,52 @@ export default function App() {
       window.removeEventListener("focus", reload);
     };
   }, [session]);
+  // Send records saved offline when the app opens, regains focus or comes back
+  // online. Each carries its own request key, so a repeat never records twice.
+  useEffect(() => {
+    const userId = session?.user.id;
+    if (!userId || isSoloMode()) return;
+    let alive = true;
+    const sync = async () => {
+      const result = await flushOutbox(userId);
+      if (!alive || result.sent === 0) return;
+      try {
+        await refresh();
+        setSuccess({ message: "Your offline records were synced. Salamat!" });
+      } catch {
+        /* The next poll loads the fresh data. */
+      }
+    };
+    void sync();
+    window.addEventListener("online", sync);
+    window.addEventListener("focus", sync);
+    return () => {
+      alive = false;
+      window.removeEventListener("online", sync);
+      window.removeEventListener("focus", sync);
+    };
+  }, [session, refresh]);
   const run: Run = async (action, options) => {
     setBusy(true);
     setError("");
     setSuccess(null);
     try {
-      await action();
-      if (isSoloMode()) {
+      const result = await action();
+      // A record saved on this phone for later has nothing new to load yet.
+      const queued = isQueuedResult(result);
+      if (queued) {
+        // Nothing to refresh; the strip on Home shows it.
+      } else if (isSoloMode()) {
         await refresh();
       } else if (supabase && (await supabase.auth.getSession()).data.session) {
         await refresh();
       }
       if (options?.showSuccess !== false)
-        setSuccess({ message: "Saved. Salamat!" });
+        setSuccess({
+          message: queued
+            ? "Saved on this phone. It will sync when you're back online."
+            : "Saved. Salamat!",
+        });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -318,7 +354,11 @@ export default function App() {
       <InstallBanner />
       {offline && (
         <div role="status" className="notice offline-banner">
-          {t("You're offline. Changes won't save until you're back online.")}
+          {session && !isSoloMode()
+            ? t(
+                "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.",
+              )
+            : t("You're offline. Changes won't save until you're back online.")}
         </div>
       )}
       {error && (

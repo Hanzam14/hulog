@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IconCircleCheck, IconPlus } from "@tabler/icons-react";
 import { t, label } from "../i18n";
 import type { ViewProps } from "../components/shared";
 import { name } from "../components/shared";
 import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
+import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import {
   buildSettlementPayload,
   money,
@@ -221,6 +222,10 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   const abonoSummary = data.abonoSummary ?? [];
   const activeDebt = abonoSummary.find((row) => row.owed_centavos > 0);
 
+  const offline = useQueueingOffline();
+  // One key per form attempt, so a double tap or a retry dedupes on the server.
+  const addRequestId = useRef(newRequestId());
+  const settleRequestId = useRef(newRequestId());
   const [showSettle, setShowSettle] = useState(false);
   const [settleAmount, setSettleAmount] = useState("");
   const [settleNote, setSettleNote] = useState("");
@@ -261,22 +266,28 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     const owedCentavos = parsePesos(owed);
     const toMember = fromMember === user ? partnerId : user;
     void run(async () => {
-      await rpc("record_abono_entry", {
-        p_kind: "expense",
-        p_from_member: fromMember,
-        p_to_member: toMember,
-        p_description: description.trim(),
-        p_total_amount_centavos: totalCentavos,
-        p_owed_amount_centavos: owedCentavos,
-        p_entry_date: entryDate || data.today,
-        p_note: note.trim(),
+      const result = await submitRecord(user, {
+        kind: "abono",
+        args: {
+          p_kind: "expense",
+          p_from_member: fromMember,
+          p_to_member: toMember,
+          p_description: description.trim(),
+          p_total_amount_centavos: totalCentavos,
+          p_owed_amount_centavos: owedCentavos,
+          p_entry_date: entryDate || data.today,
+          p_note: note.trim(),
+        },
+        id: addRequestId.current,
       });
+      addRequestId.current = newRequestId();
       setDescription("");
       setTotal("");
       setOwed("");
       setNote("");
       setEntryDate(data.today);
       setShowAdd(false);
+      return result;
     });
   };
 
@@ -358,18 +369,21 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   e.preventDefault();
                   const amt = parsePesos(settleAmount);
                   void run(async () => {
-                    await rpc(
-                      "record_abono_entry",
-                      buildSettlementPayload({
+                    const result = await submitRecord(user, {
+                      kind: "abono",
+                      args: buildSettlementPayload({
                         debtorId: activeDebt.debtor_id,
                         creditorId: activeDebt.creditor_id,
                         amountCentavos: amt,
                         entryDate: data.today,
                         note: settleNote,
                       }),
-                    );
+                      id: settleRequestId.current,
+                    });
+                    settleRequestId.current = newRequestId();
                     setShowSettle(false);
                     setSettleNote("");
+                    return result;
                   });
                 }}
               >
@@ -395,7 +409,9 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                 </label>
                 <div className="actions">
                   <button disabled={busy} type="submit">
-                    {t("Record settlement")}
+                    {offline
+                      ? t("Save for now (offline)")
+                      : t("Record settlement")}
                   </button>
                   <button
                     type="button"
@@ -547,8 +563,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </label>
 
               <button disabled={busy} type="submit">
-                {t("Record expense")}
+                {offline ? t("Save for now (offline)") : t("Record expense")}
               </button>
+              {offline && (
+                <p className="offline-hint" role="status">
+                  {t(
+                    "You're offline. This will be saved on this phone and sent when you're back online.",
+                  )}
+                </p>
+              )}
             </form>
           )}
         </div>
