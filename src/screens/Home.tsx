@@ -10,6 +10,7 @@ import {
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
 import PendingPaymentActions from "../components/PendingPaymentActions";
+import { ProofRefLine } from "../components/ProofRef";
 import { money, shortDate } from "../helpers";
 import { rpc } from "../data";
 import CycleCard from "../components/CycleCard";
@@ -100,6 +101,7 @@ export default function Home(props: ViewProps) {
                       {shortDate(cycle.end_date)}
                     </Link>
                     {!allowed && <small>{t("not counted")}</small>}
+                    <ProofRefLine value={p.proof_ref} />
                   </div>
                   <PendingPaymentActions
                     id={p.id}
@@ -191,6 +193,7 @@ export default function Home(props: ViewProps) {
                     {ae.description} ({t("Tracker")})
                   </Link>
                   {ae.note && <small>{ae.note}</small>}
+                  <ProofRefLine value={ae.proof_ref} />
                 </div>
                 <button
                   className="round no"

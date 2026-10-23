@@ -206,10 +206,18 @@ function buildArgs(
   id: string,
 ): Record<string, unknown> {
   const note = typeof args.p_note === "string" ? args.p_note : "";
+  // The server picks the overload from the argument names, so a reference is
+  // sent only when there is one (SPEC 10.14); without it the old form is used.
+  const { p_proof_ref: proofRef, ...rest } = args;
+  const withRef =
+    typeof proofRef === "string" && proofRef.trim()
+      ? { p_proof_ref: proofRef.trim() }
+      : {};
   return kind === "payment"
-    ? { ...args, p_note: note, p_client_request_id: id }
+    ? { ...rest, ...withRef, p_note: note, p_client_request_id: id }
     : {
-        ...args,
+        ...rest,
+        ...withRef,
         p_entry_date: args.p_entry_date ?? null,
         p_note: note,
         p_client_request_id: id,
