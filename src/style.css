@@ -2306,6 +2306,38 @@ select {
   font-family: var(--display);
   font-size: 20px;
 }
+.recap-period {
+  margin-top: 12px;
+}
+.recap-bars {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.recap-bars li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.recap-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  overflow: hidden;
+}
+.recap-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+}
+.recap-bar > span.best {
+  background: var(--pink);
+}
 .recap-link {
   display: flex;
   align-items: center;
