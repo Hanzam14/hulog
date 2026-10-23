@@ -6,14 +6,27 @@ export function money(centavos: number): string {
     currency: "PHP",
   }).format(centavos / 100);
 }
-export function parsePesos(value: string): number {
+export function parsePesos(value: string, allowZero = false): number {
   if (!/^\d+(\.\d{1,2})?$/.test(value.trim()))
     throw new Error("Enter pesos with up to two decimal places.");
   const [whole, fraction = ""] = value.trim().split(".");
   const result = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
-  if (!Number.isSafeInteger(result) || result <= 0)
+  if (
+    !Number.isSafeInteger(result) ||
+    result < 0 ||
+    (result === 0 && !allowZero)
+  )
     throw new Error("Enter a positive amount.");
   return result;
+}
+/** What an abono entry moves: the share owed, or the whole total when the share is 0. */
+export function abonoAmount(entry: {
+  owed_amount_centavos: number;
+  total_amount_centavos: number;
+}): number {
+  return entry.owed_amount_centavos > 0
+    ? entry.owed_amount_centavos
+    : entry.total_amount_centavos;
 }
 export function addDays(date: string, days: number): string {
   const value = new Date(`${date}T00:00:00Z`);

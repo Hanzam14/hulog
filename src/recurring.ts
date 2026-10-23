@@ -39,13 +39,17 @@ export function medianCentavos(values: number[]): number {
     : Math.floor((sorted[mid - 1] + sorted[mid] + 1) / 2);
 }
 
-/** `total × owed ÷ pastTotal`, rounded half up to the centavo, kept within 1..total. */
+/**
+ * `total × owed ÷ pastTotal`, rounded half up to the centavo, kept within 1..total.
+ * A past share of 0 ("all mine") stays 0.
+ */
 export function scaleShare(
   total: number,
   pastOwed: number,
   pastTotal: number,
 ): number {
   if (pastTotal <= 0) return total;
+  if (pastOwed <= 0) return 0;
   const numerator = BigInt(total) * BigInt(pastOwed);
   const denominator = BigInt(pastTotal);
   const scaled = Number((numerator * 2n + denominator) / (denominator * 2n));
