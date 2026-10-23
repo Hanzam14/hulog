@@ -929,6 +929,8 @@ export async function soloRpc(
     }
 
     case "record_payment": {
+      // p_client_request_id is accepted and ignored: the solo ledger is local,
+      // so no retry can arrive twice.
       const cycleId = args.p_cycle_id as string;
       const days = Number(args.p_days);
       const cycle = snapshot.cycles.find((c) => c.id === cycleId);
@@ -1238,6 +1240,7 @@ export async function soloRpc(
       return true;
 
     case "record_abono_entry": {
+      // p_client_request_id is accepted and ignored (see record_payment).
       const kind = (args.p_kind as "expense" | "settlement") || "expense";
       const totalAmount = Number(args.p_total_amount_centavos);
       const owedAmount = Number(args.p_owed_amount_centavos);

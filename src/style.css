@@ -2564,3 +2564,46 @@ select {
   display: grid;
   gap: 12px;
 }
+
+/* Offline recording: records saved on the phone and not synced yet. */
+.outbox-strip {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: var(--highlight);
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+}
+.outbox-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.outbox-head button {
+  min-height: 44px;
+}
+.outbox-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.outbox-item > div {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.outbox-item small {
+  color: var(--danger);
+  font-weight: 700;
+}
+.offline-hint {
+  margin: 4px 0;
+  color: var(--soft);
+  font-size: 13px;
+  text-align: center;
+}

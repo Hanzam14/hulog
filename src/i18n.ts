@@ -592,6 +592,20 @@ const taglish = {
   "Bought items cannot be edited":
     "Hindi na mababago ang nabili na. Bawiin muna.",
   "Wishlist item unavailable": "Wala na ang item na ito.",
+  "Save for now (offline)": "I-save muna (offline)",
+  "You're offline. This will be saved on this phone and sent when you're back online.":
+    "Offline ka. Ise-save ito sa phone at ipapadala pag online na.",
+  "Saved on this phone. It will sync when you're back online.":
+    "Naka-save sa phone. Ma-sync pag online na.",
+  "{count} not synced yet": "{count} hindi pa naka-sync",
+  "Sync now": "Sync now",
+  Discard: "Alisin",
+  "Could not sync": "Hindi na-sync",
+  "Your offline records were synced. Salamat!":
+    "Na-sync na ang mga offline record. Salamat!",
+  "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.":
+    "Offline ka. Naka-save sa phone ang hulog at gastos at ma-sync mamaya. Kailangan ng internet ang ibang changes.",
+  "Request id already used": "Naipadala na ang request na ito.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1181,6 +1195,20 @@ const en = {
   "Bought items cannot be edited":
     "Bought items cannot be edited. Undo bought first.",
   "Wishlist item unavailable": "This item is no longer available.",
+  "Save for now (offline)": "Save for now (offline)",
+  "You're offline. This will be saved on this phone and sent when you're back online.":
+    "You're offline. This will be saved on this phone and sent when you're back online.",
+  "Saved on this phone. It will sync when you're back online.":
+    "Saved on this phone. It will sync when you're back online.",
+  "{count} not synced yet": "{count} not synced yet",
+  "Sync now": "Sync now",
+  Discard: "Discard",
+  "Could not sync": "Could not sync",
+  "Your offline records were synced. Salamat!":
+    "Your offline records were synced. Salamat!",
+  "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.":
+    "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.",
+  "Request id already used": "This request was already used.",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1774,6 +1802,20 @@ const tl = {
   "Bought items cannot be edited":
     "Hindi na mababago ang nabili na. Bawiin muna.",
   "Wishlist item unavailable": "Wala na ang item na ito.",
+  "Save for now (offline)": "I-save muna (offline)",
+  "You're offline. This will be saved on this phone and sent when you're back online.":
+    "Wala kang internet. Ise-save ito sa phone at ipapadala kapag may internet na.",
+  "Saved on this phone. It will sync when you're back online.":
+    "Nai-save sa phone. Ma-sync kapag may internet na.",
+  "{count} not synced yet": "{count} ang hindi pa nasi-sync",
+  "Sync now": "I-sync ngayon",
+  Discard: "Alisin",
+  "Could not sync": "Hindi na-sync",
+  "Your offline records were synced. Salamat!":
+    "Na-sync na ang mga offline na record. Salamat!",
+  "You're offline. Hulog and expense records are saved on this phone and sync later. Other changes need internet.":
+    "Wala kang internet. Ise-save sa phone ang hulog at gastos at ma-sync mamaya. Kailangan ng internet ang ibang pagbabago.",
+  "Request id already used": "Nagamit na ang request na ito.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

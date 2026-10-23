@@ -284,7 +284,9 @@ export async function rpc(
   if (isSoloMode()) return soloRpc(name, args);
   if (!supabase) throw new Error("Add your Supabase settings in .env first.");
   const { data, error } = await supabase.rpc(name, args);
-  if (error) throw new Error(error.message);
+  // Keep the server code so callers can tell a rule error from a network one.
+  if (error)
+    throw Object.assign(new Error(error.message), { code: error.code });
   return data;
 }
 async function rows<T>(

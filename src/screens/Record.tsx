@@ -1,10 +1,10 @@
 import { t } from "../i18n";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, heldByText, name, tone } from "../components/shared";
-import { rpc } from "../data";
+import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import { money } from "../helpers";
 import Avatar from "../components/Avatar";
 import Tally from "../components/Tally";
@@ -14,6 +14,9 @@ export default function Record({ data, user, run, busy }: ViewProps) {
   const navigate = useNavigate();
   const [days, setDays] = useState(1);
   const [note, setNote] = useState("");
+  const offline = useQueueingOffline();
+  // One key per attempt: a double tap or a retry is recognised by the server.
+  const requestId = useRef(newRequestId());
   const c = [...data.cycles]
     .sort(byNewest)
     .find((cycle) => cycle.status === "accepted" && !closed(cycle));
@@ -104,13 +107,26 @@ export default function Record({ data, user, run, busy }: ViewProps) {
             if (trimmed) {
               payload.p_note = trimmed;
             }
-            await rpc("record_payment", payload);
+            const result = await submitRecord(user, {
+              kind: "payment",
+              args: payload,
+              id: requestId.current,
+            });
+            requestId.current = newRequestId();
             navigate("/");
+            return result;
           })
         }
       >
-        {t("hulog!")}
+        {offline ? t("Save for now (offline)") : t("hulog!")}
       </button>
+      {offline && (
+        <p className="offline-hint" role="status">
+          {t(
+            "You're offline. This will be saved on this phone and sent when you're back online.",
+          )}
+        </p>
+      )}
     </div>
   );
 }
