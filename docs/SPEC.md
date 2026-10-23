@@ -335,3 +335,17 @@ Hulog v2 expands the app from a single-mode paluwagan tracker into a read-only c
 - **Share card**: the same card with the year ("2026") as its title, GROUP figures only (paluwagan paid and payouts, abono spent and settled, shared ipon saved). Personal savings and the per-month list are never on the card. The file is named `hulog-recap-2026.png`.
 - Amounts are integer centavos and use the existing peso formatter. Works at 360px, in light and dark, and in all three languages. Hulog records movements the user already made; the recap never moves money.
 - **Owner phone check**: open Recap, tap "Taon", step back a year, see the bars and the best month, share the card and confirm it shows no personal savings.
+
+
+### 10.13 Recurring bills suggestions (owner decisions, 2026-10-23)
+
+- **What**: on the Gastos (abono) screen, above "Add shared expense", Hulog offers up to three bills that keep coming back, one compact row each: "Kuryente ~₱2,450 — i-record?". It is client-only: no table, RPC or migration, and it works in offline solo mode. It only suggests; it never records anything.
+- **A suggestion** is a bill seen on a confirmed, non-deleted `expense` (settlements are ignored) with the same normalized description (trimmed, case-folded, runs of whitespace collapsed) and the same payer (`from_member`), dated in at least two different months among the three whole Manila months before the current one (for example July, August and September when today is in October). The current month is never part of that window. Pending and deleted entries are not past sightings.
+- **Not yet recorded**: a bill is hidden while the current Manila month already has a non-deleted expense with the same payer and description, pending ones included (so the row does not return right after the user records it and before the partner confirms). A deleted entry does not hide it.
+- **Amount**: the median of the totals of the matching past entries in integer centavos (an even count averages the middle two, rounded half up). The partner's share is pre-filled in the same proportion as the most recent matching entry, rounded half up to the centavo and kept between 1 centavo and the total.
+- **Tapping a row** opens the existing add form pre-filled with description (the newest spelling), total, payer and the partner's share, dated today. The user still taps "Record expense"; nothing is recorded automatically and the usual server rules apply.
+- **Order**: bills seen in more months first, then the most recently seen, then by key; at most three rows. Only bills paid by one of the two members are offered, filtered before the cut to three. Opening a suggestion gives the form a fresh request key (§10.11). Rows are hidden while the add form is open.
+- **"Huwag na"** hides that suggestion until the end of the month. It is stored on this device only (`localStorage`, every access in try/catch) per signed-in user as `{month, keys}`; a new month starts empty, and if storage fails the row still hides for this session.
+- Known limit: a bill recorded this month but dated in an earlier month does not count as recorded this month, so it stays suggested until the user taps "Huwag na".
+- Works at 360px (the row wraps, the skip button stays tappable), in light and dark, and in all three languages.
+- **Owner phone check**: with an expense recorded and confirmed in two earlier months, open Gastos, see the suggestion, tap it, check the pre-filled form, record it and see the row disappear; on another suggestion tap "Huwag na".

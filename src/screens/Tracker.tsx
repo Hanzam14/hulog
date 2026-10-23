@@ -7,6 +7,12 @@ import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
 import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import {
+  dismissSuggestion,
+  readDismissed,
+  recurringSuggestions,
+  type RecurringSuggestion,
+} from "../recurring";
+import {
   buildSettlementPayload,
   money,
   parsePesos,
@@ -249,6 +255,22 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   // Edit entry state
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // Bills that keep coming back. "Huwag na" hides one until next month.
+  const month = data.today.slice(0, 7);
+  const [dismissed, setDismissed] = useState(() => ({
+    month,
+    keys: readDismissed(user, month),
+  }));
+  // A month rollover while the app stays open starts from a clean slate.
+  const shownDismissed =
+    dismissed.month === month ? dismissed.keys : readDismissed(user, month);
+  const suggestions = recurringSuggestions(
+    data.abonoEntries ?? [],
+    data.today,
+    shownDismissed,
+    new Set([user, partnerId]),
+  );
+
   const entries = [...(data.abonoEntries ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
@@ -289,6 +311,19 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       setShowAdd(false);
       return result;
     });
+  };
+
+  // Pre-fill only: nothing is recorded until the user submits the form.
+  const applySuggestion = (s: RecurringSuggestion) => {
+    // A different expense is a new attempt, so it gets its own request key.
+    addRequestId.current = newRequestId();
+    setDescription(s.description);
+    setFromMember(s.payerId);
+    setTotal((s.totalCentavos / 100).toFixed(2));
+    setOwed((s.owedCentavos / 100).toFixed(2));
+    setEntryDate(data.today);
+    setNote("");
+    setShowAdd(true);
   };
 
   const handleSplitHalf = () => {
@@ -436,6 +471,42 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
           </div>
         )}
         <div className="abono-add">
+          {!showAdd && suggestions.length > 0 && (
+            <ul className="recurring-list" aria-label={t("Recurring bills")}>
+              {suggestions.map((s) => (
+                <li key={s.key} className="recurring-row">
+                  <button
+                    type="button"
+                    className="secondary recurring-use"
+                    onClick={() => applySuggestion(s)}
+                  >
+                    {t("Recurring suggestion", {
+                      what:
+                        s.payerId === user
+                          ? s.description
+                          : `${s.description} · ${name(data, s.payerId)}`,
+                      amount: money(s.totalCentavos),
+                    })}
+                  </button>
+                  <button
+                    type="button"
+                    className="quiet recurring-skip"
+                    aria-label={t("Skip {name} this month", {
+                      name: s.description,
+                    })}
+                    onClick={() =>
+                      setDismissed({
+                        month,
+                        keys: dismissSuggestion(user, month, s.key),
+                      })
+                    }
+                  >
+                    {t("Huwag na")}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           {!showAdd ? (
             <button
               type="button"

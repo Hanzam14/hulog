@@ -2639,3 +2639,29 @@ select {
   font-size: 13px;
   text-align: center;
 }
+
+/* Recurring bill suggestions: one compact row each. */
+.recurring-list {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.recurring-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.recurring-use {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  justify-content: flex-start;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.recurring-skip {
+  flex: none;
+  min-height: 44px;
+}
