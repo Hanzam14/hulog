@@ -62,6 +62,7 @@ export default function Changes({
     withdrawn_at: t("Withdrawn"),
     archived_at: t("Archive wallet"),
     note: t("Note or ref # (optional)"),
+    price_centavos: t("Price (₱)"),
   };
   const value = (key: string, v: unknown) =>
     v == null

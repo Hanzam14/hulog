@@ -20,6 +20,7 @@ import {
   personalRpc,
   personalRpcNames,
 } from "./personal";
+import { wishlistRpc, wishlistRpcNames } from "./wishlist";
 
 const SOLO_MODE_KEY = "hulog-solo-mode";
 const SOLO_SNAPSHOT_KEY = "hulog-solo-snapshot";
@@ -81,6 +82,7 @@ export function setSoloPotMode(
     snap.personalGoals = previous.personalGoals;
     snap.personalEntries = previous.personalEntries;
     snap.personalHistory = previous.personalHistory;
+    snap.wishlistItems = previous.wishlistItems;
   }
   saveRawSoloSnapshot(snap);
   return snap;
@@ -519,6 +521,10 @@ function adaptSoloSnapshotUser(
   for (const change of snapshot.personalHistory ?? []) {
     if (change.actor_id === oldId) change.actor_id = newId;
   }
+  for (const item of snapshot.wishlistItems ?? []) {
+    if (item.added_by === oldId) item.added_by = newId;
+    if (item.bought_by === oldId) item.bought_by = newId;
+  }
 }
 
 function loadRawSoloSnapshot(): Snapshot | null {
@@ -597,15 +603,18 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
     snapshot = createInitialSoloSnapshot(undefined, currentMode);
   } else if (currentMode === "partnered" && snapshot.memberships.length < 2) {
     // Upgrade existing single-member solo snapshot to default partnered demo pot
+    const wishlistItems = snapshot.wishlistItems;
     snapshot = createInitialSoloSnapshot(
       snapshot.memberships[0]?.user_id,
       "partnered",
     );
+    snapshot.wishlistItems = wishlistItems;
   }
 
   const today = getManilaToday();
   snapshot.today = today;
   migratePersonalSavings(snapshot);
+  snapshot.wishlistItems ??= [];
   const uid = snapshot.memberships[0]?.user_id ?? "solo-user";
   const activeMembers = snapshot.memberships.filter(
     (m) => m.status === "active",
@@ -764,6 +773,11 @@ export async function soloRpc(
 
   if (personalRpcNames.includes(name)) {
     const result = personalRpc(snapshot, uid, name, args);
+    saveRawSoloSnapshot(snapshot);
+    return result;
+  }
+  if (wishlistRpcNames.includes(name)) {
+    const result = wishlistRpc(snapshot, uid, name, args);
     saveRawSoloSnapshot(snapshot);
     return result;
   }

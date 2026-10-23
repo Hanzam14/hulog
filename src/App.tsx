@@ -21,6 +21,7 @@ import Propose from "./screens/Propose";
 import Detail from "./screens/Detail";
 import History from "./screens/History";
 import Recap from "./screens/Recap";
+import Wishlist from "./screens/Wishlist";
 import Changes from "./screens/Changes";
 import Settings from "./screens/Settings";
 import Record from "./screens/Record";
@@ -570,6 +571,17 @@ export default function App() {
                 path="/recap"
                 element={
                   <Recap
+                    data={data}
+                    user={session.user.id}
+                    run={run}
+                    busy={busy}
+                  />
+                }
+              />
+              <Route
+                path="/wishlist"
+                element={
+                  <Wishlist
                     data={data}
                     user={session.user.id}
                     run={run}

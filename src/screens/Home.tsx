@@ -1,6 +1,12 @@
 import { t } from "../i18n";
 import { Link } from "react-router-dom";
-import { IconCheck, IconPlus, IconSparkles, IconX } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconChevronRight,
+  IconPlus,
+  IconSparkles,
+  IconX,
+} from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
 import PendingPaymentActions from "../components/PendingPaymentActions";
@@ -16,6 +22,7 @@ import IponCard from "../components/IponCard";
 import PersonalSavings from "../components/PersonalSavings";
 import { isSoloMode } from "../solo";
 import { isSoloCycle } from "../helpers";
+import { liveWishlist, wantedCount } from "../wishlist";
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
@@ -53,6 +60,7 @@ export default function Home(props: ViewProps) {
   const hasPersonal = (data.personalGoals ?? []).some(
     (g) => !g.deleted_at && (g.owner_id === user || g.visibility === "shared"),
   );
+  const wishlist = liveWishlist(data.wishlistItems);
   const partner = data.memberships.find(
     (m) => m.status === "active" && m.user_id !== user,
   );
@@ -331,6 +339,17 @@ export default function Home(props: ViewProps) {
           }
         />
       </section>
+      <Link to="/wishlist" className="recap-link">
+        <span>
+          {t("Gusto natin")}
+          <small className="meta wish-count">
+            {wishlist.length > 0
+              ? t("{count} still wanted", { count: wantedCount(wishlist) })
+              : t("Nothing on the wishlist yet")}
+          </small>
+        </span>
+        <IconChevronRight size={20} aria-hidden="true" />
+      </Link>
     </>
   );
 }
