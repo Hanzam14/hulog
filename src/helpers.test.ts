@@ -16,7 +16,6 @@ import {
   payoutCountdown,
   phaseDisplay,
   shortDate,
-  splitHalfCentavos,
 } from "./helpers";
 import { setLang } from "./i18n";
 
@@ -82,14 +81,6 @@ describe("display helpers", () => {
     expect(cadenceDisplay(1)).toBe("Araw-araw");
     expect(cadenceDisplay(7)).toBe("Linggu-linggo");
     expect(cadenceDisplay(3)).toBe("Tuwing 3 araw");
-  });
-  it("splits centavos evenly with ceiling for odd amounts", () => {
-    expect(splitHalfCentavos(0)).toBe(0);
-    expect(splitHalfCentavos(1)).toBe(1);
-    expect(splitHalfCentavos(100)).toBe(50);
-    expect(splitHalfCentavos(101)).toBe(51);
-    expect(splitHalfCentavos(2500)).toBe(1250);
-    expect(splitHalfCentavos(2501)).toBe(1251);
   });
   it("quotes CSV and prevents spreadsheet formula injection", () => {
     expect(csv([{ name: "=1+1", note: 'a,"b"\nline', amount: 5000 }])).toBe(
@@ -196,17 +187,13 @@ describe("display helpers", () => {
       paceLabel: "On track",
       reachedTarget: false,
     });
-    expect(
-      iponGoalProgress({ ...baseGoal, expected_steps_today: 6 }),
-    ).toEqual({
+    expect(iponGoalProgress({ ...baseGoal, expected_steps_today: 6 })).toEqual({
       percent: 50,
       onTrack: false,
       paceLabel: "Behind",
       reachedTarget: false,
     });
-    expect(
-      iponGoalProgress({ ...baseGoal, saved_centavos: 100000 }),
-    ).toEqual({
+    expect(iponGoalProgress({ ...baseGoal, saved_centavos: 100000 })).toEqual({
       percent: 100,
       onTrack: true,
       paceLabel: "On track",
@@ -233,13 +220,20 @@ describe("display helpers", () => {
   });
   it("pins the final contribution day to payout tomorrow", () => {
     setLang("en");
-    expect(payoutCountdown({
-      status: "accepted",
-      end_date: "2026-12-31",
-      receiver_id: "a",
-      payout_state: null,
-      received_at: null,
-    }, "2026-12-31", "a", "Ana")).toBe("Payout tomorrow - your turn");
+    expect(
+      payoutCountdown(
+        {
+          status: "accepted",
+          end_date: "2026-12-31",
+          receiver_id: "a",
+          payout_state: null,
+          received_at: null,
+        },
+        "2026-12-31",
+        "a",
+        "Ana",
+      ),
+    ).toBe("Payout tomorrow - your turn");
   });
   it("computes payoutCountdown for today, tomorrow, multi-day, overdue, and no-active-cycle", () => {
     setLang("en");
@@ -252,7 +246,12 @@ describe("display helpers", () => {
     };
     expect(payoutCountdown(null, "2026-10-20", "a", "Ana")).toBeNull();
     expect(
-      payoutCountdown({ ...base, status: "proposed" }, "2026-10-20", "a", "Ana"),
+      payoutCountdown(
+        { ...base, status: "proposed" },
+        "2026-10-20",
+        "a",
+        "Ana",
+      ),
     ).toBeNull();
     expect(
       payoutCountdown(

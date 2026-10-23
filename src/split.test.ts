@@ -42,6 +42,18 @@ describe("shareCentavos", () => {
     expect(shareCentavos(3, 1666)).toBe(0); // 0.4998
   });
 
+  it("gives the other member the extra centavo at 50/50 (the old ceiling)", () => {
+    for (const [total, other] of [
+      [0, 0],
+      [1, 1],
+      [100, 50],
+      [101, 51],
+      [2500, 1250],
+      [2501, 1251],
+    ])
+      expect(shareCentavos(total, 5000)).toBe(other);
+  });
+
   it("covers the bounds and stays within 0..total", () => {
     expect(shareCentavos(24500, 0)).toBe(0);
     expect(shareCentavos(24500, 10000)).toBe(24500);

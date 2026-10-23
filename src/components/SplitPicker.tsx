@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import type { SplitChoice, SplitState } from "../split";
+import { shareLabel, type SplitChoice, type SplitState } from "../split";
 
 /**
  * How an expense is shared: 50/50, all mine, all theirs, or a custom percent.
@@ -10,11 +10,13 @@ export default function SplitPicker({
   split,
   onChange,
   otherName,
+  otherIsMe,
 }: {
   split: SplitState;
   onChange: (next: SplitState) => void;
   /** The member who does not pay: their share is what the percent means. */
   otherName: string;
+  otherIsMe: boolean;
 }) {
   const pick = (choice: SplitChoice, label: string) => (
     <button
@@ -36,7 +38,7 @@ export default function SplitPicker({
       </div>
       {split.choice === "custom" && (
         <label>
-          {t("{name}'s share (%)", { name: otherName })}
+          {shareLabel(otherIsMe, otherName, "%")}
           <input
             type="text"
             inputMode="decimal"

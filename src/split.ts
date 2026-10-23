@@ -1,4 +1,5 @@
 import { parsePesos } from "./helpers";
+import { t } from "./i18n";
 
 /**
  * Splitting a shared expense (SPEC 10.15). The form fills in the other member's
@@ -79,4 +80,19 @@ export function owedFieldText(
   } catch {
     return "";
   }
+}
+
+/** "Bahagi mo (₱)" for me, "Bahagi ni Maya (₱)" for the other member. */
+export function shareLabel(
+  otherIsMe: boolean,
+  otherName: string,
+  unit: "₱" | "%",
+): string {
+  return unit === "₱"
+    ? otherIsMe
+      ? t("Your share (₱)")
+      : t("{name}'s share (₱)", { name: otherName })
+    : otherIsMe
+      ? t("Your share (%)")
+      : t("{name}'s share (%)", { name: otherName });
 }

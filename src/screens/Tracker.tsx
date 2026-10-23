@@ -9,7 +9,7 @@ import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import { ProofRefField, ProofRefLine } from "../components/ProofRef";
 import { cleanProofRef, editAbonoArgs } from "../proofRef";
 import SplitPicker from "../components/SplitPicker";
-import { NO_SPLIT, owedFieldText, type SplitState } from "../split";
+import { NO_SPLIT, owedFieldText, shareLabel, type SplitState } from "../split";
 import {
   dismissSuggestion,
   readDismissed,
@@ -151,9 +151,14 @@ function AbonoEditRow({
             split={split}
             onChange={setSplit}
             otherName={name(data, fromMember === user ? partnerId : user)}
+            otherIsMe={fromMember !== user}
           />
           <label>
-            {t("Partner's share (₱)")}
+            {shareLabel(
+              fromMember !== user,
+              name(data, fromMember === user ? partnerId : user),
+              "₱",
+            )}
             <input
               type="text"
               inputMode="decimal"
@@ -574,10 +579,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                 split={split}
                 onChange={setSplit}
                 otherName={name(data, fromMember === user ? partnerId : user)}
+                otherIsMe={fromMember !== user}
               />
 
               <label>
-                {t("Partner's share (₱)")}
+                {shareLabel(
+                  fromMember !== user,
+                  name(data, fromMember === user ? partnerId : user),
+                  "₱",
+                )}
                 <input
                   type="text"
                   inputMode="decimal"

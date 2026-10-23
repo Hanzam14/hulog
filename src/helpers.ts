@@ -70,9 +70,6 @@ export function cadenceDisplay(cadenceDays: number | null): string {
   if (cadenceDays === 7) return t("Every week");
   return t("Every {days} days", { days: cadenceDays });
 }
-export function splitHalfCentavos(totalCentavos: number): number {
-  return Math.ceil(totalCentavos / 2);
-}
 export function isNavigatorOffline(): boolean {
   return typeof navigator !== "undefined" && navigator.onLine === false;
 }

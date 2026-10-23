@@ -620,7 +620,8 @@ const taglish = {
   "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
   "Ref no. (optional)": "Ref no. (opsyonal)",
   "e.g. GCash or Maya ref no.": "hal. GCash o Maya ref no.",
-  "Ref no. only — never your account number or PIN": "Ref no. lang — huwag ilagay ang account number o PIN",
+  "Ref no. only — never your account number or PIN":
+    "Ref no. lang — huwag ilagay ang account number o PIN",
   "Ref {ref}": "Ref {ref}",
   "All mine": "Ako lahat",
   "All theirs": "Siya lahat",
@@ -628,6 +629,9 @@ const taglish = {
   "{name}'s share (%)": "Bahagi ni {name} (%)",
   "Owes nothing of {total}": "Walang utang sa {total}",
   "Nothing owed": "Walang utang",
+  "{name}'s share (₱)": "Bahagi ni {name} (₱)",
+  "Your share (₱)": "Bahagi mo (₱)",
+  "Your share (%)": "Bahagi mo (%)",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1245,7 +1249,8 @@ const en = {
   "Skip {name} this month": "Skip {name} this month",
   "Ref no. (optional)": "Ref no. (optional)",
   "e.g. GCash or Maya ref no.": "e.g. GCash or Maya ref no.",
-  "Ref no. only — never your account number or PIN": "Ref no. only — never your account number or PIN",
+  "Ref no. only — never your account number or PIN":
+    "Ref no. only — never your account number or PIN",
   "Ref {ref}": "Ref {ref}",
   "All mine": "All mine",
   "All theirs": "All theirs",
@@ -1253,6 +1258,9 @@ const en = {
   "{name}'s share (%)": "{name}'s share (%)",
   "Owes nothing of {total}": "Owes nothing of {total}",
   "Nothing owed": "Nothing owed",
+  "{name}'s share (₱)": "{name}'s share (₱)",
+  "Your share (₱)": "Your share (₱)",
+  "Your share (%)": "Your share (%)",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1874,7 +1882,8 @@ const tl = {
   "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
   "Ref no. (optional)": "Ref no. (opsyonal)",
   "e.g. GCash or Maya ref no.": "hal. GCash o Maya ref no.",
-  "Ref no. only — never your account number or PIN": "Ref no. lang — huwag ilagay ang account number o PIN",
+  "Ref no. only — never your account number or PIN":
+    "Ref no. lang — huwag ilagay ang account number o PIN",
   "Ref {ref}": "Ref {ref}",
   "All mine": "Akin lahat",
   "All theirs": "Kanya lahat",
@@ -1882,6 +1891,9 @@ const tl = {
   "{name}'s share (%)": "Bahagi ni {name} (%)",
   "Owes nothing of {total}": "Walang utang sa {total}",
   "Nothing owed": "Walang utang",
+  "{name}'s share (₱)": "Bahagi ni {name} (₱)",
+  "Your share (₱)": "Bahagi mo (₱)",
+  "Your share (%)": "Bahagi mo (%)",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
