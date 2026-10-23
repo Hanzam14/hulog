@@ -615,6 +615,10 @@ const taglish = {
   "Recap quiet year": "Walang galaw ngayong taon",
   "Recap each month": "Bawat buwan",
   "Recap best month": "Pinakamalaki: {month} · {amount}",
+  "Recurring bills": "Mga paulit-ulit na bayarin",
+  "Recurring suggestion": "{what} ~{amount} — i-record?",
+  "Huwag na": "Huwag na",
+  "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1227,6 +1231,10 @@ const en = {
   "Recap quiet year": "Nothing moved this year",
   "Recap each month": "Each month",
   "Recap best month": "Best month: {month} · {amount}",
+  "Recurring bills": "Recurring bills",
+  "Recurring suggestion": "{what} ~{amount} — record it?",
+  "Huwag na": "Skip",
+  "Skip {name} this month": "Skip {name} this month",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1843,6 +1851,10 @@ const tl = {
   "Recap quiet year": "Walang galaw ngayong taon",
   "Recap each month": "Bawat buwan",
   "Recap best month": "Pinakamalaki: {month} · {amount}",
+  "Recurring bills": "Mga paulit-ulit na bayarin",
+  "Recurring suggestion": "{what} ~{amount} — i-record?",
+  "Huwag na": "Huwag na",
+  "Skip {name} this month": "Huwag na ang {name} ngayong buwan",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
