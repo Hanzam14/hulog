@@ -194,47 +194,62 @@ export default function Home(props: ViewProps) {
                 (g) => g.id === sc.goal_id,
               );
               return (
-                <div className="sticker confirm" key={sc.id}>
+                <div
+                  className="sticker confirm"
+                  key={sc.id}
+                  style={{ flexWrap: "wrap" }}
+                >
                   <Avatar data={data} id={sc.delete_proposed_by!} />
-                  <div>
+                  <div style={{ minWidth: "140px" }}>
                     <strong>{money(sc.amount_centavos)}</strong>
                     <Link to={`/ipon/${sc.goal_id}`} className="muted">
                       {goal?.title ?? t("Ipon detail")}
                     </Link>
                     <small>{t("Deletion requested")}</small>
                   </div>
-                  <button
-                    className="round no"
-                    aria-label={t("Cancel delete")}
-                    title={t("Cancel delete")}
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() =>
-                        rpc("respond_delete_savings_contribution", {
-                          p_id: sc.id,
-                          p_action: "decline",
-                        }),
-                      )
-                    }
+                  <div
+                    style={{
+                      display: "flex",
+                      flex: "0 0 auto",
+                      gap: "8px",
+                      alignItems: "center",
+                      marginLeft: "auto",
+                      flexWrap: "wrap",
+                    }}
                   >
-                    <IconX />
-                  </button>
-                  <button
-                    className="round ok"
-                    aria-label={t("Confirm delete")}
-                    title={t("Confirm delete")}
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() =>
-                        rpc("respond_delete_savings_contribution", {
-                          p_id: sc.id,
-                          p_action: "accept",
-                        }),
-                      )
-                    }
-                  >
-                    <IconCheck />
-                  </button>
+                    <button
+                      className="secondary"
+                      aria-label={t("Cancel delete")}
+                      title={t("Cancel delete")}
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          rpc("respond_delete_savings_contribution", {
+                            p_id: sc.id,
+                            p_action: "decline",
+                          }),
+                        )
+                      }
+                    >
+                      {t("Keep")}
+                    </button>
+                    <button
+                      className="danger"
+                      aria-label={t("Confirm delete")}
+                      title={t("Confirm delete")}
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          rpc("respond_delete_savings_contribution", {
+                            p_id: sc.id,
+                            p_action: "accept",
+                          }),
+                        )
+                      }
+                    >
+                      {t("Delete")}
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -291,47 +306,62 @@ export default function Home(props: ViewProps) {
             ))}
 
             {deleteProposedAbono.map((ae) => (
-              <div className="sticker confirm" key={ae.id}>
+              <div
+                className="sticker confirm"
+                key={ae.id}
+                style={{ flexWrap: "wrap" }}
+              >
                 <Avatar data={data} id={ae.delete_proposed_by!} />
-                <div>
+                <div style={{ minWidth: "140px" }}>
                   <strong>{money(ae.owed_amount_centavos)}</strong>
                   <Link to="/tracker" className="muted">
                     {ae.description} ({t("Tracker")})
                   </Link>
                   <small>{t("Deletion requested")}</small>
                 </div>
-                <button
-                  className="round no"
-                  aria-label={t("Cancel delete")}
-                  title={t("Cancel delete")}
-                  disabled={busy}
-                  onClick={() =>
-                    void run(() =>
-                      rpc("respond_delete_abono_entry", {
-                        p_id: ae.id,
-                        p_action: "decline",
-                      }),
-                    )
-                  }
+                <div
+                  style={{
+                    display: "flex",
+                    flex: "0 0 auto",
+                    gap: "8px",
+                    alignItems: "center",
+                    marginLeft: "auto",
+                    flexWrap: "wrap",
+                  }}
                 >
-                  <IconX />
-                </button>
-                <button
-                  className="round ok"
-                  aria-label={t("Confirm delete")}
-                  title={t("Confirm delete")}
-                  disabled={busy}
-                  onClick={() =>
-                    void run(() =>
-                      rpc("respond_delete_abono_entry", {
-                        p_id: ae.id,
-                        p_action: "accept",
-                      }),
-                    )
-                  }
-                >
-                  <IconCheck />
-                </button>
+                  <button
+                    className="secondary"
+                    aria-label={t("Cancel delete")}
+                    title={t("Cancel delete")}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_delete_abono_entry", {
+                          p_id: ae.id,
+                          p_action: "decline",
+                        }),
+                      )
+                    }
+                  >
+                    {t("Keep")}
+                  </button>
+                  <button
+                    className="danger"
+                    aria-label={t("Confirm delete")}
+                    title={t("Confirm delete")}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_delete_abono_entry", {
+                          p_id: ae.id,
+                          p_action: "accept",
+                        }),
+                      )
+                    }
+                  >
+                    {t("Delete")}
+                  </button>
+                </div>
               </div>
             ))}
 

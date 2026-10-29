@@ -383,10 +383,10 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   </div>
                 </div>
               ) : (
-                !hasPendingOrDelete && (
+                <div>
                   <button
                     className="quiet secondary"
-                    disabled={busy}
+                    disabled={busy || hasPendingOrDelete}
                     onClick={() =>
                       void run(() =>
                         rpc("propose_withdraw_goal", { p_goal_id: g.id }),
@@ -395,7 +395,17 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
                   >
                     {t("Propose withdrawal / close goal")}
                   </button>
-                )
+                  {hasPendingOrDelete && (
+                    <p
+                      className="meta"
+                      style={{ marginTop: "4px", overflowWrap: "anywhere" }}
+                    >
+                      {t(
+                        "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.",
+                      )}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </>

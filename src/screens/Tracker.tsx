@@ -150,11 +150,15 @@ function AbonoEditRow({
                 }
               }}
             >
-              {t("Full amount (100%)")}
+              {fromMember === user
+                ? t("All for {name} (100%)", { name: name(data, partnerId) })
+                : t("All for me (100%)")}
             </button>
           </div>
           <label>
-            {t("Partner's share (₱)")}
+            {fromMember === user
+              ? t("{name} owes you (₱)", { name: name(data, partnerId) })
+              : t("You owe {name} (₱)", { name: name(data, partnerId) })}
             <input
               type="text"
               inputMode="decimal"
@@ -338,6 +342,50 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   amount: money(activeDebt.owed_centavos),
                 })}
               </strong>
+              {activeDebt.pending_settlement_centavos > 0 && (() => {
+                const pendingSettlements = entries.filter(
+                  (e) =>
+                    e.kind === "settlement" &&
+                    e.status === "pending" &&
+                    !e.deleted_at &&
+                    e.from_member === activeDebt.debtor_id &&
+                    e.to_member === activeDebt.creditor_id,
+                );
+                const confirmers = new Set(
+                  pendingSettlements.map((e) => {
+                    const actor = e.last_edited_by ?? e.created_by;
+                    return actor === activeDebt.debtor_id
+                      ? activeDebt.creditor_id
+                      : activeDebt.debtor_id;
+                  }),
+                );
+                const singleConfirmer =
+                  confirmers.size === 1
+                    ? [...confirmers][0]
+                    : pendingSettlements.length === 0
+                      ? activeDebt.creditor_id
+                      : null;
+                return (
+                  <p
+                    className="meta"
+                    style={{ marginTop: "6px", overflowWrap: "anywhere" }}
+                  >
+                    {singleConfirmer
+                      ? t(
+                          "{amount} settlement waiting for {name}'s confirmation",
+                          {
+                            amount: money(
+                              activeDebt.pending_settlement_centavos,
+                            ),
+                            name: name(data, singleConfirmer),
+                          },
+                        )
+                      : t("{amount} settlement waiting for confirmation", {
+                          amount: money(activeDebt.pending_settlement_centavos),
+                        })}
+                  </p>
+                );
+              })()}
             </div>
 
             {hasPartner && remaining > 0 && (
@@ -514,12 +562,16 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   className="pick"
                   onClick={handleSplitFull}
                 >
-                  {t("Full amount (100%)")}
+                  {fromMember === user
+                ? t("All for {name} (100%)", { name: name(data, partnerId) })
+                : t("All for me (100%)")}
                 </button>
               </div>
 
               <label>
-                {t("Partner's share (₱)")}
+                {fromMember === user
+              ? t("{name} owes you (₱)", { name: name(data, partnerId) })
+              : t("You owe {name} (₱)", { name: name(data, partnerId) })}
                 <input
                   type="text"
                   inputMode="decimal"

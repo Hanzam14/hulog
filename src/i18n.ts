@@ -549,6 +549,17 @@ const taglish = {
   "Owner only": "Para sa may-ari lang.",
   "Only an open round can close early": "Bukas na round lang ang puwedeng isara nang maaga.",
   "Pot is not full yet": "Hindi pa puno ang ipon.",
+  "{name} owes you (₱)": "Utang ni {name} sa'yo (₱)",
+  "You owe {name} (₱)": "Utang mo kay {name} (₱)",
+  "All for {name} (100%)": "Sa kanya lahat — {name} (100%)",
+  "All for me (100%)": "Sa akin lahat (100%)",
+  Keep: "Panatilihin",
+  "{amount} settlement waiting for {name}'s confirmation":
+    "{amount} na bayad ang naghihintay ng confirm ni {name}",
+  "{amount} settlement waiting for confirmation":
+    "{amount} na bayad ang naghihintay ng confirm",
+  "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
+    "I-confirm o tapusin muna ang mga pending na hulog at pag-delete bago mag-withdraw o isara ang goal.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1096,6 +1107,17 @@ const en = {
   "Owner only": "Owner only.",
   "Only an open round can close early": "Only an open round can close early.",
   "Pot is not full yet": "Pot is not full yet.",
+  "{name} owes you (₱)": "{name} owes you (₱)",
+  "You owe {name} (₱)": "You owe {name} (₱)",
+  "All for {name} (100%)": "All for {name} (100%)",
+  "All for me (100%)": "All for me (100%)",
+  Keep: "Keep",
+  "{amount} settlement waiting for {name}'s confirmation":
+    "{amount} settlement waiting for {name}'s confirmation",
+  "{amount} settlement waiting for confirmation":
+    "{amount} settlement waiting for confirmation",
+  "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
+    "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1646,6 +1668,17 @@ const tl = {
   "Owner only": "Para sa may-ari lamang.",
   "Only an open round can close early": "Bukas na round lamang ang maaaring isara nang maaga.",
   "Pot is not full yet": "Hindi pa puno ang kabuuang ipon.",
+  "{name} owes you (₱)": "Utang ni {name} sa iyo (₱)",
+  "You owe {name} (₱)": "Utang mo kay {name} (₱)",
+  "All for {name} (100%)": "Para kay {name} lahat (100%)",
+  "All for me (100%)": "Para sa akin lahat (100%)",
+  Keep: "Panatilihin",
+  "{amount} settlement waiting for {name}'s confirmation":
+    "{amount} na bayad ang naghihintay ng kumpirmasyon ni {name}",
+  "{amount} settlement waiting for confirmation":
+    "{amount} na bayad ang naghihintay ng kumpirmasyon",
+  "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
+    "Kumpirmahin o tapusin muna ang mga nakabinbing ambag at pagbura bago mag-withdraw o isara ang layunin.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
