@@ -82,7 +82,7 @@ export function owedFieldText(
   }
 }
 
-/** "Bahagi mo (₱)" for me, "Bahagi ni Maya (₱)" for the other member. */
+/** "Utang mo kay Maya (₱)" when Maya paid, "Utang ni Maya sa'yo (₱)" when you paid. */
 export function shareLabel(
   otherIsMe: boolean,
   otherName: string,
@@ -90,8 +90,10 @@ export function shareLabel(
 ): string {
   return unit === "₱"
     ? otherIsMe
-      ? t("Your share (₱)")
-      : t("{name}'s share (₱)", { name: otherName })
+      ? otherName
+        ? t("You owe {name} (₱)", { name: otherName })
+        : t("Your share (₱)")
+      : t("{name} owes you (₱)", { name: otherName })
     : otherIsMe
       ? t("Your share (%)")
       : t("{name}'s share (%)", { name: otherName });

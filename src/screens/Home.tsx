@@ -44,11 +44,23 @@ export default function Home(props: ViewProps) {
       sc.status === "pending" &&
       (sc.last_edited_by ?? sc.created_by) !== user,
   );
+  const deleteProposedContributions = (data.savingsContributions ?? []).filter(
+    (sc) =>
+      !sc.deleted_at &&
+      sc.delete_proposed_by &&
+      sc.delete_proposed_by !== user,
+  );
   const pendingAbono = (data.abonoEntries ?? []).filter(
     (ae) =>
       !ae.deleted_at &&
       ae.status === "pending" &&
       (ae.last_edited_by ?? ae.created_by) !== user,
+  );
+  const deleteProposedAbono = (data.abonoEntries ?? []).filter(
+    (ae) =>
+      !ae.deleted_at &&
+      ae.delete_proposed_by &&
+      ae.delete_proposed_by !== user,
   );
 
   const activeGoals = (data.savingsGoals ?? [])
@@ -72,7 +84,9 @@ export default function Home(props: ViewProps) {
       <OutboxStrip {...props} />
       {(waiting.length > 0 ||
         pendingContributions.length > 0 ||
-        pendingAbono.length > 0) && (
+        deleteProposedContributions.length > 0 ||
+        pendingAbono.length > 0 ||
+        deleteProposedAbono.length > 0) && (
         <section className="home-waiting">
           <h2 className="section-label">{t("Waiting for your check")}</h2>
           <div className="confirm-list">
@@ -184,6 +198,71 @@ export default function Home(props: ViewProps) {
               );
             })}
 
+            {deleteProposedContributions.map((sc) => {
+              const goal = (data.savingsGoals ?? []).find(
+                (g) => g.id === sc.goal_id,
+              );
+              return (
+                <div
+                  className="sticker confirm"
+                  key={sc.id}
+                  style={{ flexWrap: "wrap" }}
+                >
+                  <Avatar data={data} id={sc.delete_proposed_by!} />
+                  <div style={{ minWidth: "140px" }}>
+                    <strong>{money(sc.amount_centavos)}</strong>
+                    <Link to={`/ipon/${sc.goal_id}`} className="muted">
+                      {goal?.title ?? t("Ipon detail")}
+                    </Link>
+                    <small>{t("Deletion requested")}</small>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flex: "0 0 auto",
+                      gap: "8px",
+                      alignItems: "center",
+                      marginLeft: "auto",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <button
+                      className="secondary"
+                      aria-label={t("Cancel delete")}
+                      title={t("Cancel delete")}
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          rpc("respond_delete_savings_contribution", {
+                            p_id: sc.id,
+                            p_action: "decline",
+                          }),
+                        )
+                      }
+                    >
+                      {t("Keep")}
+                    </button>
+                    <button
+                      className="secondary danger"
+                      aria-label={t("Confirm delete")}
+                      title={t("Confirm delete")}
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          rpc("respond_delete_savings_contribution", {
+                            p_id: sc.id,
+                            p_action: "accept",
+                          }),
+                        )
+                      }
+                    >
+                      {t("Delete")}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
             {pendingAbono.map((ae) => (
               <div className="sticker confirm" key={ae.id}>
                 <Avatar data={data} id={ae.from_member} />
@@ -236,6 +315,70 @@ export default function Home(props: ViewProps) {
                 >
                   <IconCheck />
                 </button>
+              </div>
+            ))}
+
+            {deleteProposedAbono.map((ae) => (
+              <div
+                className="sticker confirm"
+                key={ae.id}
+                style={{ flexWrap: "wrap" }}
+              >
+                <Avatar data={data} id={ae.delete_proposed_by!} />
+                <div style={{ minWidth: "140px" }}>
+                  <strong>{money(abonoAmount(ae))}</strong>
+                  <Link to="/tracker" className="muted">
+                    {ae.description} ({t("Tracker")})
+                  </Link>
+                  {ae.owed_amount_centavos === 0 && (
+                    <small>{t("Nothing owed")}</small>
+                  )}
+                  <small>{t("Deletion requested")}</small>
+                  <ProofRefLine value={ae.proof_ref} />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flex: "0 0 auto",
+                    gap: "8px",
+                    alignItems: "center",
+                    marginLeft: "auto",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    className="secondary"
+                    aria-label={t("Cancel delete")}
+                    title={t("Cancel delete")}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_delete_abono_entry", {
+                          p_id: ae.id,
+                          p_action: "decline",
+                        }),
+                      )
+                    }
+                  >
+                    {t("Keep")}
+                  </button>
+                  <button
+                    className="secondary danger"
+                    aria-label={t("Confirm delete")}
+                    title={t("Confirm delete")}
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_delete_abono_entry", {
+                          p_id: ae.id,
+                          p_action: "accept",
+                        }),
+                      )
+                    }
+                  >
+                    {t("Delete")}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

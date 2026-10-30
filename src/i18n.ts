@@ -657,6 +657,16 @@ const taglish = {
   "{name}'s share (₱)": "Bahagi ni {name} (₱)",
   "Your share (₱)": "Bahagi mo (₱)",
   "Your share (%)": "Bahagi mo (%)",
+  "{name} owes you (₱)": "Utang ni {name} sa'yo (₱)",
+  "You owe {name} (₱)": "Utang mo kay {name} (₱)",
+  "All for {name}": "Kay {name} lahat",
+  Keep: "Panatilihin",
+  "{amount} settlement waiting for {name}'s confirmation":
+    "{amount} na bayad ang naghihintay ng confirm ni {name}",
+  "{amount} settlement waiting for confirmation":
+    "{amount} na bayad ang naghihintay ng confirm",
+  "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
+    "I-confirm o tapusin muna ang mga pending na hulog at pag-delete bago mag-withdraw o isara ang goal.",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1310,6 +1320,16 @@ const en = {
   "{name}'s share (₱)": "{name}'s share (₱)",
   "Your share (₱)": "Your share (₱)",
   "Your share (%)": "Your share (%)",
+  "{name} owes you (₱)": "{name} owes you (₱)",
+  "You owe {name} (₱)": "You owe {name} (₱)",
+  "All for {name}": "All for {name}",
+  Keep: "Keep",
+  "{amount} settlement waiting for {name}'s confirmation":
+    "{amount} settlement waiting for {name}'s confirmation",
+  "{amount} settlement waiting for confirmation":
+    "{amount} settlement waiting for confirmation",
+  "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
+    "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1967,6 +1987,16 @@ const tl = {
   "{name}'s share (₱)": "Bahagi ni {name} (₱)",
   "Your share (₱)": "Bahagi mo (₱)",
   "Your share (%)": "Bahagi mo (%)",
+  "{name} owes you (₱)": "Utang ni {name} sa iyo (₱)",
+  "You owe {name} (₱)": "Utang mo kay {name} (₱)",
+  "All for {name}": "Kay {name} lahat",
+  Keep: "Panatilihin",
+  "{amount} settlement waiting for {name}'s confirmation":
+    "{amount} na bayad ang naghihintay ng kumpirmasyon ni {name}",
+  "{amount} settlement waiting for confirmation":
+    "{amount} na bayad ang naghihintay ng kumpirmasyon",
+  "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
+    "Kumpirmahin o tapusin muna ang mga nakabinbing ambag at pagbura bago mag-withdraw o isara ang layunin.",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
