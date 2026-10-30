@@ -1370,6 +1370,25 @@ export async function soloRpc(
       return true;
     }
 
+    case "respond_delete_savings_contribution": {
+      const sc = (snapshot.savingsContributions ?? []).find(
+        (c) => c.id === args.p_id,
+      );
+      if (sc) {
+        const action = args.p_action as string;
+        if (action === "confirm" || action === "accept") {
+          sc.deleted_at = new Date().toISOString();
+          sc.delete_proposed_by = null;
+          sc.edited_at = new Date().toISOString();
+        } else if (action === "decline" || action === "cancel") {
+          sc.delete_proposed_by = null;
+          sc.edited_at = new Date().toISOString();
+        }
+      }
+      saveRawSoloSnapshot(snapshot);
+      return true;
+    }
+
     case "propose_withdraw_goal": {
       const goal = (snapshot.savingsGoals ?? []).find(
         (g) => g.id === args.p_goal_id,
@@ -1504,7 +1523,15 @@ export async function soloRpc(
         (e) => e.id === args.p_id,
       );
       if (entry) {
-        entry.deleted_at = new Date().toISOString();
+        const action = args.p_action as string;
+        if (action === "decline" || action === "cancel") {
+          entry.delete_proposed_by = null;
+          entry.edited_at = new Date().toISOString();
+        } else {
+          entry.deleted_at = new Date().toISOString();
+          entry.delete_proposed_by = null;
+          entry.edited_at = new Date().toISOString();
+        }
       }
       saveRawSoloSnapshot(snapshot);
       return true;

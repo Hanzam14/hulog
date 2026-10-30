@@ -33,7 +33,10 @@ export default function SplitPicker({
       <div className="chips">
         {pick("half", t("50/50 split"))}
         {pick("mine", t("All mine"))}
-        {pick("theirs", t("All theirs"))}
+        {pick(
+          "theirs",
+          otherName ? t("All for {name}", { name: otherName }) : t("All theirs"),
+        )}
         {pick("custom", t("Custom %"))}
       </div>
       {split.choice === "custom" && (

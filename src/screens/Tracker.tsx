@@ -150,13 +150,13 @@ function AbonoEditRow({
           <SplitPicker
             split={split}
             onChange={setSplit}
-            otherName={name(data, fromMember === user ? partnerId : user)}
+            otherName={name(data, partnerId)}
             otherIsMe={fromMember !== user}
           />
           <label>
             {shareLabel(
               fromMember !== user,
-              name(data, fromMember === user ? partnerId : user),
+              name(data, partnerId),
               "₱",
             )}
             <input
@@ -365,14 +365,73 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </figure>
             </div>
 
-            <div style={{ textAlign: "center", margin: "12px 0 8px" }}>
-              <strong style={{ fontSize: "20px", display: "block" }}>
+            <div
+              style={{
+                textAlign: "center",
+                margin: "12px 0 8px",
+                overflowWrap: "anywhere",
+              }}
+            >
+              <strong
+                style={{
+                  fontSize: "20px",
+                  display: "block",
+                  overflowWrap: "anywhere",
+                }}
+              >
                 {t("{debtor} owes {creditor} {amount}", {
                   debtor: name(data, activeDebt.debtor_id),
                   creditor: name(data, activeDebt.creditor_id),
                   amount: money(activeDebt.owed_centavos),
                 })}
               </strong>
+              {activeDebt.pending_settlement_centavos > 0 &&
+                (() => {
+                  const pendingSettlements = entries.filter(
+                    (e) =>
+                      e.kind === "settlement" &&
+                      e.status === "pending" &&
+                      !e.deleted_at &&
+                      e.from_member === activeDebt.debtor_id &&
+                      e.to_member === activeDebt.creditor_id,
+                  );
+                  const confirmers = new Set(
+                    pendingSettlements.map((e) => {
+                      const actor = e.last_edited_by ?? e.created_by;
+                      return actor === activeDebt.debtor_id
+                        ? activeDebt.creditor_id
+                        : activeDebt.debtor_id;
+                    }),
+                  );
+                  const singleConfirmer =
+                    confirmers.size === 1
+                      ? [...confirmers][0]
+                      : pendingSettlements.length === 0
+                        ? activeDebt.creditor_id
+                        : null;
+                  return (
+                    <p
+                      className="meta"
+                      style={{ marginTop: "6px", overflowWrap: "anywhere" }}
+                    >
+                      {singleConfirmer
+                        ? t(
+                            "{amount} settlement waiting for {name}'s confirmation",
+                            {
+                              amount: money(
+                                activeDebt.pending_settlement_centavos,
+                              ),
+                              name: name(data, singleConfirmer),
+                            },
+                          )
+                        : t("{amount} settlement waiting for confirmation", {
+                            amount: money(
+                              activeDebt.pending_settlement_centavos,
+                            ),
+                          })}
+                    </p>
+                  );
+                })()}
             </div>
 
             {remaining > 0 && (
@@ -578,14 +637,14 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               <SplitPicker
                 split={split}
                 onChange={setSplit}
-                otherName={name(data, fromMember === user ? partnerId : user)}
+                otherName={name(data, partnerId)}
                 otherIsMe={fromMember !== user}
               />
 
               <label>
                 {shareLabel(
                   fromMember !== user,
-                  name(data, fromMember === user ? partnerId : user),
+                  name(data, partnerId),
                   "₱",
                 )}
                 <input
