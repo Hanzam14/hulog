@@ -605,7 +605,31 @@ describe("Batch 1 UX audit fixes: Abono owed-amount labels/presets, Home Keep/De
       "₱500.00 settlement waiting for confirmation",
     );
 
-    // 5. IponDetail pending blocker explanation
+    // 5. Empty abonoEntries with pending_settlement_centavos > 0 renders generic explanation without guessing member
+    data.abonoEntries = [];
+    data.abonoSummary = [
+      {
+        group_id: "group",
+        debtor_id: "a",
+        creditor_id: "b",
+        owed_centavos: 30000,
+        pending_settlement_centavos: 30000,
+      },
+    ];
+    const emptyEntriesMarkup = html(
+      createElement(Tracker, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(emptyEntriesMarkup).toContain(
+      "₱300.00 settlement waiting for confirmation",
+    );
+    expect(emptyEntriesMarkup).not.toContain(
+      "settlement waiting for Ben Santos",
+    );
+    expect(emptyEntriesMarkup).not.toContain(
+      "settlement waiting for Ana Cruz",
+    );
+
+    // 6. IponDetail pending blocker explanation
     const goal: SavingsGoal = {
       id: "g-1",
       group_id: "group",
