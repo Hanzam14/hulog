@@ -404,11 +404,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     }),
                   );
                   const singleConfirmer =
-                    confirmers.size === 1
-                      ? [...confirmers][0]
-                      : pendingSettlements.length === 0
-                        ? activeDebt.creditor_id
-                        : null;
+                    confirmers.size === 1 ? [...confirmers][0] : null;
                   return (
                     <p
                       className="meta"
