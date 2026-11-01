@@ -544,6 +544,7 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(markup).toContain('value="Oct bill"');
     expect(markup).toContain('value="bad"');
     expect(markup).not.toMatch(/type="date"[^>]*required/);
+    expect(markup).not.toMatch(/type="date"[^>]*max=/);
     expect(markup).not.toMatch(/class="split-preview"[^>]*role="status"/);
 
     // Submit with invalid proofRef ("bad") reveals error and opens details
@@ -651,5 +652,6 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(markup).toContain("Details (optional)");
     expect(markup).toContain('name="date"');
     expect(markup).toContain('name="note"');
+    expect(markup).not.toMatch(/type="date"[^>]*max=/);
   });
 });

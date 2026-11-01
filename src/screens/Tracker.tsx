@@ -280,7 +280,6 @@ function AbonoEditRow({
             {t("Date")}
             <input
               type="date"
-              max={data.today}
               value={entryDate}
               onChange={(e) => {
                 setEntryDate(e.target.value);
@@ -904,7 +903,6 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     {t("Date")}
                     <input
                       type="date"
-                      max={data.today}
                       value={entryDate}
                       onChange={(e) => {
                         setEntryDate(e.target.value);

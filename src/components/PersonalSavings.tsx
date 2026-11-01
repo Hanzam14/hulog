@@ -188,7 +188,6 @@ function EntryForm({
             <input
               name="date"
               type="date"
-              max={today}
               defaultValue={entry?.entry_date ?? today}
               onChange={() => {
                 if (formError) setFormError(null);

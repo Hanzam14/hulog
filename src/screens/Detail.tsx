@@ -20,7 +20,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
   const { id } = useParams();
   const c = data.cycles.find((cycle) => cycle.id === id);
   const [editing, setEditing] = useState<string | null>(null);
-  const [editDays, setEditDays] = useState(1);
+  const [editDaysText, setEditDaysText] = useState("1");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   // Only the creator can change the reference, and only while it is pending.
@@ -216,7 +216,7 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           setEditing(null);
                         } else {
                           setEditing(p.id);
-                          setEditDays(p.days);
+                          setEditDaysText(String(p.days));
                           setDetailsOpen(Boolean(p.note || p.proof_ref));
                           setFormError(null);
                         }
@@ -301,16 +301,16 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           type="number"
                           min="1"
                           max={c.num_days}
-                          value={editDays}
-                          onChange={(e) =>
-                            setEditDays(Math.max(1, Number(e.target.value) || 1))
-                          }
+                          value={editDaysText}
+                          onChange={(e) => setEditDaysText(e.target.value)}
                           required
                         />
                       </label>
-                      <strong className="amount-preview">
-                        {money(editDays * c.daily_amount_centavos)}
-                      </strong>
+                      {Number(editDaysText) >= 1 && (
+                        <strong className="amount-preview">
+                          {money(Number(editDaysText) * c.daily_amount_centavos)}
+                        </strong>
+                      )}
                       <details
                         className="form-optional"
                         open={detailsOpen}
