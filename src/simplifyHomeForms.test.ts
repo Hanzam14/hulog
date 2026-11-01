@@ -667,4 +667,95 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(markup).toContain('name="note"');
     expect(markup).not.toMatch(/type="date"[^>]*max=/);
   });
+
+  it("Home does not prompt an observing partner on a solo round, hides the hulog CTA when all days are logged, and states 'All recorded · waiting for confirmation' when pending days remain", () => {
+    const data = makeSnapshot();
+    setLang("en");
+
+    // 1. Observing partner ('a' is observing when receiver_id === 'b' on a solo cycle: target = daily * num_days = 150000)
+    data.cycles[0] = {
+      ...data.cycles[0],
+      receiver_id: "b",
+      daily_amount_centavos: 10000,
+      num_days: 15,
+      target_centavos: 150000,
+      is_solo: true,
+    };
+    const observingMarkup = html(
+      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(observingMarkup).toContain("Observing Ben&#x27;s solo round");
+    expect(observingMarkup).not.toContain('href="/hulog"');
+
+    // 2. Shared round where all 15 days are logged, including 2 pending unconfirmed days:
+    // Must say "All 15 days recorded · waiting for confirmation" (not "logged for this round ✓") and hide /hulog button
+    data.cycles[0] = {
+      ...data.cycles[0],
+      target_centavos: 300000,
+      is_solo: false,
+    };
+    data.progress[0] = {
+      ...data.progress[0],
+      confirmed_days: 13,
+      pending_days: 2,
+      pending_count: 1,
+    };
+    const allRecordedPendingMarkup = html(
+      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(allRecordedPendingMarkup).toContain(
+      "All 15 days recorded · waiting for confirmation",
+    );
+    expect(allRecordedPendingMarkup).not.toContain("logged for this round ✓");
+    expect(allRecordedPendingMarkup).not.toContain('href="/hulog"');
+
+    // 3. Shared round where all 15 days are confirmed: hides /hulog button and shows ✓
+    data.progress[0] = {
+      ...data.progress[0],
+      confirmed_days: 15,
+      pending_days: 0,
+      pending_count: 0,
+    };
+    const allConfirmedMarkup = html(
+      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(allConfirmedMarkup).toContain("All 15 days logged for this round ✓");
+    expect(allConfirmedMarkup).not.toContain('href="/hulog"');
+  });
+
+  it("SplitPicker shows current split upfront and tucks advanced split options behind 'Change split'", () => {
+    const data = makeSnapshot();
+    state.values = [
+      false, // 0: showSettle
+      "", // 1: settleAmount
+      "", // 2: settleNote
+      "", // 3: settleRef
+      true, // 4: showAdd
+      "Dinner", // 5: description
+      "a", // 6: fromMember
+      "500.00", // 7: total
+      "250.00", // 8: owed
+      { choice: "half", percent: "" }, // 9: split
+      "2026-10-25", // 10: entryDate
+      "", // 11: note
+      "", // 12: proofRef
+      null, // 13: editingId
+    ];
+
+    setLang("en");
+    const markup = html(
+      createElement(Tracker, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
+      ["/tracker"],
+    );
+
+    expect(markup).toContain("Change split");
+    const beforeSplitDetails = markup.split('<details class="split-more"')[0];
+    expect(beforeSplitDetails).toContain("50/50 split");
+    expect(beforeSplitDetails).not.toContain("Custom %");
+  });
 });

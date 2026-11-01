@@ -12,8 +12,8 @@ export default function ThemeSettings() {
     return () => window.removeEventListener("hulog-theme", changed);
   }, []);
   return (
-    <section className="appearance">
-      <h2>{t("Itsura")}</h2>
+    <div className="appearance">
+      <h3>{t("Itsura")}</h3>
       <div className="segmented" role="group" aria-label={t("Itsura")}>
         {(["system", "light", "dark"] as const).map((value) => (
           <button
@@ -30,6 +30,6 @@ export default function ThemeSettings() {
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

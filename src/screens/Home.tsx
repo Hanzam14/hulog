@@ -423,6 +423,16 @@ export default function Home(props: ViewProps) {
   const paidDays = myProgress?.confirmed_days ?? 0;
   const pendingDays = myProgress?.pending_days ?? 0;
   const loggedDays = paidDays + pendingDays;
+  const isObservingCycle = Boolean(
+    c && isSoloCycle(c) && c.receiver_id !== user,
+  );
+  const canLogHulog = Boolean(
+    c &&
+      c.status === "accepted" &&
+      !closed(c) &&
+      !isObservingCycle &&
+      loggedDays < c.num_days,
+  );
 
   let todaySummary: string | null = null;
   if (c) {
@@ -432,10 +442,19 @@ export default function Home(props: ViewProps) {
           ? t("Waiting for partner to accept round")
           : t("Respond to the round proposal below");
     } else if (!closed(c)) {
-      if (loggedDays >= c.num_days) {
-        todaySummary = t("All {total} days logged for this round ✓", {
-          total: c.num_days,
+      if (isObservingCycle) {
+        todaySummary = t("Observing {name}'s solo round", {
+          name: name(data, c.receiver_id),
         });
+      } else if (loggedDays >= c.num_days) {
+        todaySummary =
+          pendingDays > 0
+            ? t("All {total} days recorded · waiting for confirmation", {
+                total: c.num_days,
+              })
+            : t("All {total} days logged for this round ✓", {
+                total: c.num_days,
+              });
       } else if (pendingDays > 0) {
         todaySummary = t("{paid} of {total} days logged · {pending} pending", {
           paid: loggedDays,
@@ -542,7 +561,7 @@ export default function Home(props: ViewProps) {
             <div className="today-action">
               <span className="today-label">{t("Today's action")}</span>
               <strong className="today-text">{todaySummary}</strong>
-              {c.status === "accepted" && !closed(c) && (
+              {canLogHulog && (
                 <Link className="button big" to="/hulog">
                   <IconPlus aria-hidden="true" /> {t("hulog!")}
                 </Link>

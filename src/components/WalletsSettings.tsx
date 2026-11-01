@@ -51,8 +51,11 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
   };
 
   return (
-    <section className="wallets-section">
-      <h2>{t("Wallets & accounts")}</h2>
+    <details
+      className="wallets-section wallets-manage"
+      open={wallets.length === 0 || editingId !== null || undefined}
+    >
+      <summary>{t("Manage wallets")}</summary>
       <div className="wallets-list">
         {wallets.map((w) => {
           const isOwner = w.holder_id === user;
@@ -160,6 +163,6 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
           </button>
         </form>
       </details>
-    </section>
+    </details>
   );
 }
