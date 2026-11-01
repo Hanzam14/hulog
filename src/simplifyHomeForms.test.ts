@@ -1,4 +1,6 @@
 import { createElement, type ReactElement } from "react";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -757,5 +759,19 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     const beforeSplitDetails = markup.split('<details class="split-more"')[0];
     expect(beforeSplitDetails).toContain("50/50 split");
     expect(beforeSplitDetails).not.toContain("Custom %");
+  });
+
+  it("styles flex disclosure summaries with rotating chevron indicators across closed and open states", () => {
+    const css = readFileSync(resolve(__dirname, "style.css"), "utf8");
+    for (const cls of [
+      "confirm-more",
+      "form-optional",
+      "split-more",
+      "wallets-manage",
+    ]) {
+      expect(css).toContain(`.${cls} > summary::after`);
+      expect(css).toContain(`.${cls}[open] > summary::after`);
+      expect(css).toContain(`.${cls} > summary::-webkit-details-marker`);
+    }
   });
 });

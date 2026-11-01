@@ -2748,10 +2748,44 @@ select {
 .confirm-more {
   margin-top: 4px;
 }
+.confirm-more > summary,
+.form-optional > summary,
+.split-more > summary,
+.wallets-manage > summary {
+  list-style: none;
+  user-select: none;
+}
+.confirm-more > summary::-webkit-details-marker,
+.form-optional > summary::-webkit-details-marker,
+.split-more > summary::-webkit-details-marker,
+.wallets-manage > summary::-webkit-details-marker {
+  display: none;
+}
+.confirm-more > summary::after,
+.form-optional > summary::after,
+.split-more > summary::after,
+.wallets-manage > summary::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  border-radius: 1px;
+  flex-shrink: 0;
+  transform: translateY(-2px) rotate(45deg);
+}
+.confirm-more[open] > summary::after,
+.form-optional[open] > summary::after,
+.split-more[open] > summary::after,
+.wallets-manage[open] > summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
 .confirm-more > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   min-height: 44px;
   padding: 8px 12px;
   background: var(--highlight);
@@ -2775,8 +2809,10 @@ select {
 .form-optional > summary {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   min-height: 44px;
-  padding: 6px 0;
+  padding: 6px 4px 6px 0;
   color: var(--soft);
   font-size: 13px;
   font-weight: 800;
@@ -2797,8 +2833,9 @@ select {
 .split-more > summary {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   min-height: 44px;
-  padding: 4px 0;
+  padding: 4px 4px 4px 0;
   color: var(--soft);
   font-size: 13px;
   font-weight: 800;
@@ -2864,6 +2901,8 @@ select {
 .wallets-manage > summary {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   min-height: 44px;
   padding: 6px 8px;
   color: var(--soft);
