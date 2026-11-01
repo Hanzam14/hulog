@@ -379,6 +379,23 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     );
     expect(closedSelfHeldMarkup).toContain("Start a new round when ready");
     expect(closedSelfHeldMarkup).not.toContain("Confirm payout receipt below");
+
+    // 6. When a round has both confirmed and pending days, the logged count includes pending days
+    data.cycles[0] = {
+      ...data.cycles[0],
+      phase: "open",
+      payout_state: null,
+    };
+    data.progress[0] = {
+      ...data.progress[0],
+      confirmed_days: 5,
+      pending_days: 2,
+      pending_count: 1,
+    };
+    const pendingDaysMarkup = html(
+      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(pendingDaysMarkup).toContain("7 of 15 days logged · 2 pending");
   });
 
   it("Record (/hulog) tucks optional note and payment ref behind a collapsible option, preserves values, and reveals validation errors", () => {

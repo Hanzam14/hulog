@@ -438,7 +438,7 @@ export default function Home(props: ViewProps) {
         });
       } else if (pendingDays > 0) {
         todaySummary = t("{paid} of {total} days logged · {pending} pending", {
-          paid: paidDays,
+          paid: loggedDays,
           total: c.num_days,
           pending: pendingDays,
         });
