@@ -7,6 +7,7 @@ import {
   IconSparkles,
   IconX,
 } from "@tabler/icons-react";
+import type { ReactNode } from "react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name, tone } from "../components/shared";
 import PendingPaymentActions from "../components/PendingPaymentActions";
@@ -25,6 +26,8 @@ import OutboxStrip from "../components/OutboxStrip";
 import { isSoloMode } from "../solo";
 import { isSoloCycle } from "../helpers";
 import { liveWishlist, wantedCount } from "../wishlist";
+
+const MAX_INLINE_CONFIRMATIONS = 2;
 
 export default function Home(props: ViewProps) {
   const { data, user, run, busy } = props;
@@ -78,309 +81,447 @@ export default function Home(props: ViewProps) {
   const partner = data.memberships.find(
     (m) => m.status === "active" && m.user_id !== user,
   );
+
+  // Build confirmation items, separating urgent/blocked items from regular pending items
+  const confirmItems: { key: string; urgent: boolean; node: ReactNode }[] = [];
+
+  for (const p of waiting) {
+    const cycle = data.cycles.find((cy) => cy.id === p.cycle_id);
+    if (!cycle) continue;
+    const allowed = cycle.phase !== "ended" || p.was_confirmed;
+    const isUrgent = !allowed || cycle.phase === "settling";
+    confirmItems.push({
+      key: `pay-${p.id}`,
+      urgent: isUrgent,
+      node: (
+        <div
+          className={`sticker confirm${isUrgent ? " urgent" : ""}`}
+          key={p.id}
+        >
+          <Avatar data={data} id={p.member_id} />
+          <div>
+            <strong>{money(p.amount_centavos)}</strong>
+            <div
+              className={`tally ${tone(data, p.member_id)} mini`}
+              role="img"
+              aria-label={t("{days} days", { days: p.days })}
+            >
+              {Array.from({ length: p.days }, (_, i) => (
+                <span key={i} className="pending" />
+              ))}
+            </div>
+            <Link to={`/cycles/${cycle.id}`} className="muted">
+              {t("round")} {shortDate(cycle.start_date)} →{" "}
+              {shortDate(cycle.end_date)}
+            </Link>
+            {!allowed && <small>{t("not counted")}</small>}
+            {allowed && cycle.phase === "settling" && (
+              <small>{t("Settling · last day to confirm")}</small>
+            )}
+            <ProofRefLine value={p.proof_ref} />
+          </div>
+          <PendingPaymentActions
+            id={p.id}
+            memberName={name(data, p.member_id)}
+            amount={p.amount_centavos}
+            allowed={allowed}
+            busy={busy}
+            run={run}
+          />
+        </div>
+      ),
+    });
+  }
+
+  for (const sc of pendingContributions) {
+    const goal = (data.savingsGoals ?? []).find((g) => g.id === sc.goal_id);
+    const isUrgent = Boolean(goal?.withdraw_proposed_by);
+    confirmItems.push({
+      key: `sc-${sc.id}`,
+      urgent: isUrgent,
+      node: (
+        <div
+          className={`sticker confirm${isUrgent ? " urgent" : ""}`}
+          key={sc.id}
+        >
+          <Avatar data={data} id={sc.member_id} />
+          <div>
+            <strong>{money(sc.amount_centavos)}</strong>
+            {sc.steps ? (
+              <div
+                className={`tally ${tone(data, sc.member_id)} mini`}
+                role="img"
+                aria-label={t("{days} days", { days: sc.steps })}
+              >
+                {Array.from({ length: sc.steps }, (_, i) => (
+                  <span key={i} className="pending" />
+                ))}
+              </div>
+            ) : null}
+            <Link to={`/ipon/${sc.goal_id}`} className="muted">
+              {goal?.title ?? t("Ipon detail")}
+            </Link>
+            {sc.note && <small>{sc.note}</small>}
+          </div>
+          <button
+            className="round no"
+            aria-label={t("Decline {name}'s {amount}", {
+              name: name(data, sc.member_id),
+              amount: money(sc.amount_centavos),
+            })}
+            disabled={busy}
+            onClick={() => {
+              if (
+                window.confirm(
+                  t(
+                    "Delete this payment record? The change stays in history.",
+                  ),
+                )
+              )
+                void run(() =>
+                  rpc("edit_savings_contribution", {
+                    p_id: sc.id,
+                    p_delete: true,
+                  }),
+                );
+            }}
+          >
+            <IconX />
+          </button>
+          <button
+            className="round ok"
+            aria-label={t("Confirm {name}'s {amount}", {
+              name: name(data, sc.member_id),
+              amount: money(sc.amount_centavos),
+            })}
+            disabled={busy}
+            onClick={() =>
+              void run(() =>
+                rpc("confirm_savings_contribution", { p_id: sc.id }),
+              )
+            }
+          >
+            <IconCheck />
+          </button>
+        </div>
+      ),
+    });
+  }
+
+  for (const sc of deleteProposedContributions) {
+    const goal = (data.savingsGoals ?? []).find((g) => g.id === sc.goal_id);
+    confirmItems.push({
+      key: `sc-del-${sc.id}`,
+      urgent: true,
+      node: (
+        <div
+          className="sticker confirm urgent"
+          key={sc.id}
+          style={{ flexWrap: "wrap" }}
+        >
+          <Avatar data={data} id={sc.delete_proposed_by!} />
+          <div style={{ minWidth: "140px" }}>
+            <strong>{money(sc.amount_centavos)}</strong>
+            <Link to={`/ipon/${sc.goal_id}`} className="muted">
+              {goal?.title ?? t("Ipon detail")}
+            </Link>
+            <small>{t("Deletion requested")}</small>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flex: "0 0 auto",
+              gap: "8px",
+              alignItems: "center",
+              marginLeft: "auto",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              className="secondary"
+              aria-label={t("Cancel delete")}
+              title={t("Cancel delete")}
+              disabled={busy}
+              onClick={() =>
+                void run(() =>
+                  rpc("respond_delete_savings_contribution", {
+                    p_id: sc.id,
+                    p_action: "decline",
+                  }),
+                )
+              }
+            >
+              {t("Keep")}
+            </button>
+            <button
+              className="secondary danger"
+              aria-label={t("Confirm delete")}
+              title={t("Confirm delete")}
+              disabled={busy}
+              onClick={() =>
+                void run(() =>
+                  rpc("respond_delete_savings_contribution", {
+                    p_id: sc.id,
+                    p_action: "accept",
+                  }),
+                )
+              }
+            >
+              {t("Delete")}
+            </button>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  for (const ae of pendingAbono) {
+    confirmItems.push({
+      key: `ae-${ae.id}`,
+      urgent: false,
+      node: (
+        <div className="sticker confirm" key={ae.id}>
+          <Avatar data={data} id={ae.from_member} />
+          <div>
+            <strong>{money(abonoAmount(ae))}</strong>
+            <Link to="/tracker" className="muted">
+              {ae.description} ({t("Tracker")})
+            </Link>
+            {ae.owed_amount_centavos === 0 && (
+              <small>{t("Nothing owed")}</small>
+            )}
+            {ae.note && <small>{ae.note}</small>}
+            <ProofRefLine value={ae.proof_ref} />
+          </div>
+          <button
+            className="round no"
+            aria-label={t("Decline {name}'s {amount}", {
+              name: name(data, ae.from_member),
+              amount: money(abonoAmount(ae)),
+            })}
+            disabled={busy}
+            onClick={() => {
+              if (
+                window.confirm(
+                  t(
+                    "Delete this payment record? The change stays in history.",
+                  ),
+                )
+              )
+                void run(() =>
+                  rpc("edit_abono_entry", {
+                    p_id: ae.id,
+                    p_delete: true,
+                  }),
+                );
+            }}
+          >
+            <IconX />
+          </button>
+          <button
+            className="round ok"
+            aria-label={t("Confirm {name}'s {amount}", {
+              name: name(data, ae.from_member),
+              amount: money(abonoAmount(ae)),
+            })}
+            disabled={busy}
+            onClick={() =>
+              void run(() => rpc("confirm_abono_entry", { p_id: ae.id }))
+            }
+          >
+            <IconCheck />
+          </button>
+        </div>
+      ),
+    });
+  }
+
+  for (const ae of deleteProposedAbono) {
+    confirmItems.push({
+      key: `ae-del-${ae.id}`,
+      urgent: true,
+      node: (
+        <div
+          className="sticker confirm urgent"
+          key={ae.id}
+          style={{ flexWrap: "wrap" }}
+        >
+          <Avatar data={data} id={ae.delete_proposed_by!} />
+          <div style={{ minWidth: "140px" }}>
+            <strong>{money(abonoAmount(ae))}</strong>
+            <Link to="/tracker" className="muted">
+              {ae.description} ({t("Tracker")})
+            </Link>
+            {ae.owed_amount_centavos === 0 && (
+              <small>{t("Nothing owed")}</small>
+            )}
+            <small>{t("Deletion requested")}</small>
+            <ProofRefLine value={ae.proof_ref} />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flex: "0 0 auto",
+              gap: "8px",
+              alignItems: "center",
+              marginLeft: "auto",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              className="secondary"
+              aria-label={t("Cancel delete")}
+              title={t("Cancel delete")}
+              disabled={busy}
+              onClick={() =>
+                void run(() =>
+                  rpc("respond_delete_abono_entry", {
+                    p_id: ae.id,
+                    p_action: "decline",
+                  }),
+                )
+              }
+            >
+              {t("Keep")}
+            </button>
+            <button
+              className="secondary danger"
+              aria-label={t("Confirm delete")}
+              title={t("Confirm delete")}
+              disabled={busy}
+              onClick={() =>
+                void run(() =>
+                  rpc("respond_delete_abono_entry", {
+                    p_id: ae.id,
+                    p_action: "accept",
+                  }),
+                )
+              }
+            >
+              {t("Delete")}
+            </button>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // Urgent/blocked items are never hidden; regular items show up to MAX_INLINE_CONFIRMATIONS before summarizing
+  const urgentConfirmItems = confirmItems.filter((item) => item.urgent);
+  const regularConfirmItems = confirmItems.filter((item) => !item.urgent);
+  const visibleRegularSlots = Math.max(
+    1,
+    MAX_INLINE_CONFIRMATIONS - urgentConfirmItems.length,
+  );
+  const inlineRegularItems = regularConfirmItems.slice(0, visibleRegularSlots);
+  const overflowRegularItems = regularConfirmItems.slice(visibleRegularSlots);
+
+  // Determine today's action summary
+  const myProgress = c
+    ? data.progress.find((p) => p.cycle_id === c.id && p.member_id === user)
+    : undefined;
+  const paidDays = myProgress?.confirmed_days ?? 0;
+  const pendingDays = myProgress?.pending_days ?? 0;
+  const loggedDays = paidDays + pendingDays;
+
+  let todaySummary: string | null = null;
+  if (c) {
+    if (c.status === "proposed") {
+      todaySummary =
+        c.proposed_by === user
+          ? t("Waiting for partner to accept round")
+          : t("Respond to the round proposal below");
+    } else if (!closed(c)) {
+      if (loggedDays >= c.num_days) {
+        todaySummary = t("All {total} days logged for this round ✓", {
+          total: c.num_days,
+        });
+      } else if (pendingDays > 0) {
+        todaySummary = t("{paid} of {total} days logged · {pending} pending", {
+          paid: loggedDays,
+          total: c.num_days,
+          pending: pendingDays,
+        });
+      } else {
+        const elapsedDays = Math.min(
+          c.num_days,
+          Math.max(
+            0,
+            Math.round(
+              (Date.parse(`${data.today}T00:00:00Z`) -
+                Date.parse(`${c.start_date}T00:00:00Z`)) /
+                86_400_000,
+            ) + 1,
+          ),
+        );
+        if (loggedDays >= elapsedDays) {
+          todaySummary = t("Caught up for today ✓ ({paid} of {total} days done)", {
+            paid: paidDays,
+            total: c.num_days,
+          });
+        } else {
+          todaySummary = t(
+            "Log today's {amount} hulog ({paid} of {total} days done)",
+            {
+              amount: money(c.daily_amount_centavos),
+              paid: paidDays,
+              total: c.num_days,
+            },
+          );
+        }
+      }
+    } else {
+      const activeWithdrawn = (data.payoutWithdrawals ?? [])
+        .filter((entry) => entry.cycle_id === c.id && !entry.voided_at)
+        .reduce((sum, entry) => sum + entry.amount_centavos, 0);
+      const holder =
+        c.holder_id ?? data.wallets?.find((w) => w.id === c.wallet_id)?.holder_id;
+      const done = c.payout_state === "Received";
+      const fullLedgerWithdrawal =
+        c.pot_centavos > 0 &&
+        (c.withdrawn_centavos ?? activeWithdrawn) >= c.pot_centavos;
+      const canAcknowledgeFullWithdrawal =
+        c.status === "accepted" &&
+        done &&
+        fullLedgerWithdrawal &&
+        !c.received_at &&
+        holder != null &&
+        holder !== c.receiver_id &&
+        c.receiver_id === user;
+      const canConfirmPayout =
+        (!done && c.receiver_id === user) || canAcknowledgeFullWithdrawal;
+      if (canConfirmPayout) {
+        todaySummary = t("Confirm payout receipt below");
+      } else {
+        todaySummary = t("Start a new round when ready");
+      }
+    }
+  }
+
   return (
     <>
       <h1 className="sr-only">{group.name}</h1>
       <OutboxStrip {...props} />
-      {(waiting.length > 0 ||
-        pendingContributions.length > 0 ||
-        deleteProposedContributions.length > 0 ||
-        pendingAbono.length > 0 ||
-        deleteProposedAbono.length > 0) && (
+      {confirmItems.length > 0 && (
         <section className="home-waiting">
-          <h2 className="section-label">{t("Waiting for your check")}</h2>
+          <h2 className="section-label">
+            {t("Waiting for your check")} ({confirmItems.length})
+          </h2>
           <div className="confirm-list">
-            {waiting.map((p) => {
-              const cycle = data.cycles.find(
-                (cycle) => cycle.id === p.cycle_id,
-              );
-              if (!cycle) return null;
-              const allowed = cycle.phase !== "ended" || p.was_confirmed;
-              return (
-                <div className="sticker confirm" key={p.id}>
-                  <Avatar data={data} id={p.member_id} />
-                  <div>
-                    <strong>{money(p.amount_centavos)}</strong>
-                    <div
-                      className={`tally ${tone(data, p.member_id)} mini`}
-                      role="img"
-                      aria-label={t("{days} days", { days: p.days })}
-                    >
-                      {Array.from({ length: p.days }, (_, i) => (
-                        <span key={i} className="pending" />
-                      ))}
-                    </div>
-                    <Link to={`/cycles/${cycle.id}`} className="muted">
-                      {t("round")} {shortDate(cycle.start_date)} →{" "}
-                      {shortDate(cycle.end_date)}
-                    </Link>
-                    {!allowed && <small>{t("not counted")}</small>}
-                    <ProofRefLine value={p.proof_ref} />
-                  </div>
-                  <PendingPaymentActions
-                    id={p.id}
-                    memberName={name(data, p.member_id)}
-                    amount={p.amount_centavos}
-                    allowed={allowed}
-                    busy={busy}
-                    run={run}
-                  />
-                </div>
-              );
-            })}
-
-            {pendingContributions.map((sc) => {
-              const goal = (data.savingsGoals ?? []).find(
-                (g) => g.id === sc.goal_id,
-              );
-              return (
-                <div className="sticker confirm" key={sc.id}>
-                  <Avatar data={data} id={sc.member_id} />
-                  <div>
-                    <strong>{money(sc.amount_centavos)}</strong>
-                    {sc.steps ? (
-                      <div
-                        className={`tally ${tone(data, sc.member_id)} mini`}
-                        role="img"
-                        aria-label={t("{days} days", { days: sc.steps })}
-                      >
-                        {Array.from({ length: sc.steps }, (_, i) => (
-                          <span key={i} className="pending" />
-                        ))}
-                      </div>
-                    ) : null}
-                    <Link to={`/ipon/${sc.goal_id}`} className="muted">
-                      {goal?.title ?? t("Ipon detail")}
-                    </Link>
-                    {sc.note && <small>{sc.note}</small>}
-                  </div>
-                  <button
-                    className="round no"
-                    aria-label={t("Decline {name}'s {amount}", {
-                      name: name(data, sc.member_id),
-                      amount: money(sc.amount_centavos),
-                    })}
-                    disabled={busy}
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          t(
-                            "Delete this payment record? The change stays in history.",
-                          ),
-                        )
-                      )
-                        void run(() =>
-                          rpc("edit_savings_contribution", {
-                            p_id: sc.id,
-                            p_delete: true,
-                          }),
-                        );
-                    }}
-                  >
-                    <IconX />
-                  </button>
-                  <button
-                    className="round ok"
-                    aria-label={t("Confirm {name}'s {amount}", {
-                      name: name(data, sc.member_id),
-                      amount: money(sc.amount_centavos),
-                    })}
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() =>
-                        rpc("confirm_savings_contribution", { p_id: sc.id }),
-                      )
-                    }
-                  >
-                    <IconCheck />
-                  </button>
-                </div>
-              );
-            })}
-
-            {deleteProposedContributions.map((sc) => {
-              const goal = (data.savingsGoals ?? []).find(
-                (g) => g.id === sc.goal_id,
-              );
-              return (
-                <div
-                  className="sticker confirm"
-                  key={sc.id}
-                  style={{ flexWrap: "wrap" }}
-                >
-                  <Avatar data={data} id={sc.delete_proposed_by!} />
-                  <div style={{ minWidth: "140px" }}>
-                    <strong>{money(sc.amount_centavos)}</strong>
-                    <Link to={`/ipon/${sc.goal_id}`} className="muted">
-                      {goal?.title ?? t("Ipon detail")}
-                    </Link>
-                    <small>{t("Deletion requested")}</small>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flex: "0 0 auto",
-                      gap: "8px",
-                      alignItems: "center",
-                      marginLeft: "auto",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <button
-                      className="secondary"
-                      aria-label={t("Cancel delete")}
-                      title={t("Cancel delete")}
-                      disabled={busy}
-                      onClick={() =>
-                        void run(() =>
-                          rpc("respond_delete_savings_contribution", {
-                            p_id: sc.id,
-                            p_action: "decline",
-                          }),
-                        )
-                      }
-                    >
-                      {t("Keep")}
-                    </button>
-                    <button
-                      className="secondary danger"
-                      aria-label={t("Confirm delete")}
-                      title={t("Confirm delete")}
-                      disabled={busy}
-                      onClick={() =>
-                        void run(() =>
-                          rpc("respond_delete_savings_contribution", {
-                            p_id: sc.id,
-                            p_action: "accept",
-                          }),
-                        )
-                      }
-                    >
-                      {t("Delete")}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-
-            {pendingAbono.map((ae) => (
-              <div className="sticker confirm" key={ae.id}>
-                <Avatar data={data} id={ae.from_member} />
-                <div>
-                  <strong>{money(abonoAmount(ae))}</strong>
-                  <Link to="/tracker" className="muted">
-                    {ae.description} ({t("Tracker")})
-                  </Link>
-                  {ae.owed_amount_centavos === 0 && (
-                    <small>{t("Nothing owed")}</small>
-                  )}
-                  {ae.note && <small>{ae.note}</small>}
-                  <ProofRefLine value={ae.proof_ref} />
-                </div>
-                <button
-                  className="round no"
-                  aria-label={t("Decline {name}'s {amount}", {
-                    name: name(data, ae.from_member),
-                    amount: money(abonoAmount(ae)),
+            {urgentConfirmItems.map((item) => item.node)}
+            {inlineRegularItems.map((item) => item.node)}
+            {overflowRegularItems.length > 0 && (
+              <details className="confirm-more">
+                <summary>
+                  {t("Show {count} more waiting", {
+                    count: overflowRegularItems.length,
                   })}
-                  disabled={busy}
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        t(
-                          "Delete this payment record? The change stays in history.",
-                        ),
-                      )
-                    )
-                      void run(() =>
-                        rpc("edit_abono_entry", {
-                          p_id: ae.id,
-                          p_delete: true,
-                        }),
-                      );
-                  }}
-                >
-                  <IconX />
-                </button>
-                <button
-                  className="round ok"
-                  aria-label={t("Confirm {name}'s {amount}", {
-                    name: name(data, ae.from_member),
-                    amount: money(abonoAmount(ae)),
-                  })}
-                  disabled={busy}
-                  onClick={() =>
-                    void run(() => rpc("confirm_abono_entry", { p_id: ae.id }))
-                  }
-                >
-                  <IconCheck />
-                </button>
-              </div>
-            ))}
-
-            {deleteProposedAbono.map((ae) => (
-              <div
-                className="sticker confirm"
-                key={ae.id}
-                style={{ flexWrap: "wrap" }}
-              >
-                <Avatar data={data} id={ae.delete_proposed_by!} />
-                <div style={{ minWidth: "140px" }}>
-                  <strong>{money(abonoAmount(ae))}</strong>
-                  <Link to="/tracker" className="muted">
-                    {ae.description} ({t("Tracker")})
-                  </Link>
-                  {ae.owed_amount_centavos === 0 && (
-                    <small>{t("Nothing owed")}</small>
-                  )}
-                  <small>{t("Deletion requested")}</small>
-                  <ProofRefLine value={ae.proof_ref} />
+                </summary>
+                <div className="confirm-list">
+                  {overflowRegularItems.map((item) => item.node)}
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flex: "0 0 auto",
-                    gap: "8px",
-                    alignItems: "center",
-                    marginLeft: "auto",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button
-                    className="secondary"
-                    aria-label={t("Cancel delete")}
-                    title={t("Cancel delete")}
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() =>
-                        rpc("respond_delete_abono_entry", {
-                          p_id: ae.id,
-                          p_action: "decline",
-                        }),
-                      )
-                    }
-                  >
-                    {t("Keep")}
-                  </button>
-                  <button
-                    className="secondary danger"
-                    aria-label={t("Confirm delete")}
-                    title={t("Confirm delete")}
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() =>
-                        rpc("respond_delete_abono_entry", {
-                          p_id: ae.id,
-                          p_action: "accept",
-                        }),
-                      )
-                    }
-                  >
-                    {t("Delete")}
-                  </button>
-                </div>
-              </div>
-            ))}
+              </details>
+            )}
           </div>
         </section>
       )}
@@ -397,6 +538,17 @@ export default function Home(props: ViewProps) {
         </div>
       ) : (
         <>
+          {todaySummary && (
+            <div className="today-action">
+              <span className="today-label">{t("Today's action")}</span>
+              <strong className="today-text">{todaySummary}</strong>
+              {c.status === "accepted" && !closed(c) && (
+                <Link className="button big" to="/hulog">
+                  <IconPlus aria-hidden="true" /> {t("hulog!")}
+                </Link>
+              )}
+            </div>
+          )}
           <CycleCard c={c} data={data} user={user} />
           {c.status === "proposed" ? (
             <Proposal c={c} user={user} run={run} busy={busy} />
@@ -432,11 +584,6 @@ export default function Home(props: ViewProps) {
                   );
                 })}
             </div>
-          )}
-          {c.status === "accepted" && !closed(c) && (
-            <Link className="button big" to="/hulog">
-              <IconPlus aria-hidden="true" /> {t("hulog!")}
-            </Link>
           )}
           <Payout c={c} data={data} user={user} run={run} busy={busy} />
         </>

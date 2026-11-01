@@ -100,17 +100,53 @@ function EntryForm({
   run: Run;
   close: () => void;
 }) {
+  const [amountText, setAmountText] = useState(
+    entry ? (entry.amount_centavos / 100).toFixed(2) : "",
+  );
+  const [detailsOpen, setDetailsOpen] = useState(
+    Boolean(entry?.note || (entry && entry.entry_date !== today)),
+  );
+  const [formError, setFormError] = useState<string | null>(null);
+
+  let previewCentavos: number | null = null;
+  try {
+    if (amountText.trim()) previewCentavos = parsePesos(amountText);
+  } catch {
+    previewCentavos = null;
+  }
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const rawDate = String(form.get("date") || today).trim() || today;
+    const rawNote = String(form.get("note") ?? "");
+    if (rawDate > today) {
+      setDetailsOpen(true);
+      setFormError(t("Entry date cannot be in the future"));
+      return;
+    }
+    if (rawNote.length > 140) {
+      setDetailsOpen(true);
+      setFormError(t("Note must be at most 140 characters"));
+      return;
+    }
+    let parsedAmount: number;
+    try {
+      parsedAmount = parsePesos(String(form.get("amount")));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setFormError(label(msg));
+      return;
+    }
+    setFormError(null);
     void run(async () => {
       await rpc(entry ? "update_personal_entry" : "record_personal_entry", {
         ...(entry
           ? { p_entry_id: entry.id }
           : { p_goal_id: goal.id, p_kind: kind }),
-        p_amount_centavos: parsePesos(String(form.get("amount"))),
-        p_entry_date: form.get("date"),
-        p_note: form.get("note"),
+        p_amount_centavos: parsedAmount,
+        p_entry_date: rawDate,
+        p_note: rawNote,
       });
       close();
     });
@@ -130,23 +166,52 @@ function EntryForm({
           name="amount"
           inputMode="decimal"
           required
-          defaultValue={entry ? (entry.amount_centavos / 100).toFixed(2) : ""}
+          value={amountText}
+          onChange={(e) => {
+            setAmountText(e.target.value);
+            if (formError) setFormError(null);
+          }}
         />
       </label>
-      <label>
-        {t("Date")}
-        <input
-          name="date"
-          type="date"
-          required
-          max={today}
-          defaultValue={entry?.entry_date ?? today}
-        />
-      </label>
-      <label>
-        {t("Note (optional)")}
-        <input name="note" maxLength={140} defaultValue={entry?.note ?? ""} />
-      </label>
+      {previewCentavos !== null && (
+        <strong className="amount-preview">{money(previewCentavos)}</strong>
+      )}
+      <details
+        className="form-optional"
+        open={detailsOpen}
+        onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
+      >
+        <summary>{t("Details (optional)")}</summary>
+        <div className="form-optional-body">
+          <label>
+            {t("Date")}
+            <input
+              name="date"
+              type="date"
+              defaultValue={entry?.entry_date ?? today}
+              onChange={() => {
+                if (formError) setFormError(null);
+              }}
+            />
+          </label>
+          <label>
+            {t("Note (optional)")}
+            <input
+              name="note"
+              maxLength={140}
+              defaultValue={entry?.note ?? ""}
+              onChange={() => {
+                if (formError) setFormError(null);
+              }}
+            />
+          </label>
+        </div>
+      </details>
+      {formError && (
+        <p className="field-error" role="alert">
+          {formError}
+        </p>
+      )}
       <p className="meta">
         {t("This records money you moved yourself. Hulog does not move money.")}
       </p>
@@ -253,11 +318,6 @@ export function PersonalGoalCard({
       >
         <span style={{ width: `${progress}%` }} />
       </div>
-      <GrowthChart
-        series={personalSeries(data, user, goal.id)}
-        tone="green"
-        targetCentavos={goal.target_amount_centavos}
-      />
       {owner ? (
         <>
           <div className="actions">
@@ -306,6 +366,11 @@ export function PersonalGoalCard({
       )}
       <details>
         <summary>{t("Savings records")}</summary>
+        <GrowthChart
+          series={personalSeries(data, user, goal.id)}
+          tone="green"
+          targetCentavos={goal.target_amount_centavos}
+        />
         {entries.length === 0 && (
           <p className="meta">
             {t("No entries yet. Record your first deposit.")}

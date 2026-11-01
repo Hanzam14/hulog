@@ -20,6 +20,9 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
   const { id } = useParams();
   const c = data.cycles.find((cycle) => cycle.id === id);
   const [editing, setEditing] = useState<string | null>(null);
+  const [editDaysText, setEditDaysText] = useState("1");
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   // Only the creator can change the reference, and only while it is pending.
   const canEditRef = (p: Payment) =>
     p.created_by === user && p.status === "pending";
@@ -123,30 +126,26 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    const f = new FormData(e.currentTarget);
-                    const targetId = String(f.get("wallet_id"));
-                    if (!targetId) return;
-                    void run(() =>
-                      rpc("propose_cycle_wallet", {
-                        p_cycle_id: c.id,
-                        p_wallet_id: targetId,
-                      }),
-                    );
+                    const fd = new FormData(e.currentTarget);
+                    const nextWallet = String(fd.get("wallet_id"));
+                    if (nextWallet && nextWallet !== c.wallet_id) {
+                      void run(() =>
+                        rpc("propose_cycle_wallet", {
+                          p_cycle_id: c.id,
+                          p_wallet_id: nextWallet,
+                        }),
+                      );
+                    }
                   }}
                   style={{ display: "grid", gap: "8px" }}
                 >
-                  <label
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: "var(--soft)",
-                    }}
-                  >
+                  <label style={{ fontSize: "13px" }}>
                     {t("Move pot to another wallet")}
-                    <select name="wallet_id" defaultValue="" required>
-                      <option value="" disabled>
-                        -- {t("Move pot to another wallet")} --
-                      </option>
+                    <select
+                      name="wallet_id"
+                      defaultValue={candidateWallets[0]?.id}
+                      disabled={busy}
+                    >
                       {candidateWallets.map((w) => (
                         <option key={w.id} value={w.id}>
                           {w.label} ({name(data, w.holder_id)})
@@ -212,7 +211,16 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                     <button
                       className="quiet"
                       disabled={busy}
-                      onClick={() => setEditing(editing === p.id ? null : p.id)}
+                      onClick={() => {
+                        if (editing === p.id) {
+                          setEditing(null);
+                        } else {
+                          setEditing(p.id);
+                          setEditDaysText(String(p.days));
+                          setDetailsOpen(Boolean(p.note || p.proof_ref));
+                          setFormError(null);
+                        }
+                      }}
                     >
                       {t("Edit days")}
                     </button>
@@ -254,16 +262,30 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                         const noteVal = f.get("note")
                           ? String(f.get("note")).trim()
                           : "";
+                        if (noteVal.length > 140) {
+                          setDetailsOpen(true);
+                          setFormError(t("Note must be at most 140 characters"));
+                          return;
+                        }
+                        let ref: string | null | undefined;
+                        try {
+                          ref = canEditRef(p)
+                            ? cleanProofRef(f.get("proof_ref"))
+                            : undefined;
+                        } catch (err) {
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
+                          setDetailsOpen(true);
+                          setFormError(label(msg));
+                          return;
+                        }
+                        setFormError(null);
                         void run(async () => {
                           const payload: Record<string, unknown> = {
                             p_id: p.id,
                             p_days: newDays,
                             p_note: noteVal,
                           };
-                          // Only the creator can change it, and only while pending.
-                          const ref = canEditRef(p)
-                            ? cleanProofRef(f.get("proof_ref"))
-                            : undefined;
                           await rpc(
                             "edit_payment",
                             editPaymentArgs(payload, ref),
@@ -279,24 +301,47 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           type="number"
                           min="1"
                           max={c.num_days}
-                          defaultValue={p.days}
+                          value={editDaysText}
+                          onChange={(e) => setEditDaysText(e.target.value)}
                           required
                         />
                       </label>
-                      <label>
-                        {t("Note (optional)")}
-                        <input
-                          name="note"
-                          type="text"
-                          maxLength={140}
-                          defaultValue={p.note ?? ""}
-                        />
-                      </label>
-                      {canEditRef(p) && (
-                        <ProofRefField
-                          name="proof_ref"
-                          defaultValue={p.proof_ref ?? ""}
-                        />
+                      {Number(editDaysText) >= 1 && (
+                        <strong className="amount-preview">
+                          {money(Number(editDaysText) * c.daily_amount_centavos)}
+                        </strong>
+                      )}
+                      <details
+                        className="form-optional"
+                        open={detailsOpen}
+                        onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
+                      >
+                        <summary>{t("Note & payment ref (optional)")}</summary>
+                        <div className="form-optional-body">
+                          <label>
+                            {t("Note (optional)")}
+                            <input
+                              name="note"
+                              type="text"
+                              maxLength={140}
+                              defaultValue={p.note ?? ""}
+                              onChange={() => {
+                                if (formError) setFormError(null);
+                              }}
+                            />
+                          </label>
+                          {canEditRef(p) && (
+                            <ProofRefField
+                              name="proof_ref"
+                              defaultValue={p.proof_ref ?? ""}
+                            />
+                          )}
+                        </div>
+                      </details>
+                      {formError && (
+                        <p className="field-error" role="alert">
+                          {formError}
+                        </p>
                       )}
                       <button disabled={busy}>{t("Save correction")}</button>
                     </form>

@@ -9,7 +9,13 @@ import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
 import { ProofRefField, ProofRefLine } from "../components/ProofRef";
 import { cleanProofRef, editAbonoArgs } from "../proofRef";
 import SplitPicker from "../components/SplitPicker";
-import { NO_SPLIT, owedFieldText, shareLabel, type SplitState } from "../split";
+import {
+  NO_SPLIT,
+  owedFieldText,
+  parsePercent,
+  shareLabel,
+  type SplitState,
+} from "../split";
 import {
   dismissSuggestion,
   readDismissed,
@@ -17,6 +23,42 @@ import {
   type RecurringSuggestion,
 } from "../recurring";
 import { buildSettlementPayload, money, parsePesos } from "../helpers";
+
+function computeSplitPreview(
+  totalText: string,
+  owedText: string,
+  payerName: string,
+  otherName: string,
+  payerIsMe: boolean,
+): { total: number; payerShare: number; owed: number; line1: string; line2: string } | null {
+  try {
+    if (!totalText.trim() || !owedText.trim()) return null;
+    const total = parsePesos(totalText);
+    const owed = parsePesos(owedText, true);
+    if (owed > total) return null;
+    const payerShare = total - owed;
+    const line1 = payerIsMe
+      ? `${t("Total tracked")}: ${money(total)} · ${t("Your share {share}", {
+          share: money(payerShare),
+        })}`
+      : t("Total {total} · {payer} share {payerShare}", {
+          total: money(total),
+          payer: payerName,
+          payerShare: money(payerShare),
+        });
+    const line2 =
+      owed === 0
+        ? t("Nothing owed")
+        : t("{debtor} owes {creditor}: {amount}", {
+            debtor: otherName,
+            creditor: payerName,
+            amount: money(owed),
+          });
+    return { total, payerShare, owed, line1, line2 };
+  } catch {
+    return null;
+  }
+}
 
 function AbonoEditRow({
   entry,
@@ -51,11 +93,49 @@ function AbonoEditRow({
   // Only the creator can change the reference, and only while it is pending.
   const canEditRef = entry.created_by === user && entry.status === "pending";
   const [proofRef, setProofRef] = useState(entry.proof_ref ?? "");
+  const [detailsOpen, setDetailsOpen] = useState(
+    Boolean(entry.note || entry.proof_ref || entry.entry_date !== data.today),
+  );
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const preview = isExpense
+    ? computeSplitPreview(
+        total,
+        owedText,
+        name(data, fromMember),
+        name(data, fromMember === user ? partnerId : user),
+        fromMember === user,
+      )
+    : null;
 
   const handleSubmit = (ev: React.FormEvent) => {
     ev.preventDefault();
+    let ref: string | null | undefined;
+    try {
+      ref = canEditRef ? cleanProofRef(proofRef) : undefined;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setDetailsOpen(true);
+      setFormError(label(msg));
+      return;
+    }
+    const effectiveDate = entryDate.trim() || entry.entry_date;
+    if (effectiveDate > data.today) {
+      setDetailsOpen(true);
+      setFormError(t("Entry date cannot be in the future"));
+      return;
+    }
+    if (note.trim().length > 140) {
+      setDetailsOpen(true);
+      setFormError(t("Note must be at most 140 characters"));
+      return;
+    }
+    if (isExpense && split.choice === "custom" && parsePercent(split.percent) === null) {
+      setFormError(t("Enter a valid percentage (0 to 100)."));
+      return;
+    }
+    setFormError(null);
     void run(async () => {
-      const ref = canEditRef ? cleanProofRef(proofRef) : undefined;
       if (isExpense) {
         const totalCents = parsePesos(total);
         const owedCents = parsePesos(owedText, true);
@@ -70,7 +150,7 @@ function AbonoEditRow({
               p_description: desc.trim(),
               p_total_amount_centavos: totalCents,
               p_owed_amount_centavos: owedCents,
-              p_entry_date: entryDate,
+              p_entry_date: effectiveDate,
               p_note: note.trim(),
             },
             ref,
@@ -85,7 +165,7 @@ function AbonoEditRow({
               p_id: entry.id,
               p_total_amount_centavos: amt,
               p_owed_amount_centavos: amt,
-              p_entry_date: entryDate,
+              p_entry_date: effectiveDate,
               p_note: note.trim(),
             },
             ref,
@@ -170,6 +250,12 @@ function AbonoEditRow({
               }}
             />
           </label>
+          {preview && (
+            <div className="split-preview">
+              <small>{preview.line1}</small>
+              <strong>{preview.line2}</strong>
+            </div>
+          )}
         </>
       ) : (
         <label>
@@ -183,26 +269,52 @@ function AbonoEditRow({
           />
         </label>
       )}
-      <label>
-        {t("Date")}
-        <input
-          type="date"
-          required
-          max={data.today}
-          value={entryDate}
-          onChange={(e) => setEntryDate(e.target.value)}
-        />
-      </label>
-      <label>
-        {t("Note (optional)")}
-        <input
-          type="text"
-          maxLength={140}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
-      </label>
-      {canEditRef && <ProofRefField value={proofRef} onChange={setProofRef} />}
+      <details
+        className="form-optional"
+        open={detailsOpen}
+        onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
+      >
+        <summary>{t("Date, note & payment ref (optional)")}</summary>
+        <div className="form-optional-body">
+          <label>
+            {t("Date")}
+            <input
+              type="date"
+              value={entryDate}
+              onChange={(e) => {
+                setEntryDate(e.target.value);
+                if (formError) setFormError(null);
+              }}
+            />
+          </label>
+          <label>
+            {t("Note (optional)")}
+            <input
+              type="text"
+              maxLength={140}
+              value={note}
+              onChange={(e) => {
+                setNote(e.target.value);
+                if (formError) setFormError(null);
+              }}
+            />
+          </label>
+          {canEditRef && (
+            <ProofRefField
+              value={proofRef}
+              onChange={(val) => {
+                setProofRef(val);
+                if (formError) setFormError(null);
+              }}
+            />
+          )}
+        </div>
+      </details>
+      {formError && (
+        <p className="field-error" role="alert">
+          {formError}
+        </p>
+      )}
       <div className="actions">
         <button disabled={busy} type="submit">
           {t("Save correction")}
@@ -232,10 +344,11 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   // One key per form attempt, so a double tap or a retry dedupes on the server.
   const addRequestId = useRef(newRequestId());
   const settleRequestId = useRef(newRequestId());
-  const [showSettle, setShowSettle] = useState(false);
-  const [settleAmount, setSettleAmount] = useState("");
-  const [settleNote, setSettleNote] = useState("");
-  const [settleRef, setSettleRef] = useState("");
+  // IMPORTANT: Keep indices 0..14 in exact order for batch1Ux.test.ts compatibility!
+  const [showSettle, setShowSettle] = useState(false); // 0
+  const [settleAmount, setSettleAmount] = useState(""); // 1
+  const [settleNote, setSettleNote] = useState(""); // 2
+  const [settleRef, setSettleRef] = useState(""); // 3
 
   const remaining = activeDebt
     ? Math.max(
@@ -245,26 +358,33 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     : 0;
 
   // Add Expense form state
-  const [showAdd, setShowAdd] = useState(false);
-  const [description, setDescription] = useState("");
-  const [fromMember, setFromMember] = useState(user);
-  const [total, setTotal] = useState("");
-  const [owed, setOwed] = useState("");
-  const [split, setSplit] = useState<SplitState>(NO_SPLIT);
+  const [showAdd, setShowAdd] = useState(false); // 4
+  const [description, setDescription] = useState(""); // 5
+  const [fromMember, setFromMember] = useState(user); // 6
+  const [total, setTotal] = useState(""); // 7
+  const [owed, setOwed] = useState(""); // 8
+  const [split, setSplit] = useState<SplitState>(NO_SPLIT); // 9
   const owedText = owedFieldText(total, split, fromMember === user, owed);
-  const [entryDate, setEntryDate] = useState(data.today);
-  const [note, setNote] = useState("");
-  const [proofRef, setProofRef] = useState("");
+  const [entryDate, setEntryDate] = useState(data.today); // 10
+  const [note, setNote] = useState(""); // 11
+  const [proofRef, setProofRef] = useState(""); // 12
 
   // Edit entry state
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null); // 13
 
   // Bills that keep coming back. "Huwag na" hides one until next month.
   const month = data.today.slice(0, 7);
   const [dismissed, setDismissed] = useState(() => ({
     month,
     keys: readDismissed(user, month),
-  }));
+  })); // 14
+
+  // Additional UI disclosure & validation state appended AFTER index 14:
+  const [addDetailsOpen, setAddDetailsOpen] = useState(false); // 15
+  const [addFormError, setAddFormError] = useState<string | null>(null); // 16
+  const [settleDetailsOpen, setSettleDetailsOpen] = useState(false); // 17
+  const [settleFormError, setSettleFormError] = useState<string | null>(null); // 18
+
   // A month rollover while the app stays open starts from a clean slate.
   const shownDismissed =
     dismissed.month === month ? dismissed.keys : readDismissed(user, month);
@@ -283,16 +403,48 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     if (!showSettle && remaining > 0) {
       setSettleAmount((remaining / 100).toFixed(2));
     }
+    setSettleFormError(null);
     setShowSettle(!showSettle);
   };
 
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
-    const totalCentavos = parsePesos(total);
-    const owedCentavos = parsePesos(owedText, true);
+    let ref: string | null = null;
+    try {
+      ref = cleanProofRef(proofRef);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setAddDetailsOpen(true);
+      setAddFormError(label(msg));
+      return;
+    }
+    if ((entryDate || data.today) > data.today) {
+      setAddDetailsOpen(true);
+      setAddFormError(t("Entry date cannot be in the future"));
+      return;
+    }
+    if (note.trim().length > 140) {
+      setAddDetailsOpen(true);
+      setAddFormError(t("Note must be at most 140 characters"));
+      return;
+    }
+    if (split.choice === "custom" && parsePercent(split.percent) === null) {
+      setAddFormError(t("Enter a valid percentage (0 to 100)."));
+      return;
+    }
+    let totalCentavos: number;
+    let owedCentavos: number;
+    try {
+      totalCentavos = parsePesos(total);
+      owedCentavos = parsePesos(owedText, true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setAddFormError(label(msg));
+      return;
+    }
+    setAddFormError(null);
     const toMember = fromMember === user ? partnerId : user;
     void run(async () => {
-      const ref = cleanProofRef(proofRef);
       const result = await submitRecord(user, {
         kind: "abono",
         args: {
@@ -302,7 +454,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
           p_description: description.trim(),
           p_total_amount_centavos: totalCentavos,
           p_owed_amount_centavos: owedCentavos,
-          p_entry_date: entryDate || data.today,
+          p_entry_date: entryDate.trim() || data.today,
           p_note: note.trim(),
           ...(ref ? { p_proof_ref: ref } : {}),
         },
@@ -316,6 +468,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       setNote("");
       setProofRef("");
       setEntryDate(data.today);
+      setAddDetailsOpen(false);
       setShowAdd(false);
       return result;
     });
@@ -333,8 +486,24 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     setEntryDate(data.today);
     setNote("");
     setProofRef("");
+    setAddFormError(null);
     setShowAdd(true);
   };
+
+  const expensePreview = computeSplitPreview(
+    total,
+    owedText,
+    name(data, fromMember),
+    name(data, fromMember === user ? partnerId : user),
+    fromMember === user,
+  );
+
+  let settlePreviewCentavos: number | null = null;
+  try {
+    if (settleAmount.trim()) settlePreviewCentavos = parsePesos(settleAmount);
+  } catch {
+    settlePreviewCentavos = null;
+  }
 
   return (
     <>
@@ -448,7 +617,28 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const amt = parsePesos(settleAmount);
+                  try {
+                    cleanProofRef(settleRef);
+                  } catch (err) {
+                    const msg = err instanceof Error ? err.message : String(err);
+                    setSettleDetailsOpen(true);
+                    setSettleFormError(label(msg));
+                    return;
+                  }
+                  if (settleNote.trim().length > 140) {
+                    setSettleDetailsOpen(true);
+                    setSettleFormError(t("Note must be at most 140 characters"));
+                    return;
+                  }
+                  let amt: number;
+                  try {
+                    amt = parsePesos(settleAmount);
+                  } catch (err) {
+                    const msg = err instanceof Error ? err.message : String(err);
+                    setSettleFormError(label(msg));
+                    return;
+                  }
+                  setSettleFormError(null);
                   void run(async () => {
                     const result = await submitRecord(user, {
                       kind: "abono",
@@ -466,6 +656,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     setShowSettle(false);
                     setSettleNote("");
                     setSettleRef("");
+                    setSettleDetailsOpen(false);
                     return result;
                   });
                 }}
@@ -477,19 +668,50 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     inputMode="decimal"
                     required
                     value={settleAmount}
-                    onChange={(e) => setSettleAmount(e.target.value)}
+                    onChange={(e) => {
+                      setSettleAmount(e.target.value);
+                      if (settleFormError) setSettleFormError(null);
+                    }}
                   />
                 </label>
-                <label>
-                  {t("Note (optional)")}
-                  <input
-                    type="text"
-                    maxLength={140}
-                    value={settleNote}
-                    onChange={(e) => setSettleNote(e.target.value)}
-                  />
-                </label>
-                <ProofRefField value={settleRef} onChange={setSettleRef} />
+                {settlePreviewCentavos !== null && (
+                  <strong className="amount-preview">
+                    {money(settlePreviewCentavos)}
+                  </strong>
+                )}
+                <details
+                  className="form-optional"
+                  open={settleDetailsOpen}
+                  onToggle={(e) => setSettleDetailsOpen(e.currentTarget.open)}
+                >
+                  <summary>{t("Note & payment ref (optional)")}</summary>
+                  <div className="form-optional-body">
+                    <label>
+                      {t("Note (optional)")}
+                      <input
+                        type="text"
+                        maxLength={140}
+                        value={settleNote}
+                        onChange={(e) => {
+                          setSettleNote(e.target.value);
+                          if (settleFormError) setSettleFormError(null);
+                        }}
+                      />
+                    </label>
+                    <ProofRefField
+                      value={settleRef}
+                      onChange={(val) => {
+                        setSettleRef(val);
+                        if (settleFormError) setSettleFormError(null);
+                      }}
+                    />
+                  </div>
+                </details>
+                {settleFormError && (
+                  <p className="field-error" role="alert">
+                    {settleFormError}
+                  </p>
+                )}
                 <div className="actions">
                   <button disabled={busy} type="submit">
                     {offline
@@ -626,13 +848,19 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   required
                   placeholder="0.00"
                   value={total}
-                  onChange={(e) => setTotal(e.target.value)}
+                  onChange={(e) => {
+                    setTotal(e.target.value);
+                    if (addFormError) setAddFormError(null);
+                  }}
                 />
               </label>
 
               <SplitPicker
                 split={split}
-                onChange={setSplit}
+                onChange={(next) => {
+                  setSplit(next);
+                  if (addFormError) setAddFormError(null);
+                }}
                 otherName={name(data, partnerId)}
                 otherIsMe={fromMember !== user}
               />
@@ -652,31 +880,64 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   onChange={(e) => {
                     setSplit(NO_SPLIT);
                     setOwed(e.target.value);
+                    if (addFormError) setAddFormError(null);
                   }}
                 />
               </label>
 
-              <label>
-                {t("Date")}
-                <input
-                  type="date"
-                  required
-                  max={data.today}
-                  value={entryDate}
-                  onChange={(e) => setEntryDate(e.target.value)}
-                />
-              </label>
+              {expensePreview && (
+                <div className="split-preview" aria-label={t("Split summary")}>
+                  <small>{expensePreview.line1}</small>
+                  <strong>{expensePreview.line2}</strong>
+                </div>
+              )}
 
-              <label>
-                {t("Note (optional)")}
-                <input
-                  type="text"
-                  maxLength={140}
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                />
-              </label>
-              <ProofRefField value={proofRef} onChange={setProofRef} />
+              <details
+                className="form-optional"
+                open={addDetailsOpen}
+                onToggle={(e) => setAddDetailsOpen(e.currentTarget.open)}
+              >
+                <summary>{t("Date, note & payment ref (optional)")}</summary>
+                <div className="form-optional-body">
+                  <label>
+                    {t("Date")}
+                    <input
+                      type="date"
+                      value={entryDate}
+                      onChange={(e) => {
+                        setEntryDate(e.target.value);
+                        if (addFormError) setAddFormError(null);
+                      }}
+                    />
+                  </label>
+
+                  <label>
+                    {t("Note (optional)")}
+                    <input
+                      type="text"
+                      maxLength={140}
+                      value={note}
+                      onChange={(e) => {
+                        setNote(e.target.value);
+                        if (addFormError) setAddFormError(null);
+                      }}
+                    />
+                  </label>
+                  <ProofRefField
+                    value={proofRef}
+                    onChange={(val) => {
+                      setProofRef(val);
+                      if (addFormError) setAddFormError(null);
+                    }}
+                  />
+                </div>
+              </details>
+
+              {addFormError && (
+                <p className="field-error" role="alert">
+                  {addFormError}
+                </p>
+              )}
 
               <button disabled={busy} type="submit">
                 {offline ? t("Save for now (offline)") : t("Record expense")}
