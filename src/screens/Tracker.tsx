@@ -49,17 +49,11 @@ function computeSplitPreview(
     const line2 =
       owed === 0
         ? t("Nothing owed")
-        : payerIsMe
-          ? t("{debtor} owes {creditor}: {amount}", {
-              debtor: otherName,
-              creditor: payerName,
-              amount: money(owed),
-            })
-          : t("{debtor} owes {creditor}: {amount}", {
-              debtor: payerName,
-              creditor: otherName,
-              amount: money(owed),
-            });
+        : t("{debtor} owes {creditor}: {amount}", {
+            debtor: otherName,
+            creditor: payerName,
+            amount: money(owed),
+          });
     return { total, payerShare, owed, line1, line2 };
   } catch {
     return null;
@@ -501,7 +495,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
     total,
     owedText,
     name(data, fromMember),
-    name(data, partnerId),
+    name(data, fromMember === user ? partnerId : user),
     fromMember === user,
   );
 

@@ -452,10 +452,31 @@ export default function Home(props: ViewProps) {
           },
         );
       }
-    } else if (!c.received_at && c.receiver_id === user) {
-      todaySummary = t("Confirm payout receipt below");
     } else {
-      todaySummary = t("Start a new round when ready");
+      const activeWithdrawn = (data.payoutWithdrawals ?? [])
+        .filter((entry) => entry.cycle_id === c.id && !entry.voided_at)
+        .reduce((sum, entry) => sum + entry.amount_centavos, 0);
+      const holder =
+        c.holder_id ?? data.wallets?.find((w) => w.id === c.wallet_id)?.holder_id;
+      const done = c.payout_state === "Received";
+      const fullLedgerWithdrawal =
+        c.pot_centavos > 0 &&
+        (c.withdrawn_centavos ?? activeWithdrawn) >= c.pot_centavos;
+      const canAcknowledgeFullWithdrawal =
+        c.status === "accepted" &&
+        done &&
+        fullLedgerWithdrawal &&
+        !c.received_at &&
+        holder != null &&
+        holder !== c.receiver_id &&
+        c.receiver_id === user;
+      const canConfirmPayout =
+        (!done && c.receiver_id === user) || canAcknowledgeFullWithdrawal;
+      if (canConfirmPayout) {
+        todaySummary = t("Confirm payout receipt below");
+      } else {
+        todaySummary = t("Start a new round when ready");
+      }
     }
   }
 

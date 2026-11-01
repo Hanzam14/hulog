@@ -363,6 +363,22 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     // 4. Personal savings chart is tucked inside Savings records details, not expanded on the main card face
     const cardBeforeDetails = markup.split("<details")[0];
     expect(cardBeforeDetails).not.toContain('class="growth-chart"');
+
+    // 5. When a closed round's receiver holds its wallet (payout_state === "Received" without received_at),
+    // Home shows "Start a new round when ready" instead of prompting to confirm receipt when no button exists
+    data.cycles[0] = {
+      ...data.cycles[0],
+      phase: "ended",
+      payout_state: "Received",
+      received_at: null,
+      receiver_id: "a",
+      holder_id: "a",
+    };
+    const closedSelfHeldMarkup = html(
+      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(closedSelfHeldMarkup).toContain("Start a new round when ready");
+    expect(closedSelfHeldMarkup).not.toContain("Confirm payout receipt below");
   });
 
   it("Record (/hulog) tucks optional note and payment ref behind a collapsible option, preserves values, and reveals validation errors", () => {
@@ -582,6 +598,20 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(percentErrorMarkup).toContain(
       "Enter a valid percentage (0 to 100).",
     );
+
+    // Verify partner-paid preview shows current user (Ana) owing partner (Ben)
+    state.values[6] = "b"; // fromMember = 'b' (Ben paid)
+    state.values[9] = NO_SPLIT;
+    const partnerPaidMarkup = html(
+      createElement(Tracker, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
+      ["/tracker"],
+    );
+    expect(partnerPaidMarkup).toContain("Ana owes Ben: ₱300.00");
   });
 
   it("PersonalSavings EntryForm tucks optional date and note inside details while showing exact amount", () => {
