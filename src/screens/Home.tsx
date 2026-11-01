@@ -443,14 +443,32 @@ export default function Home(props: ViewProps) {
           pending: pendingDays,
         });
       } else {
-        todaySummary = t(
-          "Log today's {amount} hulog ({paid} of {total} days done)",
-          {
-            amount: money(c.daily_amount_centavos),
+        const elapsedDays = Math.min(
+          c.num_days,
+          Math.max(
+            0,
+            Math.round(
+              (Date.parse(`${data.today}T00:00:00Z`) -
+                Date.parse(`${c.start_date}T00:00:00Z`)) /
+                86_400_000,
+            ) + 1,
+          ),
+        );
+        if (loggedDays >= elapsedDays) {
+          todaySummary = t("Caught up for today ✓ ({paid} of {total} days done)", {
             paid: paidDays,
             total: c.num_days,
-          },
-        );
+          });
+        } else {
+          todaySummary = t(
+            "Log today's {amount} hulog ({paid} of {total} days done)",
+            {
+              amount: money(c.daily_amount_centavos),
+              paid: paidDays,
+              total: c.num_days,
+            },
+          );
+        }
       }
     } else {
       const activeWithdrawn = (data.payoutWithdrawals ?? [])

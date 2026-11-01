@@ -396,6 +396,19 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
       createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
     );
     expect(pendingDaysMarkup).toContain("7 of 15 days logged · 2 pending");
+
+    // 7. When today's obligation is already covered (e.g. day 6 of round, 6 confirmed days, 0 pending),
+    // Home shows a caught-up state instead of prompting to log another contribution today
+    data.progress[0] = {
+      ...data.progress[0],
+      confirmed_days: 6,
+      pending_days: 0,
+      pending_count: 0,
+    };
+    const caughtUpMarkup = html(
+      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+    );
+    expect(caughtUpMarkup).toContain("Caught up for today ✓ (6 of 15 days done)");
   });
 
   it("Record (/hulog) tucks optional note and payment ref behind a collapsible option, preserves values, and reveals validation errors", () => {
