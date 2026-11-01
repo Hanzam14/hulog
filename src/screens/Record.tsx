@@ -5,7 +5,7 @@ import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, heldByText, name, tone } from "../components/shared";
 import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
-import { money } from "../helpers";
+import { isSoloCycle, money } from "../helpers";
 import { cleanProofRef } from "../proofRef";
 import { ProofRefField } from "../components/ProofRef";
 import Avatar from "../components/Avatar";
@@ -31,13 +31,25 @@ export default function Record({ data, user, run, busy }: ViewProps) {
         {t("No open round.")} <Link to="/">{t("Go home")}</Link>
       </p>
     );
+  if (isSoloCycle(c) && c.receiver_id !== user)
+    return (
+      <p>
+        {t("Observing partner does not log hulog.")}{" "}
+        <Link to="/">{t("Go home")}</Link>
+      </p>
+    );
   const mine = data.progress.find(
     (p) => p.cycle_id === c.id && p.member_id === user,
   );
-  const left = Math.max(
-    1,
-    c.num_days - (mine ? mine.confirmed_days + mine.pending_days : 0),
-  );
+  const logged = mine ? mine.confirmed_days + mine.pending_days : 0;
+  if (logged >= c.num_days)
+    return (
+      <p>
+        {t("All days already recorded for this round.")}{" "}
+        <Link to="/">{t("Go home")}</Link>
+      </p>
+    );
+  const left = Math.max(1, c.num_days - logged);
   const set = (n: number) => setDays(Math.min(left, Math.max(1, n)));
   return (
     <div className="record">

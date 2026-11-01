@@ -18,6 +18,10 @@ export default function SplitPicker({
   otherName: string;
   otherIsMe: boolean;
 }) {
+  const isAdvanced =
+    split.choice === "mine" ||
+    split.choice === "theirs" ||
+    split.choice === "custom";
   const pick = (choice: SplitChoice, label: string) => (
     <button
       type="button"
@@ -29,31 +33,49 @@ export default function SplitPicker({
     </button>
   );
   return (
-    <>
+    <div className="split-picker">
       <div className="chips">
         {pick("half", t("50/50 split"))}
-        {pick("mine", t("All mine"))}
-        {pick(
-          "theirs",
-          otherName ? t("All for {name}", { name: otherName }) : t("All theirs"),
+        {isAdvanced && (
+          <span className="chip on">
+            {split.choice === "mine"
+              ? t("All mine")
+              : split.choice === "theirs"
+                ? otherName
+                  ? t("All for {name}", { name: otherName })
+                  : t("All theirs")
+                : split.percent
+                  ? `${split.percent}%`
+                  : t("Custom %")}
+          </span>
         )}
-        {pick("custom", t("Custom %"))}
       </div>
-      {split.choice === "custom" && (
-        <label>
-          {shareLabel(otherIsMe, otherName, "%")}
-          <input
-            type="text"
-            inputMode="decimal"
-            autoComplete="off"
-            placeholder="30"
-            value={split.percent}
-            onChange={(e) =>
-              onChange({ choice: "custom", percent: e.target.value })
-            }
-          />
-        </label>
-      )}
-    </>
+      <details className="split-more" open={isAdvanced || undefined}>
+        <summary>{t("Change split")}</summary>
+        <div className="chips">
+          {pick("mine", t("All mine"))}
+          {pick(
+            "theirs",
+            otherName ? t("All for {name}", { name: otherName }) : t("All theirs"),
+          )}
+          {pick("custom", t("Custom %"))}
+        </div>
+        {split.choice === "custom" && (
+          <label>
+            {shareLabel(otherIsMe, otherName, "%")}
+            <input
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              placeholder="30"
+              value={split.percent}
+              onChange={(e) =>
+                onChange({ choice: "custom", percent: e.target.value })
+              }
+            />
+          </label>
+        )}
+      </details>
+    </div>
   );
 }

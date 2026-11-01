@@ -2715,14 +2715,14 @@ select {
   min-height: 44px;
 }
 
-/* Batch 1 simplification: Today's action, confirmation summary, and progressive form disclosure. */
+/* Batch 1 & follow-up simplification: Today's action, confirmation summary, progressive form disclosure, and tidy Settings. */
 .today-action {
   display: grid;
-  gap: 8px;
-  margin: 8px 0 12px;
-  padding: 14px 16px;
-  background: var(--card);
-  border: 1.5px solid var(--line);
+  gap: 6px;
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  background: var(--card-tint);
+  border: 1px solid var(--line);
   border-radius: 14px;
 }
 .today-action .today-label {
@@ -2748,52 +2748,110 @@ select {
 .confirm-more {
   margin-top: 4px;
 }
+.confirm-more > summary,
+.form-optional > summary,
+.split-more > summary,
+.wallets-manage > summary {
+  list-style: none;
+  user-select: none;
+}
+.confirm-more > summary::-webkit-details-marker,
+.form-optional > summary::-webkit-details-marker,
+.split-more > summary::-webkit-details-marker,
+.wallets-manage > summary::-webkit-details-marker {
+  display: none;
+}
+.confirm-more > summary::after,
+.form-optional > summary::after,
+.split-more > summary::after,
+.wallets-manage > summary::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  border-radius: 1px;
+  flex-shrink: 0;
+  transform: translateY(-2px) rotate(45deg);
+}
+.confirm-more[open] > summary::after,
+.form-optional[open] > summary::after,
+.split-more[open] > summary::after,
+.wallets-manage[open] > summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
 .confirm-more > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   min-height: 44px;
   padding: 8px 12px;
   background: var(--highlight);
-  border: 1.5px dashed var(--control-border);
+  border: none;
   border-radius: 12px;
   color: var(--ink);
   font-size: 14px;
   font-weight: 800;
+  cursor: pointer;
 }
 .confirm-more > .confirm-list {
   margin-top: 8px;
 }
 .form-optional {
-  border: 1.5px dashed var(--control-border);
-  border-radius: 12px;
-  padding: 0 12px;
-  background: var(--highlight);
+  border: none;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 2px 0 0;
+  background: transparent;
 }
 .form-optional > summary {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   min-height: 44px;
-  padding: 8px 0;
-  color: var(--ink);
+  padding: 6px 4px 6px 0;
+  color: var(--soft);
   font-size: 13px;
   font-weight: 800;
+  cursor: pointer;
 }
 .form-optional[open] {
-  padding-bottom: 12px;
+  padding-bottom: 8px;
 }
 .form-optional-body {
   display: grid;
   gap: 10px;
   padding-top: 4px;
 }
+.split-picker {
+  display: grid;
+  gap: 6px;
+}
+.split-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 4px 4px 0;
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.split-more > .chips {
+  margin-top: 4px;
+}
 .split-preview {
   display: grid;
   gap: 2px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background: var(--highlight);
-  border: 1.5px solid var(--line);
-  border-radius: 12px;
+  border: none;
+  border-left: 3px solid var(--pink-deep);
+  border-radius: 10px;
   color: var(--ink);
   overflow-wrap: anywhere;
 }
@@ -2824,4 +2882,37 @@ select {
   color: var(--danger);
   font-size: 13px;
   font-weight: 800;
+}
+.preferences-card {
+  display: grid;
+  gap: 14px;
+}
+.preferences-card .appearance h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.preferences-card .install-hint {
+  margin: 4px 0 0;
+}
+.wallets-manage {
+  margin: -4px 0 8px;
+  padding: 0 4px;
+}
+.wallets-manage > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 8px;
+  color: var(--soft);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.wallets-manage[open] {
+  padding: 8px 14px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }

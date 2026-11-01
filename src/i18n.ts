@@ -697,6 +697,15 @@ const taglish = {
     "Maglagay ng valid na porsyento (0 hanggang 100).",
   "Caught up for today ✓ ({paid} of {total} days done)":
     "Okay na ang hulog mo ngayon ✓ ({paid} sa {total} araw na)",
+  "Observing {name}'s solo round": "Nagmamasid sa solo round ni {name}",
+  "All {total} days recorded · waiting for confirmation":
+    "Naitala na ang {total} araw · hinihintay ang confirm",
+  "Observing partner does not log hulog.":
+    "Hindi nagre-record ng hulog ang nagmamasid na partner.",
+  "All days already recorded for this round.":
+    "Naitala na ang lahat ng araw mo sa round na ito.",
+  "Change split": "Baguhin ang hatian",
+  "Manage wallets": "Ayusin ang mga wallet",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1387,6 +1396,15 @@ const en = {
     "Enter a valid percentage (0 to 100).",
   "Caught up for today ✓ ({paid} of {total} days done)":
     "Caught up for today ✓ ({paid} of {total} days done)",
+  "Observing {name}'s solo round": "Observing {name}'s solo round",
+  "All {total} days recorded · waiting for confirmation":
+    "All {total} days recorded · waiting for confirmation",
+  "Observing partner does not log hulog.":
+    "Observing partner does not log contributions.",
+  "All days already recorded for this round.":
+    "All days already recorded for this round.",
+  "Change split": "Change split",
+  "Manage wallets": "Manage wallets",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -2084,6 +2102,15 @@ const tl = {
     "Maglagay ng wastong porsyento (0 hanggang 100).",
   "Caught up for today ✓ ({paid} of {total} days done)":
     "Kumpleto na ang hulog mo ngayon ✓ ({paid} sa {total} araw na)",
+  "Observing {name}'s solo round": "Nagmamasid sa sariling round ni {name}",
+  "All {total} days recorded · waiting for confirmation":
+    "Naitala na ang {total} araw · naghihintay ng kumpirmasyon",
+  "Observing partner does not log hulog.":
+    "Hindi nagtatala ng hulog ang nagmamasid na kasama.",
+  "All days already recorded for this round.":
+    "Naitala na ang lahat ng araw para sa round na ito.",
+  "Change split": "Baguhin ang hatian",
+  "Manage wallets": "Pamahalaan ang mga wallet",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

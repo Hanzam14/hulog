@@ -308,9 +308,11 @@ export default function Settings({
         </>
       )}
       <h2 className="section-label settings-title">{t("App")}</h2>
-      <ThemeSettings />
-      <LanguageSettings />
-      <InstallSettings />
+      <section className="preferences-card">
+        <ThemeSettings />
+        <LanguageSettings />
+        <InstallSettings />
+      </section>
       <NotificationSettings />
       <h2 className="section-label settings-title">{t("More")}</h2>
       <section className="more-card">

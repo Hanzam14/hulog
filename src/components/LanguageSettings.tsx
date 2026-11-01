@@ -3,8 +3,8 @@ import { setLang, t, useLanguage } from "../i18n";
 export default function LanguageSettings() {
   const language = useLanguage();
   return (
-    <section className="appearance">
-      <h2>{t("Language")}</h2>
+    <div className="appearance">
+      <h3>{t("Language")}</h3>
       <div className="segmented" role="group" aria-label={t("Language")}>
         {(["en", "tl", "taglish"] as const).map((value, index) => (
           <button
@@ -17,6 +17,6 @@ export default function LanguageSettings() {
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
