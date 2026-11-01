@@ -667,6 +667,32 @@ const taglish = {
     "{amount} na bayad ang naghihintay ng confirm",
   "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
     "I-confirm o tapusin muna ang mga pending na hulog at pag-delete bago mag-withdraw o isara ang goal.",
+  "Today's action": "Gagawin ngayon",
+  "Review round proposal": "Tingnan ang panukalang round",
+  "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
+  "Waiting for partner to accept round":
+    "Hinihintay na tanggapin ng partner ang round",
+  "Log today's {amount} hulog ({paid} of {total} days done)":
+    "I-record ang {amount} na hulog ngayon ({paid} sa {total} araw na)",
+  "{paid} of {total} days logged · {pending} pending":
+    "{paid} sa {total} araw na · {pending} pending",
+  "All {total} days logged for this round ✓":
+    "Kumpleto na ang {total} araw mo sa round na ito ✓",
+  "Confirm payout receipt below": "I-confirm ang natanggap na pot sa ibaba",
+  "Start a new round when ready": "Magsimula ng bagong round kapag handa na",
+  "Show {count} more waiting": "Ipakita pa ang {count} na naghihintay",
+  "Add note or payment ref (optional)": "Maglagay ng note o ref no. (opsyonal)",
+  "Date, note & payment ref (optional)":
+    "Petsa, note at ref no. (opsyonal)",
+  "Note & payment ref (optional)": "Note at ref no. (opsyonal)",
+  "Reference must be 4 to 40 letters, numbers, spaces or dashes":
+    "Dapat 4 hanggang 40 letters, numbers, spaces o dashes ang ref no.",
+  "Split summary": "Buod ng hatian",
+  "Total {total} · {payer} share {payerShare}":
+    "Kabuuan {total} · Bahagi ni {payer}: {payerShare}",
+  "Your share {share}": "Bahagi mo: {share}",
+  "{debtor} owes {creditor}: {amount}":
+    "Utang ni {debtor} kay {creditor}: {amount}",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1330,6 +1356,29 @@ const en = {
     "{amount} settlement waiting for confirmation",
   "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
     "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.",
+  "Today's action": "Today's action",
+  "Review round proposal": "Review round proposal",
+  "Respond to the round proposal below": "Respond to the round proposal below",
+  "Waiting for partner to accept round": "Waiting for partner to accept round",
+  "Log today's {amount} hulog ({paid} of {total} days done)":
+    "Log today's {amount} contribution ({paid} of {total} days done)",
+  "{paid} of {total} days logged · {pending} pending":
+    "{paid} of {total} days logged · {pending} pending",
+  "All {total} days logged for this round ✓":
+    "All {total} days logged for this round ✓",
+  "Confirm payout receipt below": "Confirm payout receipt below",
+  "Start a new round when ready": "Start a new round when ready",
+  "Show {count} more waiting": "Show {count} more waiting",
+  "Add note or payment ref (optional)": "Add note or payment ref (optional)",
+  "Date, note & payment ref (optional)": "Date, note & payment ref (optional)",
+  "Note & payment ref (optional)": "Note & payment ref (optional)",
+  "Reference must be 4 to 40 letters, numbers, spaces or dashes":
+    "Reference must be 4 to 40 letters, numbers, spaces or dashes",
+  "Split summary": "Split summary",
+  "Total {total} · {payer} share {payerShare}":
+    "Total {total} · {payer} share {payerShare}",
+  "Your share {share}": "Your share {share}",
+  "{debtor} owes {creditor}: {amount}": "{debtor} owes {creditor}: {amount}",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -1997,6 +2046,32 @@ const tl = {
     "{amount} na bayad ang naghihintay ng kumpirmasyon",
   "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
     "Kumpirmahin o tapusin muna ang mga nakabinbing ambag at pagbura bago mag-withdraw o isara ang layunin.",
+  "Today's action": "Gagawin ngayon",
+  "Review round proposal": "Suriin ang panukalang round",
+  "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
+  "Waiting for partner to accept round":
+    "Hinihintay na tanggapin ng kasama ang round",
+  "Log today's {amount} hulog ({paid} of {total} days done)":
+    "Itala ang {amount} na hulog ngayon ({paid} sa {total} araw na)",
+  "{paid} of {total} days logged · {pending} pending":
+    "{paid} sa {total} araw na · {pending} nakabinbin",
+  "All {total} days logged for this round ✓":
+    "Kumpleto na ang {total} araw mo sa round na ito ✓",
+  "Confirm payout receipt below": "Kumpirmahin ang natanggap na pot sa ibaba",
+  "Start a new round when ready": "Magsimula ng bagong round kapag handa na",
+  "Show {count} more waiting": "Ipakita pa ang {count} na naghihintay",
+  "Add note or payment ref (optional)": "Maglagay ng tala o ref no. (opsyonal)",
+  "Date, note & payment ref (optional)":
+    "Petsa, tala at ref no. (opsyonal)",
+  "Note & payment ref (optional)": "Tala at ref no. (opsyonal)",
+  "Reference must be 4 to 40 letters, numbers, spaces or dashes":
+    "Dapat 4 hanggang 40 titik, numero, espasyo o gitling ang ref no.",
+  "Split summary": "Buod ng hatian",
+  "Total {total} · {payer} share {payerShare}":
+    "Kabuuan {total} · Bahagi ni {payer}: {payerShare}",
+  "Your share {share}": "Bahagi mo: {share}",
+  "{debtor} owes {creditor}: {amount}":
+    "Utang ni {debtor} kay {creditor}: {amount}",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

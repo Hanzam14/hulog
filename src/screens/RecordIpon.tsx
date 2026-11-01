@@ -12,7 +12,7 @@ import {
   money,
   parsePesos,
 } from "../helpers";
-import { t } from "../i18n";
+import { label, t } from "../i18n";
 
 /** Route /ipon/:id/record: Log a contribution towards a matched or flexible savings goal. */
 export default function RecordIpon({ data, user, run, busy }: ViewProps) {
@@ -43,6 +43,8 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
       : "0",
   );
   const [note, setNote] = useState("");
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   if (!g) {
     return (
@@ -67,7 +69,20 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
   const set = (n: number) => setSteps(Math.min(remainingSteps, Math.max(1, n)));
   const stepAmount = g.step_amount_centavos ?? 0;
 
+  let flexiblePreviewCentavos: number | null = null;
+  try {
+    if (amount.trim()) flexiblePreviewCentavos = parsePesos(amount);
+  } catch {
+    flexiblePreviewCentavos = null;
+  }
+
   const submitMatched = () => {
+    if (note.trim().length > 140) {
+      setDetailsOpen(true);
+      setFormError(t("Note must be at most 140 characters"));
+      return;
+    }
+    setFormError(null);
     void run(async () => {
       await rpc("record_savings_contribution", {
         p_goal_id: g.id,
@@ -79,10 +94,24 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
   };
 
   const submitFlexible = () => {
+    if (note.trim().length > 140) {
+      setDetailsOpen(true);
+      setFormError(t("Note must be at most 140 characters"));
+      return;
+    }
+    let parsedCentavos: number;
+    try {
+      parsedCentavos = parsePesos(amount);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setFormError(label(msg));
+      return;
+    }
+    setFormError(null);
     void run(async () => {
       await rpc("record_savings_contribution", {
         p_goal_id: g.id,
-        p_amount_centavos: parsePesos(amount),
+        p_amount_centavos: parsedCentavos,
         p_note: note.trim(),
       });
       navigate(`/ipon/${g.id}`);
@@ -168,30 +197,33 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
             </>
           )}
 
-          <label
-            style={{
-              width: "100%",
-              maxWidth: "320px",
-              display: "grid",
-              gap: "8px",
-            }}
+          <details
+            className="form-optional"
+            open={detailsOpen}
+            onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
+            style={{ maxWidth: "320px", margin: "8px auto", width: "100%" }}
           >
-            <span
-              style={{
-                color: "var(--soft)",
-                fontSize: "13px",
-                fontWeight: 500,
-              }}
-            >
-              {t("Note or ref # (optional)")}
-            </span>
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder={t("e.g. GCash ref #1234")}
-              maxLength={140}
-            />
-          </label>
+            <summary>{t("Add note or payment ref (optional)")}</summary>
+            <div className="form-optional-body">
+              <label>
+                {t("Note or ref # (optional)")}
+                <input
+                  value={note}
+                  onChange={(e) => {
+                    setNote(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  placeholder={t("e.g. GCash ref #1234")}
+                  maxLength={140}
+                />
+              </label>
+            </div>
+          </details>
+          {formError && (
+            <p className="field-error" role="alert">
+              {formError}
+            </p>
+          )}
 
           <button
             className="big"
@@ -208,60 +240,73 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
               {t("Goal reached ✓")}
             </p>
           ) : (
-            <label
-              style={{
-                width: "100%",
-                maxWidth: "320px",
-                display: "grid",
-                gap: "8px",
-              }}
-            >
-              <span
+            <>
+              <label
                 style={{
-                  color: "var(--soft)",
-                  fontSize: "13px",
-                  fontWeight: 500,
+                  width: "100%",
+                  maxWidth: "320px",
+                  display: "grid",
+                  gap: "8px",
                 }}
               >
-                {t("Amount to save (₱)")}
-              </span>
-              <input
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-                required
-              />
-              <small style={{ color: "var(--soft)" }}>
-                {t("of {amount}", { amount: money(remainingCentavos) })}
-              </small>
-            </label>
+                <span
+                  style={{
+                    color: "var(--soft)",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                  }}
+                >
+                  {t("Amount to save (₱)")}
+                </span>
+                <input
+                  inputMode="decimal"
+                  value={amount}
+                  onChange={(e) => {
+                    setAmount(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  placeholder="0.00"
+                  required
+                />
+                <small style={{ color: "var(--soft)" }}>
+                  {t("of {amount}", { amount: money(remainingCentavos) })}
+                </small>
+              </label>
+              {flexiblePreviewCentavos !== null && (
+                <strong className="amount">
+                  {money(flexiblePreviewCentavos)}
+                </strong>
+              )}
+            </>
           )}
 
-          <label
-            style={{
-              width: "100%",
-              maxWidth: "320px",
-              display: "grid",
-              gap: "8px",
-            }}
+          <details
+            className="form-optional"
+            open={detailsOpen}
+            onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
+            style={{ maxWidth: "320px", margin: "8px auto", width: "100%" }}
           >
-            <span
-              style={{
-                color: "var(--soft)",
-                fontSize: "13px",
-                fontWeight: 500,
-              }}
-            >
-              {t("Note or ref # (optional)")}
-            </span>
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder={t("e.g. GCash ref #1234")}
-              maxLength={140}
-            />
-          </label>
+            <summary>{t("Add note or payment ref (optional)")}</summary>
+            <div className="form-optional-body">
+              <label>
+                {t("Note or ref # (optional)")}
+                <input
+                  value={note}
+                  onChange={(e) => {
+                    setNote(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  placeholder={t("e.g. GCash ref #1234")}
+                  maxLength={140}
+                />
+              </label>
+            </div>
+          </details>
+          {formError && (
+            <p className="field-error" role="alert">
+              {formError}
+            </p>
+          )}
 
           <button
             className="big"

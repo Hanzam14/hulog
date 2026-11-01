@@ -1,4 +1,4 @@
-import { t } from "../i18n";
+import { label, t } from "../i18n";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconArrowLeft, IconMinus, IconPlus } from "@tabler/icons-react";
@@ -17,6 +17,8 @@ export default function Record({ data, user, run, busy }: ViewProps) {
   const [days, setDays] = useState(1);
   const [note, setNote] = useState("");
   const [proofRef, setProofRef] = useState("");
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const offline = useQueueingOffline();
   // One key per attempt: a double tap or a retry is recognised by the server.
   const requestId = useRef(newRequestId());
@@ -84,23 +86,62 @@ export default function Record({ data, user, run, busy }: ViewProps) {
           {heldByText(data, c.holder_id, c.wallet_label, user)}
         </p>
       )}
-      <input
-        type="text"
-        maxLength={140}
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        aria-label={t("Note (optional)")}
-        placeholder={t("Note (optional)")}
-        style={{ textAlign: "center", maxWidth: "320px", margin: "8px auto" }}
-      />
-      <div style={{ maxWidth: "320px", margin: "8px auto", width: "100%" }}>
-        <ProofRefField value={proofRef} onChange={setProofRef} />
-      </div>
+      <details
+        className="form-optional"
+        open={detailsOpen}
+        onToggle={(e) => setDetailsOpen(e.currentTarget.open)}
+        style={{ maxWidth: "320px", margin: "8px auto", width: "100%" }}
+      >
+        <summary>{t("Add note or payment ref (optional)")}</summary>
+        <div className="form-optional-body">
+          <label>
+            {t("Note (optional)")}
+            <input
+              type="text"
+              maxLength={140}
+              value={note}
+              onChange={(e) => {
+                setNote(e.target.value);
+                if (formError) setFormError(null);
+              }}
+              aria-label={t("Note (optional)")}
+              placeholder={t("Note (optional)")}
+            />
+          </label>
+          <ProofRefField
+            value={proofRef}
+            onChange={(val) => {
+              setProofRef(val);
+              if (formError) setFormError(null);
+            }}
+          />
+          {formError && (
+            <p className="field-error" role="alert">
+              {formError}
+            </p>
+          )}
+        </div>
+      </details>
       <button
         className="big"
         disabled={busy}
-        onClick={() =>
-          run(async () => {
+        onClick={() => {
+          let ref: string | null = null;
+          try {
+            ref = cleanProofRef(proofRef);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            setDetailsOpen(true);
+            setFormError(label(msg));
+            return;
+          }
+          if (note.trim().length > 140) {
+            setDetailsOpen(true);
+            setFormError(t("Note must be at most 140 characters"));
+            return;
+          }
+          setFormError(null);
+          void run(async () => {
             const payload: {
               p_cycle_id: string;
               p_days: number;
@@ -114,7 +155,6 @@ export default function Record({ data, user, run, busy }: ViewProps) {
             if (trimmed) {
               payload.p_note = trimmed;
             }
-            const ref = cleanProofRef(proofRef);
             if (ref) payload.p_proof_ref = ref;
             const result = await submitRecord(user, {
               kind: "payment",
@@ -124,8 +164,8 @@ export default function Record({ data, user, run, busy }: ViewProps) {
             requestId.current = newRequestId();
             navigate("/");
             return result;
-          })
-        }
+          });
+        }}
       >
         {offline ? t("Save for now (offline)") : t("hulog!")}
       </button>
