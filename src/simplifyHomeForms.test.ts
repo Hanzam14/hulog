@@ -506,10 +506,12 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(markup).toContain("₱1,000.00");
     expect(markup).toContain("₱700.00");
     expect(markup).toContain("₱300.00");
-    // Optional date, note, and payment ref are tucked inside <details> and preserve entered values
+    // Optional date, note, and payment ref are tucked inside <details> without required date attribute and preserve entered values
     expect(markup).toContain("Date, note &amp; payment ref (optional)");
     expect(markup).toContain('value="Oct bill"');
     expect(markup).toContain('value="bad"');
+    expect(markup).not.toMatch(/type="date"[^>]*required/);
+    expect(markup).not.toMatch(/class="split-preview"[^>]*role="status"/);
 
     // Submit with invalid proofRef ("bad") reveals error and opens details
     state.cursor = 0;
@@ -551,6 +553,34 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(afterErrorMarkup).toMatch(/<details[^>]*open/);
     expect(afterErrorMarkup).toContain(
       "Reference must be 4 to 40 letters, numbers, spaces or dashes",
+    );
+
+    // Also verify invalid custom split percent shows percentage-specific error
+    state.values[12] = ""; // valid empty proofRef
+    state.values[9] = { choice: "custom", percent: "150" }; // invalid > 100%
+    state.cursor = 0;
+    const treeCustomErr = Tracker({
+      data,
+      user: "a",
+      run: async (fn) => {
+        await fn();
+      },
+      busy: false,
+    });
+    const formsCustomErr = findForms(treeCustomErr);
+    formsCustomErr[0].props.onSubmit!({ preventDefault: vi.fn() });
+
+    const percentErrorMarkup = html(
+      createElement(Tracker, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
+      ["/tracker"],
+    );
+    expect(percentErrorMarkup).toContain(
+      "Enter a valid percentage (0 to 100).",
     );
   });
 

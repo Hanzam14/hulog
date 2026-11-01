@@ -500,7 +500,7 @@ export default function Home(props: ViewProps) {
       ) : (
         <>
           {todaySummary && (
-            <div className="today-action" role="status">
+            <div className="today-action">
               <span className="today-label">{t("Today's action")}</span>
               <strong className="today-text">{todaySummary}</strong>
               {c.status === "accepted" && !closed(c) && (

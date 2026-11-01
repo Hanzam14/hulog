@@ -693,6 +693,8 @@ const taglish = {
   "Your share {share}": "Bahagi mo: {share}",
   "{debtor} owes {creditor}: {amount}":
     "Utang ni {debtor} kay {creditor}: {amount}",
+  "Enter a valid percentage (0 to 100).":
+    "Maglagay ng valid na porsyento (0 hanggang 100).",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1379,6 +1381,8 @@ const en = {
     "Total {total} · {payer} share {payerShare}",
   "Your share {share}": "Your share {share}",
   "{debtor} owes {creditor}: {amount}": "{debtor} owes {creditor}: {amount}",
+  "Enter a valid percentage (0 to 100).":
+    "Enter a valid percentage (0 to 100).",
 } satisfies Dictionary;
 const tl = {
   "Just me": "Para sa akin",
@@ -2072,6 +2076,8 @@ const tl = {
   "Your share {share}": "Bahagi mo: {share}",
   "{debtor} owes {creditor}: {amount}":
     "Utang ni {debtor} kay {creditor}: {amount}",
+  "Enter a valid percentage (0 to 100).":
+    "Maglagay ng wastong porsyento (0 hanggang 100).",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {

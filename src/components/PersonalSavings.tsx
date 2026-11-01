@@ -118,7 +118,7 @@ function EntryForm({
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const rawDate = String(form.get("date") ?? today);
+    const rawDate = String(form.get("date") || today).trim() || today;
     const rawNote = String(form.get("note") ?? "");
     if (rawDate > today) {
       setDetailsOpen(true);
@@ -188,7 +188,6 @@ function EntryForm({
             <input
               name="date"
               type="date"
-              required
               max={today}
               defaultValue={entry?.entry_date ?? today}
               onChange={() => {

@@ -125,7 +125,8 @@ function AbonoEditRow({
       setFormError(label(msg));
       return;
     }
-    if (entryDate > data.today) {
+    const effectiveDate = entryDate.trim() || entry.entry_date;
+    if (effectiveDate > data.today) {
       setDetailsOpen(true);
       setFormError(t("Entry date cannot be in the future"));
       return;
@@ -136,7 +137,7 @@ function AbonoEditRow({
       return;
     }
     if (isExpense && split.choice === "custom" && parsePercent(split.percent) === null) {
-      setFormError(t("Enter a positive amount."));
+      setFormError(t("Enter a valid percentage (0 to 100)."));
       return;
     }
     setFormError(null);
@@ -155,7 +156,7 @@ function AbonoEditRow({
               p_description: desc.trim(),
               p_total_amount_centavos: totalCents,
               p_owed_amount_centavos: owedCents,
-              p_entry_date: entryDate,
+              p_entry_date: effectiveDate,
               p_note: note.trim(),
             },
             ref,
@@ -170,7 +171,7 @@ function AbonoEditRow({
               p_id: entry.id,
               p_total_amount_centavos: amt,
               p_owed_amount_centavos: amt,
-              p_entry_date: entryDate,
+              p_entry_date: effectiveDate,
               p_note: note.trim(),
             },
             ref,
@@ -256,7 +257,7 @@ function AbonoEditRow({
             />
           </label>
           {preview && (
-            <div className="split-preview" role="status">
+            <div className="split-preview">
               <small>{preview.line1}</small>
               <strong>{preview.line2}</strong>
             </div>
@@ -285,7 +286,6 @@ function AbonoEditRow({
             {t("Date")}
             <input
               type="date"
-              required
               max={data.today}
               value={entryDate}
               onChange={(e) => {
@@ -370,7 +370,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
   const [fromMember, setFromMember] = useState(user); // 6
   const [total, setTotal] = useState(""); // 7
   const [owed, setOwed] = useState(""); // 8
-  const [split, setSplit] = useState<SplitState>({ choice: "half", percent: "" }); // 9
+  const [split, setSplit] = useState<SplitState>(NO_SPLIT); // 9
   const owedText = owedFieldText(total, split, fromMember === user, owed);
   const [entryDate, setEntryDate] = useState(data.today); // 10
   const [note, setNote] = useState(""); // 11
@@ -436,7 +436,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       return;
     }
     if (split.choice === "custom" && parsePercent(split.percent) === null) {
-      setAddFormError(t("Enter a positive amount."));
+      setAddFormError(t("Enter a valid percentage (0 to 100)."));
       return;
     }
     let totalCentavos: number;
@@ -461,7 +461,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
           p_description: description.trim(),
           p_total_amount_centavos: totalCentavos,
           p_owed_amount_centavos: owedCentavos,
-          p_entry_date: entryDate || data.today,
+          p_entry_date: entryDate.trim() || data.today,
           p_note: note.trim(),
           ...(ref ? { p_proof_ref: ref } : {}),
         },
@@ -471,7 +471,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       setDescription("");
       setTotal("");
       setOwed("");
-      setSplit({ choice: "half", percent: "" });
+      setSplit(NO_SPLIT);
       setNote("");
       setProofRef("");
       setEntryDate(data.today);
@@ -893,7 +893,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               </label>
 
               {expensePreview && (
-                <div className="split-preview" role="status" aria-label={t("Split summary")}>
+                <div className="split-preview" aria-label={t("Split summary")}>
                   <small>{expensePreview.line1}</small>
                   <strong>{expensePreview.line2}</strong>
                 </div>
@@ -910,7 +910,6 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                     {t("Date")}
                     <input
                       type="date"
-                      required
                       max={data.today}
                       value={entryDate}
                       onChange={(e) => {
