@@ -16,6 +16,8 @@ import { flushOutbox, isQueuedResult } from "./outbox";
 import type { Run } from "./components/shared";
 import Join from "./screens/Join";
 import NoGroup from "./screens/NoGroup";
+import Waiting from "./screens/Waiting";
+import { ActiveInvite, WelcomeActions } from "./components/InviteEntry";
 import Home from "./screens/Home";
 import { getSoloSession, isSoloMode, setSoloMode } from "./solo";
 import Propose from "./screens/Propose";
@@ -421,24 +423,15 @@ export default function App() {
             />
             <figcaption>{t("Example: ₱50 a day for 15 days.")}</figcaption>
           </figure>
-          <button disabled={busy} onClick={signIn}>
-            {t("Continue with Google")}
-          </button>
-          <button
-            type="button"
-            className="secondary"
-            disabled={busy}
-            onClick={() => {
+          <WelcomeActions
+            busy={busy}
+            onSignIn={() => void signIn()}
+            onSolo={() => {
               setSoloMode(true);
               setSession(getSoloSession());
               void refresh();
             }}
-          >
-            {t("Go solo on this device")}
-          </button>
-          {location.pathname.startsWith("/join/") && (
-            <p>{t("Your invite will be here after sign-in.")}</p>
-          )}
+          />
         </main>
       ) : !data ? (
         <main aria-busy="true">
@@ -455,23 +448,13 @@ export default function App() {
         </main>
       ) : own && own.status !== "active" ? (
         <main>
-          <h1>
-            {own.status === "pending"
-              ? t("Konting hintay.")
-              : t("Request denied")}
-          </h1>
-          <p>
-            {own.status === "pending"
-              ? t(
-                  "Your holder will review your join request. This screen refreshes automatically.",
-                )
-              : t(
-                  "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.",
-                )}
-          </p>
-          <button disabled={busy} onClick={() => run(refresh)}>
-            {t("Refresh status")}
-          </button>
+          <Waiting
+            status={own.status}
+            run={run}
+            busy={busy}
+            user={session.user.id}
+            onSignOut={() => void signOut()}
+          />
         </main>
       ) : !own ? (
         <main>
@@ -643,6 +626,12 @@ export default function App() {
                     busy={busy}
                     onSignOut={() => void signOut()}
                   />
+                }
+              />
+              <Route
+                path="/join/:token"
+                element={
+                  <ActiveInvite busy={busy} onExitSolo={() => void signOut()} />
                 }
               />
               <Route

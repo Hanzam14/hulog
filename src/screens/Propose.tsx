@@ -42,7 +42,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
   const [walletId, setWalletId] = useState<string | undefined>(defaultWallet);
   let total: string;
   try {
-    // A round always has two people paying, even before the partner joins.
+    // Online rounds need two members; standalone solo rounds have one saver.
     const multiplier = isSoloRound ? 1 : 2;
     total = money(parsePesos(amount) * Number(days) * multiplier);
   } catch {
@@ -66,6 +66,15 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
       navigate("/");
     });
   };
+  if (!local && active.length < 2)
+    return (
+      <>
+        <p>{t("A round needs two people.")}</p>
+        <Link className="button big" to="/settings">
+          {t("Invite your partner")}
+        </Link>
+      </>
+    );
   return (
     <form className="propose" onSubmit={submit}>
       <Link to="/" className="back" aria-label={t("Back")}>

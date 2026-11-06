@@ -1,5 +1,4 @@
 import { t } from "../i18n";
-import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconSparkles } from "@tabler/icons-react";
 import { rpc } from "../data";
@@ -16,7 +15,6 @@ export default function NoGroup({
   user?: string;
 }) {
   const navigate = useNavigate();
-  const nameRef = useRef<HTMLInputElement>(null);
   return (
     <>
       <h1 className="sr-only">{t("Create group")}</h1>
@@ -25,15 +23,9 @@ export default function NoGroup({
         <p>
           {t("Start a shared pot or paste an invite link from your partner.")}
         </p>
-        <button
-          type="button"
-          className="secondary"
-          onClick={() => nameRef.current?.focus()}
-        >
-          {t("Create group")}
-        </button>
       </div>
       <section>
+        <h2>{t("Create group")}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -48,12 +40,7 @@ export default function NoGroup({
         >
           <label>
             {t("Group name")}
-            <input
-              ref={nameRef}
-              name="name"
-              required
-              placeholder={t("Our little pot")}
-            />
+            <input name="name" required placeholder={t("Our little pot")} />
           </label>
           <label>
             {t("Pot held at")}

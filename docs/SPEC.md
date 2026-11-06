@@ -224,7 +224,7 @@ Hulog v2 expands the app from a single-mode paluwagan tracker into a read-only c
 - **Home**: Custody Breakdown Card (`custody_summary`), unified "Waiting for your check" confirm list, Paluwagan Round section, and Ipon Goals section (up to 3 active goals).
 - **Tracker**: Net Abono balance card with **Settle Abono** action + Shared Expense & Settlement log + `+ Add Abono`.
 - **History**: Closed Paluwagan cycles (with cycle debts/repayments) + completed/withdrawn/expired Ipon goals.
-- **Settings**: Profile (`Ikaw`), Group name, Wallets Manager, Invite QR, Theme (`Itsura`), Language (`Wika`), Notifications, Updates, and extended CSV export (`cycles`, `payments`, `repayments`, `wallets`, `savings-goals`, `savings-contributions`, `abono-entries`).
+- **Settings**: Owner pending join requests come first, followed by Grupo (avatars, profile editor, online invite QR), Pera (custody and wallets), App (theme, language, notifications), and Iba pa (Solo mode disclosure with pot mode, device-only notes and Exit/Switch control, install, CSV export, updates, sign out).
 
 ### 10.5 Personal savings (owner decisions, 2026-10-21)
 

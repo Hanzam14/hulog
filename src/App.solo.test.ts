@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Exercise App's actual handlers/effects without adding a DOM dependency.
 const harness = vi.hoisted(() => ({
+  pathname: "/",
   cells: [] as { value?: unknown; deps?: unknown[]; cleanup?: () => void }[],
   cursor: 0,
   pending: [] as (() => void)[],
@@ -63,7 +64,7 @@ vi.mock("react-router-dom", async () => ({
   ...(await vi.importActual<typeof import("react-router-dom")>(
     "react-router-dom",
   )),
-  useLocation: () => ({ pathname: "/" }),
+  useLocation: () => ({ pathname: harness.pathname }),
 }));
 vi.mock("@supabase/supabase-js", () => ({
   createClient: () => ({
@@ -98,6 +99,13 @@ function nodes(node: ReactNode): ReactElement<Props>[] {
   if (Array.isArray(node)) return node.flatMap(nodes);
   if (!node || typeof node !== "object" || !("props" in node)) return [];
   const element = node as ReactElement<Props>;
+  // Expand the extracted welcome actions so the existing auth assertions still
+  // exercise the actual buttons and handlers returned by that child.
+  if (
+    typeof element.type === "function" &&
+    ["WelcomeActions", "ActiveInvite"].includes(element.type.name)
+  )
+    return nodes((element.type as (props: Props) => ReactNode)(element.props));
   // Route elements hold their screen in the `element` prop.
   return [
     element,
@@ -126,6 +134,7 @@ function text(node: ReactNode): string {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.resetModules();
+  harness.pathname = "/";
   harness.cells = [];
   harness.cursor = 0;
   harness.pending = [];
@@ -200,6 +209,20 @@ async function app() {
   };
 }
 describe("configured Supabase solo entry", () => {
+  it("exits solo on an invite path and reveals invite sign-in without losing the path", async () => {
+    const { setSoloMode, isSoloMode } = await import("./solo");
+    setSoloMode(true);
+    harness.pathname = "/join/x";
+    const screen = await app();
+    await screen.flush();
+    expect(screen.hasButton("Exit solo mode")).toBe(true);
+    await screen.click("Exit solo mode");
+    expect(isSoloMode()).toBe(false);
+    expect(harness.pathname).toBe("/join/x");
+    expect(screen.hasButton("Continue with Google")).toBe(true);
+    expect(screen.hasButton("Go solo on this device")).toBe(false);
+  });
+
   it("does not replace a later online session with the stale startup read after leaving solo", async () => {
     const screen = await app();
     await screen.click("Go solo on this device");

@@ -588,11 +588,20 @@ export default function Home(props: ViewProps) {
           <Payout c={c} data={data} user={user} run={run} busy={busy} />
         </>
       )}
-      {!live && (
-        <Link className={`button big${c ? " secondary" : ""}`} to="/propose">
-          <IconSparkles aria-hidden="true" /> {t("new round")}
-        </Link>
-      )}
+      {!live &&
+        (!isSoloMode() &&
+        data.memberships.filter((m) => m.status === "active").length < 2 ? (
+          <>
+            <Link className="button big" to="/settings">
+              {t("Invite your partner")}
+            </Link>
+            {c && <p className="meta">{t("A round needs two people.")}</p>}
+          </>
+        ) : (
+          <Link className={`button big${c ? " secondary" : ""}`} to="/propose">
+            <IconSparkles aria-hidden="true" /> {t("new round")}
+          </Link>
+        ))}
 
       <section className="ipon-home-section">
         <h2 className="section-label">{t("Ipon")}</h2>
