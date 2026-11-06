@@ -2245,7 +2245,7 @@ select {
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
-/* "More": one card — CSV and update side by side, version and sign out below. */
+/* "More": solo/install first, then CSV and update side by side. */
 .more-card {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2264,11 +2264,19 @@ select {
 }
 .more-card .export {
   grid-column: 1;
-  grid-row: 1;
 }
 .more-card .app-updates > button {
   grid-column: 2;
-  grid-row: 1;
+}
+.more-card > details,
+.more-card > .install-hint {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.more-card > details > summary {
+  min-height: 44px;
+  padding-block: 10px;
+  cursor: pointer;
 }
 .more-card .app-version,
 .more-card .update-result,

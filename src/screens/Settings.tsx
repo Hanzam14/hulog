@@ -82,106 +82,6 @@ export default function Settings({
     });
   return (
     <div className="settings-grid">
-      <h1 className="sr-only">{group.name}</h1>
-      <h2 className="section-label settings-title">{t("Grupo")}</h2>
-      <div className="duo">
-        {active.map((m) => (
-          <figure key={m.user_id}>
-            {m.user_id === user ? (
-              <button
-                type="button"
-                className="avatar-edit"
-                aria-label={t("I-edit ang profile mo")}
-                aria-expanded={editingProfile}
-                disabled={busy}
-                onClick={() => setEditingProfile(!editingProfile)}
-              >
-                <Avatar data={data} id={m.user_id} size="lg" />
-              </button>
-            ) : (
-              <Avatar data={data} id={m.user_id} size="lg" />
-            )}
-            <figcaption>{name(data, m.user_id)}</figcaption>
-          </figure>
-        ))}
-      </div>
-      {editingProfile && (
-        <ProfileEditor
-          data={data}
-          user={user}
-          run={run}
-          busy={busy}
-          close={() => setEditingProfile(false)}
-        />
-      )}
-      <CustodyCard data={data} />
-      <WalletsSettings data={data} user={user} run={run} busy={busy} />
-      {isSoloMode() && (
-        <div className="segmented" role="radiogroup" aria-label={t("Pot mode")}>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={active.length > 1}
-            aria-pressed={active.length > 1}
-            aria-label={t("Partnered Pot (with Solo & Shared goals)")}
-            onClick={() => {
-              setSoloPotMode("partnered", user);
-              void run(async () => {});
-            }}
-          >
-            {t("Together")}
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={active.length <= 1}
-            aria-pressed={active.length <= 1}
-            aria-label={t("Standalone Solo")}
-            onClick={() => {
-              setSoloPotMode("standalone", user);
-              void run(async () => {});
-            }}
-          >
-            {t("Solo")}
-          </button>
-        </div>
-      )}
-      {isSoloMode() && (
-        <p className="meta">
-          {t("On this device only. Sign in to sync personal savings.")}
-        </p>
-      )}
-      {active.length < 2 && (
-        <div className="solo-mode-settings">
-          {isSoloMode() ? (
-            <button
-              type="button"
-              className="quiet"
-              disabled={busy}
-              onClick={() =>
-                run(async () => {
-                  setSoloMode(false);
-                })
-              }
-            >
-              {t("Exit solo mode")}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="quiet"
-              disabled={busy}
-              onClick={() =>
-                run(async () => {
-                  setSoloMode(true, user);
-                })
-              }
-            >
-              {t("Switch to solo mode")}
-            </button>
-          )}
-        </div>
-      )}
       {owner && (
         <>
           {pending.map((m) => (
@@ -225,7 +125,43 @@ export default function Settings({
               </button>
             </div>
           ))}
-          {active.length < 2 && pending.length === 0 && (
+        </>
+      )}
+      <h1 className="sr-only">{group.name}</h1>
+      <h2 className="section-label settings-title">{t("Grupo")}</h2>
+      <div className="duo">
+        {active.map((m) => (
+          <figure key={m.user_id}>
+            {m.user_id === user ? (
+              <button
+                type="button"
+                className="avatar-edit"
+                aria-label={t("I-edit ang profile mo")}
+                aria-expanded={editingProfile}
+                disabled={busy}
+                onClick={() => setEditingProfile(!editingProfile)}
+              >
+                <Avatar data={data} id={m.user_id} size="lg" />
+              </button>
+            ) : (
+              <Avatar data={data} id={m.user_id} size="lg" />
+            )}
+            <figcaption>{name(data, m.user_id)}</figcaption>
+          </figure>
+        ))}
+      </div>
+      {editingProfile && (
+        <ProfileEditor
+          data={data}
+          user={user}
+          run={run}
+          busy={busy}
+          close={() => setEditingProfile(false)}
+        />
+      )}
+      {owner && (
+        <>
+          {!isSoloMode() && active.length < 2 && pending.length === 0 && (
             <div className="invite">
               {invite && openInvite ? (
                 <>
@@ -307,13 +243,96 @@ export default function Settings({
           )}
         </>
       )}
+      <h2 className="section-label settings-title">{t("Money")}</h2>
+      <CustodyCard data={data} />
+      <WalletsSettings data={data} user={user} run={run} busy={busy} />
       <h2 className="section-label settings-title">{t("App")}</h2>
       <ThemeSettings />
       <LanguageSettings />
-      <InstallSettings />
       <NotificationSettings />
       <h2 className="section-label settings-title">{t("More")}</h2>
       <section className="more-card">
+        {(isSoloMode() || active.length < 2) && (
+          <details>
+            <summary>{t("Solo mode")}</summary>
+            {isSoloMode() && (
+              <div
+                className="segmented"
+                role="radiogroup"
+                aria-label={t("Pot mode")}
+              >
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={active.length > 1}
+                  aria-pressed={active.length > 1}
+                  aria-label={t("Partnered Pot (with Solo & Shared goals)")}
+                  onClick={() => {
+                    setSoloPotMode("partnered", user);
+                    void run(async () => {});
+                  }}
+                >
+                  {t("Together")}
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={active.length <= 1}
+                  aria-pressed={active.length <= 1}
+                  aria-label={t("Standalone Solo")}
+                  onClick={() => {
+                    setSoloPotMode("standalone", user);
+                    void run(async () => {});
+                  }}
+                >
+                  {t("Solo")}
+                </button>
+              </div>
+            )}
+            {isSoloMode() && (
+              <p className="meta">
+                {t("On this device only. Sign in to sync personal savings.")}
+              </p>
+            )}
+            {isSoloMode() && (
+              <p className="meta">
+                {t("To invite a partner, leave solo and sign in.")}
+              </p>
+            )}
+            {(isSoloMode() || active.length < 2) && (
+              <div className="solo-mode-settings">
+                {isSoloMode() ? (
+                  <button
+                    type="button"
+                    className="quiet"
+                    disabled={busy}
+                    onClick={() =>
+                      run(async () => {
+                        setSoloMode(false);
+                      })
+                    }
+                  >
+                    {t("Exit solo mode")}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="quiet"
+                    disabled={busy}
+                    onClick={() =>
+                      run(async () => {
+                        setSoloMode(true, user);
+                      })
+                    }
+                  >
+                    {t("Switch to solo mode")}
+                  </button>
+                )}
+              </div>
+            )}
+          </details>
+        )}
+        <InstallSettings />
         <button
           className="secondary export"
           disabled={busy}

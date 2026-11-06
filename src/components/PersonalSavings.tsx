@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import {
+  IconDeviceMobile,
   IconEye,
   IconLock,
   IconMinus,
@@ -11,6 +12,7 @@ import { rpc } from "../data";
 import { personalSeries } from "../growth";
 import { money, parsePesos, shortDate } from "../helpers";
 import { t, label } from "../i18n";
+import { isSoloMode } from "../solo";
 import { personalBalance } from "../personal";
 import GrowthChart from "./GrowthChart";
 import { useGoalCelebration } from "./useGoalCelebration";
@@ -499,6 +501,12 @@ export default function PersonalSavings({
       >
         {t("Personal savings")}
       </h3>
+      {isSoloMode() && (
+        <p className="meta">
+          <IconDeviceMobile size={16} aria-hidden="true" />{" "}
+          {t("Saved on this device only. Not synced.")}
+        </p>
+      )}
       {goals.map((goal) => (
         <PersonalGoalCard key={goal.id} goal={goal} {...props} />
       ))}

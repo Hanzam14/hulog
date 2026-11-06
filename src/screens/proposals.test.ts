@@ -140,6 +140,14 @@ describe("proposal backend contracts", () => {
           .buttons()
           .some((n) => text(n.props.children).includes("Solo round")),
       ).toBe(false);
+      if (single) {
+        // An online one-member group now gets the invite guard, never a form.
+        expect(screen.content()).toContain("A round needs two people.");
+        expect(screen.content()).toContain("Invite your partner");
+        expect(screen.buttons()).toHaveLength(0);
+        expect(rpc).not.toHaveBeenCalled();
+        return;
+      }
       const [name, payload] = await screen.submit();
       expect(name).toBe("propose_cycle");
       expect(payload).not.toHaveProperty("p_is_solo");

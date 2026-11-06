@@ -2,6 +2,25 @@ import { useSyncExternalStore } from "react";
 
 export type Lang = "en" | "tl" | "taglish";
 const taglish = {
+  "Request sent ✓": "Nakapag-request ka na ✓",
+  "Your partner approves you": "Ia-approve ka ng partner mo",
+  "Then you're in!": "Tapos, pasok ka na!",
+  "You're no longer in this group": "Wala ka na sa grupo",
+  "This screen updates automatically.": "Kusang nag-a-update ang screen na ito.",
+  "The owner did not approve your request. Ask them directly.":
+    "Hindi ka muna pinapasok ng owner. Kausapin mo siya nang direkta.",
+  "Want to join another group? Ask the owner to remove your membership first.":
+    "Gustong sumali sa ibang grupo? Pakiusap muna sa owner na alisin ang membership mo.",
+  "Solo data stays on this device.": "Dito lang sa device na ito ang solo data mo.",
+  "Invite your partner": "I-invite ang partner mo",
+  "A round needs two people.": "Kailangan ng dalawa para sa round.",
+  Money: "Pera",
+  "You're in solo mode on this device. To use this invite, leave solo and sign in.":
+    "Nasa solo mode ka sa device na ito. Para sumali sa invite, umalis muna sa solo at mag-sign in.",
+  "To invite a partner, leave solo and sign in.":
+    "Para mag-invite, umalis muna sa solo at mag-sign in.",
+  "Saved on this device only. Not synced.":
+    "Sa device na ito lang naka-save. Hindi pa naka-sync.",
   "Just me": "Para sa akin",
   "With partner": "Kasama ang partner",
   "With {name}": "Kasama si {name}",
@@ -701,6 +720,25 @@ const taglish = {
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
 const en = {
+  "Request sent ✓": "Request sent ✓",
+  "Your partner approves you": "Your partner approves you",
+  "Then you're in!": "Then you're in!",
+  "You're no longer in this group": "You're no longer in this group",
+  "This screen updates automatically.": "This screen updates automatically.",
+  "The owner did not approve your request. Ask them directly.":
+    "The owner did not approve your request. Ask them directly.",
+  "Want to join another group? Ask the owner to remove your membership first.":
+    "Want to join another group? Ask the owner to remove your membership first.",
+  "Solo data stays on this device.": "Solo data stays on this device.",
+  "Invite your partner": "Invite your partner",
+  "A round needs two people.": "A round needs two people.",
+  Money: "Money",
+  "You're in solo mode on this device. To use this invite, leave solo and sign in.":
+    "You're in solo mode on this device. To use this invite, leave solo and sign in.",
+  "To invite a partner, leave solo and sign in.":
+    "To invite a partner, leave solo and sign in.",
+  "Saved on this device only. Not synced.":
+    "Saved on this device only. Not synced.",
   "Just me": "Just me",
   "With partner": "With partner",
   "With {name}": "With {name}",
@@ -1389,6 +1427,26 @@ const en = {
     "Caught up for today ✓ ({paid} of {total} days done)",
 } satisfies Dictionary;
 const tl = {
+  "Request sent ✓": "Naipadala na ang kahilingan ✓",
+  "Your partner approves you": "Aaprubahan ka ng kapareha mo",
+  "Then you're in!": "Pagkatapos, pasok ka na!",
+  "You're no longer in this group": "Wala ka na sa grupo",
+  "This screen updates automatically.": "Kusang nag-a-update ang pahinang ito.",
+  "The owner did not approve your request. Ask them directly.":
+    "Hindi inaprubahan ng may-ari ang kahilingan mo. Kausapin mo siya nang direkta.",
+  "Want to join another group? Ask the owner to remove your membership first.":
+    "Gustong sumali sa ibang grupo? Hilingin muna sa may-ari na alisin ang pagiging miyembro mo.",
+  "Solo data stays on this device.":
+    "Sa device na ito lang nakatago ang solo mong tala.",
+  "Invite your partner": "Imbitahan ang kapareha mo",
+  "A round needs two people.": "Kailangan ng dalawang tao para sa round.",
+  Money: "Pera",
+  "You're in solo mode on this device. To use this invite, leave solo and sign in.":
+    "Nasa solo mode ka sa device na ito. Para gamitin ang imbitasyon, umalis muna sa solo at mag-sign in.",
+  "To invite a partner, leave solo and sign in.":
+    "Para mag-imbita ng kapareha, umalis muna sa solo at mag-sign in.",
+  "Saved on this device only. Not synced.":
+    "Sa device na ito lang nakatago. Hindi naka-sync.",
   "Just me": "Para sa akin",
   "With partner": "Kasama ang partner",
   "With {name}": "Kasama si {name}",
