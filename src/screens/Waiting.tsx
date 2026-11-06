@@ -38,7 +38,7 @@ export default function Waiting({
           <button
             className="secondary"
             disabled={busy}
-            onClick={() => run(async () => {})}
+            onClick={() => run(async () => {}, { showSuccess: false })}
           >
             {t("Refresh status")}
           </button>
