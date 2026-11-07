@@ -145,7 +145,7 @@ const taglish = {
     "I-copy ang .env.example sa .env, sundin ang SETUP.md, tapos i-restart ang app.",
   hulog: "hulog",
   "Sign out": "Sign out",
-  Dismiss: "Dismiss",
+  Dismiss: "Isara",
   "Loading…": "Loading…",
   "Paluwagan para sa": "Paluwagan para sa",
   "ating dalawa": "ating dalawa",
