@@ -122,4 +122,12 @@ describe("device language", () => {
     expect(t("savings_goals")).toBe("mga ipon goal");
     expect(t("abono_entries")).toBe("mga abono");
   });
+  it("uses Isara, not English Dismiss, for close buttons in Taglish (#31)", () => {
+    setLang("taglish");
+    expect(t("Dismiss")).toBe("Isara");
+    setLang("tl");
+    expect(t("Dismiss")).toBe("Isara");
+    setLang("en");
+    expect(t("Dismiss")).toBe("Dismiss");
+  });
 });
