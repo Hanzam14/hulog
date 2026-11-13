@@ -423,6 +423,21 @@ export default function Home(props: ViewProps) {
   const paidDays = myProgress?.confirmed_days ?? 0;
   const pendingDays = myProgress?.pending_days ?? 0;
   const loggedDays = paidDays + pendingDays;
+  const elapsedDays = c
+    ? Math.min(
+        c.num_days,
+        Math.max(
+          0,
+          Math.round(
+            (Date.parse(`${data.today}T00:00:00Z`) -
+              Date.parse(`${c.start_date}T00:00:00Z`)) /
+              86_400_000,
+          ) + 1,
+        ),
+      )
+    : 0;
+  // Logging ahead stays an option via /hulog, while due days get the primary button.
+  const dueToday = loggedDays < elapsedDays;
 
   let todaySummary: string | null = null;
   if (c) {
@@ -443,18 +458,7 @@ export default function Home(props: ViewProps) {
           pending: pendingDays,
         });
       } else {
-        const elapsedDays = Math.min(
-          c.num_days,
-          Math.max(
-            0,
-            Math.round(
-              (Date.parse(`${data.today}T00:00:00Z`) -
-                Date.parse(`${c.start_date}T00:00:00Z`)) /
-                86_400_000,
-            ) + 1,
-          ),
-        );
-        if (loggedDays >= elapsedDays) {
+        if (!dueToday) {
           todaySummary = t("Caught up for today ✓ ({paid} of {total} days done)", {
             paid: paidDays,
             total: c.num_days,
@@ -540,51 +544,68 @@ export default function Home(props: ViewProps) {
         <>
           {todaySummary && (
             <div className="today-action">
-              <span className="today-label">{t("Today's action")}</span>
-              <strong className="today-text">{todaySummary}</strong>
-              {c.status === "accepted" && !closed(c) && (
-                <Link className="button big" to="/hulog">
-                  <IconPlus aria-hidden="true" /> {t("hulog!")}
-                </Link>
-              )}
+              <div className="today-copy">
+                <span className="today-label">{t("Today's action")}</span>
+                <strong className="today-text">{todaySummary}</strong>
+              </div>
+              {c.status === "accepted" &&
+                !closed(c) &&
+                loggedDays < c.num_days && (
+                  <Link
+                    className={dueToday ? "button big" : "button secondary big"}
+                    to="/hulog"
+                  >
+                    <IconPlus aria-hidden="true" />{" "}
+                    {t("Hulog {amount}", {
+                      amount: money(c.daily_amount_centavos),
+                    })}
+                  </Link>
+                )}
             </div>
           )}
-          <CycleCard c={c} data={data} user={user} />
-          {c.status === "proposed" ? (
-            <Proposal c={c} user={user} run={run} busy={busy} />
-          ) : (
-            <div className="members tally-sheet">
-              {data.progress
-                .filter((p) => p.cycle_id === c.id)
-                .map((p) => {
-                  const isSolo = isSoloCycle(c);
-                  const isSaver = p.member_id === c.receiver_id;
-                  const isObserving = isSolo && !isSaver;
-                  return (
-                    <div className="member" key={p.member_id}>
-                      <div className="member-who">
-                        <Avatar data={data} id={p.member_id} size="sm" />
-                        <strong>{name(data, p.member_id)}</strong>
-                        {!isObserving && (
-                          <StreakChip data={data} memberId={p.member_id} />
+          <div className="round-panel">
+            <CycleCard c={c} data={data} user={user} />
+            {c.status === "proposed" ? (
+              <Proposal c={c} user={user} run={run} busy={busy} />
+            ) : (
+              <div className="members tally-sheet">
+                {data.progress
+                  .filter((p) => p.cycle_id === c.id)
+                  .map((p) => {
+                    const isSolo = isSoloCycle(c);
+                    const isSaver = p.member_id === c.receiver_id;
+                    const isObserving = isSolo && !isSaver;
+                    return (
+                      <div className="member" key={p.member_id}>
+                        <div className="member-who">
+                          <Avatar data={data} id={p.member_id} size="sm" />
+                          <strong>{name(data, p.member_id)}</strong>
+                          {!isObserving && (
+                            <StreakChip data={data} memberId={p.member_id} />
+                          )}
+                          {!isObserving && (
+                            <span className="member-ratio">
+                              {p.confirmed_days}/{c.num_days}
+                            </span>
+                          )}
+                        </div>
+                        {isObserving ? (
+                          <span className="meta">{t("₱0 · Observing")}</span>
+                        ) : (
+                          <Tally
+                            label={name(data, p.member_id)}
+                            paid={p.confirmed_days}
+                            pending={p.pending_days}
+                            total={c.num_days}
+                            tone={tone(data, p.member_id)}
+                          />
                         )}
                       </div>
-                      {isObserving ? (
-                        <span className="meta">{t("₱0 · Observing")}</span>
-                      ) : (
-                        <Tally
-                          label={name(data, p.member_id)}
-                          paid={p.confirmed_days}
-                          pending={p.pending_days}
-                          total={c.num_days}
-                          tone={tone(data, p.member_id)}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          )}
+                    );
+                  })}
+              </div>
+            )}
+          </div>
           <Payout c={c} data={data} user={user} run={run} busy={busy} />
         </>
       )}

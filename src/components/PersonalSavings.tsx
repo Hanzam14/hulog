@@ -4,8 +4,10 @@ import {
   IconEye,
   IconLock,
   IconMinus,
+  IconPencil,
   IconPlus,
   IconTarget,
+  IconTrash,
 } from "@tabler/icons-react";
 import type { PersonalEntry, PersonalGoal } from "../data";
 import { rpc } from "../data";
@@ -71,9 +73,6 @@ export function GoalForm({
           <option value="shared">{t("Shared — partner can view")}</option>
         </select>
       </label>
-      <p className="meta">
-        {t("Only you can change this goal or its records.")}
-      </p>
       <div className="actions">
         <button disabled={busy}>
           {goal ? t("Save goal") : t("Create personal goal")}
@@ -214,9 +213,6 @@ function EntryForm({
           {formError}
         </p>
       )}
-      <p className="meta">
-        {t("This records money you moved yourself. Hulog does not move money.")}
-      </p>
       <div className="actions">
         <button disabled={busy}>
           {entry
@@ -379,42 +375,47 @@ export function PersonalGoalCard({
           </p>
         )}
         {entries.map((entry) => (
-          <div className="entry" key={entry.id}>
-            <div className="row">
-              <span>
-                {entry.kind === "deposit" ? t("Deposit") : t("Withdrawal")}
-              </span>
-              <b className="personal-entry-amount">
-                {money(entry.amount_centavos)}
-              </b>
+          <div className="entry personal-entry" key={entry.id}>
+            <div className="personal-entry-main">
+              <div className="personal-entry-head">
+                <b
+                  className={
+                    entry.kind === "deposit"
+                      ? "personal-entry-amount deposit"
+                      : "personal-entry-amount withdrawal"
+                  }
+                >
+                  {entry.kind === "deposit" ? "+" : "−"}
+                  {money(entry.amount_centavos)}
+                </b>
+                <span className="meta">{shortDate(entry.entry_date)}</span>
+              </div>
+              {entry.note && <p className="personal-entry-note">{entry.note}</p>}
             </div>
-            <p>
-              {shortDate(entry.entry_date)}
-              {entry.note && (
-                <>
-                  <br />
-                  {entry.note}
-                </>
-              )}
-            </p>
             {owner && (
-              <div className="actions">
+              <div className="personal-entry-actions">
                 <button
-                  className="quiet"
+                  type="button"
+                  className="quiet icon-btn"
                   disabled={busy}
+                  aria-label={t("Edit personal entry")}
+                  title={t("Edit personal entry")}
                   onClick={() => {
                     setEditingEntry(entry);
                     setRecording(entry.kind);
                   }}
                 >
-                  {t("Edit personal entry")}
+                  <IconPencil size={16} aria-hidden="true" />
                 </button>
                 <button
-                  className="quiet danger"
+                  type="button"
+                  className="quiet danger icon-btn"
                   disabled={busy}
+                  aria-label={t("Delete entry")}
+                  title={t("Delete entry")}
                   onClick={() => remove("entry", entry.id)}
                 >
-                  {t("Delete entry")}
+                  <IconTrash size={16} aria-hidden="true" />
                 </button>
               </div>
             )}
@@ -424,52 +425,54 @@ export function PersonalGoalCard({
       {owner && (
         <details>
           <summary>{t("Manage personal goal")}</summary>
-          <button
-            className="secondary personal-share"
-            disabled={busy}
-            onClick={() =>
-              void run(() =>
-                rpc("update_personal_goal", {
-                  p_goal_id: goal.id,
-                  p_visibility:
-                    goal.visibility === "private" ? "shared" : "private",
-                }),
-              )
-            }
-          >
-            {goal.visibility === "private" ? (
-              <IconEye size={18} aria-hidden="true" />
-            ) : (
-              <IconLock size={18} aria-hidden="true" />
+          <div className="personal-manage-body">
+            <button
+              className="secondary personal-share"
+              disabled={busy}
+              onClick={() =>
+                void run(() =>
+                  rpc("update_personal_goal", {
+                    p_goal_id: goal.id,
+                    p_visibility:
+                      goal.visibility === "private" ? "shared" : "private",
+                  }),
+                )
+              }
+            >
+              {goal.visibility === "private" ? (
+                <IconEye size={18} aria-hidden="true" />
+              ) : (
+                <IconLock size={18} aria-hidden="true" />
+              )}
+              {goal.visibility === "private"
+                ? t("Share read-only")
+                : t("Make private")}
+            </button>
+            <div className="actions">
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => setEditingGoal(!editingGoal)}
+              >
+                {t("Edit goal")}
+              </button>
+              <button
+                className="quiet danger"
+                disabled={busy}
+                onClick={() => remove("goal", goal.id)}
+              >
+                {t("Delete goal")}
+              </button>
+            </div>
+            {editingGoal && (
+              <GoalForm
+                goal={goal}
+                run={run}
+                busy={busy}
+                close={() => setEditingGoal(false)}
+              />
             )}
-            {goal.visibility === "private"
-              ? t("Share read-only")
-              : t("Make private")}
-          </button>
-          <div className="actions">
-            <button
-              className="secondary"
-              disabled={busy}
-              onClick={() => setEditingGoal(!editingGoal)}
-            >
-              {t("Edit goal")}
-            </button>
-            <button
-              className="quiet danger"
-              disabled={busy}
-              onClick={() => remove("goal", goal.id)}
-            >
-              {t("Delete goal")}
-            </button>
           </div>
-          {editingGoal && (
-            <GoalForm
-              goal={goal}
-              run={run}
-              busy={busy}
-              close={() => setEditingGoal(false)}
-            />
-          )}
         </details>
       )}
     </article>
@@ -502,8 +505,8 @@ export default function PersonalSavings({
         {t("Personal savings")}
       </h3>
       {isSoloMode() && (
-        <p className="meta">
-          <IconDeviceMobile size={16} aria-hidden="true" />{" "}
+        <p className="meta local-note">
+          <IconDeviceMobile size={16} aria-hidden="true" />
           {t("Saved on this device only. Not synced.")}
         </p>
       )}

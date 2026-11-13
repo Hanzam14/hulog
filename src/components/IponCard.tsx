@@ -30,9 +30,6 @@ export default function IponCard({
   action?: ReactNode;
 }) {
   const { percent: progress, paceLabel } = iponGoalProgress(g);
-  const radius = 18;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   useGoalCelebration(data, { kind: "ipon", goal: g }, user);
 
@@ -80,35 +77,13 @@ export default function IponCard({
   const card = (
     <Link to={`/ipon/${g.id}`} className="pot ipon-card" aria-label={g.title}>
       <div className="pot-top">
-        <div className="ipon-ring" aria-hidden="true">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle
-              cx="22"
-              cy="22"
-              r={radius}
-              fill="none"
-              stroke="var(--dots)"
-              strokeWidth="4"
-            />
-            <circle
-              cx="22"
-              cy="22"
-              r={radius}
-              fill="none"
-              stroke="var(--leaf-deep)"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              transform="rotate(-90 22 22)"
-            />
-          </svg>
-          <span>{progress}%</span>
-        </div>
         <div className="ipon-head">
           <div className="ipon-title-row">
             <span className="ipon-title">{cleanGoalTitle(g.title)}</span>
-            {statusChip && <span className="chip">{statusChip}</span>}
+            <div className="ipon-badges">
+              {statusChip && <span className="chip">{statusChip}</span>}
+              <span className="ipon-pct">{progress}%</span>
+            </div>
           </div>
           <div className="ipon-amounts">
             <strong>{money(g.saved_centavos)}</strong>

@@ -86,14 +86,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
 
   return (
     <section className="custody-ledger">
-      <div
-        className="custody-header row"
-        style={{
-          marginBottom: "12px",
-          borderBottom: "2px dashed var(--dots)",
-          paddingBottom: "10px",
-        }}
-      >
+      <div className="custody-header row">
         <h2 style={{ margin: 0, fontSize: "20px" }}>
           {t("Where our money is")}
         </h2>

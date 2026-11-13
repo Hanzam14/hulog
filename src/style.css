@@ -51,48 +51,49 @@
   grid-column: 1 / -1;
 }
 @theme {
-  --font-sans: Nunito, system-ui, "Segoe UI", sans-serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-/* A shared sticker planner: dotted paper, inked outlines, one color each. */
+/* Minimalist financial companion: clean surfaces, hairline dividers, zero clutter. */
 :root {
-  --paper: #f5efff;
-  --dots: #e2d6fa;
-  --ink: #2b2140;
-  --soft: #6b5e85;
+  --paper: #f7f7f8;
+  --dots: #e5e6eb;
+  --ink: #141418;
+  --soft: #595a66;
   --card: #ffffff;
-  --card-tint: #fbf8ff;
-  --pink: #ff7aa2;
-  --pink-deep: #c2386a;
-  --blue: #5dbbff;
-  --blue-deep: #1c6ba5;
-  --mango: #ffc94d;
-  --mango-deep: #a86a00;
-  --leaf: #3dbe84;
-  --leaf-deep: #1f7a50;
-  --green: #3dbe84;
-  --green-deep: #1f7a50;
-  --orange: #ffc94d;
-  --orange-deep: #965c00;
-  --purple: #b79cff;
-  --purple-deep: #6a4bc4;
-  --danger: #c0362c;
-  --sticker-ink: #2b2140;
-  --control-border: #887699;
-  --line: color-mix(in srgb, var(--ink) 18%, transparent);
+  --card-tint: #f1f2f5;
+  --pink: #ff85a9;
+  --pink-deep: #b82858;
+  --blue: #6cb8ff;
+  --blue-deep: #155fa0;
+  --mango: #f7be42;
+  --mango-deep: #855200;
+  --leaf: #42c288;
+  --leaf-deep: #186843;
+  --green: #42c288;
+  --green-deep: #186843;
+  --orange: #f7be42;
+  --orange-deep: #855200;
+  --purple: #b89eff;
+  --purple-deep: #5e3db3;
+  --danger: #ba2b26;
+  --sticker-ink: #141418;
+  --control-border: #828491;
+  --line: color-mix(in srgb, var(--ink) 10%, transparent);
   --card-border: var(--line);
   --highlight-border: var(--line);
   --highlight: var(--card-tint);
   --hover-card: var(--card-tint);
   --inset: var(--card-tint);
-  --nav-surface: var(--card);
+  --nav-surface: color-mix(in srgb, var(--card) 88%, transparent);
   --action-pink: var(--pink);
-  --tan: color-mix(in srgb, var(--soft) 35%, transparent);
+  --tan: color-mix(in srgb, var(--soft) 28%, transparent);
   --success-tint: color-mix(in srgb, var(--leaf) 12%, var(--card));
   --danger-tint: color-mix(in srgb, var(--danger) 10%, var(--card));
-  --brand-soft: var(--card-tint);
+  --brand-soft: color-mix(in srgb, var(--pink) 14%, var(--card));
   --brand: var(--pink-deep);
+  --elev-sm: 0 1px 2px rgba(20, 20, 24, 0.04);
   color-scheme: light;
-  --display: Fredoka, Nunito, system-ui, sans-serif;
+  --display: var(--font-sans);
   font-family: var(--font-sans);
   font-size: 15px;
   font-variant-numeric: tabular-nums;
@@ -100,6 +101,7 @@
   background: var(--paper);
   font-synthesis: none;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 * {
   box-sizing: border-box;
@@ -108,12 +110,10 @@ body {
   margin: 0;
   min-width: 320px;
   background-color: var(--paper);
-  background-image: radial-gradient(var(--dots) 1.2px, transparent 1.2px);
-  background-size: 16px 16px;
 }
 .app {
-  --container-width: 560px;
-  max-width: 560px;
+  --container-width: 520px;
+  max-width: var(--container-width);
   margin: auto;
   min-height: 100dvh;
   display: flex;
@@ -123,13 +123,18 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 16px 4px;
+  padding: 16px 16px 6px;
 }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   color: var(--ink);
   font-family: var(--display);
-  font-size: 26px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   text-decoration: none;
 }
 .dot {
@@ -139,20 +144,21 @@ h1,
 h2,
 h3 {
   font-family: var(--display);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 h1 {
-  font-size: 26px;
-  line-height: 1.15;
+  font-size: 24px;
+  line-height: 1.2;
   margin: 8px 0 0;
 }
 h2 {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.25;
   margin: 0 0 8px;
 }
 h3 {
-  font-size: 17px;
+  font-size: 16px;
   margin: 12px 0 4px;
 }
 p {
@@ -162,14 +168,13 @@ main {
   flex: 1;
   padding: 8px 16px 24px;
 }
-/* Stickers: white, inked edge, hard offset shadow. */
 section {
   margin: 16px 0;
   padding: 16px;
   background: var(--card);
-  border: 1.5px solid var(--line);
-  border-radius: 14px;
-  box-shadow: none;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--elev-sm);
 }
 nav {
   position: sticky;
@@ -178,9 +183,11 @@ nav {
   display: flex;
   justify-content: space-around;
   gap: 4px;
-  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-  background: var(--card);
-  border-top: 1.5px solid var(--line);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: var(--nav-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
 }
 nav a {
   position: relative;
@@ -190,30 +197,33 @@ nav a {
   min-height: 44px;
   color: var(--soft);
   font-family: var(--display);
-  font-size: 15px;
-  font-weight: 500;
-  padding: 4px 16px;
-  border: 2px solid transparent;
-  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
   text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 nav a.active {
-  color: var(--sticker-ink);
-  background: var(--pink);
-  border-color: var(--ink);
+  color: var(--pink-deep);
+  background: var(--brand-soft);
+  border-color: transparent;
 }
 button,
 .button {
   min-height: 44px;
-  background: var(--pink);
-  color: var(--sticker-ink);
-  border: 1.5px solid var(--line);
-  border-radius: 14px;
+  background: var(--brand);
+  color: var(--paper);
+  border: 1px solid transparent;
+  border-radius: 12px;
   box-shadow: none;
   font-family: var(--display);
   font-size: 15px;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 10px 16px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -222,17 +232,17 @@ button,
   text-align: center;
   text-decoration: none;
   transition:
-    transform 0.08s,
-    box-shadow 0.08s;
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.08s ease;
 }
 button:hover:not(:disabled),
 .button:hover {
-  background: var(--pink);
+  filter: brightness(0.97);
 }
 button:active:not(:disabled),
 .button:active {
-  transform: translate(1px, 1px);
-  box-shadow: none;
+  transform: scale(0.99);
 }
 button:disabled {
   opacity: 0.5;
@@ -241,6 +251,7 @@ button:disabled {
 .secondary {
   background: var(--card);
   color: var(--ink);
+  border-color: var(--line);
 }
 .secondary:hover:not(:disabled) {
   background: var(--hover-card);
@@ -267,12 +278,19 @@ button:disabled {
 .danger {
   color: var(--danger);
 }
+button.danger:not(.secondary):not(.quiet),
+.button.danger:not(.secondary):not(.quiet),
+button.danger:not(.secondary):not(.quiet):hover:not(:disabled),
+.button.danger:not(.secondary):not(.quiet):hover:not(:disabled) {
+  background: var(--danger);
+  color: var(--paper);
+}
 a {
   color: var(--ink);
   font-weight: 700;
   text-underline-offset: 3px;
 }
-a:hover {
+a:not(.button):hover {
   color: var(--pink-deep);
 }
 form {
@@ -618,6 +636,7 @@ button svg,
 }
 .round.ok {
   background: var(--leaf);
+  color: var(--sticker-ink);
 }
 .round.no {
   background: var(--card);
@@ -802,9 +821,10 @@ button svg,
   border-radius: 999px;
 }
 .pick.on {
-  background: var(--highlight);
+  background: var(--ink);
+  color: var(--paper);
 }
-.pick:hover:not(:disabled) {
+.pick:hover:not(:disabled):not(.on) {
   background: var(--highlight);
 }
 .who {
@@ -1049,31 +1069,32 @@ button svg,
   }
 }
 
-/* Ube night: the same sheets and member colors after dark. */
+/* Night mode: calm neutral slate with soft accents. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #1b1526;
-  --dots: #2c2340;
-  --card: #251d35;
-  --card-tint: #2d2440;
-  --ink: #f4eeff;
-  --soft: #b9acd6;
-  --pink: #ff8db0;
-  --blue: #7dc8ff;
-  --mango: #ffd56d;
-  --leaf: #64d59e;
-  --green: #64d59e;
-  --orange: #ffd56d;
-  --purple: #c5aeff;
-  --pink-deep: #ff9bbc;
-  --blue-deep: #8bd5ff;
-  --mango-deep: #ffd56d;
-  --leaf-deep: #91e1b7;
-  --green-deep: #91e1b7;
-  --orange-deep: #ffd56d;
-  --purple-deep: #d0bdff;
-  --danger: #ffaaa1;
-  --control-border: #9582ad;
+  --paper: #0e0f12;
+  --dots: #252730;
+  --card: #16181f;
+  --card-tint: #1f212a;
+  --ink: #f3f4f6;
+  --soft: #9fa2b2;
+  --pink: #ff8fb1;
+  --blue: #7bc6ff;
+  --mango: #ffd166;
+  --leaf: #5ed19a;
+  --green: #5ed19a;
+  --orange: #ffd166;
+  --purple: #c3abff;
+  --pink-deep: #ff9ebc;
+  --blue-deep: #8cd0ff;
+  --mango-deep: #ffd166;
+  --leaf-deep: #89dfb5;
+  --green-deep: #89dfb5;
+  --orange-deep: #ffd166;
+  --purple-deep: #d0bfff;
+  --danger: #ff9f96;
+  --control-border: #777988;
+  --elev-sm: none;
 }
 .pink {
   --tone: var(--pink);
@@ -1178,8 +1199,8 @@ button svg,
   background: var(--card);
 }
 .emoji-grid button[aria-pressed="true"] {
-  background: var(--pink);
-  border-color: var(--line);
+  background: var(--brand-soft);
+  border-color: var(--pink-deep);
 }
 .color-grid {
   display: grid;
@@ -1200,9 +1221,9 @@ button svg,
   background: var(--hover-card);
 }
 .color-choice[aria-pressed="true"] {
-  border-style: dashed;
+  border: 1.5px solid var(--tone, var(--pink-deep));
   outline: 2px solid var(--tone, var(--pink));
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 .swatch {
   display: grid;
@@ -1461,9 +1482,9 @@ button svg,
   gap: 8px;
 }
 
-/* One sheet hierarchy, shared by every screen. */
+/* One minimalist hierarchy, shared by every screen. */
 header {
-  padding: 16px 16px 4px;
+  padding: 16px 16px 6px;
 }
 main {
   min-width: 0;
@@ -1471,7 +1492,7 @@ main {
 }
 .welcome {
   width: 100%;
-  max-width: 560px;
+  max-width: 520px;
   margin-inline: auto;
 }
 section,
@@ -1480,12 +1501,13 @@ section,
 .abono-form-card,
 .welcome figure,
 .pot,
-.celebrate {
-  border-radius: 22px;
+.celebrate,
+.round-panel {
+  border-radius: 16px;
 }
 section {
   padding: 16px;
-  margin-block: 24px;
+  margin-block: 16px;
 }
 .welcome figure {
   padding: 16px;
@@ -1496,15 +1518,16 @@ h3 {
   line-height: 1.2;
 }
 h1 {
-  font-size: 26px;
-  margin-bottom: 16px;
+  font-size: 24px;
+  margin-bottom: 14px;
 }
 .brand,
 .welcome h1 {
-  font-size: 34px;
+  font-size: 28px;
 }
 .welcome h1 {
   margin-top: 24px;
+  font-size: 32px;
   line-height: 1.15;
 }
 .welcome > p {
@@ -1520,48 +1543,53 @@ footer {
 input,
 select {
   min-height: 44px;
-  border-color: var(--control-border);
+  font-size: 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
 }
 button,
 .button {
   min-height: 44px;
   min-width: 44px;
-  border-color: var(--sticker-ink);
-}
-button:not(
-  .secondary,
-  .quiet,
-  .pick,
-  .who,
-  .avatar-edit,
-  .color-choice,
-  .round,
-  .segmented button,
-  .emoji-grid button
-),
-.button:not(.secondary, .quiet) {
-  box-shadow: 2px 3px 0 var(--ink);
+  border-color: transparent;
+  box-shadow: none;
 }
 .secondary,
 .pick,
 .color-choice,
 .emoji-grid button {
-  border-color: var(--control-border);
+  border: 1px solid var(--line);
+}
+.pick.on,
+.segmented button[aria-pressed="true"],
+.emoji-grid button[aria-pressed="true"] {
+  border-color: transparent;
+}
+.who.on {
+  background: var(--brand-soft);
+  border: 1px solid var(--pink);
+}
+.preview-pot {
+  background: var(--card-tint);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
 }
 .secondary:active,
 .quiet:active,
 .pick:active,
 .round:active {
-  transform: none;
+  transform: scale(0.99);
 }
 .big {
-  font-size: 20px;
+  font-size: 16px;
+  font-weight: 700;
 }
 .welcome button {
-  font-size: 17px;
+  font-size: 16px;
 }
 .welcome button + button {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 .settled-icon {
   display: block;
@@ -1569,56 +1597,124 @@ button:not(
   color: var(--leaf-deep);
 }
 .who:not(.on) .avatar {
-  opacity: 1;
-  border-style: dashed;
+  opacity: 0.5;
+  border-style: solid;
 }
 .back,
 .header-bell {
   width: 44px;
   height: 44px;
-  border-color: var(--control-border);
+  border: 1px solid var(--line);
+  box-shadow: none;
 }
 nav {
   z-index: 10;
   gap: 4px;
-  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
 }
 nav a {
   min-height: 44px;
   min-width: 0;
   flex: 1;
-  padding: 8px;
-  font-size: 13px;
+  padding: 6px 8px;
+  font-size: 12px;
 }
 nav a.active {
-  border-color: var(--sticker-ink);
+  color: var(--pink-deep);
+  background: var(--brand-soft);
+  border-color: transparent;
+}
+.round-panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--elev-sm);
+  margin: 12px 0;
 }
 .pot {
+  margin: 0;
   padding: 16px;
   gap: 12px;
-  border-color: var(--control-border);
-  box-shadow: 2px 3px 0 var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--elev-sm);
 }
-.pot .pig {
-  color: var(--mango-deep);
+.round-panel > .pot {
+  border: 0;
+  border-radius: 15px 15px 0 0;
+  box-shadow: none;
+}
+.round-panel > .pot:only-child {
+  border-radius: 15px;
+}
+.round-panel > :last-child:not(.pot) {
+  border-radius: 0 0 15px 15px;
+}
+.pot-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pot-amount {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.pot-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pot-solo-chip {
+  justify-self: start;
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  border: 0;
 }
 .pot strong,
 .amount,
 .celebrate strong,
 .stepper output {
-  font-size: 34px;
-  line-height: 1.2;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 .pot small {
   font-size: 13px;
+  font-weight: 500;
+}
+.pot-receiver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 10px;
+  background: var(--card-tint);
+  border-radius: 999px;
+  font-size: 13px;
 }
 .pot-progress {
-  height: 12px;
-  border-color: var(--control-border);
+  height: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dots);
+  overflow: hidden;
 }
 .pot-progress > span {
-  background: var(--mango);
-  border-right: 1.5px solid var(--mango-deep);
+  background: var(--pink-deep);
+  border-right: 0;
+  border-radius: 999px;
+}
+.pot-custody small {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font-weight: 500;
+  color: var(--soft);
 }
 .ipon-card,
 .ipon-card:hover {
@@ -1627,28 +1723,53 @@ nav a.active {
   border-color: var(--line);
 }
 .ipon-card .pot-progress > span {
-  background: var(--leaf);
-  border-right-color: var(--leaf-deep);
+  background: var(--leaf-deep);
 }
 .custody-ledger {
-  background: var(--card-tint);
+  background: var(--card);
+}
+.custody-header {
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
 }
 .custody-wallet-pill {
   flex-wrap: wrap;
   border: 0;
-  border-radius: 14px;
-  background: var(--card);
+  border-radius: 10px;
+  background: var(--card-tint);
 }
 .sticker,
 .abono-form-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.entry,
+.list-row {
+  border-bottom: 1px solid var(--line);
+}
+.chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
   background: var(--card-tint);
+}
+.badge {
+  border: 0;
+  background: var(--pink);
+  color: var(--sticker-ink);
+  font-size: 11px;
+  font-weight: 700;
 }
 .place {
   max-width: 100%;
   overflow-wrap: anywhere;
+  border: 1px solid var(--line);
 }
 .notice {
   margin-inline: 16px;
+  border: 1px solid var(--line);
   color: var(--ink);
 }
 .notice.error {
@@ -1661,15 +1782,16 @@ nav a.active {
   max-width: calc(100% - 32px);
   white-space: normal;
   border-radius: 14px;
-  border-color: var(--mango-deep);
+  border: 1px solid var(--line);
 }
 .celebrate {
-  background: var(--card-tint);
+  background: var(--card);
+  border: 1px solid var(--line);
 }
 :focus-visible,
 input:focus,
 select:focus {
-  outline: 3px solid var(--blue-deep);
+  outline: 2px solid var(--blue-deep);
   outline-offset: 2px;
 }
 .members,
@@ -1685,47 +1807,30 @@ select:focus {
   overflow-wrap: anywhere;
 }
 .segmented {
-  border-color: var(--line);
-  border-radius: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card-tint);
 }
 .segmented button {
-  border-radius: 12px;
+  border-radius: 10px;
 }
 .tally {
-  grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
-  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 .tally span {
   position: relative;
-  border: 1.5px dashed var(--tan);
-  transform: rotate(var(--coin-rotation, 0deg));
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card-tint);
 }
 .tally .paid {
   background: var(--tone);
-  border: 1.5px solid var(--sticker-ink);
-  color: var(--sticker-ink);
+  border-color: transparent;
 }
-.tally .paid::before {
-  content: "";
-  position: absolute;
-  inset: 12%;
-  border: 1px solid transparent;
-  border-top-color: var(--card);
-  border-left-color: var(--card);
-  border-radius: 50%;
-}
+.tally .paid::before,
 .tally .paid::after {
-  content: "₱";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 1;
-}
-.tally.mini .paid::after {
   content: none;
 }
 .tally .pending {
@@ -1733,12 +1838,13 @@ select:focus {
   border: 1.5px dashed var(--tone-deep);
 }
 .tally-sheet {
-  padding: 16px;
-  margin-block: 16px;
+  padding: 14px 16px 16px;
+  margin-block: 0;
   background: var(--card);
-  border: 1.5px solid var(--control-border);
-  border-radius: 22px;
-  box-shadow: 2px 3px 0 var(--ink);
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
 }
 .tally-sheet .members {
   padding-top: 0;
@@ -1746,6 +1852,7 @@ select:focus {
 .personal-savings {
   padding: 0;
   border: 0;
+  box-shadow: none;
   background: transparent;
 }
 .personal-savings > .meta {
@@ -1753,7 +1860,7 @@ select:focus {
 }
 .personal-goal {
   margin-bottom: 16px;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .personal-goal h3 {
   margin: 0;
@@ -1762,6 +1869,8 @@ select:focus {
   align-items: center;
   gap: 8px;
   flex: 1 1 160px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .personal-goal h3 svg {
   flex: none;
@@ -1792,6 +1901,58 @@ select:focus {
 }
 .personal-entry-amount {
   font-family: var(--display);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.personal-entry-amount.deposit {
+  color: var(--leaf-deep);
+}
+.personal-entry-amount.withdrawal {
+  color: var(--soft);
+}
+.personal-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+.personal-entry-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.personal-entry-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.personal-entry-note {
+  margin: 0;
+  color: var(--soft);
+  font-size: 13px;
+  overflow-wrap: break-word;
+}
+.personal-entry-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+.icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  color: var(--soft);
+  text-decoration: none;
+}
+.personal-manage-body {
+  display: grid;
+  gap: 10px;
+  padding-top: 8px;
+}
+.personal-manage-body .personal-share {
+  justify-self: start;
 }
 .tally .stamped {
   animation: coin-stamp 220ms ease-out;
@@ -1892,10 +2053,9 @@ main {
   padding-bottom: calc(32px + env(safe-area-inset-bottom));
 }
 
-/* Coin stickers are the signature: big enough to read, wrapped evenly. */
+/* Minimalist progress dots: clean, balanced geometric indicators without heavy coin badges. */
 .tally {
-  --coin: 28px;
-  grid-template-columns: repeat(var(--coin-cols, auto-fill), var(--coin));
+  --coin: 12px;
   justify-content: start;
   gap: 4px;
 }
@@ -1904,16 +2064,15 @@ main {
   height: var(--coin);
 }
 .tally .paid::after {
-  font-size: 14px;
+  content: "";
 }
 .tally.mini {
-  --coin: 12px;
-  grid-template-columns: repeat(auto-fill, var(--coin));
+  --coin: 10px;
+  gap: 3px;
 }
 .tally.preview {
-  --coin: 28px;
+  --coin: 14px;
   width: 100%;
-  grid-template-columns: repeat(var(--coin-cols, auto-fill), var(--coin));
   justify-content: center;
   min-height: var(--coin);
   margin: 0;
@@ -1935,8 +2094,15 @@ main {
   gap: 8px;
   min-width: 0;
   font-family: var(--display);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
+}
+.member-ratio {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
 }
 .member .tally {
   margin: 0;
@@ -1970,14 +2136,14 @@ main {
   font-size: 13px;
 }
 
-/* Ipon goal card: one chip at most, meta as plain lines, action inside. */
+/* Ipon goal card: clean hierarchy, single progress bar + numeric percentage. */
 .ipon-item {
   display: grid;
-  gap: 16px;
+  gap: 14px;
   padding: 16px;
   background: var(--card);
-  border: 1.5px solid var(--line);
-  border-radius: 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
 }
 .ipon-item > .ipon-card,
 .ipon-item > .ipon-card:hover {
@@ -1993,19 +2159,17 @@ main {
   align-items: flex-start;
   gap: 12px;
 }
-.ipon-ring {
-  position: relative;
-  display: grid;
-  place-items: center;
+.ipon-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex: none;
-  width: 44px;
-  height: 44px;
 }
-.ipon-ring span {
-  position: absolute;
-  color: var(--ink);
-  font-size: 11px;
-  font-weight: 800;
+.ipon-pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--leaf-deep);
+  font-variant-numeric: tabular-nums;
 }
 .ipon-head {
   display: grid;
@@ -2015,21 +2179,24 @@ main {
 }
 .ipon-title-row {
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px 8px;
 }
 .ipon-title {
+  flex: 1 1 150px;
+  min-width: 0;
   color: var(--ink);
   font-family: var(--display);
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 .ipon-title-row .chip {
   flex: none;
-  font-weight: 700;
+  font-weight: 600;
 }
 .ipon-amounts {
   display: flex;
@@ -2064,22 +2231,23 @@ main {
   justify-self: stretch;
 }
 
-/* Personal savings: badge always top right, two short actions on one line. */
+/* Personal savings: readable title with visibility badge, two short actions on one line. */
 .personal-goal > .row {
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
 }
 .personal-goal h3 {
-  flex: 1 1 auto;
+  flex: 1 1 160px;
   min-width: 0;
+  font-size: 17px;
 }
 .personal-visibility {
   flex: none;
-  max-width: 55%;
+  max-width: 100%;
   margin-left: auto;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 .personal-goal > .actions {
   display: flex;
@@ -2096,12 +2264,12 @@ main {
 /* Tracker: one sheet for status, add button and empty state. */
 .abono-sheet {
   padding: 16px;
-  border-radius: 22px;
+  border-radius: 16px;
 }
 .abono-add {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1.5px dashed var(--dots);
+  border-top: 1px solid var(--line);
 }
 .abono-empty {
   margin: 12px 0 0;
@@ -2113,12 +2281,12 @@ main {
 /* Disabled controls look disabled and never lift. */
 :root:root button:disabled,
 :root:root .button[aria-disabled="true"] {
-  background: color-mix(in srgb, var(--soft) 14%, var(--card));
+  background: color-mix(in srgb, var(--soft) 10%, var(--card));
   color: var(--soft);
-  border-color: var(--control-border);
-  border-style: dashed;
+  border-color: var(--line);
+  border-style: solid;
   box-shadow: none;
-  opacity: 1;
+  opacity: 0.56;
   cursor: not-allowed;
   transform: none;
 }
@@ -2161,11 +2329,10 @@ a.muted {
 
 /* Simplify pass */
 .section-label {
-  margin: 20px 0 8px;
+  margin: 24px 0 8px;
   font-size: 15px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--soft);
+  font-weight: 600;
+  color: var(--ink);
 }
 .home-waiting {
   margin-bottom: 8px;
@@ -2231,10 +2398,46 @@ nav a {
   margin-inline: auto;
 }
 details.wallet-add > summary,
-details.reminder-time > summary {
+details.reminder-time > summary,
+.more-card > details > summary,
+.ipon-item details > summary,
+.personal-savings details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
   min-height: 44px;
   padding-block: 10px;
+  font-weight: 600;
   cursor: pointer;
+}
+details.wallet-add > summary::-webkit-details-marker,
+details.reminder-time > summary::-webkit-details-marker,
+.more-card > details > summary::-webkit-details-marker,
+.ipon-item details > summary::-webkit-details-marker,
+.personal-savings details > summary::-webkit-details-marker {
+  display: none;
+}
+details.wallet-add > summary::after,
+details.reminder-time > summary::after,
+.more-card > details > summary::after,
+.ipon-item details > summary::after,
+.personal-savings details > summary::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--soft);
+  border-bottom: 2px solid var(--soft);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  margin-right: 4px;
+}
+details.wallet-add[open] > summary::after,
+details.reminder-time[open] > summary::after,
+.more-card > details[open] > summary::after,
+.ipon-item details[open] > summary::after,
+.personal-savings details[open] > summary::after {
+  transform: rotate(-135deg);
 }
 /* Own chevron, 16px in from the rounded edge (native arrow hugs it). */
 select {
@@ -2245,7 +2448,11 @@ select {
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
-/* "More": solo/install first, then CSV and update side by side. */
+/* Newer Chromium draws its own picker arrow even with appearance: none. */
+select::picker-icon {
+  display: none;
+}
+/* "More": solo/install first, then CSV and update side by side above version. */
 .more-card {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2259,24 +2466,33 @@ select {
 .more-card .app-updates > button {
   width: 100%;
   margin: 0;
+  padding: 10px 10px;
+  font-size: 13px;
   justify-self: stretch;
   align-self: stretch;
 }
 .more-card .export {
+  order: 2;
   grid-column: 1;
 }
 .more-card .app-updates > button {
+  order: 3;
   grid-column: 2;
 }
 .more-card > details,
 .more-card > .install-hint {
+  order: 1;
   grid-column: 1 / -1;
   min-width: 0;
 }
-.more-card > details > summary {
-  min-height: 44px;
-  padding-block: 10px;
-  cursor: pointer;
+.more-card .app-version {
+  order: 4;
+}
+.more-card .update-result {
+  order: 5;
+}
+.more-card > .quiet {
+  order: 6;
 }
 .more-card .app-version,
 .more-card .update-result,
@@ -2589,9 +2805,11 @@ select {
 }
 .round-cal .cal-toggle button[aria-pressed="true"],
 .round-cal .cal-toggle button[aria-pressed="true"]:hover:not(:disabled) {
-  background: var(--pink);
-  color: var(--sticker-ink);
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
   border-color: var(--line);
+  box-shadow: var(--elev-sm);
 }
 
 /* Wishlist: compact rows, no new colours. */
@@ -2652,6 +2870,9 @@ select {
 .wish-form {
   display: grid;
   gap: 12px;
+}
+.wish-add {
+  margin-top: 14px;
 }
 
 /* Offline recording: records saved on the phone and not synced yet. */
@@ -2723,38 +2944,102 @@ select {
   min-height: 44px;
 }
 
-/* Batch 1 simplification: Today's action, confirmation summary, and progressive form disclosure. */
+/* Minimalist Today action card, confirmation drawer, form disclosure, and history metrics. */
 .today-action {
   display: grid;
-  gap: 8px;
-  margin: 8px 0 12px;
-  padding: 14px 16px;
+  gap: 12px;
+  margin: 8px 0 14px;
+  padding: 16px;
   background: var(--card);
-  border: 1.5px solid var(--line);
-  border-radius: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.today-copy {
+  display: grid;
+  gap: 4px;
 }
 .today-action .today-label {
   color: var(--soft);
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  font-weight: 500;
 }
 .today-action .today-text {
   font-family: var(--display);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--ink);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 .today-action .button.big {
-  margin: 4px 0 0;
+  margin: 0;
+  padding: 11px 14px;
+}
+.history-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+.history-metric {
+  flex: 1 1 92px;
+  min-width: max-content;
+  max-width: 100%;
+  display: grid;
+  gap: 2px;
+}
+.history-metric > span {
+  font-size: 12px;
+  color: var(--soft);
+}
+.history-metric strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.history-member h3 {
+  margin: 12px 0 0;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--soft);
+}
+/* One strong primary per screen; the pastel stays for dots and tints. */
+.big:not(.secondary):not(.quiet),
+.big:not(.secondary):not(.quiet):hover:not(:disabled) {
+  background: var(--brand);
+  color: var(--paper);
+}
+/* Selected stays selected even when touch leaves :hover stuck. */
+:root .segmented button[aria-pressed="true"],
+:root .segmented button[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
+  border-color: var(--line);
+  box-shadow: var(--elev-sm);
+}
+legend::first-letter {
+  text-transform: uppercase;
+}
+.local-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.local-note svg {
+  flex: none;
+}
+.propose legend {
+  font-weight: 600;
 }
 .sticker.confirm.urgent {
   border-color: var(--pink-deep);
 }
 .confirm-more {
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .confirm-more > summary {
   display: flex;
@@ -2763,20 +3048,20 @@ select {
   min-height: 44px;
   padding: 8px 12px;
   background: var(--highlight);
-  border: 1.5px dashed var(--control-border);
+  border: 1px solid var(--line);
   border-radius: 12px;
   color: var(--ink);
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 600;
 }
 .confirm-more > .confirm-list {
   margin-top: 8px;
 }
 .form-optional {
-  border: 1.5px dashed var(--control-border);
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0 12px;
-  background: var(--highlight);
+  background: var(--card-tint);
 }
 .form-optional > summary {
   display: flex;
@@ -2785,7 +3070,7 @@ select {
   padding: 8px 0;
   color: var(--ink);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
 }
 .form-optional[open] {
   padding-bottom: 12px;

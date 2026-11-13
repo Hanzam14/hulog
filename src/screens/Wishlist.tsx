@@ -4,6 +4,7 @@ import {
   IconArrowBackUp,
   IconCheck,
   IconChevronLeft,
+  IconDeviceMobile,
   IconPencil,
   IconPlus,
   IconTrash,
@@ -12,6 +13,7 @@ import type { Snapshot, WishlistItem } from "../data";
 import { rpc } from "../data";
 import { money, parsePesos, shortDate } from "../helpers";
 import { t } from "../i18n";
+import { isSoloMode } from "../solo";
 import { name } from "../components/shared";
 import type { Run, ViewProps } from "../components/shared";
 import {
@@ -263,11 +265,12 @@ export default function Wishlist({ data, run, busy }: ViewProps) {
         </Link>
         <h1>{t("Gusto natin")}</h1>
       </div>
-      <p className="meta">
-        {t(
-          "Hulog only records this. Buying is your own action outside the app.",
-        )}
-      </p>
+      {isSoloMode() && (
+        <p className="meta local-note">
+          <IconDeviceMobile size={16} aria-hidden="true" />
+          {t("Saved on this device only. Not synced.")}
+        </p>
+      )}
       {editing === "new" ? (
         <WishlistForm
           data={data}
@@ -278,7 +281,11 @@ export default function Wishlist({ data, run, busy }: ViewProps) {
       ) : full ? (
         <p className="meta">{t("Maximum of 30 wishlist items reached")}</p>
       ) : (
-        <button disabled={busy} onClick={() => setEditing("new")}>
+        <button
+          className="wish-add"
+          disabled={busy}
+          onClick={() => setEditing("new")}
+        >
           <IconPlus size={18} aria-hidden="true" /> {t("Add to wishlist")}
         </button>
       )}

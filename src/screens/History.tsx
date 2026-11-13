@@ -105,17 +105,19 @@ export default function History({ data, user, run, busy }: ViewProps) {
             </div>
           </section>
           <section className="history-summary">
-            <div className="row" style={{ gap: "8px 16px" }}>
-              <span>
-                {t("Total pots")}: <strong>{money(totalPotCentavos)}</strong>
-              </span>
-              <span>
-                {t("Total saved")}: <strong>{money(totalSavedCentavos)}</strong>
-              </span>
-              <span>
-                {t("Outstanding debt")}:{" "}
+            <div className="history-metrics">
+              <div className="history-metric">
+                <span>{t("Total pots")}</span>
+                <strong>{money(totalPotCentavos)}</strong>
+              </div>
+              <div className="history-metric">
+                <span>{t("Total saved")}</span>
+                <strong>{money(totalSavedCentavos)}</strong>
+              </div>
+              <div className="history-metric">
+                <span>{t("Outstanding debt")}</span>
                 <strong>{money(totalDebtCentavos)}</strong>
-              </span>
+              </div>
             </div>
           </section>
         </>
@@ -129,7 +131,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
                 (p) => p.cycle_id === c.id && p.member_id !== c.receiver_id,
               )
               .map((p) => (
-                <div key={p.member_id}>
+                <div key={p.member_id} className="history-member">
                   <h3>
                     {name(data, p.member_id)}{" "}
                     {p.debt_centavos > 0

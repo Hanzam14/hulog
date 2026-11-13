@@ -225,6 +225,49 @@ describe("personal savings presentation permissions", () => {
       ),
     );
     expect(form).toContain('<option value="private" selected="">');
-    expect(form).toContain("Only you can change this goal or its records.");
+    expect(form).not.toContain("Only you can change this goal or its records.");
+  });
+
+  it("renders signed deposits/withdrawals, omits absent notes, and hides entry actions from partners", () => {
+    const goal = createGoal();
+    goal.visibility = "shared";
+    record(goal, "deposit", 10000);
+    const withdrawalId = record(goal, "withdrawal", 4000);
+    // Clear the note on the withdrawal so we verify empty-note omission.
+    snapshot.personalEntries = snapshot.personalEntries!.map((entry) =>
+      entry.id === withdrawalId ? { ...entry, note: "" } : entry,
+    );
+
+    const ownerHtml = renderToStaticMarkup(
+      createElement(PersonalGoalCard, {
+        goal,
+        data: snapshot,
+        user: owner,
+        run: async () => {},
+        busy: false,
+      }),
+    );
+    expect(ownerHtml).toContain("+₱100.00");
+    expect(ownerHtml).toContain("−₱40.00");
+    expect(ownerHtml.match(/class="personal-entry-note"/g)).toBeNull();
+    expect(ownerHtml).toContain('aria-label="Edit entry"');
+    expect(ownerHtml).toContain('aria-label="Delete entry"');
+
+    const partnerHtml = renderToStaticMarkup(
+      createElement(PersonalGoalCard, {
+        goal,
+        data: snapshot,
+        user: "partner-user",
+        run: async () => {},
+        busy: false,
+      }),
+    );
+    expect(partnerHtml).toContain("+₱100.00");
+    expect(partnerHtml).toContain("−₱40.00");
+    expect(partnerHtml).not.toContain('aria-label="Edit entry"');
+    expect(partnerHtml).not.toContain('aria-label="Delete entry"');
+    expect(partnerHtml).not.toContain("Edit goal");
+    expect(partnerHtml).not.toContain("Delete goal");
+    expect(partnerHtml).not.toContain("Make private");
   });
 });
