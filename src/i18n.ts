@@ -82,8 +82,7 @@ const taglish = {
     "{amount} sa {target} ang naipon mula {date}",
   "Share read-only": "Ipakita sa partner",
   "Make private": "Gawing private",
-  "Read-only. Only the owner can change these records.":
-    "Tingin lang. Ang may-ari lang ang puwedeng magbago ng records.",
+  "Read-only.": "Tingin lang.",
   "Savings records": "Mga record ng ipon",
   "No entries yet. Record your first deposit.":
     "Wala pang record. I-record ang unang dagdag na ipon.",
@@ -801,8 +800,7 @@ const en = {
     "{amount} of {target} saved since {date}",
   "Share read-only": "Let partner view",
   "Make private": "Make private",
-  "Read-only. Only the owner can change these records.":
-    "Read-only. Only the owner can change these records.",
+  "Read-only.": "Read-only.",
   "Savings records": "Savings records",
   "No entries yet. Record your first deposit.":
     "No entries yet. Record your first deposit.",
@@ -1511,8 +1509,7 @@ const tl = {
     "{amount} sa {target} ang naipon mula {date}",
   "Share read-only": "Ipakita sa kasama",
   "Make private": "Gawing pribado",
-  "Read-only. Only the owner can change these records.":
-    "Makikita lang. Ang may-ari lang ang makakabago sa mga tala.",
+  "Read-only.": "Makikita lang.",
   "Savings records": "Mga tala ng ipon",
   "No entries yet. Record your first deposit.":
     "Wala pang tala. Itala ang unang dagdag na ipon.",

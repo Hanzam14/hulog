@@ -119,7 +119,7 @@ describe("payout withdrawals", () => {
     expect(html).toContain("Hawak mo pa");
   });
 
-  it("does not show held custody or undo after the receiver acknowledges receipt", () => {
+  it("simplifies to pot and congrats after the receiver acknowledges receipt while keeping history", () => {
     setLang("en");
     const html = renderToStaticMarkup(
       createElement(Payout, {
@@ -134,13 +134,44 @@ describe("payout withdrawals", () => {
         busy: false,
       }),
     );
-    expect(html).toContain("No amount remains held");
+    expect(html).toContain("₱1,000.00");
+    expect(html).toContain("Congrats, Bea Cruz! You&#x27;ve received the pot.");
+    expect(html).toContain("Withdrawal history");
+    expect(html).not.toContain("Original pot");
+    expect(html).not.toContain("Received or withdrawn");
+    expect(html).not.toContain("No amount remains held");
     expect(html).not.toContain("Still held by you");
     expect(html).not.toContain("Record pot withdrawal");
     expect(html).not.toContain("Undo withdrawal");
   });
 
-  it("keeps a ledger-only full withdrawal correctable", () => {
+  it("simplifies auto-received payouts while preserving over-withdrawal warnings", () => {
+    setLang("en");
+    const data = snapshot();
+    const html = renderToStaticMarkup(
+      createElement(Payout, {
+        c: cycle({
+          receiver_id: "a",
+          holder_id: "a",
+          payout_state: "Received",
+          held_centavos: 0,
+          withdrawn_centavos: 120000,
+        }),
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
+    );
+    expect(html).toContain("₱1,000.00");
+    expect(html).toContain("Congrats, Ana Cruz! You&#x27;ve received the pot.");
+    expect(html).toContain("Withdrawals exceed the corrected pot by ₱200.00");
+    expect(html).toContain("Withdrawal history");
+    expect(html).not.toContain("Original pot");
+    expect(html).not.toContain("No amount remains held");
+  });
+
+  it("keeps a ledger-only full withdrawal correctable with full balances", () => {
     setLang("en");
     const html = renderToStaticMarkup(
       createElement(Payout, {
@@ -155,6 +186,8 @@ describe("payout withdrawals", () => {
         busy: false,
       }),
     );
+    expect(html).toContain("Original pot");
+    expect(html).toContain("No amount remains held");
     expect(html).toContain("Undo withdrawal");
   });
 

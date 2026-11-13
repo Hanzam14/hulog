@@ -38,7 +38,9 @@ export default function Avatar({
       ) : profile?.avatar_kind === "emoji" && profile.avatar_emoji ? (
         profile.avatar_emoji
       ) : (
-        Array.from(who)[0]?.toUpperCase()
+        <span className="avatar-initial">
+          {Array.from(who)[0]?.toUpperCase()}
+        </span>
       )}
     </span>
   );

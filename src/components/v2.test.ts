@@ -454,10 +454,16 @@ describe("Hulog v2 Tracker", () => {
         ),
       );
 
-    // Debt banner shows who owes whom in Taglish
+    // Debt banner shows who owes whom in Taglish with distinct member tones
     const debtorMarkup = renderTrackerFor("a");
-    expect(debtorMarkup).toContain(
+    expect(debtorMarkup.replace(/<[^>]+>/g, "")).toContain(
       "May utang si Ana Cruz kay Ben Santos na ₱500.00",
+    );
+    expect(debtorMarkup).toContain(
+      '<span class="member-name pink">Ana Cruz</span>',
+    );
+    expect(debtorMarkup).toContain(
+      '<span class="member-name blue">Ben Santos</span>',
     );
     // Debtor 'a' sees Bayaran (Settle)
     expect(debtorMarkup).toContain("Bayaran (Settle)");

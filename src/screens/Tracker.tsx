@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { IconCircleCheck, IconPlus } from "@tabler/icons-react";
 import { t, label } from "../i18n";
 import type { ViewProps } from "../components/shared";
-import { name } from "../components/shared";
+import { name, tone } from "../components/shared";
 import Avatar from "../components/Avatar";
 import { rpc, type AbonoEntry } from "../data";
 import { newRequestId, submitRecord, useQueueingOffline } from "../outbox";
@@ -548,11 +548,34 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   overflowWrap: "anywhere",
                 }}
               >
-                {t("{debtor} owes {creditor} {amount}", {
-                  debtor: name(data, activeDebt.debtor_id),
-                  creditor: name(data, activeDebt.creditor_id),
-                  amount: money(activeDebt.owed_centavos),
-                })}
+                {t("{debtor} owes {creditor} {amount}")
+                  .split(/(\{debtor\}|\{creditor\}|\{amount\})/)
+                  .map((part, index) => {
+                    if (part === "{debtor}") {
+                      return (
+                        <span
+                          key={index}
+                          className={`member-name ${tone(data, activeDebt.debtor_id)}`}
+                        >
+                          {name(data, activeDebt.debtor_id)}
+                        </span>
+                      );
+                    }
+                    if (part === "{creditor}") {
+                      return (
+                        <span
+                          key={index}
+                          className={`member-name ${tone(data, activeDebt.creditor_id)}`}
+                        >
+                          {name(data, activeDebt.creditor_id)}
+                        </span>
+                      );
+                    }
+                    if (part === "{amount}") {
+                      return money(activeDebt.owed_centavos);
+                    }
+                    return part;
+                  })}
               </strong>
               {activeDebt.pending_settlement_centavos > 0 &&
                 (() => {

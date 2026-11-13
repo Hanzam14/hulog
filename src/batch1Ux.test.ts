@@ -554,7 +554,15 @@ describe("Batch 1 UX audit fixes: Abono owed-amount labels/presets, Home Keep/De
     const debtorRecordedMarkup = html(
       createElement(Tracker, { data, user: "a", run: async () => {}, busy: false }),
     );
-    expect(debtorRecordedMarkup).toContain("Ana Cruz owes Ben Santos ₱500.00");
+    expect(debtorRecordedMarkup.replace(/<[^>]+>/g, "")).toContain(
+      "Ana Cruz owes Ben Santos ₱500.00",
+    );
+    expect(debtorRecordedMarkup).toContain(
+      '<span class="member-name pink">Ana Cruz</span>',
+    );
+    expect(debtorRecordedMarkup).toContain(
+      '<span class="member-name blue">Ben Santos</span>',
+    );
     expect(debtorRecordedMarkup).toContain(
       "₱500.00 settlement waiting for Ben Santos&#x27;s confirmation",
     );

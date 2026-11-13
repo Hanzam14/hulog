@@ -358,9 +358,7 @@ export function PersonalGoalCard({
           )}
         </>
       ) : (
-        <p className="meta">
-          {t("Read-only. Only the owner can change these records.")}
-        </p>
+        <p className="meta">{t("Read-only.")}</p>
       )}
       <details>
         <summary>{t("Savings records")}</summary>
@@ -478,11 +476,65 @@ export function PersonalGoalCard({
     </article>
   );
 }
+export function PersonalSavingsHistory({
+  data,
+  user,
+}: Pick<ViewProps, "data" | "user">) {
+  const entries = (data.personalHistory ?? []).filter(
+    (h) => h.actor_id === user,
+  );
+  if (entries.length === 0) return null;
+  return (
+    <details className="personal-history">
+      <summary>{t("Personal savings history")}</summary>
+      {[...entries]
+        .sort((a, b) => b.id - a.id)
+        .map((change) => (
+          <div className="entry pay-row" key={change.id}>
+            <div className="row">
+              <span>
+                <b>
+                  {
+                    data.personalGoals?.find((g) => g.id === change.goal_id)
+                      ?.title
+                  }
+                </b>{" "}
+                · {label(change.action)}{" "}
+                {change.entity === "personal_savings_goals"
+                  ? t("Goal")
+                  : t("Savings entry")}
+              </span>
+              {typeof change.after?.amount_centavos === "number" && (
+                <b>{money(change.after.amount_centavos)}</b>
+              )}
+            </div>
+            <p>
+              {new Date(change.created_at).toLocaleString("en-PH", {
+                timeZone: "Asia/Manila",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+              {typeof change.after?.note === "string" && change.after.note && (
+                <i> · {change.after.note}</i>
+              )}
+            </p>
+          </div>
+        ))}
+    </details>
+  );
+}
 export default function PersonalSavings({
   trailing,
   siblingGoals,
+  showHistory = true,
   ...props
-}: ViewProps & { trailing?: ReactNode; siblingGoals?: boolean }) {
+}: ViewProps & {
+  trailing?: ReactNode;
+  siblingGoals?: boolean;
+  showHistory?: boolean;
+}) {
   const [creating, setCreating] = useState(false);
   const goals = (props.data.personalGoals ?? []).filter(
     (g) =>
@@ -531,48 +583,8 @@ export default function PersonalSavings({
           {trailing}
         </div>
       )}
-      {(props.data.personalHistory ?? []).some(
-        (h) => h.actor_id === props.user,
-      ) && (
-        <details className="personal-history">
-          <summary>{t("Personal savings history")}</summary>
-          {[...(props.data.personalHistory ?? [])]
-            .filter((h) => h.actor_id === props.user)
-            .sort((a, b) => b.id - a.id)
-            .map((change) => (
-              <div className="entry pay-row" key={change.id}>
-                <div className="row">
-                  <span>
-                    <b>
-                      {
-                        props.data.personalGoals?.find(
-                          (g) => g.id === change.goal_id,
-                        )?.title
-                      }
-                    </b>{" "}
-                    · {label(change.action)}{" "}
-                    {change.entity === "personal_savings_goals"
-                      ? t("Goal")
-                      : t("Savings entry")}
-                  </span>
-                  {typeof change.after?.amount_centavos === "number" && (
-                    <b>{money(change.after.amount_centavos)}</b>
-                  )}
-                </div>
-                <p>
-                  {new Date(change.created_at).toLocaleString("en-PH", {
-                    timeZone: "Asia/Manila",
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                  {typeof change.after?.note === "string" &&
-                    change.after.note && <i> · {change.after.note}</i>}
-                </p>
-              </div>
-            ))}
-        </details>
+      {showHistory && (
+        <PersonalSavingsHistory data={props.data} user={props.user} />
       )}
     </section>
   );

@@ -193,9 +193,8 @@ describe("personal savings presentation permissions", () => {
       }),
     );
     expect(html).toContain("Personal savings by Ikaw");
-    expect(html).toContain(
-      "Read-only. Only the owner can change these records.",
-    );
+    expect(html).toContain("<p class=\"meta\">Read-only.</p>");
+    expect(html).not.toContain("Only the owner can change these records.");
     expect(html).not.toContain("<button");
     expect(html).toContain("Shared, read-only");
   });
