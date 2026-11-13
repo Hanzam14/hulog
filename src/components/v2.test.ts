@@ -587,7 +587,7 @@ describe("Hulog v2 Tracker", () => {
     const css = fs.readFileSync("src/style.css", "utf8");
     expect(css).toMatch(/\.back\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s);
     expect(css).toMatch(
-      /\.header-bell\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s,
+      /\.header-bell\s*\{[^}]*min-width:\s*44px;\s*height:\s*44px;/s,
     );
     expect(css).toMatch(/\.quiet\s*\{[^}]*min-height:\s*44px;/s);
     expect(css).toMatch(/nav a\s*\{[^}]*min-height:\s*44px;/s);

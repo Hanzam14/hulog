@@ -439,14 +439,10 @@ describe("Minimalist UI and Hulog /hulog flow", () => {
     expect(home366Tl).toContain("300/366 · Naghihintay 1");
   });
 
-  it("keeps bell badge centering, history chevron rules, and compact Tracker entry spacing in CSS", async () => {
+  it("keeps the history chevron and compact Tracker entry spacing in CSS", async () => {
     const { readFileSync } = await import("node:fs");
     const css = readFileSync(new URL("./style.css", import.meta.url), "utf8");
 
-    expect(css).toMatch(/\.header-bell\s*\{[\s\S]*?width:\s*44px;[\s\S]*?height:\s*44px;/);
-    expect(css).toMatch(
-      /\.header-bell\s+\.badge\s*\{[\s\S]*?display:\s*inline-flex;[\s\S]*?line-height:\s*1;/,
-    );
     expect(css).toContain("details.personal-history > summary");
     expect(css).toMatch(/\.abono-entry\s+\.actions\s*\{[\s\S]*?margin:\s*0\s+0\s+0\s+-8px;/);
     expect(css).toMatch(/\.member-name\s*\{\s*color:\s*var\(--tone-deep\);/);

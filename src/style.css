@@ -1329,16 +1329,16 @@ button svg,
   gap: 8px;
 }
 .header-bell {
-  display: inline-grid;
-  place-items: center;
-  align-content: center;
-  gap: 2px;
-  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
   height: 44px;
-  padding: 0;
+  padding-inline: 10px;
   line-height: 1;
-  border: 1.5px solid var(--line);
-  border-radius: 50%;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   background: var(--card);
   color: var(--ink);
   text-decoration: none;
@@ -1355,20 +1355,11 @@ button svg,
   transform: translate(2px, 2px);
   box-shadow: none;
 }
-.header-bell .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 16px;
-  margin: 0;
-  padding: 0 5px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-}
 .header-bell-count {
-  transform: translateY(-1px);
+  color: var(--pink-deep);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 .custody-ledger {
   background: var(--card);
@@ -1628,8 +1619,7 @@ button,
   opacity: 0.5;
   border-style: solid;
 }
-.back,
-.header-bell {
+.back {
   width: 44px;
   height: 44px;
   border: 1px solid var(--line);
