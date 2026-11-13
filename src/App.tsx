@@ -338,12 +338,12 @@ export default function App() {
                     : t("Changes")
                 }
               >
+                <IconBell size={18} stroke={2} aria-hidden="true" />
                 {unreadCount > 0 && (
-                  <span className="badge" aria-hidden="true">
-                    <span className="header-bell-count">{unreadCount}</span>
+                  <span className="header-bell-count" aria-hidden="true">
+                    {unreadCount}
                   </span>
                 )}
-                <IconBell size={18} stroke={2} aria-hidden="true" />
               </NavLink>
             )}
             {!(own && own.status === "active") && (
