@@ -598,6 +598,20 @@ describe("Hulog v2 Tracker", () => {
 });
 
 describe("Hulog v2 Unified Home Dashboard", () => {
+  it("shows a withdrawn savings goal's status once, inside its History card", () => {
+    setLang("en");
+    const data = v2Snapshot();
+    const goal = data.savingsGoals![0];
+    goal.withdrawn_at = "2026-10-24";
+    goal.phase = "withdrawn";
+
+    const markup = html(
+      createElement(History, { data, user: "a", run, busy: false }),
+    );
+    expect(markup).toContain("<small>Withdrawn</small>");
+    expect(markup).not.toContain('<span class="chip">withdrawn</span>');
+  });
+
   it("renders the Ipon section with quick Mag-ipon action and keeps custody/mode controls off Home", () => {
     setLang("taglish");
     const data = v2Snapshot();

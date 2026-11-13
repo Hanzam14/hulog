@@ -269,9 +269,11 @@ export default function History({ data, user, run, busy }: ViewProps) {
           {pastGoals.map((g) => (
             <div key={g.id}>
               <IponCard g={g} data={data} user={user} />
-              <p>
-                <span className="chip">{label(g.phase)}</span>
-              </p>
+              {g.phase !== "withdrawn" && (
+                <p>
+                  <span className="chip">{label(g.phase)}</span>
+                </p>
+              )}
             </div>
           ))}
         </section>
