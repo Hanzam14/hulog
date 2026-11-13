@@ -1329,9 +1329,10 @@ button svg,
   gap: 8px;
 }
 .header-bell {
-  position: relative;
   display: inline-grid;
   place-items: center;
+  align-content: center;
+  gap: 2px;
   width: 44px;
   height: 44px;
   padding: 0;
@@ -1355,14 +1356,11 @@ button svg,
   box-shadow: none;
 }
 .header-bell .badge {
-  position: absolute;
-  top: -3px;
-  right: -3px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 20px;
-  height: 20px;
+  height: 16px;
   margin: 0;
   padding: 0 5px;
   line-height: 1;
