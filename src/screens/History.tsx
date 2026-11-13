@@ -1,7 +1,7 @@
 import { t, label } from "../i18n";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { IconChevronRight, IconSparkles } from "@tabler/icons-react";
+import { IconCheck, IconChevronRight, IconSparkles } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name } from "../components/shared";
 import { rpc } from "../data";
@@ -132,12 +132,19 @@ export default function History({ data, user, run, busy }: ViewProps) {
               )
               .map((p) => (
                 <div key={p.member_id} className="history-member">
-                  <h3>
-                    {name(data, p.member_id)}{" "}
-                    {p.debt_centavos > 0
-                      ? `${t("· Owes")} ${money(p.debt_centavos)}`
-                      : t("· Paid up ✓")}
-                  </h3>
+                  <div className="history-member-summary">
+                    <h3>{name(data, p.member_id)}</h3>
+                    {p.debt_centavos > 0 ? (
+                      <span className="history-member-status">
+                        {t("Owes {amount}", { amount: money(p.debt_centavos) })}
+                      </span>
+                    ) : (
+                      <span className="history-member-status paid">
+                        <IconCheck size={16} aria-hidden="true" />
+                        {t("Paid up")}
+                      </span>
+                    )}
+                  </div>
                   {p.debt_centavos > 0 && (
                     <form
                       onSubmit={(e) => {
