@@ -21,7 +21,9 @@ import Tally from "../components/Tally";
 import Avatar from "../components/Avatar";
 import StreakChip from "../components/StreakChip";
 import IponCard from "../components/IponCard";
-import PersonalSavings from "../components/PersonalSavings";
+import PersonalSavings, {
+  PersonalSavingsHistory,
+} from "../components/PersonalSavings";
 import OutboxStrip from "../components/OutboxStrip";
 import { isSoloMode } from "../solo";
 import { isSoloCycle } from "../helpers";
@@ -74,9 +76,6 @@ export default function Home(props: ViewProps) {
     )
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 
-  const hasPersonal = (data.personalGoals ?? []).some(
-    (g) => !g.deleted_at && (g.owner_id === user || g.visibility === "shared"),
-  );
   const wishlist = liveWishlist(data.wishlistItems);
   const partner = data.memberships.find(
     (m) => m.status === "active" && m.user_id !== user,
@@ -586,6 +585,9 @@ export default function Home(props: ViewProps) {
                           {!isObserving && (
                             <span className="member-ratio">
                               {p.confirmed_days}/{c.num_days}
+                              {p.pending_days > 0
+                                ? ` · ${t("Pending {count}", { count: p.pending_days })}`
+                                : ""}
                             </span>
                           )}
                         </div>
@@ -598,6 +600,7 @@ export default function Home(props: ViewProps) {
                             pending={p.pending_days}
                             total={c.num_days}
                             tone={tone(data, p.member_id)}
+                            variant="track"
                           />
                         )}
                       </div>
@@ -626,9 +629,6 @@ export default function Home(props: ViewProps) {
 
       <section className="ipon-home-section">
         <h2 className="section-label">{t("Ipon")}</h2>
-        {activeGoals.length > 0 && hasPersonal && (
-          <h3 className="sub-label">{t("Ipon goals")}</h3>
-        )}
         {activeGoals.map((g) => (
           <div key={g.id} className="ipon-home-item">
             <IponCard
@@ -653,6 +653,7 @@ export default function Home(props: ViewProps) {
         <PersonalSavings
           {...props}
           siblingGoals={activeGoals.length > 0}
+          showHistory={false}
           trailing={
             activeGoals.length < 3 ? (
               <Link className="button quiet" to="/ipon/new">
@@ -678,6 +679,7 @@ export default function Home(props: ViewProps) {
         </span>
         <IconChevronRight size={20} aria-hidden="true" />
       </Link>
+      <PersonalSavingsHistory data={data} user={user} />
     </>
   );
 }

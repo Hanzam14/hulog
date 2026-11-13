@@ -45,6 +45,8 @@ export default function Payout({
   const holder =
     c.holder_id ?? data.wallets?.find((w) => w.id === c.wallet_id)?.holder_id;
   const done = c.payout_state === "Received";
+  const finalizedReceipt =
+    done && (Boolean(c.received_at) || holder == null || holder === c.receiver_id);
   const fullLedgerWithdrawal =
     c.pot_centavos > 0 &&
     (c.withdrawn_centavos ?? activeWithdrawn) >= c.pot_centavos;
@@ -96,22 +98,32 @@ export default function Payout({
       <IconStarFilled className="spark s3" aria-hidden="true" />
       <Avatar data={data} id={c.receiver_id} size="lg" />
       <strong>{money(c.pot_centavos)}</strong>
-      <span className="meta">{t("Original pot")}</span>
-      <div className="payout-balances" aria-label={t("Payout balance")}>
-        <span>
-          {t("Received or withdrawn")}: <strong>{money(acknowledged)}</strong>
-        </span>
-        {holder && held > 0 ? (
-          <span>
-            {t(user === holder ? "Still held by you" : "Still held by {name}", {
-              name: name(data, holder),
-            })}
-            : <strong>{money(held)}</strong>
-          </span>
-        ) : (
-          <span>{t("No amount remains held")}</span>
-        )}
-      </div>
+      {!finalizedReceipt && (
+        <>
+          <span className="meta">{t("Original pot")}</span>
+          <div className="payout-balances" aria-label={t("Payout balance")}>
+            <span>
+              {t("Received or withdrawn")}:{" "}
+              <strong>{money(acknowledged)}</strong>
+            </span>
+            {holder && held > 0 ? (
+              <span>
+                {t(
+                  user === holder
+                    ? "Still held by you"
+                    : "Still held by {name}",
+                  {
+                    name: name(data, holder),
+                  },
+                )}
+                : <strong>{money(held)}</strong>
+              </span>
+            ) : (
+              <span>{t("No amount remains held")}</span>
+            )}
+          </div>
+        </>
+      )}
       {c.withdrawn_centavos != null &&
         c.withdrawn_centavos > c.pot_centavos && (
           <p className="notice" role="alert">
@@ -120,7 +132,9 @@ export default function Payout({
             })}
           </p>
         )}
-      <span className="meta">{label(c.payout_state ?? "")}</span>
+      {!finalizedReceipt && (
+        <span className="meta">{label(c.payout_state ?? "")}</span>
+      )}
       {done && (
         <p className="payout-congrats">
           {t("Congrats, {name}! Nasa'yo na ang hulog.", {

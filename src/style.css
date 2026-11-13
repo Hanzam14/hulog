@@ -674,6 +674,9 @@ button svg,
   height: 100%;
   object-fit: cover;
 }
+.avatar-initial {
+  transform: translateY(-0.06em);
+}
 .avatar.sm {
   width: 26px;
   height: 26px;
@@ -1331,6 +1334,8 @@ button svg,
   place-items: center;
   width: 44px;
   height: 44px;
+  padding: 0;
+  line-height: 1;
   border: 1.5px solid var(--line);
   border-radius: 50%;
   background: var(--card);
@@ -1351,9 +1356,17 @@ button svg,
 }
 .header-bell .badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -3px;
+  right: -3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
   margin: 0;
+  padding: 0 5px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
 .custody-ledger {
@@ -1454,7 +1467,8 @@ button svg,
 }
 .abono-entry {
   display: grid;
-  gap: 8px;
+  gap: 4px;
+  padding: 10px 0;
 }
 .abono-entry .row {
   display: flex;
@@ -1467,10 +1481,23 @@ button svg,
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.abono-entry p {
+  margin-top: 2px;
+}
 .abono-entry .meta {
   color: var(--soft);
   font-size: 13px;
-  margin-top: 4px;
+  margin-top: 2px;
+}
+.abono-entry .actions {
+  margin: 0 0 0 -8px;
+  gap: 2px 6px;
+}
+.abono-entry .actions:not(:has(button:not(.quiet))) {
+  margin: -6px 0 -6px -8px;
+}
+.member-name {
+  color: var(--tone-deep);
 }
 .wallets-section {
   display: grid;
@@ -2090,8 +2117,9 @@ main {
 }
 .member-who {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 4px 8px;
   min-width: 0;
   font-family: var(--display);
   font-size: 14px;
@@ -2106,6 +2134,50 @@ main {
 }
 .member .tally {
   margin: 0;
+}
+/* Full-width segmented track for Home round progress (proportional for >30 days). */
+.tally.tally-track {
+  display: grid;
+  grid-template-columns: repeat(var(--tally-total, 15), minmax(0, 1fr));
+  gap: 3px;
+  width: 100%;
+  margin: 0;
+}
+.tally.tally-track span {
+  width: 100%;
+  height: 8px;
+  aspect-ratio: auto;
+  border-radius: 999px;
+}
+.tally.tally-track.proportional {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2px;
+  width: 100%;
+  height: 10px;
+  padding: 1px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card-tint);
+  overflow: hidden;
+}
+.tally.tally-track.proportional span {
+  width: auto;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 999px;
+  border: 0;
+}
+.tally.tally-track.proportional .pending {
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 3px,
+    var(--tone) 3px 5px
+  );
+  box-shadow: inset 0 0 0 1px var(--tone-deep);
+}
+.tally.tally-track.proportional .open {
+  background: transparent;
 }
 
 /* Where our money is: a plain two-level list. */
@@ -2378,9 +2450,8 @@ nav a {
 .ipon-home-section > h2.section-label {
   margin-top: 4px;
 }
-.sub-label {
-  margin: 4px 0 0;
-  font-size: 15px;
+details.personal-history {
+  margin-top: 12px;
 }
 .settings-grid > .settings-title {
   grid-column: 1 / -1;
@@ -2401,7 +2472,8 @@ details.wallet-add > summary,
 details.reminder-time > summary,
 .more-card > details > summary,
 .ipon-item details > summary,
-.personal-savings details > summary {
+.personal-savings details > summary,
+details.personal-history > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2415,14 +2487,16 @@ details.wallet-add > summary::-webkit-details-marker,
 details.reminder-time > summary::-webkit-details-marker,
 .more-card > details > summary::-webkit-details-marker,
 .ipon-item details > summary::-webkit-details-marker,
-.personal-savings details > summary::-webkit-details-marker {
+.personal-savings details > summary::-webkit-details-marker,
+details.personal-history > summary::-webkit-details-marker {
   display: none;
 }
 details.wallet-add > summary::after,
 details.reminder-time > summary::after,
 .more-card > details > summary::after,
 .ipon-item details > summary::after,
-.personal-savings details > summary::after {
+.personal-savings details > summary::after,
+details.personal-history > summary::after {
   content: "";
   width: 7px;
   height: 7px;
@@ -2436,7 +2510,8 @@ details.wallet-add[open] > summary::after,
 details.reminder-time[open] > summary::after,
 .more-card > details[open] > summary::after,
 .ipon-item details[open] > summary::after,
-.personal-savings details[open] > summary::after {
+.personal-savings details[open] > summary::after,
+details.personal-history[open] > summary::after {
   transform: rotate(-135deg);
 }
 /* Own chevron, 16px in from the rounded edge (native arrow hugs it). */

@@ -338,7 +338,7 @@ export default function App() {
                     : t("Changes")
                 }
               >
-                <IconBell aria-hidden="true" />
+                <IconBell size={20} stroke={2} aria-hidden="true" />
                 {unreadCount > 0 && (
                   <span className="badge">{unreadCount}</span>
                 )}
