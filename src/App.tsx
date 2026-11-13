@@ -340,7 +340,7 @@ export default function App() {
               >
                 {unreadCount > 0 && (
                   <span className="badge" aria-hidden="true">
-                    {unreadCount}
+                    <span className="header-bell-count">{unreadCount}</span>
                   </span>
                 )}
                 <IconBell size={18} stroke={2} aria-hidden="true" />
