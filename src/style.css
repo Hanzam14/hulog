@@ -1367,6 +1367,9 @@ button svg,
   font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
+.header-bell-count {
+  transform: translateY(-1px);
+}
 .custody-ledger {
   background: var(--card);
   border: 1.5px solid var(--line);
