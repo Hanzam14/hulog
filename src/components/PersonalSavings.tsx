@@ -316,7 +316,7 @@ export function PersonalGoalCard({
       >
         <span style={{ width: `${progress}%` }} />
       </div>
-      {owner ? (
+      {owner && (
         <>
           <div className="actions">
             <button
@@ -357,8 +357,6 @@ export function PersonalGoalCard({
             />
           )}
         </>
-      ) : (
-        <p className="meta">{t("Read-only.")}</p>
       )}
       <details>
         <summary>{t("Savings records")}</summary>
