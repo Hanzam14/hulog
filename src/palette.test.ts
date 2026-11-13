@@ -64,4 +64,16 @@ describe("planner text contrast", () => {
       ).toBeGreaterThanOrEqual(4.5);
     },
   );
+  it("keeps primary brand and destructive buttons legible against paper in light and dark mode", () => {
+    expect(contrast(value(light, "pink-deep"), value(light, "paper"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(value(dark, "pink-deep"), value(dark, "paper"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(value(light, "danger"), value(light, "paper"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(value(dark, "danger"), value(dark, "paper"))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(value(light, "pink-deep"), value(light, "dots"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(value(dark, "pink-deep"), value(dark, "dots"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(value(light, "leaf-deep"), value(light, "dots"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(value(dark, "leaf-deep"), value(dark, "dots"))).toBeGreaterThanOrEqual(3);
+    expect(css).toMatch(/a:not\(\.button\):hover/);
+    expect(css).toMatch(/button\.danger:not\(\.secondary\):not\(\.quiet\)[\s\S]*?background:\s*var\(--danger\)/);
+  });
 });

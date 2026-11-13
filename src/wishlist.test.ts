@@ -412,11 +412,11 @@ const personal = (snap: Snapshot) => ({
 });
 
 describe("wishlist screen", () => {
-  it("shows the empty state with the records-only line", () => {
+  it("shows the clean empty state", () => {
     const html = view(snapshot);
     expect(html).toContain("Our wishlist");
     expect(html).toContain("Nothing on the wishlist yet");
-    expect(html).toContain("Buying is your own action outside the app.");
+    expect(html).not.toContain("Buying is your own action outside the app.");
     expect(html).toContain("Add to wishlist");
   });
   it("lists wanted before bought with price, goal progress and who added or bought", () => {

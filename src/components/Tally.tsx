@@ -1,7 +1,6 @@
 import type { Tone } from "./shared";
 import { t } from "../i18n";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { coinColumns } from "../coins";
+import { useEffect, useRef } from "react";
 /** One row of the planner: a sticker per paid day, dashed while waiting. */
 export default function Tally({
   label,
@@ -22,16 +21,6 @@ export default function Tally({
 }) {
   const row = useRef<HTMLDivElement>(null);
   const previousPaid = useRef(paid);
-  const [cols, setCols] = useState<number | null>(null);
-  useEffect(() => {
-    const el = row.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
-    const measure = () => setCols(coinColumns(total, el.clientWidth));
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [total]);
   useEffect(() => {
     if (paid > previousPaid.current) {
       row.current?.querySelectorAll<HTMLElement>(".paid").forEach((coin, i) => {
@@ -54,7 +43,6 @@ export default function Tally({
     <div
       ref={row}
       className={`tally ${tone} ${className}`.trim()}
-      style={cols ? ({ "--coin-cols": cols } as CSSProperties) : undefined}
       {...(decorative
         ? { "aria-hidden": true }
         : {
@@ -66,13 +54,7 @@ export default function Tally({
           })}
     >
       {marks.map((mark, i) => (
-        <span
-          key={i}
-          className={mark}
-          style={
-            { "--coin-rotation": `${((i * 7) % 13) - 6}deg` } as CSSProperties
-          }
-        />
+        <span key={i} className={mark} />
       ))}
     </div>
   );

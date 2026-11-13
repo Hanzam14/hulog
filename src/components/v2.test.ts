@@ -630,7 +630,7 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     const trackerMarkup = html(
       createElement(Tracker, { data, user: "a", run, busy: false }),
     );
-    expect(trackerMarkup).toContain(
+    expect(trackerMarkup).not.toContain(
       "No shared expenses yet. Log a bill or abono above.",
     );
     expect(trackerMarkup).toContain("Add shared expense");

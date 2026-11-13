@@ -952,11 +952,6 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
             </form>
           )}
         </div>
-        {entries.length === 0 && (
-          <p className="abono-empty">
-            {t("No shared expenses yet. Log a bill or abono above.")}
-          </p>
-        )}
       </section>
 
       {/* Chronological Abono Entries List */}

@@ -2,13 +2,7 @@ import { t } from "../i18n";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { FormEvent } from "react";
-import {
-  IconArrowLeft,
-  IconArrowRight,
-  IconCalendar,
-  IconCoin,
-  IconWallet,
-} from "@tabler/icons-react";
+import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, name } from "../components/shared";
 import { rpc } from "../data";
@@ -82,9 +76,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
       </Link>
       <h1 className="sr-only">{t("New round")}</h1>
       <fieldset>
-        <legend>
-          <IconCoin aria-hidden="true" /> {t("₱ a day")}
-        </legend>
+        <legend>{t("₱ a day")}</legend>
         <div className="chips">
           {AMOUNTS.map((a) => (
             <button
@@ -107,9 +99,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
         </div>
       </fieldset>
       <fieldset>
-        <legend>
-          <IconCalendar aria-hidden="true" /> {t("days")}
-        </legend>
+        <legend>{t("days")}</legend>
         <div className="chips">
           {DAYS.map((d) => (
             <button
@@ -134,9 +124,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
         </div>
       </fieldset>
       <fieldset>
-        <legend>
-          <IconArrowRight aria-hidden="true" /> {t("pot goes to")}
-        </legend>
+        <legend>{t("pot goes to")}</legend>
         <div className="chips">
           {members.map((m) => (
             <button
@@ -154,9 +142,7 @@ export default function Propose({ data, user, run, busy }: ViewProps) {
       </fieldset>
       {activeWallets.length > 0 && (
         <fieldset>
-          <legend>
-            <IconWallet aria-hidden="true" /> {t("Wallet is held by")}
-          </legend>
+          <legend>{t("Wallet is held by")}</legend>
           <div className="chips">
             {activeWallets.map((w) => (
               <button

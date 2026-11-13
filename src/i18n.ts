@@ -636,6 +636,7 @@ const taglish = {
     "Hindi na mababago ang nabili na. Bawiin muna.",
   "Wishlist item unavailable": "Wala na ang item na ito.",
   "Save for now (offline)": "I-save muna (offline)",
+  "{amount}/day": "{amount}/day",
   "You're offline. This will be saved on this phone and sent when you're back online.":
     "Offline ka. Ise-save ito sa phone at ipapadala pag online na.",
   "Saved on this phone. It will sync when you're back online.":
@@ -716,6 +717,7 @@ const taglish = {
     "Maglagay ng valid na porsyento (0 hanggang 100).",
   "Caught up for today ✓ ({paid} of {total} days done)":
     "Okay na ang hulog mo ngayon ✓ ({paid} sa {total} araw na)",
+  "Hulog {amount}": "Hulog {amount}",
 } as const;
 export type Key = keyof typeof taglish;
 type Dictionary = Record<Key, string>;
@@ -1348,6 +1350,7 @@ const en = {
     "Bought items cannot be edited. Undo bought first.",
   "Wishlist item unavailable": "This item is no longer available.",
   "Save for now (offline)": "Save for now (offline)",
+  "{amount}/day": "{amount}/day",
   "You're offline. This will be saved on this phone and sent when you're back online.":
     "You're offline. This will be saved on this phone and sent when you're back online.",
   "Saved on this phone. It will sync when you're back online.":
@@ -1425,6 +1428,7 @@ const en = {
     "Enter a valid percentage (0 to 100).",
   "Caught up for today ✓ ({paid} of {total} days done)":
     "Caught up for today ✓ ({paid} of {total} days done)",
+  "Hulog {amount}": "Hulog {amount}",
 } satisfies Dictionary;
 const tl = {
   "Request sent ✓": "Naipadala na ang kahilingan ✓",
@@ -2062,6 +2066,7 @@ const tl = {
     "Hindi na mababago ang nabili na. Bawiin muna.",
   "Wishlist item unavailable": "Wala na ang item na ito.",
   "Save for now (offline)": "I-save muna (offline)",
+  "{amount}/day": "{amount}/araw",
   "You're offline. This will be saved on this phone and sent when you're back online.":
     "Wala kang internet. Ise-save ito sa phone at ipapadala kapag may internet na.",
   "Saved on this phone. It will sync when you're back online.":
@@ -2142,6 +2147,7 @@ const tl = {
     "Maglagay ng wastong porsyento (0 hanggang 100).",
   "Caught up for today ✓ ({paid} of {total} days done)":
     "Kumpleto na ang hulog mo ngayon ✓ ({paid} sa {total} araw na)",
+  "Hulog {amount}": "Ihulog ang {amount}",
 } satisfies Dictionary;
 export const strings = { en, tl, taglish };
 export function readLang(): Lang {
