@@ -64,6 +64,16 @@ describe("planner text contrast", () => {
       ).toBeGreaterThanOrEqual(4.5);
     },
   );
+  it.each([light, dark])("keeps the round confirm icon legible", (palette) => {
+    const confirm = css.match(/\.round\.ok\s*\{([^}]+)\}/)![1];
+    const foreground = confirm.match(/\bcolor:\s*var\(--([\w-]+)\)/)?.[1];
+    const background = confirm.match(/\bbackground:\s*var\(--([\w-]+)\)/)?.[1];
+    expect(foreground, "confirm icon needs an explicit foreground").toBeDefined();
+    expect(background).toBeDefined();
+    expect(
+      contrast(value(palette + light, foreground!), value(palette, background!)),
+    ).toBeGreaterThanOrEqual(3);
+  });
   it("keeps primary brand and destructive buttons legible against paper in light and dark mode", () => {
     expect(contrast(value(light, "pink-deep"), value(light, "paper"))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(value(dark, "pink-deep"), value(dark, "paper"))).toBeGreaterThanOrEqual(4.5);

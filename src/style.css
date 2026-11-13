@@ -636,6 +636,7 @@ button svg,
 }
 .round.ok {
   background: var(--leaf);
+  color: var(--sticker-ink);
 }
 .round.no {
   background: var(--card);
