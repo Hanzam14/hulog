@@ -3233,3 +3233,177 @@ legend::first-letter {
   font-size: 13px;
   font-weight: 800;
 }
+
+/* ── Polish pass (2026-11-15): calmer surfaces, clearer hierarchy, depth. ── */
+:root {
+  --paper: #f6f5f2;
+  --card: #ffffff;
+  --card-tint: #f2f1ee;
+  --line: color-mix(in srgb, var(--ink) 8%, transparent);
+  --radius-card: 20px;
+  --elev-sm: 0 1px 2px rgba(24, 20, 16, 0.04), 0 6px 20px -8px rgba(24, 20, 16, 0.08);
+  --elev-pop: 0 10px 30px -12px rgba(184, 40, 88, 0.45);
+  --nav-surface: color-mix(in srgb, var(--card) 82%, transparent);
+}
+:root[data-theme="dark"] {
+  --paper: #0c0d11;
+  --card: #15171e;
+  --card-tint: #1d2029;
+  --line: color-mix(in srgb, #ffffff 7%, transparent);
+  --elev-sm: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --elev-pop: 0 10px 30px -14px rgba(255, 133, 169, 0.5);
+  --nav-surface: color-mix(in srgb, var(--card) 80%, transparent);
+}
+
+/* Header stays reachable and lets content slide under it. */
+.app > header {
+  position: sticky;
+  top: 0;
+  z-index: 11;
+  padding: 12px 16px 8px;
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+}
+html {
+  scroll-padding-top: 76px;
+}
+
+/* Cards: one consistent radius, hairline border, soft depth. */
+main section,
+.pot,
+.today-action {
+  border-radius: var(--radius-card);
+}
+main section:not(:has(.pot)):not(.app-updates):not(.wish-section):not(.custody-ledger),
+.pot {
+  border-color: var(--line);
+  box-shadow: var(--elev-sm);
+}
+
+/* Section labels read as quiet group headers, not stray body text. */
+.section-label {
+  margin: 28px 4px 10px;
+  color: var(--soft);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.home-waiting .section-label {
+  margin-top: 8px;
+}
+
+/* Today: the one thing to do, tinted so it is the first thing seen. */
+.today-action {
+  gap: 14px;
+  padding: 18px;
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--pink) 22%, transparent), transparent 60%),
+    var(--brand-soft);
+  border-color: color-mix(in srgb, var(--pink) 30%, transparent);
+}
+.today-action .today-label {
+  justify-self: start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pink) 18%, transparent);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.today-action .today-text {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+.today-action .button.big:not(.secondary) {
+  box-shadow: var(--elev-pop);
+}
+
+/* Pot: the amount is the hero. */
+.pot {
+  padding: 18px;
+}
+.pot .pot-figure strong {
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+.pot .pot-target {
+  color: var(--soft);
+}
+.pot > .pot-progress {
+  height: 8px;
+  border-radius: 999px;
+}
+.pot > .pot-progress > span {
+  border-radius: inherit;
+}
+.pot .pot-bottom small,
+.pot .pot-custody small {
+  color: var(--soft);
+}
+
+/* Buttons: tactile press, consistent primary fill. */
+button:not(:disabled):active,
+.button:active {
+  transform: scale(0.98);
+}
+button:focus-visible,
+.button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+}
+input,
+select {
+  border-radius: 14px;
+  background-color: var(--card);
+}
+
+/* History filters stack full-width on narrow screens so labels never truncate. */
+@media (max-width: 420px) {
+  .history-filters .row {
+    flex-wrap: wrap;
+  }
+  .history-filters .row > label {
+    flex: 1 1 100% !important;
+  }
+}
+
+/* Bottom nav: a floating bar with a clear active pill. */
+.app > nav {
+  margin: 0 10px calc(8px + env(safe-area-inset-bottom));
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--nav-surface);
+  backdrop-filter: saturate(1.4) blur(16px);
+  -webkit-backdrop-filter: saturate(1.4) blur(16px);
+  box-shadow: 0 8px 28px -12px rgba(0, 0, 0, 0.25);
+}
+.app > nav a {
+  border-radius: 16px;
+  color: var(--soft);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.app > nav a.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+/* App updates button can wrap neatly instead of breaking mid-word. */
+.more-card .app-updates > button {
+  white-space: normal;
+  line-height: 1.25;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active,
+  .button:active {
+    transform: none;
+  }
+}
