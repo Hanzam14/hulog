@@ -1,5 +1,6 @@
 import { t } from "../i18n";
 import { Link } from "react-router-dom";
+import { IconChevronRight } from "@tabler/icons-react";
 import type { Cycle, Snapshot } from "../data";
 import {
   getSoloCycleBadgeText,
@@ -33,6 +34,7 @@ export default function CycleCard({
       className="pot"
       aria-label={t("Round details")}
     >
+      <IconChevronRight className="pot-chevron" size={18} aria-hidden="true" />
       <div className="pot-top">
         <div className="pot-amount">
           {soloBadge && <span className="chip pot-solo-chip">{soloBadge}</span>}

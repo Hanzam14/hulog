@@ -437,6 +437,8 @@ export default function Home(props: ViewProps) {
     : 0;
   // Logging ahead stays an option via /hulog, while due days get the primary button.
   const dueToday = loggedDays < elapsedDays;
+  const showPendingPayments =
+    c?.status === "accepted" && !closed(c) && pendingDays > 0;
 
   let todaySummary: string | null = null;
   if (c) {
@@ -449,6 +451,10 @@ export default function Home(props: ViewProps) {
       if (loggedDays >= c.num_days) {
         todaySummary = t("All {total} days logged for this round ✓", {
           total: c.num_days,
+        });
+      } else if (data.today < c.start_date) {
+        todaySummary = t("Round starts {date}", {
+          date: shortDate(c.start_date),
         });
       } else if (pendingDays > 0) {
         todaySummary = t("{paid} of {total} days logged · {pending} pending", {
@@ -547,6 +553,16 @@ export default function Home(props: ViewProps) {
                 <span className="today-label">{t("Today's action")}</span>
                 <strong className="today-text">{todaySummary}</strong>
               </div>
+              {showPendingPayments && (
+                <div className="today-pending">
+                  <span>
+                    {t("{amount} pending confirmation", {
+                      amount: money(pendingDays * c.daily_amount_centavos),
+                    })}
+                  </span>
+                  <Link to={`/cycles/${c.id}`}>{t("View payment records")}</Link>
+                </div>
+              )}
               {c.status === "accepted" &&
                 !closed(c) &&
                 loggedDays < c.num_days && (
@@ -555,9 +571,11 @@ export default function Home(props: ViewProps) {
                     to="/hulog"
                   >
                     <IconPlus aria-hidden="true" />{" "}
-                    {t("Hulog {amount}", {
-                      amount: money(c.daily_amount_centavos),
-                    })}
+                    {dueToday
+                      ? t("Hulog {amount}", {
+                          amount: money(c.daily_amount_centavos),
+                        })
+                      : t("Log in advance")}
                   </Link>
                 )}
             </div>

@@ -1650,6 +1650,7 @@ nav a.active {
 }
 .pot {
   margin: 0;
+  position: relative;
   padding: 16px;
   gap: 12px;
   background: var(--card);
@@ -1673,6 +1674,13 @@ nav a.active {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  padding-inline-end: 26px;
+}
+.pot-chevron {
+  position: absolute;
+  inset-block-start: 16px;
+  inset-inline-end: 16px;
+  color: var(--soft);
 }
 .pot-amount {
   display: grid;
@@ -3023,6 +3031,23 @@ select::picker-icon {
 .today-copy {
   display: grid;
   gap: 4px;
+}
+.today-pending {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  row-gap: 4px;
+  color: var(--soft);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.today-pending a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: underline;
 }
 .today-action .today-label {
   color: var(--soft);
