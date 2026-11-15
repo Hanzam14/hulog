@@ -686,6 +686,10 @@ const taglish = {
   "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
     "I-confirm o tapusin muna ang mga pending na hulog at pag-delete bago mag-withdraw o isara ang goal.",
   "Today's action": "Gagawin ngayon",
+  "Log in advance": "Mag-log in advance",
+  "Round starts {date}": "Magsisimula ang round sa {date}",
+  "{amount} pending confirmation": "{amount} pending pa",
+  "View payment records": "Tingnan ang mga hulog",
   "Review round proposal": "Tingnan ang panukalang round",
   "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
   "Waiting for partner to accept round":
@@ -1398,6 +1402,10 @@ const en = {
   "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
     "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.",
   "Today's action": "Today's action",
+  "Log in advance": "Log in advance",
+  "Round starts {date}": "Round starts {date}",
+  "{amount} pending confirmation": "{amount} pending confirmation",
+  "View payment records": "View payment records",
   "Review round proposal": "Review round proposal",
   "Respond to the round proposal below": "Respond to the round proposal below",
   "Waiting for partner to accept round": "Waiting for partner to accept round",
@@ -2112,6 +2120,10 @@ const tl = {
   "Confirm or resolve pending contributions and deletions before withdrawing or closing this goal.":
     "Kumpirmahin o tapusin muna ang mga nakabinbing ambag at pagbura bago mag-withdraw o isara ang layunin.",
   "Today's action": "Gagawin ngayon",
+  "Log in advance": "Magtala nang maaga",
+  "Round starts {date}": "Magsisimula ang ikot sa {date}",
+  "{amount} pending confirmation": "{amount} naghihintay ng kumpirmasyon",
+  "View payment records": "Tingnan ang tala ng mga hulog",
   "Review round proposal": "Suriin ang panukalang round",
   "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
   "Waiting for partner to accept round":

@@ -82,15 +82,53 @@ describe("Minimalist UI and Hulog /hulog flow", () => {
       ),
     );
     expect(caughtUpHtml).toContain('class="button secondary big" href="/hulog"');
-    expect(caughtUpHtml).toContain("Hulog ₱50.00");
+    expect(caughtUpHtml).toContain("Log in advance");
+    expect(caughtUpHtml).not.toContain("View payment records");
   });
 
-  it("hides the Hulog link once the member has already logged all round days", () => {
+  it("offers advance logging for an upcoming round", () => {
+    const data = createInitialSoloSnapshot(SELF_ID);
+    const cycle = data.cycles[0];
+    data.today = "2026-12-31";
+    cycle.phase = "upcoming";
+    cycle.start_date = "2027-01-01";
+    cycle.end_date = "2027-01-15";
+    cycle.days_left = cycle.num_days;
+    data.progress = data.progress.map((p) =>
+      p.cycle_id === cycle.id
+        ? { ...p, confirmed_days: 0, pending_days: 0, pending_count: 0 }
+        : p,
+    );
+
+    const html = renderToStaticMarkup(
+      createElement(
+        MemoryRouter,
+        null,
+        createElement(Home, {
+          data,
+          user: SELF_ID,
+          run: async () => {},
+          busy: false,
+        }),
+      ),
+    );
+    expect(html).toContain('class="button secondary big" href="/hulog"');
+    expect(html).toContain("Log in advance");
+    expect(html).toContain("Round starts Jan 1");
+    expect(html).not.toContain("Caught up for today");
+    expect(html).not.toContain("View payment records");
+  });
+
+  it.each([0, 2])("hides logging when all days are logged (%i pending)", (pendingDays) => {
     const data = createInitialSoloSnapshot(SELF_ID);
     const cycle = data.cycles[0];
     data.progress = data.progress.map((p) =>
       p.cycle_id === cycle.id && p.member_id === SELF_ID
-        ? { ...p, confirmed_days: cycle.num_days, pending_days: 0 }
+        ? {
+            ...p,
+            confirmed_days: cycle.num_days - pendingDays,
+            pending_days: pendingDays,
+          }
         : p,
     );
 
@@ -107,7 +145,16 @@ describe("Minimalist UI and Hulog /hulog flow", () => {
       ),
     );
     expect(html).not.toContain('href="/hulog"');
-    expect(html).not.toContain("Hulog ₱");
+    expect(html).toContain(`All ${cycle.num_days} days logged for this round ✓`);
+    if (pendingDays) {
+      expect(html).toContain("₱100.00 pending confirmation");
+      expect(html).toMatch(
+        new RegExp(`href="/cycles/${cycle.id}"[^>]*>View payment records</a>`),
+      );
+    } else {
+      expect(html).not.toContain("pending confirmation");
+      expect(html).not.toContain("View payment records");
+    }
   });
 
   it("renders CycleCard without decorative piggy SVG while keeping accessible progress", () => {
@@ -126,11 +173,12 @@ describe("Minimalist UI and Hulog /hulog flow", () => {
       ),
     );
 
-    expect(html).not.toContain("<svg");
+    expect(html).not.toContain("tabler-icon-pig");
     expect(html).not.toContain(`× ${cycle.num_days}`);
     expect(html).toContain('role="progressbar"');
     expect(html).toContain('aria-label="Pot progress"');
     expect(html).toContain("pot-figure");
+    expect(html).toMatch(/<svg[^>]*class="[^"]*pot-chevron[^"]*"[^>]*aria-hidden="true"/);
   });
 
   it("renders IponCard with crisp percentage badge and without the redundant 44px ring SVG", () => {
