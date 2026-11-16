@@ -17,6 +17,7 @@ import {
   setSoloMode,
   setSoloPotMode,
   loadSoloSnapshot,
+  createInitialSoloSnapshot,
   soloRpc,
 } from "../solo";
 import App from "../App";
@@ -31,6 +32,8 @@ vi.mock("./AppUpdates", () => ({
   UpdateBanner: () => null,
 }));
 import History from "../screens/History";
+import Detail from "../screens/Detail";
+import { readFileSync } from "node:fs";
 import NoGroup from "../screens/NoGroup";
 
 vi.mock("../data", async () => {
@@ -626,8 +629,9 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     expect(markup).toContain("Ipon");
     expect(markup).toContain("Japan Trip");
     expect(markup).toContain("Mag-ipon");
-    expect(markup).toContain("Kasama si ");
-    expect(markup).toContain("Para sa akin");
+    expect(markup).toContain("Bagong ipon goal");
+    expect(markup).not.toContain("Para sa akin");
+    expect(markup).not.toContain("Kasama si ");
   });
 
   it("renders friendly empty states and next-step actions across History, Tracker, Home/IponDetail, and NoGroup", () => {
@@ -659,7 +663,9 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     const homeMarkup = html(
       createElement(Home, { data, user: "a", run, busy: false }),
     );
-    expect(homeMarkup).toContain('href="/ipon/new"');
+    expect(homeMarkup).toContain('class="secondary new-savings-goal"');
+    expect(homeMarkup).toContain("New savings goal");
+    expect(homeMarkup).not.toContain('href="/ipon/new"');
 
     const noGroupMarkup = html(createElement(NoGroup, { run, busy: false }));
     expect(noGroupMarkup).toContain(
@@ -1155,5 +1161,166 @@ describe("Hulog Solo Mode", () => {
     expect(group).toContain("Together");
     expect(group).toContain("custody-ledger");
     expect(group).toContain("₱3,750.00");
+  });
+});
+
+describe("UI simplification layout regressions", () => {
+  it.each(["en", "taglish", "tl"] as const)(
+    "keeps History filters compact and printing after every list in %s",
+    (lang) => {
+      setLang(lang);
+      const data = v2Snapshot();
+      data.savingsGoals![0].withdrawn_at = "2026-10-17";
+      data.savingsGoals![0].phase = "withdrawn";
+      const markup = html(
+        createElement(History, { data, user: "a", run, busy: false }),
+      );
+      const filters = markup.match(
+        /<div class="history-filters no-print">([\s\S]*?)<\/div>/,
+      )?.[1];
+      expect(filters).toBeDefined();
+      expect(filters!.match(/<select /g)).toHaveLength(2);
+      expect(filters).toContain(`aria-label="${t("Month")}"`);
+      expect(filters).toContain(`aria-label="${t("Member")}"`);
+      expect(filters).not.toContain("<label");
+      expect(markup).not.toContain('<section class="history-filters');
+      expect(
+        markup.slice(0, markup.indexOf('class="history-filters')),
+      ).not.toContain(t("Print summary"));
+      expect(markup).toMatch(
+        /<button type="button" class="secondary no-print">[^<]+<\/button>$/,
+      );
+      const css = readFileSync("src/style.css", "utf8");
+      expect(css).toMatch(
+        /\.history-filters \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/,
+      );
+      expect(css).toMatch(/\.history-filters select \{[^}]*min-height: 44px/);
+      expect(css).not.toContain(".history-filters .row > label");
+    },
+  );
+
+  it.each(["en", "taglish", "tl"] as const)(
+    "renders wallets once with balances and owner actions in the first money card in %s",
+    (lang) => {
+      setLang(lang);
+      const data = v2Snapshot();
+      const markup = html(
+        createElement(Settings, { data, user: "a", run, busy: false }),
+      );
+      expect(markup).not.toContain("wallets-section");
+      const card = markup.match(
+        /<section class="custody-ledger">([\s\S]*?)<\/section>/,
+      )?.[1];
+      expect(card).toBeDefined();
+      expect(card).toContain("₱3,750.00");
+      for (const wallet of data.wallets!) {
+        expect(card!.split(`>${wallet.label}<`)).toHaveLength(2);
+        expect(markup.split(`>${wallet.label}<`)).toHaveLength(2);
+      }
+      expect(card!.match(/class="holder-header row"/g)).toHaveLength(2);
+      const walletRows = [
+        ...card!.matchAll(/<div class="custody-wallet-row">([\s\S]*?)<\/li>/g),
+      ];
+      expect(walletRows).toHaveLength(3);
+      expect(walletRows[0][1]).toContain("₱1,500.00");
+      expect(walletRows[0][1]).toContain(`aria-label="${t("Rename wallet")}"`);
+      expect(walletRows[0][1]).toContain(`aria-label="${t("Archive wallet")}"`);
+      expect(walletRows[2][1]).not.toContain(
+        `aria-label="${t("Rename wallet")}"`,
+      );
+      expect(card).toContain('<details class="wallet-add">');
+      expect(card!.indexOf('class="wallet-add"')).toBeGreaterThan(
+        card!.lastIndexOf('class="custody-wallet-row"'),
+      );
+    },
+  );
+
+  it("keeps the Settings profile trigger with compact avatars and adjacent names", () => {
+    setLang("en");
+    const markup = html(
+      createElement(Settings, {
+        data: v2Snapshot(),
+        user: "a",
+        run,
+        busy: false,
+      }),
+    );
+    const duo = markup.match(
+      /<div class="duo">([\s\S]*?)<\/figure><\/div>/,
+    )?.[1];
+    expect(duo).toBeDefined();
+    expect(duo!.match(/class="avatar (?:pink|blue) md"/g)).toHaveLength(2);
+    expect(duo).not.toContain(' lg"');
+    expect(duo).toContain('class="avatar-edit"');
+    expect(duo).toContain("<figcaption>Ana Cruz</figcaption>");
+    expect(duo).toContain("<figcaption>Ben Santos</figcaption>");
+    const css = readFileSync("src/style.css", "utf8");
+    expect(css).toMatch(
+      /\.duo \.avatar.md \{[^}]*width: 48px;[^}]*height: 48px/,
+    );
+    expect(css).toMatch(/\.duo figure \{[^}]*display: flex/);
+  });
+
+  it("places the transfer select and button inside closed details after the round calendar", () => {
+    setLang("en");
+    const data = v2Snapshot();
+    // Reuse an accepted round from the solo fixture, retaining the multi-wallet group.
+    const cycle = createInitialSoloSnapshot("a").cycles[0];
+    data.cycles = [
+      {
+        ...cycle,
+        id: "round",
+        wallet_id: "w1",
+        holder_id: "a",
+        receiver_id: "a",
+        payout_state: null,
+        phase: "open",
+      },
+    ];
+    data.today = cycle.start_date;
+    data.progress = [
+      {
+        cycle_id: "round",
+        member_id: "a",
+        expected_centavos: 75000,
+        confirmed_days: 0,
+        pending_days: 0,
+        pending_count: 0,
+        debt_centavos: 0,
+      },
+    ];
+    const markup = renderToStaticMarkup(
+      createElement(
+        MemoryRouter,
+        { initialEntries: ["/cycles/round"] },
+        createElement(
+          Routes,
+          {},
+          createElement(Route, {
+            path: "/cycles/:id",
+            element: createElement(Detail, {
+              data,
+              user: "a",
+              run,
+              busy: false,
+            }),
+          }),
+        ),
+      ),
+    );
+    const transfer = markup.match(
+      /<details class="cycle-wallet-control">([\s\S]*?)<\/details>/,
+    )?.[1];
+    expect(transfer).toBeDefined();
+    expect(transfer).toContain("<summary>Move pot to another wallet</summary>");
+    expect(transfer).toContain(
+      '<select aria-label="Move pot to another wallet" name="wallet_id"',
+    );
+    expect(transfer!.match(/<button /g)).toHaveLength(1);
+    expect(transfer).not.toContain("<label");
+    expect(markup).toContain('class="round-cal ');
+    expect(markup.indexOf('class="cycle-wallet-control"')).toBeGreaterThan(
+      markup.indexOf('class="round-cal '),
+    );
   });
 });

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { t } from "../i18n";
 import type { CustodyItem, Snapshot, Wallet } from "../data";
 import { money } from "../helpers";
@@ -15,13 +16,25 @@ interface UnifiedWalletItem {
 }
 
 /** Passbook custody stamp card showing where the couple's money is held. */
-export default function CustodyCard({ data }: { data: Snapshot }) {
+export default function CustodyCard({
+  data,
+  walletControls,
+  children,
+}: {
+  data: Snapshot;
+  walletControls?: (walletId: string) => ReactNode;
+  children?: ReactNode;
+}) {
   const configuredWallets: Wallet[] = (data.wallets ?? []).filter(
     (w) => !w.archived_at,
   );
   const custodyItems: CustodyItem[] = data.custody ?? [];
 
-  if (configuredWallets.length === 0 && custodyItems.length === 0) {
+  if (
+    configuredWallets.length === 0 &&
+    custodyItems.length === 0 &&
+    !children
+  ) {
     return null;
   }
 
@@ -61,7 +74,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
     }
   }
 
-  if (unifiedWallets.length === 0) {
+  if (unifiedWallets.length === 0 && !children) {
     return null;
   }
 
@@ -147,6 +160,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
                     <div className="custody-wallet-row">
                       <span>{item.label}</span>
                       <strong>{money(item.total_centavos)}</strong>
+                      {walletControls?.(item.wallet_id)}
                     </div>
                     {item.paluwagan_centavos > 0 && item.ipon_centavos > 0 && (
                       <ul className="custody-split">
@@ -169,6 +183,7 @@ export default function CustodyCard({ data }: { data: Snapshot }) {
           );
         })}
       </div>
+      {children}
     </section>
   );
 }

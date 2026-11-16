@@ -649,7 +649,13 @@ export default function App() {
           </main>
         </>
       )}
-      <footer>{t("Records only. No money moves through Hulog.")}</footer>
+      {ready &&
+        (!session ||
+          (data?.groups[0] &&
+            own?.status === "active" &&
+            location.pathname === "/")) && (
+          <footer>{t("Records only. No money moves through Hulog.")}</footer>
+        )}
     </div>
   );
 }

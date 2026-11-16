@@ -6,12 +6,14 @@ const taglish = {
   "Your partner approves you": "Ia-approve ka ng partner mo",
   "Then you're in!": "Tapos, pasok ka na!",
   "You're no longer in this group": "Wala ka na sa grupo",
-  "This screen updates automatically.": "Kusang nag-a-update ang screen na ito.",
+  "This screen updates automatically.":
+    "Kusang nag-a-update ang screen na ito.",
   "The owner did not approve your request. Ask them directly.":
     "Hindi ka muna pinapasok ng owner. Kausapin mo siya nang direkta.",
   "Want to join another group? Ask the owner to remove your membership first.":
     "Gustong sumali sa ibang grupo? Pakiusap muna sa owner na alisin ang membership mo.",
-  "Solo data stays on this device.": "Dito lang sa device na ito ang solo data mo.",
+  "Solo data stays on this device.":
+    "Dito lang sa device na ito ang solo data mo.",
   "Invite your partner": "I-invite ang partner mo",
   "A round needs two people.": "Kailangan ng dalawa para sa round.",
   Money: "Pera",
@@ -21,6 +23,7 @@ const taglish = {
     "Para mag-invite, umalis muna sa solo at mag-sign in.",
   "Saved on this device only. Not synced.":
     "Sa device na ito lang naka-save. Hindi pa naka-sync.",
+  "New savings goal": "Bagong ipon goal",
   "Just me": "Para sa akin",
   "With partner": "Kasama ang partner",
   "With {name}": "Kasama si {name}",
@@ -385,7 +388,6 @@ const taglish = {
   "Total tracked": "Kabuuang naitala",
   Paluwagan: "Paluwagan",
   Ipon: "Ipon",
-  "Wallets & accounts": "Wallets at accounts",
   "Add wallet": "Magdagdag ng wallet",
   "Rename wallet": "I-rename ang wallet",
   "Wallet name (e.g. SeaBank, GCash, Cash)":
@@ -655,7 +657,8 @@ const taglish = {
   "Round starts {date}": "Magsisimula ang round sa {date}",
   "{amount} pending confirmation": "{amount} pending pa",
   "View payment records": "Tingnan ang mga hulog",
-  "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
+  "Respond to the round proposal below":
+    "Sagutin ang panukalang round sa ibaba",
   "Waiting for partner to accept round":
     "Hinihintay na tanggapin ng partner ang round",
   "Log today's {amount} hulog ({paid} of {total} days done)":
@@ -668,8 +671,7 @@ const taglish = {
   "Start a new round when ready": "Magsimula ng bagong round kapag handa na",
   "Show {count} more waiting": "Ipakita pa ang {count} na naghihintay",
   "Add note or payment ref (optional)": "Maglagay ng note o ref no. (opsyonal)",
-  "Date, note & payment ref (optional)":
-    "Petsa, note at ref no. (opsyonal)",
+  "Date, note & payment ref (optional)": "Petsa, note at ref no. (opsyonal)",
   "Note & payment ref (optional)": "Note at ref no. (opsyonal)",
   "Reference must be 4 to 40 letters, numbers, spaces or dashes":
     "Dapat 4 hanggang 40 letters, numbers, spaces o dashes ang ref no.",
@@ -707,6 +709,7 @@ const en = {
     "To invite a partner, leave solo and sign in.",
   "Saved on this device only. Not synced.":
     "Saved on this device only. Not synced.",
+  "New savings goal": "New savings goal",
   "Just me": "Just me",
   "With partner": "With partner",
   "With {name}": "With {name}",
@@ -1068,7 +1071,6 @@ const en = {
   "Total tracked": "Total tracked",
   Paluwagan: "Shared pot",
   Ipon: "Savings",
-  "Wallets & accounts": "Wallets & accounts",
   "Add wallet": "Add wallet",
   "Rename wallet": "Rename wallet",
   "Wallet name (e.g. SeaBank, GCash, Cash)":
@@ -1383,6 +1385,7 @@ const tl = {
     "Para mag-imbita ng kapareha, umalis muna sa solo at mag-sign in.",
   "Saved on this device only. Not synced.":
     "Sa device na ito lang nakatago. Hindi naka-sync.",
+  "New savings goal": "Bagong layunin sa ipon",
   "Just me": "Para sa akin",
   "With partner": "Kasama ang partner",
   "With {name}": "Kasama si {name}",
@@ -1747,7 +1750,6 @@ const tl = {
   "Total tracked": "Kabuuang naitala",
   Paluwagan: "Paluwagan",
   Ipon: "Ipon",
-  "Wallets & accounts": "Mga wallet at account",
   "Add wallet": "Magdagdag ng wallet",
   "Rename wallet": "Palitan ang pangalan ng wallet",
   "Wallet name (e.g. SeaBank, GCash, Cash)":
@@ -2017,7 +2019,8 @@ const tl = {
   "Round starts {date}": "Magsisimula ang ikot sa {date}",
   "{amount} pending confirmation": "{amount} naghihintay ng kumpirmasyon",
   "View payment records": "Tingnan ang tala ng mga hulog",
-  "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
+  "Respond to the round proposal below":
+    "Sagutin ang panukalang round sa ibaba",
   "Waiting for partner to accept round":
     "Hinihintay na tanggapin ng kasama ang round",
   "Log today's {amount} hulog ({paid} of {total} days done)":
@@ -2030,8 +2033,7 @@ const tl = {
   "Start a new round when ready": "Magsimula ng bagong round kapag handa na",
   "Show {count} more waiting": "Ipakita pa ang {count} na naghihintay",
   "Add note or payment ref (optional)": "Maglagay ng tala o ref no. (opsyonal)",
-  "Date, note & payment ref (optional)":
-    "Petsa, tala at ref no. (opsyonal)",
+  "Date, note & payment ref (optional)": "Petsa, tala at ref no. (opsyonal)",
   "Note & payment ref (optional)": "Tala at ref no. (opsyonal)",
   "Reference must be 4 to 40 letters, numbers, spaces or dashes":
     "Dapat 4 hanggang 40 titik, numero, espasyo o gitling ang ref no.",

@@ -21,7 +21,6 @@ import InstallSettings from "../components/InstallSettings";
 import AppUpdates from "../components/AppUpdates";
 import LanguageSettings from "../components/LanguageSettings";
 import WalletsSettings from "../components/WalletsSettings";
-import CustodyCard from "../components/CustodyCard";
 import { isSoloMode, setSoloMode, setSoloPotMode } from "../solo";
 
 export default function Settings({
@@ -141,10 +140,10 @@ export default function Settings({
                 disabled={busy}
                 onClick={() => setEditingProfile(!editingProfile)}
               >
-                <Avatar data={data} id={m.user_id} size="lg" />
+                <Avatar data={data} id={m.user_id} size="md" />
               </button>
             ) : (
-              <Avatar data={data} id={m.user_id} size="lg" />
+              <Avatar data={data} id={m.user_id} size="md" />
             )}
             <figcaption>{name(data, m.user_id)}</figcaption>
           </figure>
@@ -244,7 +243,6 @@ export default function Settings({
         </>
       )}
       <h2 className="section-label settings-title">{t("Money")}</h2>
-      <CustodyCard data={data} />
       <WalletsSettings data={data} user={user} run={run} busy={busy} />
       <h2 className="section-label settings-title">{t("App")}</h2>
       <ThemeSettings />

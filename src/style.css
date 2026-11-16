@@ -983,14 +983,14 @@ button svg,
 /* Group: the two of us, where the pot is, and the invite QR sticker. */
 .duo {
   display: flex;
-  justify-content: center;
-  gap: 24px;
+  justify-content: space-between;
+  gap: 12px;
   margin: 16px 0;
 }
 .duo figure {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
 }
 .duo figcaption {
@@ -1106,11 +1106,11 @@ button svg,
 }
 .duo figure {
   min-width: 0;
-  flex: 0 1 140px;
+  flex: 1 1 0;
 }
 .duo figcaption {
   overflow-wrap: anywhere;
-  text-align: center;
+  text-align: left;
 }
 .avatar-edit,
 .avatar-edit:hover:not(:disabled) {
@@ -1280,7 +1280,6 @@ button svg,
     margin-block: 0;
   }
   .settings-grid > .duo,
-  .settings-grid > .wallets-section,
   .settings-grid > .profile-editor,
   .settings-grid > .confirm,
   .settings-grid > .place,
@@ -1442,15 +1441,6 @@ button svg,
 }
 .member-name {
   color: var(--tone-deep);
-}
-.wallets-section {
-  display: grid;
-  gap: 12px;
-  margin: 16px 0;
-}
-.wallets-list {
-  display: grid;
-  gap: 8px;
 }
 
 /* One minimalist hierarchy, shared by every screen. */
@@ -2134,7 +2124,7 @@ main {
 .custody-wallet-row {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   font-size: 15px;
 }
@@ -2305,15 +2295,6 @@ main {
 }
 
 /* Settings: archive is a normal small button; link-like actions keep 44px. */
-.wallets-section .row {
-  flex-wrap: nowrap;
-  gap: 8px;
-}
-.wallets-section .row > :first-child {
-  flex: 1 1 0;
-  min-width: 0;
-  flex-wrap: wrap;
-}
 .wallet-actions {
   flex: none;
   flex-wrap: nowrap;
@@ -3178,7 +3159,8 @@ legend::first-letter {
   --card-tint: #f2f1ee;
   --line: color-mix(in srgb, var(--ink) 8%, transparent);
   --radius-card: 20px;
-  --elev-sm: 0 1px 2px rgba(24, 20, 16, 0.04), 0 6px 20px -8px rgba(24, 20, 16, 0.08);
+  --elev-sm:
+    0 1px 2px rgba(24, 20, 16, 0.04), 0 6px 20px -8px rgba(24, 20, 16, 0.08);
   --elev-pop: 0 10px 30px -12px rgba(184, 40, 88, 0.45);
   --nav-surface: color-mix(in srgb, var(--card) 82%, transparent);
 }
@@ -3212,7 +3194,10 @@ main section,
 .today-action {
   border-radius: var(--radius-card);
 }
-main section:not(:has(.pot)):not(.app-updates):not(.wish-section):not(.custody-ledger),
+main
+  section:not(:has(.pot)):not(.app-updates):not(.wish-section):not(
+    .custody-ledger
+  ),
 .pot {
   border-color: var(--line);
   box-shadow: var(--elev-sm);
@@ -3236,7 +3221,11 @@ main section:not(:has(.pot)):not(.app-updates):not(.wish-section):not(.custody-l
   gap: 14px;
   padding: 18px;
   background:
-    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--pink) 22%, transparent), transparent 60%),
+    radial-gradient(
+      120% 140% at 100% 0%,
+      color-mix(in srgb, var(--pink) 22%, transparent),
+      transparent 60%
+    ),
     var(--brand-soft);
   border-color: color-mix(in srgb, var(--pink) 30%, transparent);
 }
@@ -3301,16 +3290,60 @@ select {
   background-color: var(--card);
 }
 
-/* History filters stack full-width on narrow screens so labels never truncate. */
-@media (max-width: 420px) {
-  .history-filters .row {
-    flex-wrap: wrap;
-  }
-  .history-filters .row > label {
-    flex: 1 1 100% !important;
-  }
+/* Compact filters retain equal columns at phone widths. */
+.history-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0;
 }
-
+.history-filters select {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+}
+.new-savings-goal {
+  width: 100%;
+  min-height: 44px;
+}
+.cycle-wallet-control {
+  margin: 16px 0;
+}
+.cycle-wallet-control summary,
+.wallet-add summary {
+  min-height: 44px;
+  align-content: center;
+}
+.cycle-wallet-control select {
+  min-width: 0;
+  min-height: 44px;
+  width: 100%;
+}
+.wallet-controls {
+  min-width: 0;
+}
+.wallet-controls form {
+  width: 100%;
+}
+.custody-wallet-row > span {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.custody-wallet-row > strong {
+  white-space: nowrap;
+}
+.custody-wallet-row:has(form) {
+  flex-wrap: wrap;
+}
+.custody-wallet-row:has(form) .wallet-controls {
+  flex-basis: 100%;
+}
+.duo .avatar.md {
+  width: 48px;
+  height: 48px;
+  flex: none;
+}
 /* Bottom nav: a floating bar with a clear active pill. */
 .app > nav {
   margin: 0 10px calc(8px + env(safe-area-inset-bottom));
@@ -3325,7 +3358,9 @@ select {
 .app > nav a {
   border-radius: 16px;
   color: var(--soft);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 .app > nav a.active {
   background: var(--brand-soft);

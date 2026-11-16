@@ -25,11 +25,13 @@ export function GoalForm({
   busy,
   run,
   close,
+  secondary = false,
 }: {
   goal?: PersonalGoal;
   busy: boolean;
   run: Run;
   close: () => void;
+  secondary?: boolean;
 }) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,7 +76,7 @@ export function GoalForm({
         </select>
       </label>
       <div className="actions">
-        <button disabled={busy}>
+        <button className={secondary ? "secondary" : undefined} disabled={busy}>
           {goal ? t("Save goal") : t("Create personal goal")}
         </button>
         <button className="quiet" type="button" onClick={close}>
@@ -92,6 +94,7 @@ function EntryForm({
   busy,
   run,
   close,
+  secondary = false,
 }: {
   goal: PersonalGoal;
   kind: PersonalEntry["kind"];
@@ -100,6 +103,7 @@ function EntryForm({
   busy: boolean;
   run: Run;
   close: () => void;
+  secondary?: boolean;
 }) {
   const [amountText, setAmountText] = useState(
     entry ? (entry.amount_centavos / 100).toFixed(2) : "",
@@ -214,7 +218,7 @@ function EntryForm({
         </p>
       )}
       <div className="actions">
-        <button disabled={busy}>
+        <button className={secondary ? "secondary" : undefined} disabled={busy}>
           {entry
             ? t("Save correction")
             : kind === "deposit"
@@ -234,7 +238,8 @@ export function PersonalGoalCard({
   user,
   run,
   busy,
-}: ViewProps & { goal: PersonalGoal }) {
+  secondaryDeposit = false,
+}: ViewProps & { goal: PersonalGoal; secondaryDeposit?: boolean }) {
   const owner = goal.owner_id === user;
   const entries = (data.personalEntries ?? [])
     .filter((e) => e.goal_id === goal.id && !e.deleted_at)
@@ -320,6 +325,7 @@ export function PersonalGoalCard({
         <>
           <div className="actions">
             <button
+              className={secondaryDeposit ? "secondary" : undefined}
               aria-label={t("Record deposit")}
               disabled={busy}
               onClick={() => {
@@ -346,6 +352,7 @@ export function PersonalGoalCard({
               key={editingEntry?.id ?? recording}
               goal={goal}
               entry={editingEntry ?? undefined}
+              secondary={secondaryDeposit}
               kind={recording}
               today={data.today}
               busy={busy}
@@ -386,7 +393,9 @@ export function PersonalGoalCard({
                 </b>
                 <span className="meta">{shortDate(entry.entry_date)}</span>
               </div>
-              {entry.note && <p className="personal-entry-note">{entry.note}</p>}
+              {entry.note && (
+                <p className="personal-entry-note">{entry.note}</p>
+              )}
             </div>
             {owner && (
               <div className="personal-entry-actions">
@@ -463,6 +472,7 @@ export function PersonalGoalCard({
             {editingGoal && (
               <GoalForm
                 goal={goal}
+                secondary={secondaryDeposit}
                 run={run}
                 busy={busy}
                 close={() => setEditingGoal(false)}
@@ -527,13 +537,16 @@ export default function PersonalSavings({
   trailing,
   siblingGoals,
   showHistory = true,
+  secondaryDeposit = false,
   ...props
 }: ViewProps & {
   trailing?: ReactNode;
   siblingGoals?: boolean;
   showHistory?: boolean;
+  secondaryDeposit?: boolean;
 }) {
   const [creating, setCreating] = useState(false);
+  const [choosing, setChoosing] = useState(false);
   const goals = (props.data.personalGoals ?? []).filter(
     (g) =>
       !g.deleted_at && (g.owner_id === props.user || g.visibility === "shared"),
@@ -561,15 +574,21 @@ export default function PersonalSavings({
         </p>
       )}
       {goals.map((goal) => (
-        <PersonalGoalCard key={goal.id} goal={goal} {...props} />
+        <PersonalGoalCard
+          key={goal.id}
+          goal={goal}
+          secondaryDeposit={secondaryDeposit}
+          {...props}
+        />
       ))}
       {creating ? (
         <GoalForm
+          secondary={secondaryDeposit}
           run={props.run}
           busy={props.busy}
           close={() => setCreating(false)}
         />
-      ) : (
+      ) : choosing ? (
         <div className="ipon-add-row">
           <button
             className="quiet"
@@ -580,6 +599,20 @@ export default function PersonalSavings({
           </button>
           {trailing}
         </div>
+      ) : (
+        <button
+          className="secondary new-savings-goal"
+          disabled={props.busy}
+          onClick={() => {
+            const partner = props.data.memberships.some(
+              (m) => m.status === "active" && m.user_id !== props.user,
+            );
+            if (isSoloMode() && !partner) setCreating(true);
+            else setChoosing(true);
+          }}
+        >
+          <IconPlus size={18} aria-hidden="true" /> {t("New savings goal")}
+        </button>
       )}
       {showHistory && (
         <PersonalSavingsHistory data={props.data} user={props.user} />
