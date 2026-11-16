@@ -69,8 +69,6 @@ const taglish = {
   "Recorded by {name}": "Ni-record ni {name}",
   Voided: "Kinansela",
   "Undo withdrawal": "Bawiin ang withdrawal",
-  "This records money you moved yourself. Hulog does not move money.":
-    "Record lang ito ng perang ikaw ang naglipat. Hindi naglilipat ng pera ang Hulog.",
   "Delete this personal savings record? It stays in your history.":
     "Alisin ang record na ito? Mananatili ito sa history mo.",
   Private: "Private",
@@ -93,9 +91,6 @@ const taglish = {
   "Delete goal": "Alisin ang goal",
   "On this device only. Sign in to sync personal savings.":
     "Sa device na ito lang. Mag-sign in para ma-sync ang sariling ipon.",
-  "Your goals sync to your account. Private unless you choose to share.":
-    "Naka-sync sa account mo ang goals. Private maliban kung gusto mong ipakita.",
-  "New personal goal": "Bagong sariling goal",
   "Use Personal savings on Home for your own goals.":
     "Sa Sariling ipon sa Home gumawa ng sarili mong goals.",
   "Invalid personal savings amount":
@@ -157,10 +152,6 @@ const taglish = {
   "Try again": "Subukan ulit",
   "Konting hintay.": "Konting hintay.",
   "Request denied": "Hindi tinanggap ang request",
-  "Your holder will review your join request. This screen refreshes automatically.":
-    "Titingnan ng holder ang join request mo. Kusang nagre-refresh ang screen na 'to.",
-  "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.":
-    "Tanungin ang group owner tungkol sa request mo. Kailangan munang alisin ang membership mo bago sumali sa iba.",
   "Refresh status": "I-refresh ang status",
   Home: "Home",
   History: "History",
@@ -272,9 +263,6 @@ const taglish = {
   "hulog!": "I-record ang hulog",
   "Join our hulog": "Sali ka sa hulog namin",
   "I-edit ang profile mo": "I-edit ang profile mo",
-  "Pangalan ng grupo": "Pangalan ng grupo",
-  "Save group name": "I-save ang group name",
-  "where's the pot?": "nasaan ang pot?",
   Save: "Save",
   "Scan to join this Hulog group": "I-scan para sumali sa Hulog group",
   "Share invite link": "I-share ang invite link",
@@ -450,7 +438,6 @@ const taglish = {
   "Confirm delete": "Kumpirmahing alisin",
   "Cancel delete": "Kanselahin ang pag-alis",
   "Deletion requested": "Humiling na alisin",
-  "Shared expenses & Abono": "Shared expenses at Abono",
   "All settled up": "Walang utang ang bawat isa",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
@@ -488,29 +475,15 @@ const taglish = {
   "Go solo without a partner": "Mag-solo nang walang partner",
   "Switch to solo mode": "Lumipat sa solo mode",
   "Exit solo mode": "Mag-exit sa solo mode",
-  "Currently in solo mode.": "Nasa solo mode ka ngayon.",
   "Start a round to begin tracking your savings.":
     "Magsimula ng round para ma-track ang ipon mo.",
   "Or track your own savings": "O i-track ang sariling ipon",
   "Solo mode": "Solo mode",
-  "Who is saving?": "Sino ang mag-iipon?",
-  "Shared goal (both of us)": "Shared goal (kaming dalawa)",
-  "Solo goal (just me — visible to partner)":
-    "Solo goal (ako lang — kita ng partner)",
-  "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
-    "Mag-ipon para sa sarili mo (tulad ng AI subscription) sa loob ng shared pot ninyo para kita ng partner mo ang progress mo nang hindi kailangang mag-ambag.",
-  "Partnered round (both of us)": "Partnered round (kaming dalawa)",
-  "Solo round (just me — visible to partner)":
-    "Solo round (ako lang — kita ng partner)",
-  "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
-    "Mag-ipon para sa sarili mo sa sarili mong schedule sa loob ng shared pot. Kita ng partner mo ang round mo nang hindi kailangang mag-ambag.",
   "Solo · You (Partner can view)": "Solo, Ikaw (Kita ng partner)",
   "Solo · You": "Solo, Ikaw",
   "Solo · {name} — visible to partner": "Solo, {name} — kita ng partner",
   "₱0 · Observing": "₱0, Nakatunghay",
   Observing: "Nakatunghay",
-  "Observing · Partner does not need to contribute":
-    "Nakatunghay, Hindi kailangang mag-ambag ng partner",
   "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
     "Ito ay solo goal mo sa shared pot ninyo. Kita ng partner mo ang progress mo nang hindi kailangang mag-ambag.",
   "This is a solo goal by {name}. You can view progress, but contributions are not required.":
@@ -519,9 +492,6 @@ const taglish = {
     "Partnered Pot (may Solo at Shared goals)",
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Mode ng pot",
-  "Flexible solo pot": "Flexible solo pot",
-  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
-    "Flexible ang solo goal sa shared pot. Walang nakatakdang hulog ang partner mo; kailangan pa rin niyang tanggapin ang goal at i-confirm ang mga hulog.",
   "You're offline. Changes won't save until you're back online.":
     "Offline ka ngayon. Hindi mase-save ang changes hangga't offline ka.",
   Month: "Buwan",
@@ -541,8 +511,6 @@ const taglish = {
   "Payout overdue - {turn}": "Lagpas na ang payout - {turn}",
   "Start a shared pot or paste an invite link from your partner.":
     "Gumawa ng ipon group o mag-paste ng invite link mula sa partner mo.",
-  "No ipon goals yet. Save together for a trip or goal.":
-    "Wala pang ipon goal. Mag-ipon nang sabay para sa trip o goal.",
   "No contributions yet. Start saving toward this goal.":
     "Wala pang hulog. Simulan na ang pag-iipon para sa goal na 'to.",
   "Held by you ({wallet})": "Hawak mo ({wallet})",
@@ -616,8 +584,6 @@ const taglish = {
   "Saved toward this item": "Naipon para dito",
   "Delete this wishlist item? The change stays in history.":
     "Alisin ito sa listahan? Mananatili ang pagbabago sa history.",
-  "Hulog only records this. Buying is your own action outside the app.":
-    "Record lang ito sa Hulog. Kayo mismo ang bibili, hindi dito sa app.",
   "Goal: {title}": "Goal: {title}",
   wishlist_items: "item sa listahan",
   bought: "nabili na",
@@ -672,7 +638,6 @@ const taglish = {
   "{name}'s share (%)": "Bahagi ni {name} (%)",
   "Owes nothing of {total}": "Walang utang sa {total}",
   "Nothing owed": "Walang utang",
-  "{name}'s share (₱)": "Bahagi ni {name} (₱)",
   "Your share (₱)": "Bahagi mo (₱)",
   "Your share (%)": "Bahagi mo (%)",
   "{name} owes you (₱)": "Utang ni {name} sa'yo (₱)",
@@ -690,7 +655,6 @@ const taglish = {
   "Round starts {date}": "Magsisimula ang round sa {date}",
   "{amount} pending confirmation": "{amount} pending pa",
   "View payment records": "Tingnan ang mga hulog",
-  "Review round proposal": "Tingnan ang panukalang round",
   "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
   "Waiting for partner to accept round":
     "Hinihintay na tanggapin ng partner ang round",
@@ -790,8 +754,6 @@ const en = {
   "Recorded by {name}": "Recorded by {name}",
   Voided: "Voided",
   "Undo withdrawal": "Undo withdrawal",
-  "This records money you moved yourself. Hulog does not move money.":
-    "This records money you moved yourself. Hulog does not move money.",
   "Delete this personal savings record? It stays in your history.":
     "Delete this savings record? It stays in your history.",
   Private: "Private",
@@ -814,9 +776,6 @@ const en = {
   "Delete goal": "Delete goal",
   "On this device only. Sign in to sync personal savings.":
     "On this device only. Sign in to sync personal savings.",
-  "Your goals sync to your account. Private unless you choose to share.":
-    "Your goals sync to your account. Private unless you choose to share.",
-  "New personal goal": "New personal goal",
   "Use Personal savings on Home for your own goals.":
     "Use Personal savings on Home for your own goals.",
   "Invalid personal savings amount":
@@ -876,10 +835,6 @@ const en = {
   "Try again": "Try again",
   "Konting hintay.": "Please wait.",
   "Request denied": "Request denied",
-  "Your holder will review your join request. This screen refreshes automatically.":
-    "Your holder will review your join request. This screen refreshes automatically.",
-  "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.":
-    "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.",
   "Refresh status": "Refresh status",
   Home: "Home",
   History: "History",
@@ -991,9 +946,6 @@ const en = {
   "hulog!": "Record contribution",
   "Join our hulog": "Join our shared pot",
   "I-edit ang profile mo": "Edit your profile",
-  "Pangalan ng grupo": "Group name",
-  "Save group name": "Save group name",
-  "where's the pot?": "where's the pot?",
   Save: "Save",
   "Scan to join this Hulog group": "Scan to join this Hulog group",
   "Share invite link": "Share invite link",
@@ -1168,7 +1120,6 @@ const en = {
   "Confirm delete": "Confirm delete",
   "Cancel delete": "Cancel delete",
   "Deletion requested": "Deletion requested",
-  "Shared expenses & Abono": "Shared expenses & Abono",
   "All settled up": "All settled up",
   "{debtor} owes {creditor} {amount}": "{debtor} owes {creditor} {amount}",
   "Bayaran (Settle)": "Settle balance",
@@ -1205,29 +1156,15 @@ const en = {
   "Go solo without a partner": "Go solo without a partner",
   "Switch to solo mode": "Switch to solo mode",
   "Exit solo mode": "Exit solo mode",
-  "Currently in solo mode.": "Currently in solo mode.",
   "Start a round to begin tracking your savings.":
     "Start a round to begin tracking your savings.",
   "Or track your own savings": "Or track your own savings",
   "Solo mode": "Solo mode",
-  "Who is saving?": "Who is saving?",
-  "Shared goal (both of us)": "Shared goal (both of us)",
-  "Solo goal (just me — visible to partner)":
-    "Solo goal (just me — visible to partner)",
-  "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
-    "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.",
-  "Partnered round (both of us)": "Partnered round (both of us)",
-  "Solo round (just me — visible to partner)":
-    "Solo round (just me — visible to partner)",
-  "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
-    "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.",
   "Solo · You (Partner can view)": "Solo, You (Partner can view)",
   "Solo · You": "Solo, You",
   "Solo · {name} — visible to partner": "Solo, {name} — visible to partner",
   "₱0 · Observing": "₱0, Observing",
   Observing: "Observing",
-  "Observing · Partner does not need to contribute":
-    "Observing, Partner does not need to contribute",
   "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
     "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.",
   "This is a solo goal by {name}. You can view progress, but contributions are not required.":
@@ -1236,9 +1173,6 @@ const en = {
     "Partnered Pot (with Solo & Shared goals)",
   "Standalone Solo": "Standalone Solo",
   "Pot mode": "Pot mode",
-  "Flexible solo pot": "Flexible solo pot",
-  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
-    "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.",
   "You're offline. Changes won't save until you're back online.":
     "You're offline. Changes won't save until you're back online.",
   Month: "Month",
@@ -1258,8 +1192,6 @@ const en = {
   "Payout overdue - {turn}": "Payout overdue - {turn}",
   "Start a shared pot or paste an invite link from your partner.":
     "Start a shared pot or paste an invite link from your partner.",
-  "No ipon goals yet. Save together for a trip or goal.":
-    "No savings goals yet. Save together for a trip or goal.",
   "No contributions yet. Start saving toward this goal.":
     "No contributions yet. Start saving toward this goal.",
   "Held by you ({wallet})": "Held by you ({wallet})",
@@ -1333,8 +1265,6 @@ const en = {
   "Saved toward this item": "Saved toward this item",
   "Delete this wishlist item? The change stays in history.":
     "Remove this from the wishlist? The change stays in history.",
-  "Hulog only records this. Buying is your own action outside the app.":
-    "Hulog only records this. Buying is your own action outside the app.",
   "Goal: {title}": "Goal: {title}",
   wishlist_items: "wishlist item",
   bought: "bought",
@@ -1388,7 +1318,6 @@ const en = {
   "{name}'s share (%)": "{name}'s share (%)",
   "Owes nothing of {total}": "Owes nothing of {total}",
   "Nothing owed": "Nothing owed",
-  "{name}'s share (₱)": "{name}'s share (₱)",
   "Your share (₱)": "Your share (₱)",
   "Your share (%)": "Your share (%)",
   "{name} owes you (₱)": "{name} owes you (₱)",
@@ -1406,7 +1335,6 @@ const en = {
   "Round starts {date}": "Round starts {date}",
   "{amount} pending confirmation": "{amount} pending confirmation",
   "View payment records": "View payment records",
-  "Review round proposal": "Review round proposal",
   "Respond to the round proposal below": "Respond to the round proposal below",
   "Waiting for partner to accept round": "Waiting for partner to accept round",
   "Log today's {amount} hulog ({paid} of {total} days done)":
@@ -1502,8 +1430,6 @@ const tl = {
   "Recorded by {name}": "Ni-record ni {name}",
   Voided: "Kinansela",
   "Undo withdrawal": "Bawiin ang withdrawal",
-  "This records money you moved yourself. Hulog does not move money.":
-    "Tala ito ng perang ikaw mismo ang naglipat. Hindi naglilipat ng pera ang Hulog.",
   "Delete this personal savings record? It stays in your history.":
     "Alisin ang talang ito? Mananatili ito sa kasaysayan mo.",
   Private: "Pribado",
@@ -1526,9 +1452,6 @@ const tl = {
   "Delete goal": "Alisin ang layunin",
   "On this device only. Sign in to sync personal savings.":
     "Sa device na ito lang. Mag-sign in para mai-sync ang sariling ipon.",
-  "Your goals sync to your account. Private unless you choose to share.":
-    "Naka-sync ang mga layunin sa account mo. Pribado maliban kung ibabahagi mo.",
-  "New personal goal": "Bagong sariling layunin",
   "Use Personal savings on Home for your own goals.":
     "Gamitin ang Sariling ipon sa Home para sa sarili mong mga layunin.",
   "Invalid personal savings amount":
@@ -1591,10 +1514,6 @@ const tl = {
   "Try again": "Subukan ulit",
   "Konting hintay.": "Konting hintay.",
   "Request denied": "Hindi tinanggap ang request",
-  "Your holder will review your join request. This screen refreshes automatically.":
-    "Titingnan ng may hawak ng ipon ang request mo. Kusang mag-a-update ang pahinang ito.",
-  "Ask the group owner about your request. Your membership must be removed before you can join elsewhere.":
-    "Tanungin ang may-ari ng grupo tungkol sa request mo. Alisin muna ang pagiging miyembro mo bago ka sumali sa iba.",
   "Refresh status": "Tingnan ulit ang status",
   Home: "Home",
   History: "Mga nakaraang hulog",
@@ -1707,9 +1626,6 @@ const tl = {
   "hulog!": "Itala ang hulog",
   "Join our hulog": "Sumali sa paluwagan namin",
   "I-edit ang profile mo": "Baguhin ang profile mo",
-  "Pangalan ng grupo": "Pangalan ng grupo",
-  "Save group name": "I-save ang pangalan ng grupo",
-  "where's the pot?": "nasaan ang ipon?",
   Save: "I-save",
   "Scan to join this Hulog group": "I-scan para sumali sa grupong ito sa Hulog",
   "Share invite link": "Ibahagi ang link ng imbitasyon",
@@ -1884,7 +1800,6 @@ const tl = {
   "Confirm delete": "Kumpirmahing alisin",
   "Cancel delete": "Kanselahin ang pag-alis",
   "Deletion requested": "Humiling na alisin",
-  "Shared expenses & Abono": "Pinagsamang gastos at abono",
   "All settled up": "Bayad na ang lahat",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
@@ -1922,29 +1837,15 @@ const tl = {
   "Go solo without a partner": "Mag-isa nang walang partner",
   "Switch to solo mode": "Lumipat sa solo mode",
   "Exit solo mode": "Umalis sa solo mode",
-  "Currently in solo mode.": "Kasalukuyang nasa solo mode.",
   "Start a round to begin tracking your savings.":
     "Magsimula ng round para maitala ang iyong ipon.",
   "Or track your own savings": "O subaybayan ang sariling ipon",
   "Solo mode": "Solo mode",
-  "Who is saving?": "Sino ang mag-iipon?",
-  "Shared goal (both of us)": "Pagsasaluhang layunin (kaming dalawa)",
-  "Solo goal (just me — visible to partner)":
-    "Sariling layunin (ako lang — kita ng partner)",
-  "Save for something on your own (like an AI subscription) inside your shared pot so your partner can see your progress without having to chip in.":
-    "Mag-ipon para sa sarili mo (tulad ng AI subscription) sa loob ng inyong shared pot upang makita ng iyong partner ang iyong progreso nang hindi kailangang mag-ambag.",
-  "Partnered round (both of us)": "Kasosyong round (kaming dalawa)",
-  "Solo round (just me — visible to partner)":
-    "Sariling round (ako lang — kita ng partner)",
-  "Save for yourself on your own schedule inside your shared pot. Your partner can see your round without having to contribute.":
-    "Mag-ipon para sa iyong sarili sa sarili mong iskedyul sa loob ng shared pot. Makikita ng iyong partner ang iyong round nang hindi kailangang mag-ambag.",
   "Solo · You (Partner can view)": "Solo, Ikaw (Kita ng partner)",
   "Solo · You": "Solo, Ikaw",
   "Solo · {name} — visible to partner": "Solo, {name} — kita ng partner",
   "₱0 · Observing": "₱0, Nakatunghay",
   Observing: "Nakatunghay",
-  "Observing · Partner does not need to contribute":
-    "Nakatunghay, Hindi kailangang mag-ambag ng partner",
   "This is your solo goal inside your shared pot. Your partner can see your progress without chipping in.":
     "Ito ay sarili mong layunin sa inyong shared pot. Makikita ng iyong partner ang iyong progreso nang hindi kailangang mag-ambag.",
   "This is a solo goal by {name}. You can view progress, but contributions are not required.":
@@ -1953,9 +1854,6 @@ const tl = {
     "Kasosyong Pot (may Sarili at Pagsasaluhang layunin)",
   "Standalone Solo": "Sariling Solo lang",
   "Pot mode": "Mode ng pot",
-  "Flexible solo pot": "Maluwag na sariling ipon",
-  "Solo goals in a shared pot use flexible saving. No scheduled hulog for your partner; they still accept the goal and confirm contributions.":
-    "Walang takdang hulog ang sariling ipon sa pinagsasaluhang pondo. Hindi kailangang maghulog ang partner mo; kailangan pa rin niyang tanggapin ang layunin at kumpirmahin ang mga hulog.",
   "You're offline. Changes won't save until you're back online.":
     "Wala kang internet ngayon. Hindi mase-save ang mga pagbabago hangga't wala ka pang internet.",
   Month: "Buwan",
@@ -1975,8 +1873,6 @@ const tl = {
   "Payout overdue - {turn}": "Lagpas na ang kuha ng ipon - {turn}",
   "Start a shared pot or paste an invite link from your partner.":
     "Gumawa ng grupo sa pag-iipon o mag-paste ng link ng imbitasyon mula sa partner mo.",
-  "No ipon goals yet. Save together for a trip or goal.":
-    "Wala pang layunin sa pag-iipon. Mag-ipon nang sabay para sa lakad o pangarap.",
   "No contributions yet. Start saving toward this goal.":
     "Wala pang hulog. Simulan ang pag-iipon para sa layuning ito.",
   "Held by you ({wallet})": "Hawak mo ({wallet})",
@@ -2050,8 +1946,6 @@ const tl = {
   "Saved toward this item": "Naipon para dito",
   "Delete this wishlist item? The change stays in history.":
     "Alisin ito sa listahan? Mananatili ang pagbabago sa history.",
-  "Hulog only records this. Buying is your own action outside the app.":
-    "Record lang ito sa Hulog. Kayo mismo ang bibili, hindi sa app.",
   "Goal: {title}": "Goal: {title}",
   wishlist_items: "item sa listahan",
   bought: "nabili na",
@@ -2106,7 +2000,6 @@ const tl = {
   "{name}'s share (%)": "Bahagi ni {name} (%)",
   "Owes nothing of {total}": "Walang utang sa {total}",
   "Nothing owed": "Walang utang",
-  "{name}'s share (₱)": "Bahagi ni {name} (₱)",
   "Your share (₱)": "Bahagi mo (₱)",
   "Your share (%)": "Bahagi mo (%)",
   "{name} owes you (₱)": "Utang ni {name} sa iyo (₱)",
@@ -2124,7 +2017,6 @@ const tl = {
   "Round starts {date}": "Magsisimula ang ikot sa {date}",
   "{amount} pending confirmation": "{amount} naghihintay ng kumpirmasyon",
   "View payment records": "Tingnan ang tala ng mga hulog",
-  "Review round proposal": "Suriin ang panukalang round",
   "Respond to the round proposal below": "Sagutin ang panukalang round sa ibaba",
   "Waiting for partner to accept round":
     "Hinihintay na tanggapin ng kasama ang round",

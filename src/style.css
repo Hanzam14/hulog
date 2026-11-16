@@ -326,7 +326,6 @@ select:focus {
   outline: 3px solid var(--blue);
   outline-offset: 2px;
 }
-.eyebrow,
 .meta {
   color: var(--soft);
   font-size: 13px;
@@ -375,10 +374,6 @@ section .pot {
 }
 .pot-top {
   flex-wrap: nowrap;
-}
-.pot .pig {
-  color: var(--pink-deep);
-  flex-shrink: 0;
 }
 .pot strong {
   font-family: var(--display);
@@ -1002,16 +997,6 @@ button svg,
   font-family: var(--display);
   font-weight: 500;
 }
-.pot-place {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 12px 0;
-}
-.pot-place .round {
-  width: 44px;
-  height: 44px;
-}
 .invite {
   justify-items: center;
 }
@@ -1136,12 +1121,6 @@ button svg,
   background: transparent;
   box-shadow: none;
   border-radius: 50%;
-}
-.group-name {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 8px;
 }
 .profile-editor fieldset {
   border: 0;
@@ -1301,8 +1280,6 @@ button svg,
     margin-block: 0;
   }
   .settings-grid > .duo,
-  .settings-grid > .group-name,
-  .settings-grid > .pot-place,
   .settings-grid > .wallets-section,
   .settings-grid > .profile-editor,
   .settings-grid > .confirm,
@@ -1379,20 +1356,6 @@ button svg,
   display: grid;
   gap: 8px;
 }
-.custody-wallet-pill {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: var(--highlight);
-  border-radius: 999px;
-  border: 1.5px solid var(--ink);
-  font-size: 13px;
-  font-weight: 600;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
 .pot-custody {
   display: flex;
   flex-wrap: wrap;
@@ -1423,9 +1386,6 @@ button svg,
   background: var(--card-tint);
   color: var(--ink);
 }
-.ipon-card .pig {
-  color: var(--green-deep);
-}
 .ipon-card .pot-progress > span {
   background: var(--green);
 }
@@ -1442,14 +1402,6 @@ button svg,
   justify-self: start;
 }
 .abono-hero {
-  background: var(--card);
-  border: 1.5px solid var(--line);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: none;
-  margin: 16px 0;
-}
-.abono-form-card {
   background: var(--card);
   border: 1.5px solid var(--line);
   border-radius: 14px;
@@ -1517,7 +1469,6 @@ main {
 section,
 .custody-ledger,
 .abono-hero,
-.abono-form-card,
 .welcome figure,
 .pot,
 .celebrate,
@@ -1759,14 +1710,7 @@ nav a.active {
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
 }
-.custody-wallet-pill {
-  flex-wrap: wrap;
-  border: 0;
-  border-radius: 10px;
-  background: var(--card-tint);
-}
-.sticker,
-.abono-form-card {
+.sticker {
   background: var(--card);
   border: 1px solid var(--line);
 }
@@ -1828,8 +1772,7 @@ select:focus {
 }
 .settings-grid > *,
 .entry,
-.confirm,
-.custody-wallet-pill {
+.confirm {
   overflow-wrap: anywhere;
 }
 .segmented {
@@ -2341,12 +2284,6 @@ main {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--line);
-}
-.abono-empty {
-  margin: 12px 0 0;
-  color: var(--soft);
-  font-weight: 700;
-  text-align: center;
 }
 
 /* Disabled controls look disabled and never lift. */
