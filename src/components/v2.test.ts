@@ -1,3 +1,5 @@
+import Money from "./Money";
+import { money } from "../helpers";
 import { createElement, type ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
@@ -228,7 +230,9 @@ describe("Hulog v2 CustodyCard", () => {
 
     // Header and overall total: 1500 + 250 + 2000 = 3750
     expect(markup).toContain("Nasaan ang pera natin");
-    expect(markup).toContain("₱3,750.00");
+    expect(markup).toContain(
+      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="money-centavos">.00</span></span>',
+    );
 
     // Holder totals: Ana = 1500 + 250 = 1750, Ben = 2000
     expect(markup).toContain("Ana Cruz");
@@ -274,7 +278,9 @@ describe("Hulog v2 IponCard & ProposeIpon", () => {
     const markup = html(createElement(IponCard, { g: goal, data }));
 
     expect(markup).toContain("Japan Trip");
-    expect(markup).toContain("₱500.00");
+    expect(markup).toContain(
+      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">500</span><span class="money-centavos">.00</span></span>',
+    );
     expect(markup).toContain("sa ₱1,000.00");
     expect(markup).toContain('aria-valuenow="50"');
     expect(markup).toContain("50%");
@@ -595,7 +601,7 @@ describe("Hulog v2 Tracker", () => {
     expect(css).toMatch(/\.quiet\s*\{[^}]*min-height:\s*44px;/s);
     expect(css).toMatch(/nav a\s*\{[^}]*min-height:\s*44px;/s);
     expect(css).toMatch(
-      /\.celebration-toast\s*\{[^}]*max-width:\s*calc\(100vw - 32px\);/s,
+      /\.celebration-toast\s*\{[^}]*max-width:\s*calc\(100% - 32px\);/s,
     );
   });
 });
@@ -1160,7 +1166,9 @@ describe("Hulog Solo Mode", () => {
     expect(group).toContain("Pot mode");
     expect(group).toContain("Together");
     expect(group).toContain("custody-ledger");
-    expect(group).toContain("₱3,750.00");
+    expect(group).toContain(
+      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="money-centavos">.00</span></span>',
+    );
   });
 });
 
@@ -1212,7 +1220,9 @@ describe("UI simplification layout regressions", () => {
         /<section class="custody-ledger">([\s\S]*?)<\/section>/,
       )?.[1];
       expect(card).toBeDefined();
-      expect(card).toContain("₱3,750.00");
+      expect(card).toContain(
+        '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="money-centavos">.00</span></span>',
+      );
       for (const wallet of data.wallets!) {
         expect(card!.split(`>${wallet.label}<`)).toHaveLength(2);
         expect(markup.split(`>${wallet.label}<`)).toHaveLength(2);
@@ -1323,4 +1333,18 @@ describe("UI simplification layout regressions", () => {
       markup.indexOf('class="round-cal '),
     );
   });
+});
+
+describe("hero money", () => {
+  it.each([0, 30000, 123456789, -12345])(
+    "preserves formatted text for %s centavos",
+    (amount) => {
+      const value = money(amount);
+      const markup = renderToStaticMarkup(createElement(Money, { value }));
+      expect(markup.replace(/<[^>]+>/g, "")).toBe(value);
+      expect(markup).toMatch(/<span class="money-sign">[^<]*₱<\/span>/);
+      expect(markup).toMatch(/<span class="money-whole">[\d,]+<\/span>/);
+      expect(markup).toMatch(/<span class="money-centavos">\.\d{2}<\/span>/);
+    },
+  );
 });

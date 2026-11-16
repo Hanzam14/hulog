@@ -141,10 +141,10 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
             style={{
               fontSize: "13px",
               padding: "4px 8px",
-              fontWeight: 600,
-              background: "var(--brand-soft)",
+              fontWeight: 650,
+              background: "var(--card-tint)",
               color: "var(--brand)",
-              border: "1px solid currentColor",
+              border: 0,
             }}
           >
             {getSoloBadgeText(g, data, user)}
@@ -155,7 +155,7 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
       {g.goal_mode === "matched" ? (
         <>
           {remainingSteps <= 0 ? (
-            <p style={{ color: "var(--soft)", fontWeight: 600 }}>
+            <p style={{ color: "var(--soft)", fontWeight: 650 }}>
               {t("Goal reached ✓")}
             </p>
           ) : (
@@ -236,7 +236,7 @@ export default function RecordIpon({ data, user, run, busy }: ViewProps) {
       ) : (
         <>
           {remainingCentavos <= 0 ? (
-            <p style={{ color: "var(--soft)", fontWeight: 600 }}>
+            <p style={{ color: "var(--soft)", fontWeight: 650 }}>
               {t("Goal reached ✓")}
             </p>
           ) : (
