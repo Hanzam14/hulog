@@ -60,17 +60,51 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
         {c.status === "proposed" && (
           <Proposal c={c} user={user} run={run} busy={busy} />
         )}
-        {canMoveWallet && (
-          <div className="cycle-wallet-control" style={{ marginTop: "12px" }}>
-            {c.pending_wallet_id ? (
-              <div className="notice" role="alert">
-                <p style={{ margin: "0 0 8px" }}>
-                  {t("Wallet change proposed: {wallet}", {
-                    wallet: pendingWallet?.label ?? "",
-                  })}
-                </p>
-                <div className="actions" style={{ margin: 0 }}>
-                  {c.wallet_proposed_by === user ? (
+      </section>
+      <RoundCalendar c={c} data={data} user={user} />
+      {canMoveWallet && (
+        <details className="cycle-wallet-control">
+          <summary>{t("Move pot to another wallet")}</summary>
+          {c.pending_wallet_id ? (
+            <div className="notice" role="alert">
+              <p style={{ margin: "0 0 8px" }}>
+                {t("Wallet change proposed: {wallet}", {
+                  wallet: pendingWallet?.label ?? "",
+                })}
+              </p>
+              <div className="actions" style={{ margin: 0 }}>
+                {c.wallet_proposed_by === user ? (
+                  <button
+                    type="button"
+                    className="quiet danger"
+                    disabled={busy}
+                    onClick={() =>
+                      void run(() =>
+                        rpc("respond_cycle_wallet", {
+                          p_cycle_id: c.id,
+                          p_action: "cancel",
+                        }),
+                      )
+                    }
+                  >
+                    {t("Cancel wallet move")}
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() =>
+                        void run(() =>
+                          rpc("respond_cycle_wallet", {
+                            p_cycle_id: c.id,
+                            p_action: "accept",
+                          }),
+                        )
+                      }
+                    >
+                      {t("Accept wallet move")}
+                    </button>
                     <button
                       type="button"
                       className="quiet danger"
@@ -79,95 +113,60 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                         void run(() =>
                           rpc("respond_cycle_wallet", {
                             p_cycle_id: c.id,
-                            p_action: "cancel",
+                            p_action: "decline",
                           }),
                         )
                       }
                     >
-                      {t("Cancel wallet move")}
+                      {t("Decline wallet move")}
                     </button>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() =>
-                          void run(() =>
-                            rpc("respond_cycle_wallet", {
-                              p_cycle_id: c.id,
-                              p_action: "accept",
-                            }),
-                          )
-                        }
-                      >
-                        {t("Accept wallet move")}
-                      </button>
-                      <button
-                        type="button"
-                        className="quiet danger"
-                        disabled={busy}
-                        onClick={() =>
-                          void run(() =>
-                            rpc("respond_cycle_wallet", {
-                              p_cycle_id: c.id,
-                              p_action: "decline",
-                            }),
-                          )
-                        }
-                      >
-                        {t("Decline wallet move")}
-                      </button>
-                    </>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
-            ) : (
-              candidateWallets.length > 0 && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const fd = new FormData(e.currentTarget);
-                    const nextWallet = String(fd.get("wallet_id"));
-                    if (nextWallet && nextWallet !== c.wallet_id) {
-                      void run(() =>
-                        rpc("propose_cycle_wallet", {
-                          p_cycle_id: c.id,
-                          p_wallet_id: nextWallet,
-                        }),
-                      );
-                    }
-                  }}
-                  style={{ display: "grid", gap: "8px" }}
+            </div>
+          ) : (
+            candidateWallets.length > 0 && (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const nextWallet = String(fd.get("wallet_id"));
+                  if (nextWallet && nextWallet !== c.wallet_id) {
+                    void run(() =>
+                      rpc("propose_cycle_wallet", {
+                        p_cycle_id: c.id,
+                        p_wallet_id: nextWallet,
+                      }),
+                    );
+                  }
+                }}
+                style={{ display: "grid", gap: "8px" }}
+              >
+                <select
+                  aria-label={t("Move pot to another wallet")}
+                  name="wallet_id"
+                  defaultValue={candidateWallets[0]?.id}
+                  disabled={busy}
                 >
-                  <label style={{ fontSize: "13px" }}>
-                    {t("Move pot to another wallet")}
-                    <select
-                      name="wallet_id"
-                      defaultValue={candidateWallets[0]?.id}
-                      disabled={busy}
-                    >
-                      {candidateWallets.map((w) => (
-                        <option key={w.id} value={w.id}>
-                          {w.label} ({name(data, w.holder_id)})
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <button
-                    type="submit"
-                    className="secondary"
-                    disabled={busy}
-                    style={{ justifySelf: "start" }}
-                  >
-                    {t("Move pot to another wallet")}
-                  </button>
-                </form>
-              )
-            )}
-          </div>
-        )}
-      </section>
-      <RoundCalendar c={c} data={data} user={user} />
+                  {candidateWallets.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.label} ({name(data, w.holder_id)})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="secondary"
+                  disabled={busy}
+                  style={{ justifySelf: "start" }}
+                >
+                  {t("Move pot to another wallet")}
+                </button>
+              </form>
+            )
+          )}
+        </details>
+      )}
       <section>
         <h2>{t("Payments")}</h2>
         {data.payments
@@ -264,7 +263,9 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                           : "";
                         if (noteVal.length > 140) {
                           setDetailsOpen(true);
-                          setFormError(t("Note must be at most 140 characters"));
+                          setFormError(
+                            t("Note must be at most 140 characters"),
+                          );
                           return;
                         }
                         let ref: string | null | undefined;
@@ -308,7 +309,9 @@ export default function Detail({ data, user, run, busy }: ViewProps) {
                       </label>
                       {Number(editDaysText) >= 1 && (
                         <strong className="amount-preview">
-                          {money(Number(editDaysText) * c.daily_amount_centavos)}
+                          {money(
+                            Number(editDaysText) * c.daily_amount_centavos,
+                          )}
                         </strong>
                       )}
                       <details

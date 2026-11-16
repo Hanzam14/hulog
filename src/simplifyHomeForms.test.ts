@@ -8,8 +8,11 @@ import Home from "./screens/Home";
 import Record from "./screens/Record";
 import RecordIpon from "./screens/RecordIpon";
 import Tracker from "./screens/Tracker";
-import { PersonalGoalCard } from "./components/PersonalSavings";
+import PersonalSavings, {
+  PersonalGoalCard,
+} from "./components/PersonalSavings";
 import { NO_SPLIT } from "./split";
+import { setSoloMode } from "./solo";
 
 vi.mock("react-router-dom", async () => {
   const actual =
@@ -42,10 +45,8 @@ vi.mock("react", async () => ({
     ];
   },
   useRef: (initial: unknown) => ({ current: initial }),
-  useSyncExternalStore: (
-    _subscribe: unknown,
-    getSnapshot: () => unknown,
-  ) => getSnapshot(),
+  useSyncExternalStore: (_subscribe: unknown, getSnapshot: () => unknown) =>
+    getSnapshot(),
   useEffect: (fn: () => (() => void) | void) => {
     fn();
   },
@@ -349,7 +350,12 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
 
     setLang("en");
     const markup = html(
-      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+      createElement(Home, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
     );
 
     // 1. Shows today's action header/card
@@ -375,7 +381,12 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
       holder_id: "a",
     };
     const closedSelfHeldMarkup = html(
-      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+      createElement(Home, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
     );
     expect(closedSelfHeldMarkup).toContain("Start a new round when ready");
     expect(closedSelfHeldMarkup).not.toContain("Confirm payout receipt below");
@@ -393,7 +404,12 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
       pending_count: 1,
     };
     const pendingDaysMarkup = html(
-      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+      createElement(Home, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
     );
     expect(pendingDaysMarkup).toContain("7 of 15 days logged · 2 pending");
     expect(pendingDaysMarkup).toContain("₱200.00 pending confirmation");
@@ -410,9 +426,16 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
       pending_count: 0,
     };
     const caughtUpMarkup = html(
-      createElement(Home, { data, user: "a", run: async () => {}, busy: false }),
+      createElement(Home, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
     );
-    expect(caughtUpMarkup).toContain("Caught up for today ✓ (6 of 15 days done)");
+    expect(caughtUpMarkup).toContain(
+      "Caught up for today ✓ (6 of 15 days done)",
+    );
   });
 
   it("Record (/hulog) tucks optional note and payment ref behind a collapsible option, preserves values, and reveals validation errors", () => {
@@ -463,7 +486,11 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
       }
       const el = node as {
         type?: unknown;
-        props?: { className?: string; onClick?: () => void; children?: unknown };
+        props?: {
+          className?: string;
+          onClick?: () => void;
+          children?: unknown;
+        };
       };
       if (el.type === "button" && el.props?.className === "big") {
         return { props: el.props };
@@ -670,5 +697,139 @@ describe("Simplify Home and Recording Forms (Batch 1)", () => {
     expect(markup).toContain('name="date"');
     expect(markup).toContain('name="note"');
     expect(markup).not.toMatch(/type="date"[^>]*max=/);
+  });
+});
+
+describe("simplified Home actions", () => {
+  it.each([
+    ["en", "New savings goal"],
+    ["taglish", "Bagong ipon goal"],
+    ["tl", "Bagong layunin sa ipon"],
+  ] as const)("labels the single goal button in %s", (lang, expected) => {
+    setLang(lang);
+    const data = makeSnapshot();
+    data.personalGoals = [];
+    const markup = html(
+      createElement(PersonalSavings, {
+        data,
+        user: "a",
+        run: async () => {},
+        busy: false,
+      }),
+    );
+    expect(markup).toContain(` ${expected}</button>`);
+    expect(markup.match(/class="secondary new-savings-goal"/g)).toHaveLength(1);
+  });
+
+  it("keeps an opened personal deposit form secondary alongside the Home action", () => {
+    const data = makeSnapshot();
+    state.values = [false, "deposit", null];
+    const markup = html(
+      createElement(PersonalGoalCard, {
+        data,
+        goal: data.personalGoals![0],
+        user: "a",
+        run: async () => {},
+        busy: false,
+        secondaryDeposit: true,
+      }),
+    );
+    expect(markup).toMatch(
+      /<button class="secondary">Record deposit<\/button>/,
+    );
+  });
+
+  function findButton(
+    node: unknown,
+    label: string,
+  ): { onClick: () => void } | undefined {
+    if (Array.isArray(node))
+      return node.map((n) => findButton(n, label)).find(Boolean);
+    if (!node || typeof node !== "object") return;
+    const el = node as {
+      type?: string;
+      props?: { children?: unknown; onClick: () => void };
+    };
+    if (
+      el.type === "button" &&
+      JSON.stringify(el.props?.children).includes(label)
+    )
+      return el.props;
+    return findButton(el.props?.children, label);
+  }
+
+  it("makes personal and shared deposits secondary while today's Hulog is primary", () => {
+    const data = makeSnapshot();
+    const render = () => {
+      state.values = [];
+      return html(
+        createElement(Home, {
+          data,
+          user: "a",
+          run: async () => {},
+          busy: false,
+        }),
+      );
+    };
+    const due = render();
+    expect(due).toContain('class="button big" href="/hulog"');
+    expect(due).toContain(
+      '<button class="secondary" aria-label="Record deposit"',
+    );
+    expect(due).toContain('class="button ipon-quick-btn secondary"');
+    data.progress[0].confirmed_days = 6;
+    const caughtUp = render();
+    expect(caughtUp).toContain('<button aria-label="Record deposit"');
+    expect(caughtUp).toContain('class="button ipon-quick-btn"');
+  });
+
+  it("reveals the personal/shared choice only after New savings goal, then opens the personal form", () => {
+    const data = makeSnapshot();
+    data.personalGoals = [];
+    const props = {
+      data,
+      user: "a",
+      run: async () => {},
+      busy: false,
+      trailing: createElement("a", { href: "/ipon/new" }, "With Ben"),
+    };
+    const render = () => html(createElement(PersonalSavings, props));
+    const initial = render();
+    expect(initial.match(/New savings goal/g)).toHaveLength(1);
+    expect(initial).toContain('class="secondary new-savings-goal"');
+    expect(initial).not.toContain("Just me");
+    expect(initial).not.toContain("With Ben");
+    state.cursor = 0;
+    findButton(PersonalSavings(props), "New savings goal")!.onClick();
+    const choices = render();
+    expect(choices).toContain("Just me");
+    expect(choices).toContain('<a href="/ipon/new">With Ben</a>');
+    expect(choices).not.toContain("New savings goal");
+    state.cursor = 0;
+    findButton(PersonalSavings(props), "Just me")!.onClick();
+    expect(render()).toContain('class="personal-form"');
+  });
+
+  it("skips the choice for solo without a partner", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => store.set(key, value),
+    });
+    setSoloMode(true);
+    try {
+      const data = makeSnapshot();
+      data.memberships = [data.memberships[0]];
+      data.personalGoals = [];
+      const props = { data, user: "a", run: async () => {}, busy: false };
+      html(createElement(PersonalSavings, props));
+      state.cursor = 0;
+      findButton(PersonalSavings(props), "New savings goal")!.onClick();
+      const markup = html(createElement(PersonalSavings, props));
+      expect(markup).toContain('class="personal-form"');
+      expect(markup).not.toContain("Just me");
+    } finally {
+      setSoloMode(false);
+    }
   });
 });

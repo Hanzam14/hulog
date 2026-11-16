@@ -2,11 +2,10 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { IconArchive, IconPencil, IconPlus } from "@tabler/icons-react";
 import type { ViewProps } from "./shared";
-import { name } from "./shared";
 import type { Wallet } from "../data";
 import { rpc } from "../data";
 import { t } from "../i18n";
-import Avatar from "./Avatar";
+import CustodyCard from "./CustodyCard";
 
 /** Settings section for viewing, adding, renaming, and archiving named wallets. */
 export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
@@ -51,99 +50,84 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
   };
 
   return (
-    <section className="wallets-section">
-      <h2>{t("Wallets & accounts")}</h2>
-      <div className="wallets-list">
-        {wallets.map((w) => {
-          const isOwner = w.holder_id === user;
-          const isEditing = editingId === w.id;
+    <CustodyCard
+      data={data}
+      walletControls={(walletId) => {
+        const w = wallets.find((wallet) => wallet.id === walletId);
+        if (!w) return null;
+        const isOwner = w.holder_id === user;
+        const isEditing = editingId === w.id;
 
-          return (
-            <article className="entry" key={w.id}>
-              {isEditing ? (
-                <form
-                  onSubmit={handleRename(w)}
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                    alignItems: "center",
-                    margin: "4px 0",
-                  }}
+        return (
+          <div className="wallet-controls">
+            {isEditing ? (
+              <form
+                onSubmit={handleRename(w)}
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                  alignItems: "center",
+                  margin: "4px 0",
+                }}
+              >
+                <input
+                  value={editLabel}
+                  onChange={(e) => setEditLabel(e.target.value)}
+                  aria-label={t("Rename wallet")}
+                  placeholder={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
+                  maxLength={40}
+                  required
+                  autoFocus
+                  style={{ flex: "1 1 180px" }}
+                />
+                <button type="submit" disabled={busy}>
+                  {t("Save")}
+                </button>
+                <button
+                  type="button"
+                  className="quiet"
+                  disabled={busy}
+                  onClick={() => setEditingId(null)}
                 >
-                  <input
-                    value={editLabel}
-                    onChange={(e) => setEditLabel(e.target.value)}
-                    aria-label={t("Rename wallet")}
-                    placeholder={t("Wallet name (e.g. SeaBank, GCash, Cash)")}
-                    maxLength={40}
-                    required
-                    autoFocus
-                    style={{ flex: "1 1 180px" }}
-                  />
-                  <button type="submit" disabled={busy}>
-                    {t("Save")}
-                  </button>
-                  <button
-                    type="button"
-                    className="quiet"
-                    disabled={busy}
-                    onClick={() => setEditingId(null)}
-                  >
-                    {t("Dismiss")}
-                  </button>
-                </form>
-              ) : (
-                <div className="row">
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <Avatar data={data} id={w.holder_id} size="sm" />
-                    <span style={{ fontWeight: 600 }}>
-                      {name(data, w.holder_id)}
-                    </span>
-                    <span className="chip" style={{ fontWeight: 700 }}>
-                      {w.label}
-                    </span>
+                  {t("Dismiss")}
+                </button>
+              </form>
+            ) : (
+              <>
+                {isOwner && (
+                  <div className="actions wallet-actions">
+                    <button
+                      type="button"
+                      className="quiet"
+                      disabled={busy}
+                      aria-label={t("Rename wallet")}
+                      title={t("Rename wallet")}
+                      onClick={() => {
+                        setEditingId(w.id);
+                        setEditLabel(w.label);
+                      }}
+                    >
+                      <IconPencil size={16} aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="quiet danger wallet-archive"
+                      disabled={busy}
+                      aria-label={t("Archive wallet")}
+                      title={t("Archive wallet")}
+                      onClick={handleArchive(w)}
+                    >
+                      <IconArchive size={16} aria-hidden="true" />
+                    </button>
                   </div>
-                  {isOwner && (
-                    <div className="actions wallet-actions">
-                      <button
-                        type="button"
-                        className="quiet"
-                        disabled={busy}
-                        aria-label={t("Rename wallet")}
-                        title={t("Rename wallet")}
-                        onClick={() => {
-                          setEditingId(w.id);
-                          setEditLabel(w.label);
-                        }}
-                      >
-                        <IconPencil size={16} aria-hidden="true" />
-                      </button>
-                      <button
-                        type="button"
-                        className="quiet danger wallet-archive"
-                        disabled={busy}
-                        aria-label={t("Archive wallet")}
-                        title={t("Archive wallet")}
-                        onClick={handleArchive(w)}
-                      >
-                        <IconArchive size={16} aria-hidden="true" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </article>
-          );
-        })}
-      </div>
-
+                )}
+              </>
+            )}
+          </div>
+        );
+      }}
+    >
       <details className="wallet-add">
         <summary>{t("Add wallet")}</summary>
         <form onSubmit={handleAdd}>
@@ -160,6 +144,6 @@ export default function WalletsSettings({ data, user, run, busy }: ViewProps) {
           </button>
         </form>
       </details>
-    </section>
+    </CustodyCard>
   );
 }

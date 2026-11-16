@@ -51,9 +51,7 @@ export default function Home(props: ViewProps) {
   );
   const deleteProposedContributions = (data.savingsContributions ?? []).filter(
     (sc) =>
-      !sc.deleted_at &&
-      sc.delete_proposed_by &&
-      sc.delete_proposed_by !== user,
+      !sc.deleted_at && sc.delete_proposed_by && sc.delete_proposed_by !== user,
   );
   const pendingAbono = (data.abonoEntries ?? []).filter(
     (ae) =>
@@ -63,9 +61,7 @@ export default function Home(props: ViewProps) {
   );
   const deleteProposedAbono = (data.abonoEntries ?? []).filter(
     (ae) =>
-      !ae.deleted_at &&
-      ae.delete_proposed_by &&
-      ae.delete_proposed_by !== user,
+      !ae.deleted_at && ae.delete_proposed_by && ae.delete_proposed_by !== user,
   );
 
   const activeGoals = (data.savingsGoals ?? [])
@@ -172,9 +168,7 @@ export default function Home(props: ViewProps) {
             onClick={() => {
               if (
                 window.confirm(
-                  t(
-                    "Delete this payment record? The change stays in history.",
-                  ),
+                  t("Delete this payment record? The change stays in history."),
                 )
               )
                 void run(() =>
@@ -302,9 +296,7 @@ export default function Home(props: ViewProps) {
             onClick={() => {
               if (
                 window.confirm(
-                  t(
-                    "Delete this payment record? The change stays in history.",
-                  ),
+                  t("Delete this payment record? The change stays in history."),
                 )
               )
                 void run(() =>
@@ -440,6 +432,14 @@ export default function Home(props: ViewProps) {
   const showPendingPayments =
     c?.status === "accepted" && !closed(c) && pendingDays > 0;
 
+  const hasPrimaryAction = Boolean(
+    c &&
+    c.status === "accepted" &&
+    !closed(c) &&
+    loggedDays < c.num_days &&
+    dueToday,
+  );
+
   let todaySummary: string | null = null;
   if (c) {
     if (c.status === "proposed") {
@@ -464,10 +464,13 @@ export default function Home(props: ViewProps) {
         });
       } else {
         if (!dueToday) {
-          todaySummary = t("Caught up for today ✓ ({paid} of {total} days done)", {
-            paid: paidDays,
-            total: c.num_days,
-          });
+          todaySummary = t(
+            "Caught up for today ✓ ({paid} of {total} days done)",
+            {
+              paid: paidDays,
+              total: c.num_days,
+            },
+          );
         } else {
           todaySummary = t(
             "Log today's {amount} hulog ({paid} of {total} days done)",
@@ -484,7 +487,8 @@ export default function Home(props: ViewProps) {
         .filter((entry) => entry.cycle_id === c.id && !entry.voided_at)
         .reduce((sum, entry) => sum + entry.amount_centavos, 0);
       const holder =
-        c.holder_id ?? data.wallets?.find((w) => w.id === c.wallet_id)?.holder_id;
+        c.holder_id ??
+        data.wallets?.find((w) => w.id === c.wallet_id)?.holder_id;
       const done = c.payout_state === "Received";
       const fullLedgerWithdrawal =
         c.pot_centavos > 0 &&
@@ -560,7 +564,9 @@ export default function Home(props: ViewProps) {
                       amount: money(pendingDays * c.daily_amount_centavos),
                     })}
                   </span>
-                  <Link to={`/cycles/${c.id}`}>{t("View payment records")}</Link>
+                  <Link to={`/cycles/${c.id}`}>
+                    {t("View payment records")}
+                  </Link>
                 </div>
               )}
               {c.status === "accepted" &&
@@ -658,7 +664,7 @@ export default function Home(props: ViewProps) {
                 !g.withdrawn_at &&
                 !g.withdraw_proposed_by ? (
                   <Link
-                    className="button ipon-quick-btn"
+                    className={`button ipon-quick-btn${hasPrimaryAction ? " secondary" : ""}`}
                     to={`/ipon/${g.id}/record`}
                   >
                     <IconPlus size={18} aria-hidden="true" /> {t("Mag-ipon")}
@@ -672,6 +678,7 @@ export default function Home(props: ViewProps) {
           {...props}
           siblingGoals={activeGoals.length > 0}
           showHistory={false}
+          secondaryDeposit={hasPrimaryAction}
           trailing={
             activeGoals.length < 3 ? (
               <Link className="button quiet" to="/ipon/new">

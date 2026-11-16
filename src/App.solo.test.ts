@@ -199,6 +199,8 @@ async function app() {
   return {
     click,
     flush,
+    footerCount: () =>
+      nodes(tree).filter((node) => node.type === "footer").length,
     hasButton: (label: string) =>
       label === "Sign out"
         ? signOutAction(tree) !== undefined
@@ -267,5 +269,30 @@ describe("configured Supabase solo entry", () => {
     harness.authChange("SIGNED_IN", { user: { id: "online-user" } });
     await screen.flush();
     expect(screen.hasButton("Sign out")).toBe(true);
+  });
+});
+
+describe("screen footer", () => {
+  it("shows the record-only line on welcome and Home, then hides it on other screens", async () => {
+    const screen = await app();
+    expect(screen.footerCount()).toBe(1);
+    await screen.click("Go solo on this device");
+    expect(screen.footerCount()).toBe(1);
+    for (const path of [
+      "/history",
+      "/settings",
+      "/cycles/example",
+      "/tracker",
+      "/wishlist",
+      "/hulog",
+      "/ipon/new",
+    ]) {
+      harness.pathname = path;
+      await screen.flush();
+      expect(screen.footerCount(), path).toBe(0);
+    }
+    harness.pathname = "/";
+    await screen.flush();
+    expect(screen.footerCount()).toBe(1);
   });
 });

@@ -53,57 +53,35 @@ export default function History({ data, user, run, busy }: ViewProps) {
         {t("Monthly recap")}
         <IconChevronRight size={20} aria-hidden="true" />
       </Link>
-      <div className="row">
-        <h1>{t("Past pots & debts")}</h1>
-        {hasHistory && (
-          <button
-            type="button"
-            className="secondary no-print"
-            onClick={() => window.print()}
-          >
-            {t("Print summary")}
-          </button>
-        )}
-      </div>
+      <h1>{t("Past pots & debts")}</h1>
       {hasHistory && (
         <>
-          <section className="history-filters no-print">
-            <div
-              className="row"
-              style={{ gap: "12px", alignItems: "flex-end" }}
+          <div className="history-filters no-print">
+            <select
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              aria-label={t("Month")}
             >
-              <label style={{ flex: "1 1 140px" }}>
-                {t("Month")}
-                <select
-                  value={monthFilter}
-                  onChange={(e) => setMonthFilter(e.target.value)}
-                  aria-label={t("Month")}
-                >
-                  <option value="all">{t("All months")}</option>
-                  {months.map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label style={{ flex: "1 1 140px" }}>
-                {t("Member")}
-                <select
-                  value={memberFilter}
-                  onChange={(e) => setMemberFilter(e.target.value)}
-                  aria-label={t("Member")}
-                >
-                  <option value="all">{t("All members")}</option>
-                  {activeMembers.map((m) => (
-                    <option key={m.user_id} value={m.user_id}>
-                      {name(data, m.user_id)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </section>
+              <option value="all">{t("All months")}</option>
+              {months.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <select
+              value={memberFilter}
+              onChange={(e) => setMemberFilter(e.target.value)}
+              aria-label={t("Member")}
+            >
+              <option value="all">{t("All members")}</option>
+              {activeMembers.map((m) => (
+                <option key={m.user_id} value={m.user_id}>
+                  {name(data, m.user_id)}
+                </option>
+              ))}
+            </select>
+          </div>
           <section className="history-summary">
             <div className="history-metrics">
               <div className="history-metric">
@@ -284,6 +262,15 @@ export default function History({ data, user, run, busy }: ViewProps) {
             </div>
           ))}
         </section>
+      )}
+      {hasHistory && (
+        <button
+          type="button"
+          className="secondary no-print"
+          onClick={() => window.print()}
+        >
+          {t("Print summary")}
+        </button>
       )}
     </>
   );
