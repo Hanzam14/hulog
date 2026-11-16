@@ -281,10 +281,6 @@ export function cleanGoalTitle(title: string): string {
   return title.replace(/^\[Solo(?::\s*[^\]]+)?\]\s*/i, "").trim() || title;
 }
 
-export function formatGoalName(goal: { title: string } | string): string {
-  return cleanGoalTitle(typeof goal === "string" ? goal : goal.title);
-}
-
 export function getSoloBadgeText(
   goal: { title: string; proposed_by?: string },
   data: {
