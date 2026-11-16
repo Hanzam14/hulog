@@ -1,3 +1,4 @@
+import Money from "../components/Money";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
@@ -47,7 +48,11 @@ function Block({
     <section className="recap-block">
       <div className="row">
         <h2>{title}</h2>
-        {!empty && <strong className="recap-total">{total}</strong>}
+        {!empty && (
+          <strong className="recap-total">
+            <Money value={total} />
+          </strong>
+        )}
       </div>
       {note && <p className="meta">{note}</p>}
       {empty ? <p className="meta">{quiet}</p> : children}

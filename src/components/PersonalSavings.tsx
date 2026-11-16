@@ -1,3 +1,4 @@
+import Money from "./Money";
 import { useState, type FormEvent, type ReactNode } from "react";
 import {
   IconDeviceMobile,
@@ -306,7 +307,9 @@ export function PersonalGoalCard({
         </p>
       )}
       <div className="pot-amount">
-        <strong>{money(balance)}</strong>
+        <strong>
+          <Money value={money(balance)} />
+        </strong>
         <span className="pot-target">
           {t("of {amount}", { amount: money(goal.target_amount_centavos) })}
         </span>

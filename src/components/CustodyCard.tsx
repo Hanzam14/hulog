@@ -1,3 +1,4 @@
+import Money from "./Money";
 import type { ReactNode } from "react";
 import { t } from "../i18n";
 import type { CustodyItem, Snapshot, Wallet } from "../data";
@@ -110,7 +111,7 @@ export default function CustodyCard({
             color: "var(--ink)",
           }}
         >
-          {money(totalActive)}
+          <Money value={money(totalActive)} />
         </strong>
       </div>
       <div style={{ display: "grid", gap: "12px" }}>
@@ -135,7 +136,7 @@ export default function CustodyCard({
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
                   <Avatar data={data} id={holderId} size="sm" />
-                  <span style={{ fontWeight: 700 }}>
+                  <span style={{ fontWeight: 650 }}>
                     {name(data, holderId)}
                   </span>
                   {!holderActive && (

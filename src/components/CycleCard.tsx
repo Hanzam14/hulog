@@ -1,3 +1,4 @@
+import Money from "./Money";
 import { t } from "../i18n";
 import { Link } from "react-router-dom";
 import { IconChevronRight } from "@tabler/icons-react";
@@ -39,7 +40,9 @@ export default function CycleCard({
         <div className="pot-amount">
           {soloBadge && <span className="chip pot-solo-chip">{soloBadge}</span>}
           <div className="pot-figure">
-            <strong>{money(c.pot_centavos)}</strong>
+            <strong>
+              <Money value={money(c.pot_centavos)} />
+            </strong>
             <span className="pot-target">
               {t("of {amount}", { amount: money(c.target_centavos) })}
             </span>

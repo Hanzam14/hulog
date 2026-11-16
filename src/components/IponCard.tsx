@@ -1,3 +1,4 @@
+import Money from "./Money";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { IconWallet } from "@tabler/icons-react";
@@ -86,7 +87,9 @@ export default function IponCard({
             </div>
           </div>
           <div className="ipon-amounts">
-            <strong>{money(g.saved_centavos)}</strong>
+            <strong>
+              <Money value={money(g.saved_centavos)} />
+            </strong>
             <span className="pot-target">
               {t("of {amount}", { amount: money(g.target_amount_centavos) })}
             </span>
