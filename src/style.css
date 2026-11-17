@@ -3598,3 +3598,37 @@ div:has(> .back) > h1 {
 
 /* Print button stands apart from the last History row. */
 .history-summary ~ button.no-print, section + button.no-print { margin-top: 20px; }
+
+/* Settings: sections breathe apart; the pair sits on a card like the rest. */
+.settings-grid > .settings-title { margin: 20px 0 0; }
+.settings-grid > .settings-title:first-of-type { margin-top: 4px; }
+.settings-grid > .duo {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+  gap: 24px;
+  margin: 12px 0;
+  padding: 14px 20px;
+  border-radius: var(--radius-card);
+  background: var(--card);
+}
+.settings-grid > .duo figure { flex: 0 1 auto; }
+
+/* Wallet rows: name, quiet edit icons, then the amount flush right. */
+.custody-wallet-row > span { flex: 0 1 auto; }
+.custody-wallet-row > strong { margin-left: auto; }
+.custody-wallet-row .wallet-actions { margin: 0; }
+.abono-edit .form-optional { background: var(--card); }
+.custody-wallet-row .wallet-actions button { color: var(--soft); }
+.custody-wallet-row .wallet-actions .wallet-archive:hover:not(:disabled) { color: var(--danger-deep); }
+.custody-wallet-row:has(form) .wallet-controls { order: 3; }
+
+/* Gastos: the correction form sits in its own inset panel under the row. */
+.abono-edit {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--card-tint);
+}
+.abono-edit .actions { margin: 0; }

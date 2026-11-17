@@ -197,7 +197,7 @@ function AbonoEditRow({
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: "12px" }}>
+    <form className="abono-edit" onSubmit={handleSubmit}>
       {isExpense ? (
         <>
           <label>
