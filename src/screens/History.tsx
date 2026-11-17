@@ -5,9 +5,16 @@ import { IconCheck, IconChevronRight, IconSparkles } from "@tabler/icons-react";
 import type { ViewProps } from "../components/shared";
 import { byNewest, closed, name } from "../components/shared";
 import { rpc } from "../data";
-import { filterHistory, historyMonths, money, parsePesos } from "../helpers";
-import CycleCard from "../components/CycleCard";
-import IponCard from "../components/IponCard";
+import {
+  cleanGoalTitle,
+  filterHistory,
+  historyMonths,
+  money,
+  parsePesos,
+  phaseDisplay,
+  shortDate,
+} from "../helpers";
+import Avatar from "../components/Avatar";
 
 export default function History({ data, user, run, busy }: ViewProps) {
   const [editing, setEditing] = useState<string | null>(null);
@@ -46,6 +53,7 @@ export default function History({ data, user, run, busy }: ViewProps) {
   });
 
   const hasHistory = allPastCycles.length > 0 || allPastGoals.length > 0;
+  const firstName = (id: string) => name(data, id).trim().split(/\s+/)[0];
 
   return (
     <>
@@ -101,8 +109,19 @@ export default function History({ data, user, run, busy }: ViewProps) {
         </>
       )}
       {filteredCycles.map((c) => (
-        <section key={c.id}>
-          <CycleCard c={c} data={data} user={user} />
+        <section key={c.id} className="past-pot-section">
+          <Link to={`/cycles/${c.id}`} className="past-row">
+            <Avatar data={data} id={c.receiver_id} size="sm" />
+            <span className="past-row-text">
+              <strong>{money(c.pot_centavos)}</strong>
+              <span className="meta">
+                {t("goes to")} {firstName(c.receiver_id)} ·{" "}
+                {shortDate(c.start_date)} → {shortDate(c.end_date)}
+              </span>
+            </span>
+            <span className="chip">{phaseDisplay(c.phase, c.days_left)}</span>
+            <IconChevronRight size={18} aria-hidden="true" />
+          </Link>
           {c.status === "accepted" &&
             data.progress
               .filter(
@@ -252,14 +271,20 @@ export default function History({ data, user, run, busy }: ViewProps) {
         <section>
           <h2>{t("Completed & withdrawn ipon")}</h2>
           {pastGoals.map((g) => (
-            <div key={g.id}>
-              <IponCard g={g} data={data} user={user} />
-              {g.phase !== "withdrawn" && (
-                <p>
-                  <span className="chip">{label(g.phase)}</span>
-                </p>
-              )}
-            </div>
+            <Link key={g.id} to={`/ipon/${g.id}`} className="past-row">
+              <span className="past-row-text">
+                <strong>{cleanGoalTitle(g.title)}</strong>
+                <span className="meta">
+                  {t("{saved} of {price}", {
+                    saved: money(g.saved_centavos),
+                    price: money(g.target_amount_centavos),
+                  })}{" "}
+                  · {shortDate(g.end_date)}
+                </span>
+              </span>
+              <span className="chip">{phaseDisplay(g.phase, g.days_left)}</span>
+              <IconChevronRight size={18} aria-hidden="true" />
+            </Link>
           ))}
         </section>
       )}

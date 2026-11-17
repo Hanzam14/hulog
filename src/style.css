@@ -3561,3 +3561,37 @@ div:has(> .back) > h1 {
 .wish-ask { display: grid; gap: 10px; margin-top: 4px; }
 .wish-ask p { margin: 0; font-weight: 600; }
 .wish-ask .actions { flex-wrap: wrap; }
+
+/* Gastos entry rows: avatar, title with amount, one quiet meta line. */
+.abono-entry-main { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+.abono-entry-main > .avatar, .abono-entry-main > :first-child { flex: none; margin-top: 2px; }
+.abono-entry-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.abono-entry-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.abono-entry-head strong { min-width: 0; }
+.abono-entry-amount { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+.abono-entry-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.chip-alert { background: var(--danger-tint, var(--card-tint)); color: var(--danger-deep); }
+.abono-entry .actions { justify-content: flex-end; margin: 0; }
+.abono-entry .actions:not(:has(button:not(.quiet))) { margin: -6px 0 -10px; }
+.abono-entry .icon-btn { color: var(--soft); }
+.abono-entry .icon-btn.danger { color: var(--soft); }
+.abono-entry .icon-btn.danger:hover:not(:disabled) { color: var(--danger-deep); }
+
+/* History: past rounds and goals as compact rows, not hero cards. */
+.past-pot-section { margin: 0; }
+.past-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+.past-row:hover { color: var(--ink); background: var(--card-tint); }
+.past-row-text { display: grid; gap: 2px; flex: 1 1 auto; min-width: 0; }
+.past-row-text strong { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.past-row-text .meta { font-size: var(--text-sm); color: var(--soft); }
+.past-row .chip { flex: none; max-width: 40%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.past-row > svg:last-child { flex: none; color: var(--soft); }

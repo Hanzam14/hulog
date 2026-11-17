@@ -1,5 +1,10 @@
 import { useRef, useState } from "react";
-import { IconCircleCheck, IconPlus } from "@tabler/icons-react";
+import {
+  IconCircleCheck,
+  IconPencil,
+  IconPlus,
+  IconTrash,
+} from "@tabler/icons-react";
 import { t, label } from "../i18n";
 import type { ViewProps } from "../components/shared";
 import { name, tone } from "../components/shared";
@@ -22,7 +27,12 @@ import {
   recurringSuggestions,
   type RecurringSuggestion,
 } from "../recurring";
-import { buildSettlementPayload, money, parsePesos } from "../helpers";
+import {
+  buildSettlementPayload,
+  money,
+  parsePesos,
+  shortDate,
+} from "../helpers";
 
 function computeSplitPreview(
   totalText: string,
@@ -30,7 +40,13 @@ function computeSplitPreview(
   payerName: string,
   otherName: string,
   payerIsMe: boolean,
-): { total: number; payerShare: number; owed: number; line1: string; line2: string } | null {
+): {
+  total: number;
+  payerShare: number;
+  owed: number;
+  line1: string;
+  line2: string;
+} | null {
   try {
     if (!totalText.trim() || !owedText.trim()) return null;
     const total = parsePesos(totalText);
@@ -130,7 +146,11 @@ function AbonoEditRow({
       setFormError(t("Note must be at most 140 characters"));
       return;
     }
-    if (isExpense && split.choice === "custom" && parsePercent(split.percent) === null) {
+    if (
+      isExpense &&
+      split.choice === "custom" &&
+      parsePercent(split.percent) === null
+    ) {
       setFormError(t("Enter a valid percentage (0 to 100)."));
       return;
     }
@@ -234,11 +254,7 @@ function AbonoEditRow({
             otherIsMe={fromMember !== user}
           />
           <label>
-            {shareLabel(
-              fromMember !== user,
-              name(data, partnerId),
-              "₱",
-            )}
+            {shareLabel(fromMember !== user, name(data, partnerId), "₱")}
             <input
               type="text"
               inputMode="decimal"
@@ -622,21 +638,25 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                   try {
                     cleanProofRef(settleRef);
                   } catch (err) {
-                    const msg = err instanceof Error ? err.message : String(err);
+                    const msg =
+                      err instanceof Error ? err.message : String(err);
                     setSettleDetailsOpen(true);
                     setSettleFormError(label(msg));
                     return;
                   }
                   if (settleNote.trim().length > 140) {
                     setSettleDetailsOpen(true);
-                    setSettleFormError(t("Note must be at most 140 characters"));
+                    setSettleFormError(
+                      t("Note must be at most 140 characters"),
+                    );
                     return;
                   }
                   let amt: number;
                   try {
                     amt = parsePesos(settleAmount);
                   } catch (err) {
-                    const msg = err instanceof Error ? err.message : String(err);
+                    const msg =
+                      err instanceof Error ? err.message : String(err);
                     setSettleFormError(label(msg));
                     return;
                   }
@@ -868,11 +888,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
               />
 
               <label>
-                {shareLabel(
-                  fromMember !== user,
-                  name(data, partnerId),
-                  "₱",
-                )}
+                {shareLabel(fromMember !== user, name(data, partnerId), "₱")}
                 <input
                   type="text"
                   inputMode="decimal"
@@ -961,54 +977,67 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
         <section className="abono-entries">
           {entries.map((e) => (
             <article className="entry abono-entry" key={e.id}>
-              <div className="row">
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <Avatar data={data} id={e.from_member} size="sm" />
-                  <div>
+              <div className="abono-entry-main">
+                <Avatar data={data} id={e.from_member} size="sm" />
+                <div className="abono-entry-text">
+                  <div className="abono-entry-head">
                     <strong>
                       {e.description === "Settlement"
                         ? t("Settlement")
                         : e.description}
                     </strong>
-                    <p>
-                      {e.kind === "expense"
-                        ? `${name(data, e.to_member)}, ${
-                            e.owed_amount_centavos === 0
-                              ? t("Owes nothing of {total}", {
-                                  total: money(e.total_amount_centavos),
-                                })
-                              : t("Owes {amount} of {total}", {
-                                  amount: money(e.owed_amount_centavos),
-                                  total: money(e.total_amount_centavos),
-                                })
-                          }`
-                        : `${name(data, e.from_member)} → ${name(
-                            data,
-                            e.to_member,
-                          )}, ${t("Paid {amount} settlement", {
-                            amount: money(e.owed_amount_centavos),
-                          })}`}
-                    </p>
-                    <p className="meta">
-                      {e.entry_date}
-                      {e.note ? `, ${e.note}` : ""}
-                    </p>
-                    <ProofRefLine value={e.proof_ref} />
+                    <span className="abono-entry-amount">
+                      {money(
+                        e.kind === "expense"
+                          ? e.total_amount_centavos
+                          : e.owed_amount_centavos,
+                      )}
+                    </span>
                   </div>
+                  <p>
+                    {e.kind === "expense"
+                      ? `${name(data, e.to_member)}, ${
+                          e.owed_amount_centavos === 0
+                            ? t("Owes nothing of {total}", {
+                                total: money(e.total_amount_centavos),
+                              })
+                            : t("Owes {amount} of {total}", {
+                                amount: money(e.owed_amount_centavos),
+                                total: money(e.total_amount_centavos),
+                              })
+                        }`
+                      : `${name(data, e.from_member)} → ${name(
+                          data,
+                          e.to_member,
+                        )}, ${t("Paid {amount} settlement", {
+                          amount: money(e.owed_amount_centavos),
+                        })}`}
+                  </p>
+                  <p className="meta abono-entry-meta">
+                    {(e.deleted_at ||
+                      e.delete_proposed_by ||
+                      e.status !== "confirmed") && (
+                      <span
+                        className={
+                          e.deleted_at || e.delete_proposed_by
+                            ? "chip chip-alert"
+                            : "chip"
+                        }
+                      >
+                        {e.deleted_at
+                          ? t("Deleted")
+                          : e.delete_proposed_by
+                            ? t("Deletion requested")
+                            : label(e.status)}
+                      </span>
+                    )}
+                    <span>
+                      {shortDate(e.entry_date)}
+                      {e.note ? ` · ${e.note}` : ""}
+                    </span>
+                  </p>
+                  <ProofRefLine value={e.proof_ref} />
                 </div>
-                <span className="chip">
-                  {e.deleted_at
-                    ? t("Deleted")
-                    : e.delete_proposed_by
-                      ? t("Deletion requested")
-                      : label(e.status)}
-                </span>
               </div>
 
               {!e.deleted_at && (
@@ -1030,19 +1059,24 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
 
                     {!e.delete_proposed_by && (
                       <button
-                        className="quiet"
+                        className="quiet icon-btn"
+                        aria-label={t("Edit entry")}
+                        title={t("Edit entry")}
+                        aria-expanded={editingId === e.id}
                         disabled={busy}
                         onClick={() =>
                           setEditingId(editingId === e.id ? null : e.id)
                         }
                       >
-                        {t("Edit entry")}
+                        <IconPencil size={18} aria-hidden="true" />
                       </button>
                     )}
 
                     {e.status === "pending" && (
                       <button
-                        className="quiet danger"
+                        className="quiet icon-btn danger"
+                        aria-label={t("Delete")}
+                        title={t("Delete")}
                         disabled={busy}
                         onClick={() =>
                           run(() =>
@@ -1053,13 +1087,15 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                           )
                         }
                       >
-                        {t("Delete")}
+                        <IconTrash size={18} aria-hidden="true" />
                       </button>
                     )}
 
                     {e.status === "confirmed" && !e.delete_proposed_by && (
                       <button
-                        className="quiet danger"
+                        className="quiet icon-btn danger"
+                        aria-label={t("Propose delete")}
+                        title={t("Propose delete")}
                         disabled={busy}
                         onClick={() =>
                           run(() =>
@@ -1070,7 +1106,7 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
                           )
                         }
                       >
-                        {t("Propose delete")}
+                        <IconTrash size={18} aria-hidden="true" />
                       </button>
                     )}
 

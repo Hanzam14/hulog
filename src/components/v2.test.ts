@@ -618,7 +618,8 @@ describe("Hulog v2 Unified Home Dashboard", () => {
     const markup = html(
       createElement(History, { data, user: "a", run, busy: false }),
     );
-    expect(markup).toContain("<small>Withdrawn</small>");
+    expect(markup.split("Withdrawn").length - 1).toBe(1);
+    expect(markup).toContain('<span class="chip">Withdrawn</span>');
     expect(markup).not.toContain('<span class="chip">withdrawn</span>');
   });
 
