@@ -49,11 +49,11 @@ export default function History({ data, user, run, busy }: ViewProps) {
 
   return (
     <>
+      <h1>{t("Past pots & debts")}</h1>
       <Link to="/recap" className="recap-link no-print">
         {t("Monthly recap")}
         <IconChevronRight size={20} aria-hidden="true" />
       </Link>
-      <h1>{t("Past pots & debts")}</h1>
       {hasHistory && (
         <>
           <div className="history-filters no-print">

@@ -139,7 +139,12 @@ export function WishlistRow({
         <strong className="wish-price">{money(item.price_centavos)}</strong>
       </div>
       {item.note && <p className="meta wish-note">{item.note}</p>}
-      {progress && (
+      {bought && progress && (
+        <Link to={"/ipon/" + progress.goal.id} className="meta">
+          {t("Goal: {title}", { title: progress.goal.title })}
+        </Link>
+      )}
+      {!bought && progress && (
         <div className="wish-progress">
           <Link to={"/ipon/" + progress.goal.id} className="meta">
             {t("Goal: {title}", { title: progress.goal.title })}
@@ -259,7 +264,7 @@ export default function Wishlist({ data, run, busy }: ViewProps) {
     );
   return (
     <>
-      <div className="row">
+      <div className="page-head">
         <Link to="/" className="back" aria-label={t("Back")}>
           <IconChevronLeft aria-hidden="true" />
         </Link>

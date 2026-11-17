@@ -59,7 +59,7 @@ export default function IponDetail({ data, user, run, busy }: ViewProps) {
         <Link to="/" className="back" aria-label={t("Back")}>
           <IconArrowLeft />
         </Link>
-        <h1 style={{ margin: 0, fontSize: "20px" }}>{t("Ipon detail")}</h1>
+        <h1>{t("Ipon detail")}</h1>
       </div>
 
       <section>
