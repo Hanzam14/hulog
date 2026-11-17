@@ -1,3 +1,4 @@
+import ProgressRing from "./ProgressRing";
 import Money from "./Money";
 import { useState, type FormEvent, type ReactNode } from "react";
 import {
@@ -306,23 +307,19 @@ export function PersonalGoalCard({
           {t("Personal savings by {name}", { name: name(data, goal.owner_id) })}
         </p>
       )}
-      <div className="pot-amount">
-        <strong>
-          <Money value={money(balance)} />
-        </strong>
-        <span className="pot-target">
-          {t("of {amount}", { amount: money(goal.target_amount_centavos) })}
-        </span>
-      </div>
-      <div
-        className="pot-progress"
-        role="progressbar"
-        aria-label={t("Personal savings progress")}
-        aria-valuenow={progress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
-        <span style={{ width: `${progress}%` }} />
+      <div className="personal-figure">
+        <div className="pot-amount">
+          <strong>
+            <Money value={money(balance)} />
+          </strong>
+          <span className="pot-target">
+            {t("of {amount}", { amount: money(goal.target_amount_centavos) })}
+          </span>
+        </div>
+        <ProgressRing
+          percent={progress}
+          label={t("Personal savings progress")}
+        />
       </div>
       {owner && (
         <>
