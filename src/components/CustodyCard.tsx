@@ -160,8 +160,8 @@ export default function CustodyCard({
                   <li key={item.wallet_id} className="custody-wallet">
                     <div className="custody-wallet-row">
                       <span>{item.label}</span>
-                      <strong>{money(item.total_centavos)}</strong>
                       {walletControls?.(item.wallet_id)}
+                      <strong>{money(item.total_centavos)}</strong>
                     </div>
                     {item.paluwagan_centavos > 0 && item.ipon_centavos > 0 && (
                       <ul className="custody-split">

@@ -244,10 +244,10 @@ export default function Settings({
       )}
       <h2 className="section-label settings-title">{t("Money")}</h2>
       <WalletsSettings data={data} user={user} run={run} busy={busy} />
+      <h2 className="section-label settings-title">{t("More")}</h2>
       <ThemeSettings />
       <LanguageSettings />
       <NotificationSettings />
-      <h2 className="section-label settings-title">{t("More")}</h2>
       <section className="more-card">
         {(isSoloMode() || active.length < 2) && (
           <details>
