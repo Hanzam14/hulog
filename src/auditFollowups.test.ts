@@ -323,7 +323,8 @@ it("solo Settings hides invite creation, groups headings, and discloses solo con
   const headings = [
     ...out.matchAll(/<h2 class="section-label settings-title">(.*?)<\/h2>/g),
   ].map((m) => m[1]);
-  expect(headings).toEqual(["Group", "Money", "App", "More"]);
+  // The App cards carry their own titles, so no extra "App" label above them.
+  expect(headings).toEqual(["Group", "Money", "More"]);
   expect(out).toContain("<summary>Solo mode</summary>");
 });
 it("pending request precedes Group heading", () => {
