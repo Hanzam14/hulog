@@ -390,7 +390,7 @@ export default function App() {
       ) : !session ? (
         <main className="welcome">
           <h1>
-            {t("Paluwagan para sa")}
+            <span className="welcome-title-lead">{t("Paluwagan para sa")}</span>
             <br />
             {t("ating dalawa")}
             <span className="dot">.</span>

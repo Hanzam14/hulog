@@ -37,7 +37,7 @@ describe("planner text contrast", () => {
           "green-deep",
           "orange-deep",
           "purple-deep",
-          "danger",
+          "danger-deep",
         ]) {
           expect(
             contrast(value(palette, text), value(palette, surface)),
@@ -68,22 +68,59 @@ describe("planner text contrast", () => {
     const confirm = css.match(/\.round\.ok\s*\{([^}]+)\}/)![1];
     const foreground = confirm.match(/\bcolor:\s*var\(--([\w-]+)\)/)?.[1];
     const background = confirm.match(/\bbackground:\s*var\(--([\w-]+)\)/)?.[1];
-    expect(foreground, "confirm icon needs an explicit foreground").toBeDefined();
+    expect(
+      foreground,
+      "confirm icon needs an explicit foreground",
+    ).toBeDefined();
     expect(background).toBeDefined();
     expect(
-      contrast(value(palette + light, foreground!), value(palette, background!)),
+      contrast(
+        value(palette + light, foreground!),
+        value(palette, background!),
+      ),
     ).toBeGreaterThanOrEqual(3);
   });
-  it("keeps primary brand and destructive buttons legible against paper in light and dark mode", () => {
-    expect(contrast(value(light, "pink-deep"), value(light, "paper"))).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(value(dark, "pink-deep"), value(dark, "paper"))).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(value(light, "danger"), value(light, "paper"))).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(value(dark, "danger"), value(dark, "paper"))).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(value(light, "pink-deep"), value(light, "dots"))).toBeGreaterThanOrEqual(3);
-    expect(contrast(value(dark, "pink-deep"), value(dark, "dots"))).toBeGreaterThanOrEqual(3);
-    expect(contrast(value(light, "leaf-deep"), value(light, "dots"))).toBeGreaterThanOrEqual(3);
-    expect(contrast(value(dark, "leaf-deep"), value(dark, "dots"))).toBeGreaterThanOrEqual(3);
+  it("keeps brand text, filled pink buttons and destructive buttons legible in both themes", () => {
+    expect(
+      contrast(value(light, "pink-deep"), value(light, "paper")),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrast(value(dark, "pink-deep"), value(dark, "paper")),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrast(value(light, "danger-button-ink"), value(light, "danger")),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrast(value(dark, "danger-button-ink"), value(dark, "danger")),
+    ).toBeGreaterThanOrEqual(4.5);
+    for (const palette of [light, dark]) {
+      expect(
+        contrast(value(palette, "sticker-ink"), value(palette, "pink")),
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(value(palette, "ink"), value(palette, "paper")),
+      ).toBeGreaterThanOrEqual(4.5);
+      for (const tone of ["pink", "blue", "green", "orange", "purple"]) {
+        expect(
+          contrast(value(palette, "sticker-ink"), value(palette, tone)),
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+    expect(
+      contrast(value(light, "pink-deep"), value(light, "dots")),
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      contrast(value(dark, "pink-deep"), value(dark, "dots")),
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      contrast(value(light, "leaf-deep"), value(light, "dots")),
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      contrast(value(dark, "leaf-deep"), value(dark, "dots")),
+    ).toBeGreaterThanOrEqual(3);
     expect(css).toMatch(/a:not\(\.button\):hover/);
-    expect(css).toMatch(/button\.danger:not\(\.secondary\):not\(\.quiet\)[\s\S]*?background:\s*var\(--danger\)/);
+    expect(css).toMatch(
+      /button\.danger:not\(\.secondary\):not\(\.quiet\)[\s\S]*?background:\s*var\(--danger\)/,
+    );
   });
 });

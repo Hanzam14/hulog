@@ -6,7 +6,8 @@ export default function Money({ value }: { value: string }) {
     <span className="money">
       <span className="money-sign">{parts[1]}</span>
       <span className="money-whole">{parts[2]}</span>
-      <span className="money-centavos">{parts[3]}</span>
+      <span className="sr-only">{parts[3][0]}</span>
+      <span className="money-centavos">{parts[3].slice(1)}</span>
     </span>
   );
 }
