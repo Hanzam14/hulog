@@ -1,4 +1,4 @@
-import type { SavingsGoal, Snapshot, WishlistItem } from "./data";
+import type { SavingsGoal, SavingsSpend, Snapshot, WishlistItem } from "./data";
 
 export const WISHLIST_MAX_ITEMS = 30;
 export const WISHLIST_TITLE_MAX = 60;
@@ -53,6 +53,38 @@ export function linkableGoals(goals: SavingsGoal[] | undefined): SavingsGoal[] {
     .filter(isLinkableGoal)
     .sort((a, b) => a.title.localeCompare(b.title));
 }
+/** Money still in a shared goal: confirmed savings minus active spends. */
+export function goalAvailable(
+  goal: Pick<SavingsGoal, "saved_centavos" | "spent_centavos">,
+): number {
+  return Math.max(0, goal.saved_centavos - (goal.spent_centavos ?? 0));
+}
+/** The active spend that paid for this item from its goal, if any. */
+export function itemSpend(
+  item: WishlistItem,
+  spends: SavingsSpend[] | undefined,
+): SavingsSpend | null {
+  return (
+    (spends ?? []).find(
+      (s) => s.wishlist_item_id === item.id && !s.voided_at,
+    ) ?? null
+  );
+}
+/** A wanted item can be paid from its linked goal while the goal is active and holds enough. */
+export function canPayFromGoal(
+  item: WishlistItem,
+  goals: SavingsGoal[] | undefined,
+): boolean {
+  if (item.status !== "wanted" || !item.linked_goal_id) return false;
+  const goal = (goals ?? []).find((g) => g.id === item.linked_goal_id);
+  return (
+    !!goal &&
+    goal.status === "accepted" &&
+    !goal.withdrawn_at &&
+    !goal.withdraw_proposed_by &&
+    goalAvailable(goal) >= item.price_centavos
+  );
+}
 export interface WishlistProgress {
   goal: SavingsGoal;
   saved: number;
@@ -60,7 +92,7 @@ export interface WishlistProgress {
   percent: number;
   ready: boolean;
 }
-/** Confirmed saved of the linked shared goal against the item price; null when nothing to show. */
+/** Money left in the linked shared goal against the item price; null when nothing to show. */
 export function wishlistProgress(
   item: WishlistItem,
   goals: SavingsGoal[] | undefined,
@@ -68,7 +100,7 @@ export function wishlistProgress(
   if (!item.linked_goal_id) return null;
   const goal = (goals ?? []).find((g) => g.id === item.linked_goal_id);
   if (!goal || !isLinkableGoal(goal)) return null;
-  const saved = Math.max(0, goal.saved_centavos);
+  const saved = goalAvailable(goal);
   const price = item.price_centavos;
   return {
     goal,
@@ -124,15 +156,16 @@ export function wishlistRpc(
   const now = new Date().toISOString();
   // Mirrors the hosted audit trigger so the offline Changes feed matches.
   const audit = (
-    item: WishlistItem,
+    item: WishlistItem | SavingsSpend,
     action: string,
-    before: WishlistItem | null,
+    before: WishlistItem | SavingsSpend | null,
+    entity = "wishlist_items",
   ) => {
     const changes = (snapshot.changes ??= []);
     changes.push({
       id: (changes.at(-1)?.id ?? 0) + 1,
       actor_id: user,
-      entity: "wishlist_items",
+      entity,
       entity_id: item.id,
       action,
       before: before as unknown as Record<string, unknown> | null,
@@ -189,7 +222,60 @@ export function wishlistRpc(
   if (name === "set_wishlist_bought") {
     if (typeof args.p_bought !== "boolean")
       throw new Error("Bought flag required");
+    const fromGoal = args.p_from_goal ?? false;
+    if (typeof fromGoal !== "boolean") throw new Error("Goal flag required");
     if ((item.status === "bought") === args.p_bought) return;
+    const spends = (snapshot.savingsSpends ??= []);
+    const goals = snapshot.savingsGoals ?? [];
+    if (args.p_bought && fromGoal) {
+      if (!item.linked_goal_id) throw new Error("Item has no linked goal");
+      const goal = goals.find(
+        (g) => g.id === item.linked_goal_id && g.group_id === item.group_id,
+      );
+      if (!goal || goal.status !== "accepted" || goal.withdrawn_at)
+        throw new Error("Goal is not active");
+      if (goal.withdraw_proposed_by) throw new Error("Withdrawal in progress");
+      const spent = spends
+        .filter((s) => s.goal_id === goal.id && !s.voided_at)
+        .reduce((sum, s) => sum + s.amount_centavos, 0);
+      if (item.price_centavos > goal.saved_centavos - spent)
+        throw new Error("Not enough saved in the goal");
+      const spend: SavingsSpend = {
+        id: crypto.randomUUID(),
+        group_id: item.group_id,
+        goal_id: goal.id,
+        wishlist_item_id: item.id,
+        amount_centavos: item.price_centavos,
+        spend_date: snapshot.today,
+        created_by: user,
+        created_at: now,
+        voided_by: null,
+        voided_at: null,
+      };
+      spends.push(spend);
+      goal.spent_centavos = spent + item.price_centavos;
+      audit(spend, "insert", null, "savings_spends");
+    }
+    if (!args.p_bought) {
+      const spend = spends.find(
+        (s) => s.wishlist_item_id === item.id && !s.voided_at,
+      );
+      if (spend) {
+        const goal = goals.find((g) => g.id === spend.goal_id);
+        if (goal?.withdrawn_at)
+          throw new Error(
+            "Goal is already withdrawn; the spend cannot be undone",
+          );
+        const spendBefore = { ...spend };
+        Object.assign(spend, { voided_at: now, voided_by: user });
+        if (goal)
+          goal.spent_centavos = Math.max(
+            0,
+            (goal.spent_centavos ?? 0) - spend.amount_centavos,
+          );
+        audit(spend, "update", spendBefore, "savings_spends");
+      }
+    }
     Object.assign(
       item,
       args.p_bought

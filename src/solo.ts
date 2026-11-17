@@ -22,7 +22,7 @@ import {
   personalRpc,
   personalRpcNames,
 } from "./personal";
-import { wishlistRpc, wishlistRpcNames } from "./wishlist";
+import { goalAvailable, wishlistRpc, wishlistRpcNames } from "./wishlist";
 
 const SOLO_MODE_KEY = "hulog-solo-mode";
 const SOLO_SNAPSHOT_KEY = "hulog-solo-snapshot";
@@ -751,6 +751,9 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
       (sum, sc) => sum + sc.amount_centavos,
       0,
     );
+    g.spent_centavos = (snapshot.savingsSpends ?? [])
+      .filter((s) => s.goal_id === g.id && !s.voided_at)
+      .reduce((sum, s) => sum + s.amount_centavos, 0);
     const { phase, daysLeft } = computeGoalPhase(g, today);
     g.phase = phase;
     g.days_left = daysLeft;
@@ -800,7 +803,7 @@ export async function loadSoloSnapshot(): Promise<Snapshot> {
 
     const iponCentavos = (snapshot.savingsGoals ?? [])
       .filter((g) => g.wallet_id === w.id && !g.withdrawn_at)
-      .reduce((sum, g) => sum + g.saved_centavos, 0);
+      .reduce((sum, g) => sum + goalAvailable(g), 0);
 
     return {
       wallet_id: w.id,

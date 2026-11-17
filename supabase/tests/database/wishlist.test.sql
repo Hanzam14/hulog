@@ -23,11 +23,11 @@ select ok(has_table_privilege('authenticated','public.wishlist_items','SELECT'),
 select ok(not has_table_privilege('authenticated','public.wishlist_items','INSERT,UPDATE,DELETE,TRUNCATE'),'Authenticated has no write privileges');
 select ok(not has_function_privilege('anon','public.add_wishlist_item(text,bigint,text,uuid)','execute'),'Anon cannot execute add_wishlist_item');
 select ok(not has_function_privilege('anon','public.edit_wishlist_item(uuid,text,bigint,text,uuid)','execute'),'Anon cannot execute edit_wishlist_item');
-select ok(not has_function_privilege('anon','public.set_wishlist_bought(uuid,boolean)','execute'),'Anon cannot execute set_wishlist_bought');
+select ok(not has_function_privilege('anon','public.set_wishlist_bought(uuid,boolean,boolean)','execute'),'Anon cannot execute set_wishlist_bought');
 select ok(not has_function_privilege('anon','public.delete_wishlist_item(uuid)','execute'),'Anon cannot execute delete_wishlist_item');
 select ok(has_function_privilege('authenticated','public.add_wishlist_item(text,bigint,text,uuid)','execute')
  and has_function_privilege('authenticated','public.edit_wishlist_item(uuid,text,bigint,text,uuid)','execute')
- and has_function_privilege('authenticated','public.set_wishlist_bought(uuid,boolean)','execute')
+ and has_function_privilege('authenticated','public.set_wishlist_bought(uuid,boolean,boolean)','execute')
  and has_function_privilege('authenticated','public.delete_wishlist_item(uuid)','execute'),'Authenticated can execute the four wishlist RPCs');
 select ok(not has_function_privilege('authenticated','private.lock_wishlist_item(uuid)','execute')
  and not has_function_privilege('authenticated','private.check_wishlist_fields(uuid,text,bigint,text,uuid)','execute'),'Private helpers are not executable by API roles');
