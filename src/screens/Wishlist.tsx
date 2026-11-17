@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   IconArrowBackUp,
@@ -133,6 +133,11 @@ export function WishlistRow({
   const bought = item.status === "bought";
   const progress = wishlistProgress(item, data.savingsGoals);
   const [asking, setAsking] = useState(false);
+  const askFirst = useRef<HTMLButtonElement>(null);
+  // Move focus into the question so keyboard and screen-reader users land on it.
+  useEffect(() => {
+    if (asking) askFirst.current?.focus();
+  }, [asking]);
   const spend = bought ? itemSpend(item, data.savingsSpends) : null;
   const spendGoal = spend
     ? (data.savingsGoals ?? []).find((g) => g.id === spend.goal_id)
@@ -208,10 +213,16 @@ export function WishlistRow({
           : t("Added by {name}", { name: firstName(data, item.added_by) })}
       </p>
       {asking && progress ? (
-        <div className="wish-ask">
-          <p>{t("Paid from {goal}?", { goal: progress.goal.title })}</p>
+        <div
+          className="wish-ask"
+          role="group"
+          aria-labelledby={"ask-" + item.id}
+        >
+          <p id={"ask-" + item.id}>
+            {t("Paid from {goal}?", { goal: progress.goal.title })}
+          </p>
           <div className="actions">
-            <button disabled={busy} onClick={() => mark(true)}>
+            <button ref={askFirst} disabled={busy} onClick={() => mark(true)}>
               {t("Yes, deduct {amount}", {
                 amount: money(item.price_centavos),
               })}
