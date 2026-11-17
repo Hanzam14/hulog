@@ -38,7 +38,7 @@ describe("listahan identity contract", () => {
   it("uses only named elevation or no shadow", () => {
     for (const shadow of declarations("box-shadow")) {
       expect(shadow).toMatch(
-        /^(none|var\(--elev-(sm|pop|nav|focus|sticker)\))$/,
+        /^(none|var\(--elev-(sm|pop|nav|focus|sticker|lip|lip-ink|lip-pink)\))$/,
       );
     }
   });
@@ -66,20 +66,26 @@ describe("listahan identity contract", () => {
       expect(weight).toMatch(/^(200 800|400|450|500|600|700|750|800|inherit)$/);
     }
   });
-  it("keeps Today solid pink with one inverted full-width action", () => {
+  it("keeps Today solid pink on a 3D lip with one white action", () => {
     const today = [...css.matchAll(/(?:^|\n)\.today-action \{([^}]+)\}/g)].at(
       -1,
     )![1];
-    expect(today).toContain("background: var(--pink);");
-    expect(today).toContain("color: var(--sticker-ink);");
-    expect(today).toContain("border: 0;");
-    expect(today).toContain("box-shadow: none;");
+    expect(today).toContain("box-shadow: var(--elev-lip-pink);");
     expect(today).not.toContain("gradient");
     expect(css).toMatch(
-      /\.today-action \.button\.big[^{}]*\{[^}]*background: var\(--ink\);[^}]*color: var\(--paper\);[^}]*width: 100%;[^}]*min-height: 52px;/,
+      /\.today-action \{[^}]*background: var\(--pink\);[^}]*color: var\(--sticker-ink\);/,
+    );
+    expect(css).toMatch(
+      /\.today-action \.button\.big,\s*\.today-action \.button\.big:hover:not\(:disabled\) \{[^}]*background: var\(--card\);[^}]*color: var\(--pink-deep\);[^}]*box-shadow: var\(--elev-lip-pink\);/,
     );
   });
-  it("keeps light and dark cards borderless without shadows", () => {
+  it("gives cards a thick edge with a deeper bottom lip", () => {
+    expect(css).toMatch(
+      /\.round-panel,[^{}]*\{\s*border: 2px solid var\(--edge\);\s*border-bottom-width: 5px;/,
+    );
+    expect(css).toContain("--elev-lip: 0 4px 0 var(--edge-deep);");
+  });
+  it("keeps the base card and chip rules flat underneath", () => {
     expect(css.replace(/\s+/g, " ")).toContain(
       "section, .custody-ledger, .abono-hero, .welcome figure, .pot, .celebrate, .round-panel { border-radius: var(--radius-card); border: 0; box-shadow: none; }",
     );
@@ -154,15 +160,15 @@ describe("listahan identity contract", () => {
     );
     expect(css).not.toMatch(/https?:\/\/[^;]*fonts/);
   });
-  it("fits fifteen 16px Home stickers with a 3px gap and card-colored outlines", () => {
+  it("fits fifteen 18px Home coins with a 4px gap and a 3D bottom edge", () => {
     expect(css).toMatch(
-      /\.tally\.tally-track:not\(\.proportional\) \{[^}]*--coin: 12px;[^}]*gap: 4px;/,
+      /\.tally\.tally-track:not\(\.proportional\) \{[^}]*--coin: 18px;[^}]*gap: 4px;/,
     );
     expect(css).toMatch(
       /\.tally\.tally-track:not\(\.proportional\) > span \{[^}]*height: var\(--coin\);[^}]*border-radius: var\(--radius-pill\);/,
     );
     expect(css).toMatch(
-      /\.tally\.tally-track:not\(\.proportional\) > :is\(\.paid, \.pending\) \{[^}]*border: 0;/,
+      /\.tally\.tally-track:not\(\.proportional\) > :is\(\.paid, \.pending\) \{[^}]*border: 0;[^}]*border-bottom: 3px solid color-mix\(in srgb, var\(--tone\) 68%, #000000\);/,
     );
   });
   it("puts the round status above the softer rate and dates", () => {
