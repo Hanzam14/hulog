@@ -72,6 +72,11 @@
   --radius-pill: 999px;
   --ease: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --elev-nav: none;
+  --edge: #e2e4ef;
+  --edge-deep: #c9cce0;
+  --elev-lip: 0 4px 0 var(--edge-deep);
+  --elev-lip-ink: 0 4px 0 #000000;
+  --elev-lip-pink: 0 5px 0 #c8346a;
 
   --paper: #f3f4fa;
   --dots: #e9ebf5;
@@ -127,11 +132,6 @@
   --radius-card: 24px;
   --elev-pop: none;
   --text-3xl: 56px;
-  --hero: #1c1b3f;
-  --hero-ink: #ffffff;
-  --hero-soft: rgba(255, 255, 255, 0.74);
-  --hero-tint: rgba(255, 255, 255, 0.13);
-  --hero-line: rgba(255, 255, 255, 0.14);
 }
 b,
 strong {
@@ -1027,8 +1027,10 @@ button svg,
   --line: color-mix(in srgb, #ffffff 9%, transparent);
   --elev-pop: none;
   --nav-surface: var(--card);
-  --hero: #2c2a66;
-  --hero-tint: rgba(255, 255, 255, 0.15);
+  --edge: #34335f;
+  --edge-deep: #29284f;
+  --elev-lip-ink: 0 4px 0 #8f8eba;
+  --elev-lip-pink: 0 5px 0 #b8336a;
 }
 .pink {
   --tone: var(--pink);
@@ -3420,7 +3422,7 @@ main > section + section {
 /* Fifteen 16px Home stickers fit on one row even on a 360px sheet.
    Long proportional tracks retain their existing representation. */
 .tally.tally-track:not(.proportional) {
-  --coin: 12px;
+  --coin: 18px;
   display: grid;
   grid-template-columns: repeat(var(--tally-total, 15), minmax(0, 1fr));
   gap: 4px;
@@ -3434,6 +3436,7 @@ main > section + section {
 }
 .tally.tally-track:not(.proportional) > :is(.paid, .pending) {
   border: 0;
+  border-bottom: 3px solid color-mix(in srgb, var(--tone) 68%, #000000);
   box-shadow: none;
 }
 .tally:not(.proportional) > span {
@@ -3647,77 +3650,14 @@ div:has(> .back) > h1 {
 
 /* ==== Overhaul: the passbook hero, rings, tighter rows. ==== */
 
-/* The running round is the one loud thing on Home: ink passbook, dot paper, pink glow. */
-.round-panel:has(> .tally-sheet) {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-card);
-  color: var(--hero-ink);
-  background:
-    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 1.6px) 0 0 / 16px 16px,
-    radial-gradient(110% 80% at 100% 0%, color-mix(in srgb, var(--pink) 42%, transparent), transparent 58%),
-    var(--hero);
-}
-.round-panel:has(> .tally-sheet) > .pot,
-.round-panel:has(> .tally-sheet) > .pot:hover {
-  background: transparent;
-  color: var(--hero-ink);
-  border: 0;
-  padding: 22px 22px 18px;
-}
-.round-panel:has(> .tally-sheet) > .tally-sheet {
-  margin: 0 22px;
-  padding: 18px 0 22px;
-  background: transparent;
-  border-top: 1px solid var(--hero-line);
-  border-radius: 0;
-}
-.round-panel:has(> .tally-sheet) .pot-figure strong,
-.round-panel:has(> .tally-sheet) .pot-figure strong * {
-  color: var(--hero-ink);
-}
-.round-panel:has(> .tally-sheet) .pot .pot-figure :is(strong, .money, .money-sign) {
-  font-size: var(--text-3xl);
-  line-height: 0.95;
-  letter-spacing: -0.045em;
-}
-.round-panel:has(> .tally-sheet) :is(.pot-target, .pot-chevron, .member-ratio),
-.round-panel:has(> .tally-sheet) .pot :is(.pot-bottom, .pot-custody) small {
-  color: var(--hero-soft);
-}
-.round-panel:has(> .tally-sheet) .pot > .pot-bottom > small:first-child,
-.round-panel:has(> .tally-sheet) :is(.member-who, .member-who strong, .pot-receiver b) {
-  color: var(--hero-ink);
-}
-.round-panel:has(> .tally-sheet) :is(.pot-receiver, .chip, .pot-solo-chip) {
-  background: var(--hero-tint);
-  color: var(--hero-ink);
-  border: 0;
-}
-.round-panel:has(> .tally-sheet) .pot > .pot-progress {
-  height: 10px;
-  background: var(--hero-tint);
-}
-.round-panel:has(> .tally-sheet) .pot > .pot-progress > span {
-  background: var(--pink);
-}
-.round-panel:has(> .tally-sheet) .pot .pot-figure .money-centavos {
-  font-size: var(--text-xl);
-}
-.round-panel:has(> .tally-sheet) .member-who {
-  font-size: var(--text-base);
-}
-.round-panel:has(> .tally-sheet) .member-ratio {
-  font-size: var(--text-sm);
-}
-
 /* Day segments: open days are quiet slots, the latest paid day glows. */
 .tally.tally-track:not(.proportional) > span:nth-child(n) {
   rotate: none;
 }
 .tally.tally-track:not(.proportional) > .open {
-  background: var(--card-tint);
+  background: var(--edge);
   border: 0;
+  border-bottom: 3px solid var(--edge-deep);
 }
 .tally.tally-track:not(.proportional) > .paid {
   background: var(--tone);
@@ -3725,14 +3665,6 @@ div:has(> .back) > h1 {
 .tally.tally-track:not(.proportional) > .pending {
   background: repeating-linear-gradient(-45deg, var(--card-tint) 0 3px, var(--tone) 3px 5px);
 }
-.round-panel:has(> .tally-sheet) .tally.tally-track:not(.proportional) > .open,
-.round-panel:has(> .tally-sheet) .tally.tally-track.proportional {
-  background: var(--hero-tint);
-}
-.round-panel:has(> .tally-sheet) .tally.tally-track:not(.proportional) > .pending {
-  background: repeating-linear-gradient(-45deg, var(--hero-tint) 0 3px, var(--tone) 3px 5px);
-}
-
 /* Goal cards: one shape for shared and personal, a ring beside the amount. */
 .ipon-home-item {
   padding: 0;
@@ -3878,4 +3810,189 @@ div:has(> .back) > h1 {
 }
 .settings-grid > .duo figure > .avatar {
   margin: 4px;
+}
+
+/* ==== Chunky: thick edges, 3D lips, presses you can feel. ==== */
+.round-panel,
+main .pot:not(.round-panel > .pot):not(.ipon-item > .pot),
+main .ipon-item,
+main section.card,
+.custody-ledger,
+.settings-grid > :not(h1, h2, h3),
+main section:not(:has(.pot)):not(.app-updates):not(.wish-section):not(.personal-savings):not(.ipon-home-section):not(.home-waiting):not(.outbox-strip) {
+  border: 2px solid var(--edge);
+  border-bottom-width: 5px;
+}
+.round-panel > .pot,
+.round-panel > .pot:hover {
+  border: 0;
+}
+a.pot,
+.round-panel:has(> a.pot) {
+  transition: translate var(--ease), border-bottom-width var(--ease);
+}
+.round-panel:has(> a.pot:active) {
+  translate: 0 3px;
+  border-bottom-width: 2px;
+  margin-bottom: 15px;
+}
+
+/* Buttons: a solid face on a darker lip; pressing sinks the face. */
+:is(.button, button.big, form button[type="submit"]):not(.secondary, .quiet, .round, .danger) {
+  box-shadow: var(--elev-lip-ink);
+  font-weight: 800;
+  margin-bottom: 4px;
+  transition: translate var(--ease), box-shadow var(--ease);
+}
+:is(.secondary, .new-savings-goal):not(.quiet, .round) {
+  background: var(--card);
+  border: 2px solid var(--edge);
+  box-shadow: var(--elev-lip);
+  font-weight: 800;
+  margin-bottom: 4px;
+  transition: translate var(--ease), box-shadow var(--ease);
+}
+:is(.button, button.big, form button[type="submit"], .secondary, .new-savings-goal):not(.quiet, .round):active:not(:disabled) {
+  translate: 0 4px;
+  transform: none;
+  box-shadow: none;
+}
+:is(.button, button, .secondary):disabled {
+  box-shadow: none;
+}
+
+/* Today: the loud card. White button with pink type on pink. */
+.today-action {
+  box-shadow: var(--elev-lip-pink);
+  margin-bottom: 20px;
+}
+.today-action .button.big,
+.today-action .button.big:hover:not(:disabled) {
+  background: var(--card);
+  color: var(--pink-deep);
+  box-shadow: var(--elev-lip-pink);
+  font-size: var(--text-md);
+}
+:root[data-theme="dark"] .today-action .button.big,
+:root[data-theme="dark"] .today-action .button.big:hover:not(:disabled) {
+  background: var(--sticker-ink);
+  color: var(--pink);
+}
+
+/* The pot: a fat bar with a shine stripe, a bigger number. */
+.round-panel .pot .pot-figure :is(strong, .money, .money-sign) {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.round-panel .pot .pot-figure .money-centavos {
+  font-size: var(--text-xl);
+}
+.pot > .pot-progress {
+  position: relative;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--edge);
+}
+.pot > .pot-progress > span {
+  position: relative;
+  min-width: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--pink);
+}
+.pot > .pot-progress > span::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.4);
+}
+.round-panel > .tally-sheet {
+  margin: 0 16px;
+  padding: 14px 0 18px;
+  border-top: 2px solid var(--edge);
+  border-radius: 0;
+  background: transparent;
+}
+.round-panel .member-who strong {
+  font-weight: 800;
+}
+.round-panel .member-ratio {
+  font-weight: 800;
+  color: var(--tone-deep);
+}
+
+/* Day coins pop in when a payment lands. */
+.tally.tally-track:not(.proportional) > .paid::after {
+  content: "";
+  display: block;
+  width: 35%;
+  height: 3px;
+  margin: 3px auto 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.45);
+}
+.tally.tally-track .stamped {
+  animation: coin-pop 560ms cubic-bezier(0.3, 1.7, 0.5, 1) both;
+}
+@keyframes coin-pop {
+  0% {
+    scale: 0.2;
+  }
+  60% {
+    scale: 1.35;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/* Goal rings: thicker, on the edge colour. */
+.ring circle {
+  stroke-width: 9;
+}
+.ring .ring-track {
+  stroke: var(--edge);
+}
+.ring .ipon-pct {
+  font-weight: 800;
+}
+
+/* Chips and section labels get weight. */
+.chip {
+  font-weight: 800;
+}
+main h2.section-label {
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
+/* Bottom nav: the current tab sits in an outlined bubble. */
+nav {
+  border-top: 2px solid var(--edge);
+}
+nav a.active {
+  border: 2px solid var(--pink);
+  border-radius: var(--radius-md);
+}
+nav a:not(.active) {
+  border: 2px solid transparent;
+}
+
+/* Grupo: flat colour behind the two of you, no wash. */
+.settings-grid > .duo {
+  background: var(--brand-soft);
+}
+:root .round-panel > .tally-sheet {
+  border-radius: 0;
+}
+:root:root nav a.active::before {
+  display: none;
+}
+.today-action .button.big:active:not(:disabled) {
+  box-shadow: none;
 }
