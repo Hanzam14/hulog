@@ -17,9 +17,10 @@ import Avatar from "./Avatar";
 import { useGoalCelebration } from "./useGoalCelebration";
 import { goalAvailable } from "../wishlist";
 import Tally from "./Tally";
+import ProgressRing from "./ProgressRing";
 import { heldByText, name, tone } from "./shared";
 
-/** An Ipon goal card: title, mode badge, progress ring + bar, pace badge, custody, and member tallies. */
+/** An Ipon goal card: title, mode badge, progress ring, pace badge, custody, and member tallies. */
 export default function IponCard({
   g,
   data,
@@ -82,10 +83,7 @@ export default function IponCard({
         <div className="ipon-head">
           <div className="ipon-title-row">
             <span className="ipon-title">{cleanGoalTitle(g.title)}</span>
-            <div className="ipon-badges">
-              {statusChip && <span className="chip">{statusChip}</span>}
-              <span className="ipon-pct">{progress}%</span>
-            </div>
+            {statusChip && <span className="chip">{statusChip}</span>}
           </div>
           <div className="ipon-amounts">
             <strong>
@@ -103,16 +101,7 @@ export default function IponCard({
             </span>
           </div>
         </div>
-      </div>
-      <div
-        className="pot-progress"
-        role="progressbar"
-        aria-label={t("Pot progress")}
-        aria-valuenow={progress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
-        <span style={{ width: `${progress}%` }} />
+        <ProgressRing percent={progress} label={t("Pot progress")} />
       </div>
       <div className="ipon-meta">
         <p>
@@ -156,6 +145,7 @@ export default function IponCard({
                     pending={p.pending_steps}
                     total={g.num_steps!}
                     tone={tone(data, p.member_id)}
+                    variant="track"
                   />
                 ) : (
                   <strong className="ipon-member-amount">

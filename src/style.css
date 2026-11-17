@@ -126,6 +126,12 @@
   -webkit-font-smoothing: antialiased;
   --radius-card: 24px;
   --elev-pop: none;
+  --text-3xl: 56px;
+  --hero: #1c1b3f;
+  --hero-ink: #ffffff;
+  --hero-soft: rgba(255, 255, 255, 0.74);
+  --hero-tint: rgba(255, 255, 255, 0.13);
+  --hero-line: rgba(255, 255, 255, 0.14);
 }
 b,
 strong {
@@ -1021,6 +1027,8 @@ button svg,
   --line: color-mix(in srgb, #ffffff 9%, transparent);
   --elev-pop: none;
   --nav-surface: var(--card);
+  --hero: #2c2a66;
+  --hero-tint: rgba(255, 255, 255, 0.15);
 }
 .pink {
   --tone: var(--pink);
@@ -3412,17 +3420,21 @@ main > section + section {
 /* Fifteen 16px Home stickers fit on one row even on a 360px sheet.
    Long proportional tracks retain their existing representation. */
 .tally.tally-track:not(.proportional) {
-  --coin: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
+  --coin: 12px;
+  display: grid;
+  grid-template-columns: repeat(var(--tally-total, 15), minmax(0, 1fr));
+  gap: 4px;
 }
 .tally.tally-track:not(.proportional) > span {
-  width: var(--coin);
+  flex: none;
+  width: auto;
   height: var(--coin);
+  aspect-ratio: auto;
+  border-radius: var(--radius-pill);
 }
 .tally.tally-track:not(.proportional) > :is(.paid, .pending) {
-  border: 2px solid var(--card);
+  border: 0;
+  box-shadow: none;
 }
 .tally:not(.proportional) > span {
   flex: 0 0 var(--coin);
@@ -3632,3 +3644,238 @@ div:has(> .back) > h1 {
   background: var(--card-tint);
 }
 .abono-edit .actions { margin: 0; }
+
+/* ==== Overhaul: the passbook hero, rings, tighter rows. ==== */
+
+/* The running round is the one loud thing on Home: ink passbook, dot paper, pink glow. */
+.round-panel:has(> .tally-sheet) {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  color: var(--hero-ink);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 1.6px) 0 0 / 16px 16px,
+    radial-gradient(110% 80% at 100% 0%, color-mix(in srgb, var(--pink) 42%, transparent), transparent 58%),
+    var(--hero);
+}
+.round-panel:has(> .tally-sheet) > .pot,
+.round-panel:has(> .tally-sheet) > .pot:hover {
+  background: transparent;
+  color: var(--hero-ink);
+  border: 0;
+  padding: 22px 22px 18px;
+}
+.round-panel:has(> .tally-sheet) > .tally-sheet {
+  margin: 0 22px;
+  padding: 18px 0 22px;
+  background: transparent;
+  border-top: 1px solid var(--hero-line);
+  border-radius: 0;
+}
+.round-panel:has(> .tally-sheet) .pot-figure strong,
+.round-panel:has(> .tally-sheet) .pot-figure strong * {
+  color: var(--hero-ink);
+}
+.round-panel:has(> .tally-sheet) .pot .pot-figure :is(strong, .money, .money-sign) {
+  font-size: var(--text-3xl);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+.round-panel:has(> .tally-sheet) :is(.pot-target, .pot-chevron, .member-ratio),
+.round-panel:has(> .tally-sheet) .pot :is(.pot-bottom, .pot-custody) small {
+  color: var(--hero-soft);
+}
+.round-panel:has(> .tally-sheet) .pot > .pot-bottom > small:first-child,
+.round-panel:has(> .tally-sheet) :is(.member-who, .member-who strong, .pot-receiver b) {
+  color: var(--hero-ink);
+}
+.round-panel:has(> .tally-sheet) :is(.pot-receiver, .chip, .pot-solo-chip) {
+  background: var(--hero-tint);
+  color: var(--hero-ink);
+  border: 0;
+}
+.round-panel:has(> .tally-sheet) .pot > .pot-progress {
+  height: 10px;
+  background: var(--hero-tint);
+}
+.round-panel:has(> .tally-sheet) .pot > .pot-progress > span {
+  background: var(--pink);
+}
+.round-panel:has(> .tally-sheet) .pot .pot-figure .money-centavos {
+  font-size: var(--text-xl);
+}
+.round-panel:has(> .tally-sheet) .member-who {
+  font-size: var(--text-base);
+}
+.round-panel:has(> .tally-sheet) .member-ratio {
+  font-size: var(--text-sm);
+}
+
+/* Day segments: open days are quiet slots, the latest paid day glows. */
+.tally.tally-track:not(.proportional) > span:nth-child(n) {
+  rotate: none;
+}
+.tally.tally-track:not(.proportional) > .open {
+  background: var(--card-tint);
+  border: 0;
+}
+.tally.tally-track:not(.proportional) > .paid {
+  background: var(--tone);
+}
+.tally.tally-track:not(.proportional) > .pending {
+  background: repeating-linear-gradient(-45deg, var(--card-tint) 0 3px, var(--tone) 3px 5px);
+}
+.round-panel:has(> .tally-sheet) .tally.tally-track:not(.proportional) > .open,
+.round-panel:has(> .tally-sheet) .tally.tally-track.proportional {
+  background: var(--hero-tint);
+}
+.round-panel:has(> .tally-sheet) .tally.tally-track:not(.proportional) > .pending {
+  background: repeating-linear-gradient(-45deg, var(--hero-tint) 0 3px, var(--tone) 3px 5px);
+}
+
+/* Goal cards: one shape for shared and personal, a ring beside the amount. */
+.ipon-home-item {
+  padding: 0;
+}
+.ring {
+  position: relative;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-shadow: none;
+}
+.ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  rotate: -90deg;
+}
+.ring circle {
+  fill: none;
+  stroke-width: 7;
+}
+.ring .ring-track {
+  stroke: var(--card-tint);
+}
+.ring .ring-fill {
+  stroke: var(--tone, var(--leaf));
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--ease);
+}
+.ring .ipon-pct {
+  font-family: var(--display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ring .ring-fill {
+    transition: none;
+  }
+}
+.ipon-item .pot-top {
+  align-items: center;
+  padding-inline-end: 0;
+}
+.ipon-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.ipon-title,
+.personal-goal h3 {
+  font-family: var(--display);
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+.personal-figure {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ipon-amounts strong,
+.personal-figure .pot-amount strong {
+  font-size: var(--text-2xl);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+/* Gastos: edit and delete ride on the date line instead of their own row. */
+.abono-entry:has(> .actions > button):not(:has(> .actions > button:not(.quiet))) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 8px;
+}
+.abono-entry:has(> .actions > button):not(:has(> .actions > button:not(.quiet))) > * {
+  grid-column: 1 / -1;
+}
+.abono-entry:has(> .actions > button):not(:has(> .actions > button:not(.quiet))) > .abono-entry-main {
+  grid-row: 1;
+}
+.abono-entry:has(> .actions > button):not(:has(> .actions > button:not(.quiet))) > .actions {
+  grid-row: 1;
+  grid-column: 2;
+  align-self: end;
+  margin: 0 -10px -12px 0;
+  gap: 0;
+}
+.abono-entry:has(> .actions > button):not(:has(> .actions > button:not(.quiet))) .abono-entry-text > :last-child {
+  padding-right: 92px;
+}
+
+/* Grupo: the two of you, side by side, filling the card. */
+.settings-grid > .duo {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px 16px 20px;
+  background:
+    radial-gradient(80% 120% at 50% 0%, var(--brand-soft), transparent 70%),
+    var(--card);
+}
+.settings-grid > .duo:not(:has(figure + figure)) {
+  grid-template-columns: 1fr;
+}
+.settings-grid > .duo figure {
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.settings-grid > .duo figcaption {
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-align: center;
+}
+.settings-grid > .duo .avatar.md {
+  width: 72px;
+  height: 72px;
+  font-size: var(--text-xl);
+}
+.settings-grid > .duo:has(figure + figure)::after {
+  content: "&";
+  position: absolute;
+  left: 50%;
+  top: 64px;
+  translate: -50% -50%;
+  font-family: var(--display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--pink-deep);
+  pointer-events: none;
+}
+.settings-grid > .duo figure > .avatar {
+  margin: 4px;
+}

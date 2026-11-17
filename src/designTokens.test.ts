@@ -15,7 +15,7 @@ describe("listahan identity contract", () => {
   it("uses only the type scale", () => {
     for (const size of declarations("font-size")) {
       expect(size).toMatch(
-        /^(var\(--text-(xs|sm|base|input|md|lg|xl|2xl)\)|inherit)$/,
+        /^(var\(--text-(xs|sm|base|input|md|lg|xl|2xl|3xl)\)|inherit)$/,
       );
     }
   });
@@ -156,13 +156,13 @@ describe("listahan identity contract", () => {
   });
   it("fits fifteen 16px Home stickers with a 3px gap and card-colored outlines", () => {
     expect(css).toMatch(
-      /\.tally\.tally-track:not\(\.proportional\) \{[^}]*--coin: 16px;[^}]*gap: 3px;/,
+      /\.tally\.tally-track:not\(\.proportional\) \{[^}]*--coin: 12px;[^}]*gap: 4px;/,
     );
     expect(css).toMatch(
-      /\.tally\.tally-track:not\(\.proportional\) > span \{[^}]*width: var\(--coin\);[^}]*height: var\(--coin\);/,
+      /\.tally\.tally-track:not\(\.proportional\) > span \{[^}]*height: var\(--coin\);[^}]*border-radius: var\(--radius-pill\);/,
     );
     expect(css).toMatch(
-      /\.tally\.tally-track:not\(\.proportional\) > :is\(\.paid, \.pending\) \{[^}]*border: 2px solid var\(--card\);/,
+      /\.tally\.tally-track:not\(\.proportional\) > :is\(\.paid, \.pending\) \{[^}]*border: 0;/,
     );
   });
   it("puts the round status above the softer rate and dates", () => {
