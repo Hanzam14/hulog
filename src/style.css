@@ -1,4 +1,10 @@
 @import "tailwindcss";
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque-latin-wght.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
 .confetti-canvas {
   position: fixed;
   inset: 0;
@@ -48,9 +54,9 @@
   grid-column: 1 / -1;
 }
 @theme {
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-/* Minimalist financial companion: clean surfaces, hairline dividers, zero clutter. */
+/* Listahan: cool notebook paper, ballpen ink, and member-colored stickers. */
 :root {
   --text-xs: 12px;
   --text-sm: 13px;
@@ -59,51 +65,55 @@
   --text-md: 17px;
   --text-lg: 20px;
   --text-xl: 26px;
-  --text-2xl: 34px;
-  --radius-sm: 10px;
+  --text-2xl: 44px;
+  --radius-sm: 14px;
   --radius-md: 14px;
+  --radius-button: 16px;
   --radius-pill: 999px;
   --ease: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  --elev-nav: 0 8px 28px -12px rgba(0, 0, 0, 0.25);
+  --elev-nav: none;
 
-  --paper: #f6f5f2;
-  --dots: #e5e6eb;
-  --ink: #141418;
-  --soft: #595a66;
+  --paper: #f3f4fa;
+  --dots: #e9ebf5;
+  --ink: #1c1b3f;
+  --soft: #565a7c;
   --card: #ffffff;
-  --card-tint: #f2f1ee;
-  --pink: #ff85a9;
-  --pink-deep: #b82858;
-  --blue: #6cb8ff;
-  --blue-deep: #155fa0;
-  --mango: #f7be42;
+  --card-tint: #e9ebf5;
+  --pink: #ff4f8b;
+  --pink-deep: #c21e5c;
+  --blue: #2e86ff;
+  --blue-deep: #155ac2;
+  --mango: #ffc233;
   --mango-deep: #855200;
-  --leaf: #42c288;
+  --leaf: #17a974;
   --leaf-deep: #186843;
-  --green: #42c288;
+  --green: #17a974;
   --green-deep: #186843;
-  --orange: #f7be42;
+  --orange: #ffc233;
   --orange-deep: #855200;
   --purple: #b89eff;
   --purple-deep: #5e3db3;
-  --danger: #ba2b26;
-  --sticker-ink: #141418;
+  --danger: #d2342c;
+  --sticker-ink: #1c1b3f;
+  --sticker-outline: #ffffff;
+  --elev-sticker: 0 1px 0 rgba(0, 0, 0, 0.18);
+  --danger-deep: #bc2923;
+  --danger-button-ink: #ffffff;
   --control-border: #828491;
-  --line: color-mix(in srgb, var(--ink) 8%, transparent);
+  --line: color-mix(in srgb, var(--ink) 12%, transparent);
   --card-border: var(--line);
   --highlight-border: var(--line);
   --highlight: var(--card-tint);
   --hover-card: var(--card-tint);
   --inset: var(--card-tint);
-  --nav-surface: color-mix(in srgb, var(--card) 82%, transparent);
+  --nav-surface: var(--card);
   --action-pink: var(--pink);
   --tan: color-mix(in srgb, var(--soft) 28%, transparent);
   --success-tint: color-mix(in srgb, var(--leaf) 12%, var(--card));
   --danger-tint: color-mix(in srgb, var(--danger) 10%, var(--card));
   --brand-soft: color-mix(in srgb, var(--pink) 14%, var(--card));
   --brand: var(--pink-deep);
-  --elev-sm:
-    0 1px 2px rgba(24, 20, 16, 0.04), 0 6px 20px -8px rgba(24, 20, 16, 0.08);
+  --elev-sm: none;
   color-scheme: light;
   --display: var(--font-sans);
   font-family: var(--font-sans);
@@ -112,14 +122,14 @@
   color: var(--ink);
   background: var(--paper);
   font-synthesis: none;
-  line-height: 1.5;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
-  --radius-card: 20px;
-  --elev-pop: 0 10px 30px -12px rgba(184, 40, 88, 0.45);
+  --radius-card: 24px;
+  --elev-pop: none;
 }
 b,
 strong {
-  font-weight: 650;
+  font-weight: 700;
 }
 * {
   box-sizing: border-box;
@@ -129,7 +139,7 @@ body {
   min-width: 320px;
   background-color: var(--paper);
   font-variant-numeric: tabular-nums;
-  font-weight: 400;
+  font-weight: 450;
 }
 .app {
   --container-width: 520px;
@@ -152,19 +162,19 @@ header {
   color: var(--ink);
   font-family: var(--display);
   font-size: var(--text-xl);
-  font-weight: 650;
-  letter-spacing: -0.03em;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   text-decoration: none;
 }
 .dot {
-  color: var(--pink-deep);
+  color: var(--pink);
 }
 h1,
 h2,
 h3 {
   font-family: var(--display);
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 h1 {
   line-height: 1.2;
@@ -187,7 +197,7 @@ main {
 }
 section {
   background: var(--card);
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
 }
 nav {
   position: sticky;
@@ -196,8 +206,7 @@ nav {
   display: flex;
   justify-content: space-around;
   background: var(--nav-surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+
   border-top: 1px solid var(--line);
 }
 nav a {
@@ -205,7 +214,7 @@ nav a {
   place-items: center;
   color: var(--soft);
   font-family: var(--display);
-  font-weight: 650;
+  font-weight: 700;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -215,13 +224,13 @@ nav a {
 }
 button,
 .button {
-  background: var(--brand);
-  color: var(--paper);
+  background: var(--pink);
+  color: var(--sticker-ink);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-button);
   font-family: var(--display);
   font-size: var(--text-base);
-  font-weight: 650;
+  font-weight: 700;
   padding: 10px 16px;
   cursor: pointer;
   display: inline-flex;
@@ -273,18 +282,18 @@ button:disabled {
   transform: none;
 }
 .danger {
-  color: var(--danger);
+  color: var(--danger-deep);
 }
 button.danger:not(.secondary):not(.quiet),
 .button.danger:not(.secondary):not(.quiet),
 button.danger:not(.secondary):not(.quiet):hover:not(:disabled),
 .button.danger:not(.secondary):not(.quiet):hover:not(:disabled) {
   background: var(--danger);
-  color: var(--paper);
+  color: var(--danger-button-ink);
 }
 a {
   color: var(--ink);
-  font-weight: 650;
+  font-weight: 700;
   text-underline-offset: 3px;
 }
 a:not(.button):hover {
@@ -313,17 +322,17 @@ textarea {
 }
 input:focus,
 select:focus {
-  outline: 3px solid var(--blue);
-  outline-offset: 1px;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 :focus-visible {
-  outline: 3px solid var(--blue);
+  outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 .meta {
   color: var(--soft);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .meta {
   margin: 0;
@@ -362,7 +371,7 @@ section .pot {
 .pot strong {
   font-family: var(--display);
   font-size: var(--text-2xl);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.05;
 }
 .pot-target,
@@ -464,7 +473,7 @@ section:has(.pot) {
   padding: 8px 12px;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
   overflow-wrap: anywhere;
   border: 0;
   background: var(--card-tint);
@@ -477,7 +486,7 @@ section:has(.pot) {
 }
 .welcome > p {
   color: var(--soft);
-  font-weight: 650;
+  font-weight: 700;
 }
 .welcome figure {
   background: var(--card);
@@ -494,7 +503,7 @@ section:has(.pot) {
 .welcome figcaption {
   color: var(--soft);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .welcome button {
   width: 100%;
@@ -515,7 +524,7 @@ section:has(.pot) {
 footer {
   color: var(--soft);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 footer {
   text-align: center;
@@ -583,7 +592,7 @@ button svg,
 }
 .round.no {
   background: var(--card);
-  color: var(--danger);
+  color: var(--danger-deep);
 }
 .back {
   display: inline-grid;
@@ -602,7 +611,7 @@ button svg,
   border-radius: 50%;
   font-family: var(--display);
   font-size: var(--text-md);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1;
   background: var(--tone);
   color: var(--sticker-ink);
@@ -641,7 +650,7 @@ button svg,
 }
 .empty p {
   color: var(--soft);
-  font-weight: 650;
+  font-weight: 700;
 }
 /* Small stickers in a list: who, how much, and a round button. */
 .confirm-list {
@@ -669,12 +678,12 @@ button svg,
 .confirm strong {
   font-family: var(--display);
   font-size: var(--text-lg);
-  font-weight: 650;
+  font-weight: 700;
 }
 .confirm small {
   color: var(--soft);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 .tally.mini {
@@ -700,7 +709,7 @@ button svg,
   min-width: 2ch;
   font-family: var(--display);
   font-size: var(--text-2xl);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1;
   text-align: center;
 }
@@ -711,7 +720,7 @@ button svg,
 .amount {
   font-family: var(--display);
   font-size: var(--text-2xl);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1;
 }
 .record .big {
@@ -802,7 +811,7 @@ button svg,
 .preview-pot strong {
   font-family: var(--display);
   font-size: var(--text-xl);
-  font-weight: 650;
+  font-weight: 700;
 }
 .answer {
   display: flex;
@@ -835,7 +844,7 @@ button svg,
 .celebrate strong {
   font-family: var(--display);
   font-size: var(--text-2xl);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.1;
 }
 .celebrate .spark {
@@ -875,7 +884,7 @@ button svg,
 }
 .celebrate .payout-balances strong {
   font-size: inherit;
-  font-weight: 650;
+  font-weight: 700;
 }
 .payout-withdrawal-form {
   display: grid;
@@ -979,17 +988,21 @@ button svg,
   margin: 16px auto 0;
 }
 
-/* Night mode: calm neutral slate with soft accents. */
+/* Indigo night: the same notebook hierarchy with brighter sticker colors. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #0c0d11;
-  --dots: #252730;
-  --card: #15171e;
-  --card-tint: #1d2029;
-  --ink: #f3f4f6;
-  --soft: #9fa2b2;
-  --pink: #ff8fb1;
-  --blue: #7bc6ff;
+  --paper: #15142e;
+  --sticker-ink: #15142e;
+  --sticker-outline: var(--paper);
+  --danger-deep: #ff9f96;
+  --danger-button-ink: #15142e;
+  --dots: #2a2950;
+  --card: #1f1e3d;
+  --card-tint: #2a2950;
+  --ink: #f3f2ff;
+  --soft: #a9a8cf;
+  --pink: #ff6b9e;
+  --blue: #5aa2ff;
   --mango: #ffd166;
   --leaf: #5ed19a;
   --green: #5ed19a;
@@ -1004,10 +1017,10 @@ button svg,
   --purple-deep: #d0bfff;
   --danger: #ff9f96;
   --control-border: #777988;
-  --elev-sm: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  --line: color-mix(in srgb, #ffffff 7%, transparent);
-  --elev-pop: 0 10px 30px -14px rgba(255, 133, 169, 0.5);
-  --nav-surface: color-mix(in srgb, var(--card) 80%, transparent);
+  --elev-sm: none;
+  --line: color-mix(in srgb, #ffffff 9%, transparent);
+  --elev-pop: none;
+  --nav-surface: var(--card);
 }
 .pink {
   --tone: var(--pink);
@@ -1128,7 +1141,7 @@ button svg,
 .color-choice[aria-pressed="true"] {
   border: 1.5px solid var(--control-border);
   outline: 2px solid var(--tone, var(--pink));
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 .swatch {
   display: grid;
@@ -1166,7 +1179,7 @@ button svg,
 .install-banner > ol {
   margin: 0 0 4px;
   padding-left: 20px;
-  font-weight: 650;
+  font-weight: 700;
   list-style: decimal;
 }
 .install-banner > ol > li {
@@ -1257,7 +1270,7 @@ button svg,
 .header-bell-count {
   color: var(--pink-deep);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .custody-ledger {
@@ -1373,7 +1386,7 @@ section,
 .round-panel {
   border-radius: var(--radius-card);
   border: 0;
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
 }
 section {
   margin-block: 16px;
@@ -1454,7 +1467,7 @@ button,
 }
 .big {
   font-size: var(--text-input);
-  font-weight: 650;
+  font-weight: 700;
 }
 .welcome button {
   font-size: var(--text-input);
@@ -1495,7 +1508,7 @@ nav a.active {
 }
 .round-panel {
   background: var(--card);
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
   margin: 12px 0;
   border: 0;
   padding: 0;
@@ -1505,7 +1518,7 @@ nav a.active {
   position: relative;
   gap: 12px;
   background: var(--card);
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
 }
 .round-panel > .pot {
   border: 0;
@@ -1556,7 +1569,7 @@ nav a.active {
 .celebrate strong,
 .stepper output {
   font-size: var(--text-xl);
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.15;
 }
@@ -1577,11 +1590,11 @@ nav a.active {
   height: 6px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--dots);
+  background: var(--card-tint);
   overflow: hidden;
 }
 .pot-progress > span {
-  background: var(--pink-deep);
+  background: var(--pink);
   border-right: 0;
   border-radius: var(--radius-pill);
 }
@@ -1599,14 +1612,14 @@ nav a.active {
   border-color: var(--line);
 }
 .ipon-card .pot-progress > span {
-  background: var(--leaf-deep);
+  background: var(--leaf);
 }
 .custody-ledger {
   background: var(--card);
   padding: 20px;
   margin: 12px 0;
   border: 0;
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
 }
 .custody-header {
   margin-bottom: 12px;
@@ -1623,7 +1636,7 @@ nav a.active {
 }
 .chip {
   font-size: var(--text-xs);
-  font-weight: 650;
+  font-weight: 700;
   padding: 2px 8px;
   border: 0;
   background: var(--card-tint);
@@ -1633,7 +1646,7 @@ nav a.active {
   background: var(--pink);
   color: var(--sticker-ink);
   font-size: var(--text-xs);
-  font-weight: 650;
+  font-weight: 700;
 }
 .place {
   max-width: 100%;
@@ -1648,7 +1661,7 @@ nav a.active {
   background: var(--card-tint);
 }
 .notice.error {
-  color: var(--danger);
+  color: var(--danger-deep);
 }
 .notice .quiet {
   color: inherit;
@@ -1666,7 +1679,7 @@ nav a.active {
 :focus-visible,
 input:focus,
 select:focus {
-  outline: 2px solid var(--blue-deep);
+  outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 .members,
@@ -1830,17 +1843,7 @@ select:focus {
   justify-self: start;
 }
 .tally .stamped {
-  animation: coin-stamp 220ms ease-out;
-}
-@keyframes coin-stamp {
-  from {
-    scale: 1.35;
-    opacity: 0.5;
-  }
-  to {
-    scale: 1;
-    opacity: 1;
-  }
+  animation: none;
 }
 
 .offline-banner {
@@ -1856,7 +1859,7 @@ select:focus {
   background: var(--card-tint);
   background-size: 200% 100%;
   border-radius: var(--radius-md);
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  animation: none;
   border: 0;
 }
 .skeleton-title {
@@ -1873,14 +1876,6 @@ select:focus {
   width: 100%;
   height: 52px;
 }
-@keyframes skeleton-pulse {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
 
 :root[data-theme="dark"] .offline-banner {
   background: var(--highlight);
@@ -1895,7 +1890,7 @@ select:focus {
 @media print {
   body {
     background: #ffffff;
-    color: #000000;
+    color: #1c1b3f;
   }
   nav,
   header .header-actions,
@@ -1962,12 +1957,12 @@ main {
   min-width: 0;
   font-family: var(--display);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .member-ratio {
   margin-left: auto;
   font-size: var(--text-xs);
-  font-weight: 650;
+  font-weight: 700;
   color: var(--soft);
   font-variant-numeric: tabular-nums;
 }
@@ -2037,7 +2032,7 @@ main {
 }
 .custody-wallet-row strong {
   font-family: var(--display);
-  font-weight: 650;
+  font-weight: 700;
 }
 .custody-split {
   margin: 4px 0 4px 24px;
@@ -2055,7 +2050,7 @@ main {
   gap: 12px;
   border: 0;
   border-radius: var(--radius-card);
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
   margin-bottom: 12px;
 }
 .ipon-item > .ipon-card,
@@ -2080,7 +2075,7 @@ main {
 }
 .ipon-pct {
   font-size: var(--text-xs);
-  font-weight: 650;
+  font-weight: 700;
   color: var(--leaf-deep);
   font-variant-numeric: tabular-nums;
 }
@@ -2103,13 +2098,13 @@ main {
   color: var(--ink);
   font-family: var(--display);
   font-size: var(--text-md);
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 .ipon-title-row .chip {
   flex: none;
-  font-weight: 650;
+  font-weight: 700;
 }
 .ipon-amounts {
   display: flex;
@@ -2131,7 +2126,7 @@ main {
   margin: 0;
   color: var(--soft);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .ipon-meta svg {
   flex: none;
@@ -2160,7 +2155,7 @@ main {
   max-width: 100%;
   margin-left: auto;
   font-size: var(--text-xs);
-  font-weight: 650;
+  font-weight: 700;
 }
 .personal-goal > .actions {
   display: flex;
@@ -2223,7 +2218,7 @@ a.muted {
 .quiet {
   min-width: 44px;
   min-height: 44px;
-  background: var(--card-tint);
+  background: transparent;
   border: 0;
 }
 .home-waiting {
@@ -2298,7 +2293,7 @@ details.personal-history > summary {
   list-style: none;
   min-height: 44px;
   padding-block: 10px;
-  font-weight: 650;
+  font-weight: 700;
   cursor: pointer;
 }
 details.wallet-add > summary::-webkit-details-marker,
@@ -2515,7 +2510,7 @@ select::picker-icon {
   color: var(--ink);
   border-radius: var(--radius-md);
   font-family: var(--display);
-  font-weight: 650;
+  font-weight: 700;
   text-decoration: none;
   border: 0;
   background: var(--card-tint);
@@ -2616,12 +2611,12 @@ select::picker-icon {
 .cal-day small {
   font-size: var(--text-xs);
   font-weight: 800;
-  text-transform: uppercase;
+  text-transform: none;
 }
 .cal-day b {
   font-family: var(--display);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .cal-day svg {
   display: block;
@@ -2637,13 +2632,13 @@ select::picker-icon {
   background: var(--brand-soft);
 }
 .cal-day.missed {
-  color: var(--danger);
+  color: var(--danger-deep);
   border: 0;
   background: var(--danger-tint);
 }
 .cal-day.today {
   outline: 2px solid var(--ink);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 .cal-legend {
   display: flex;
@@ -2653,7 +2648,7 @@ select::picker-icon {
   padding: 0;
   list-style: none;
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .cal-legend li {
   display: flex;
@@ -2681,7 +2676,7 @@ select::picker-icon {
   background: var(--brand-soft);
 }
 .cal-key.missed {
-  color: var(--danger);
+  color: var(--danger-deep);
   border: 0;
   background: var(--danger-tint);
 }
@@ -2700,15 +2695,15 @@ select::picker-icon {
 .round-cal .cal-toggle button[aria-pressed="true"]:hover:not(:disabled) {
   background: var(--card);
   color: var(--ink);
-  font-weight: 650;
+  font-weight: 700;
   border: 0;
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
 }
 
 /* Wishlist: compact rows, no new colours. */
 .recap-link .wish-count {
   display: block;
-  font-weight: 650;
+  font-weight: 700;
 }
 .wish-section {
   display: grid;
@@ -2740,7 +2735,7 @@ select::picker-icon {
 .wish-price {
   font-family: var(--display);
   font-size: var(--text-lg);
-  font-weight: 650;
+  font-weight: 700;
   white-space: nowrap;
 }
 .wish-note {
@@ -2801,8 +2796,8 @@ select::picker-icon {
   overflow-wrap: anywhere;
 }
 .outbox-item small {
-  color: var(--danger);
-  font-weight: 650;
+  color: var(--danger-deep);
+  font-weight: 700;
 }
 .offline-hint {
   margin: 4px 0;
@@ -2866,7 +2861,7 @@ select::picker-icon {
 }
 .today-action .today-text {
   font-family: var(--display);
-  font-weight: 650;
+  font-weight: 700;
   color: var(--ink);
   line-height: 1.35;
 }
@@ -2892,7 +2887,7 @@ select::picker-icon {
 }
 .history-metric strong {
   font-size: var(--text-base);
-  font-weight: 650;
+  font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
@@ -2910,14 +2905,14 @@ select::picker-icon {
   min-width: 0;
   margin: 0;
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 .history-member-status {
   margin-inline-start: auto;
   max-width: 100%;
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
   text-align: end;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
@@ -2931,20 +2926,20 @@ select::picker-icon {
 /* One strong primary per screen; the pastel stays for dots and tints. */
 .big:not(.secondary):not(.quiet),
 .big:not(.secondary):not(.quiet):hover:not(:disabled) {
-  background: var(--brand);
-  color: var(--paper);
+  background: var(--pink);
+  color: var(--sticker-ink);
 }
 /* Selected stays selected even when touch leaves :hover stuck. */
 :root .segmented button[aria-pressed="true"],
 :root .segmented button[aria-pressed="true"]:hover:not(:disabled) {
   background: var(--card);
   color: var(--ink);
-  font-weight: 650;
+  font-weight: 700;
   border: 0;
   box-shadow: none;
 }
 legend::first-letter {
-  text-transform: uppercase;
+  text-transform: none;
 }
 .local-note {
   display: flex;
@@ -2957,7 +2952,7 @@ legend::first-letter {
   flex: none;
 }
 .propose legend {
-  font-weight: 650;
+  font-weight: 700;
 }
 .sticker.confirm.urgent {
   border-color: var(--pink-deep);
@@ -2974,7 +2969,7 @@ legend::first-letter {
   border-radius: var(--radius-md);
   color: var(--ink);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
   border: 0;
   background: var(--card-tint);
 }
@@ -2994,7 +2989,7 @@ legend::first-letter {
   padding: 8px 0;
   color: var(--ink);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .form-optional[open] {
   padding-bottom: 12px;
@@ -3017,19 +3012,19 @@ legend::first-letter {
 .split-preview small {
   color: var(--soft);
   font-size: var(--text-sm);
-  font-weight: 650;
+  font-weight: 700;
 }
 .split-preview strong {
   font-family: var(--display);
   font-size: var(--text-input);
-  font-weight: 650;
+  font-weight: 700;
   color: var(--ink);
 }
 .amount-preview {
   display: block;
   font-family: var(--display);
   font-size: var(--text-lg);
-  font-weight: 650;
+  font-weight: 700;
   color: var(--ink);
 }
 .field-error {
@@ -3038,7 +3033,7 @@ legend::first-letter {
   background: var(--danger-tint);
   border: 0;
   border-radius: var(--radius-md);
-  color: var(--danger);
+  color: var(--danger-deep);
   font-size: var(--text-sm);
   font-weight: 800;
 }
@@ -3049,9 +3044,7 @@ legend::first-letter {
   top: 0;
   z-index: 11;
   padding: 12px 16px 8px;
-  background: color-mix(in srgb, var(--paper) 84%, transparent);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  background: var(--paper);
 }
 html {
   scroll-padding-top: 76px;
@@ -3069,46 +3062,56 @@ main
   ):not(.personal-savings),
 .pot {
   border: 0;
-  box-shadow: var(--elev-sm);
+  box-shadow: none;
 }
 
 /* Section labels read as quiet group headers, not stray body text. */
 .section-label {
   margin: 28px 4px 10px;
-  color: var(--soft);
-  font-size: var(--text-xs);
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--ink);
+  font-size: var(--text-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: none;
 }
 .home-waiting .section-label {
   margin-top: 8px;
 }
 
-/* Today: the one thing to do, tinted so it is the first thing seen. */
+/* Today is the one colored sheet; its single action is inverted. */
 .today-action {
   gap: 14px;
   padding: 20px;
-  background: var(--brand-soft);
+  margin: 12px 0 28px;
+  background: var(--pink);
+  color: var(--sticker-ink);
   border: 0;
   box-shadow: none;
 }
 .today-action .today-label {
   justify-self: start;
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--pink) 18%, transparent);
-  color: var(--brand);
-  font-size: var(--text-xs);
-  font-weight: 650;
-  letter-spacing: 0.02em;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 .today-action .today-text {
   font-size: var(--text-md);
+  color: inherit;
   letter-spacing: -0.01em;
 }
-.today-action .button.big:not(.secondary) {
-  box-shadow: var(--elev-pop);
+.today-action .today-pending,
+.today-action .today-pending a {
+  color: inherit;
+}
+.today-action .button.big,
+.today-action .button.big:hover {
+  background: var(--ink);
+  color: var(--paper);
+  width: 100%;
+  min-height: 52px;
+  box-shadow: none;
 }
 
 /* Pot: the amount is the hero. */
@@ -3152,10 +3155,10 @@ textarea {
   border: 1px solid var(--control-border);
 }
 
-/* Compact filters retain equal columns at phone widths. */
+/* Filters wrap when their labels need more room in the wider display face. */
 .history-filters {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 8px;
   margin: 16px 0;
 }
@@ -3206,27 +3209,33 @@ textarea {
   height: 48px;
   flex: none;
 }
-/* Bottom nav: a floating bar with a clear active pill. */
+/* The notebook's solid bottom edge, flush with the device safe area. */
 .app > nav {
-  margin: 0 10px calc(8px + env(safe-area-inset-bottom));
-  padding: 6px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--nav-surface);
-  backdrop-filter: saturate(1.4) blur(16px);
-  -webkit-backdrop-filter: saturate(1.4) blur(16px);
-  box-shadow: var(--elev-nav);
+  margin: 0;
+  padding: 10px 8px calc(6px + env(safe-area-inset-bottom));
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--card);
+  box-shadow: none;
 }
 .app > nav a {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-button);
   color: var(--soft);
-  transition:
-    background-color var(--ease),
-    color var(--ease);
+  transition: color var(--ease);
 }
 .app > nav a.active {
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: transparent;
+  color: var(--ink);
+}
+.app > nav a.active::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  width: 20px;
+  height: 4px;
+  background: var(--pink);
+  border-radius: var(--radius-pill);
 }
 
 /* App updates button can wrap neatly instead of breaking mid-word. */
@@ -3238,15 +3247,40 @@ textarea {
 /* Hero money retains the exact formatted text, with quieter fractional parts. */
 .money {
   font-size: var(--text-2xl);
-  font-weight: 650;
+  font-weight: 750;
   color: var(--ink);
+  display: inline-flex;
+  align-items: flex-start;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.money .money-sign,
-.money .money-centavos {
-  font-size: inherit;
-  zoom: 0.6;
+.money .money-sign {
+  font-size: var(--text-2xl);
+  zoom: 0.5;
+  font-weight: 600;
   color: var(--soft);
+  line-height: 1;
+  padding-top: 0.16em;
+}
+.money .money-centavos {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--soft);
+  line-height: 1;
+  padding-top: 0.16em;
+  margin-left: 2px;
+}
+.pot > .pot-bottom {
+  display: grid;
+  gap: 4px;
+  justify-content: start;
+}
+.pot > .pot-bottom > small:first-child {
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 /* Inset labels and secondary actions are flat; row dividers remain intact. */
 :is(.badge, .today-label) {
@@ -3259,44 +3293,13 @@ textarea {
 .pot-progress > span,
 .recap-bar > span,
 progress {
-  transition: width var(--ease);
-  transition-duration: 400ms;
+  transition: none;
 }
 :is(.pot, .ipon-card, .personal-goal, .recap-link)[href]:active {
   transform: scale(0.98);
 }
 :is(.pot, .ipon-card, .personal-goal, .recap-link)[href] {
   transition: transform var(--ease);
-}
-:root[data-theme="dark"]
-  :is(
-    main section,
-    .pot,
-    .custody-ledger,
-    .round-panel,
-    .ipon-item,
-    .abono-hero,
-    .welcome figure,
-    .celebrate,
-    .celebration-toast
-  ) {
-  border: 1px solid var(--line);
-  box-shadow: none;
-}
-:root[data-theme="dark"]
-  :is(
-    section:has(.pot):not(.round-panel):not(.ipon-item),
-    .personal-savings,
-    .personal-form,
-    .app-updates,
-    .wish-section,
-    .today-action,
-    .tally-sheet,
-    .round-panel > .pot,
-    .ipon-item > .ipon-card
-  ) {
-  border: 0;
-  box-shadow: none;
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -3316,5 +3319,214 @@ progress {
     .header-bell
   ):active {
     transform: none !important;
+  }
+}
+
+/* Quiet typography and deliberate radius hierarchy. */
+.meta,
+.muted,
+footer,
+small,
+.welcome > p,
+.pot-target,
+.member-who,
+.member-ratio,
+.personal-visibility,
+.ipon-meta p {
+  font-weight: 500;
+}
+h2,
+h3,
+.ipon-title {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.welcome h1 {
+  font-size: var(--text-2xl);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+.welcome-title-lead {
+  display: inline-block;
+  max-width: 100%;
+  text-wrap: balance;
+}
+.welcome figure strong {
+  font-weight: 700;
+}
+.abono-sheet,
+.custody-ledger,
+.personal-goal {
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+.round-panel > .pot,
+.round-panel > .pot:only-child,
+.round-panel > :last-child:not(.pot) {
+  border-radius: var(--radius-card);
+}
+.round-panel > .pot:not(:only-child) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.round-panel > .tally-sheet {
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding: 0 20px 20px;
+}
+.ipon-home-section {
+  margin-top: 28px;
+}
+main > section + section {
+  margin-top: 28px;
+}
+.personal-goal,
+.round-cal {
+  border: 0;
+  box-shadow: none;
+}
+.secondary {
+  border-radius: var(--radius-button);
+}
+.pot-progress,
+.recap-bar {
+  height: 8px;
+  background: var(--card-tint);
+}
+.pot-progress > span {
+  background: var(--tone, var(--pink));
+}
+.ipon-card .pot-progress > span {
+  background: var(--tone, var(--leaf));
+}
+
+/* Fifteen 16px Home stickers fit on one row even on a 360px sheet.
+   Long proportional tracks retain their existing representation. */
+.tally.tally-track:not(.proportional) {
+  --coin: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.tally.tally-track:not(.proportional) > span {
+  width: var(--coin);
+  height: var(--coin);
+}
+.tally.tally-track:not(.proportional) > :is(.paid, .pending) {
+  border: 2px solid var(--card);
+}
+.tally:not(.proportional) > span {
+  flex: 0 0 var(--coin);
+  width: var(--coin);
+  height: var(--coin);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.tally:not(.proportional) .paid,
+.cal-day.paid,
+.cal-key.paid {
+  background: var(--tone);
+  border: 2.5px solid var(--sticker-outline);
+  box-shadow: var(--elev-sticker);
+}
+.tally:not(.proportional) .pending,
+.cal-day.pending,
+.cal-key.pending {
+  border: 2.5px solid var(--sticker-outline);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--card) 0 3px,
+    var(--tone) 3px 5px
+  );
+  box-shadow: var(--elev-sticker);
+}
+.tally:not(.proportional) .open {
+  background: transparent;
+  border: 1.5px dashed var(--line);
+  box-shadow: none;
+}
+.tally:not(.proportional) > span:nth-child(4n + 1),
+.cal-day.paid:nth-child(4n + 1) {
+  rotate: -8deg;
+}
+.tally:not(.proportional) > span:nth-child(4n + 2),
+.cal-day.paid:nth-child(4n + 2) {
+  rotate: 5deg;
+}
+.tally:not(.proportional) > span:nth-child(4n + 3),
+.cal-day.paid:nth-child(4n + 3) {
+  rotate: -3deg;
+}
+.tally:not(.proportional) > span:nth-child(4n),
+.cal-day.paid:nth-child(4n) {
+  rotate: 7deg;
+}
+.tally:not(.proportional) .paid:not(:has(~ .paid)),
+.cal-day.paid:not(:has(~ .paid)) {
+  animation: sticker-press 220ms ease-out;
+}
+@keyframes sticker-press {
+  from {
+    scale: 1.25;
+  }
+  to {
+    scale: 1;
+  }
+}
+.cal-day {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: 0;
+  padding: 2px 0;
+  border-radius: 50%;
+}
+.cal-days {
+  row-gap: 16px;
+  margin-top: 16px;
+}
+.cal-day small {
+  position: absolute;
+  top: -14px;
+  width: 100%;
+  text-align: center;
+  color: var(--soft);
+}
+.cal-day.missed,
+.cal-key.missed {
+  border: 1.5px dashed var(--danger-deep);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--card) 0 4px,
+    var(--danger-tint) 4px 6px
+  );
+}
+.cal-day.upcoming {
+  background: transparent;
+  border: 1.5px dashed var(--line);
+}
+.cal-key {
+  border-radius: 50%;
+}
+.round-cal summary {
+  min-height: 44px;
+  align-content: center;
+}
+.cal-day.pending {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--card) 0 3px,
+    var(--card-tint) 3px 5px
+  );
+}
+.cal-day small {
+  font-weight: 500;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tally .paid,
+  .cal-day.paid {
+    animation: none !important;
   }
 }

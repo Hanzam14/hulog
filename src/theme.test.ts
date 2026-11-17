@@ -46,10 +46,10 @@ describe("device theme", () => {
     setTheme("light");
     expect(stored.get("hulog-theme")).toBe("light");
     expect(html.dataset.theme).toBe("light");
-    expect(metaColor).toBe("#F6F5F2");
+    expect(metaColor).toBe("#F3F4FA");
     applyTheme("dark");
     expect(html.dataset.theme).toBe("dark");
-    expect(metaColor).toBe("#0C0D11");
+    expect(metaColor).toBe("#15142E");
   });
   it("Auto follows OS changes while explicit light stays light", () => {
     initializeTheme();

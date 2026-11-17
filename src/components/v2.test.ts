@@ -231,7 +231,7 @@ describe("Hulog v2 CustodyCard", () => {
     // Header and overall total: 1500 + 250 + 2000 = 3750
     expect(markup).toContain("Nasaan ang pera natin");
     expect(markup).toContain(
-      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="money-centavos">.00</span></span>',
+      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="sr-only">.</span><span class="money-centavos">00</span></span>',
     );
 
     // Holder totals: Ana = 1500 + 250 = 1750, Ben = 2000
@@ -279,7 +279,7 @@ describe("Hulog v2 IponCard & ProposeIpon", () => {
 
     expect(markup).toContain("Japan Trip");
     expect(markup).toContain(
-      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">500</span><span class="money-centavos">.00</span></span>',
+      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">500</span><span class="sr-only">.</span><span class="money-centavos">00</span></span>',
     );
     expect(markup).toContain("sa ₱1,000.00");
     expect(markup).toContain('aria-valuenow="50"');
@@ -1167,14 +1167,14 @@ describe("Hulog Solo Mode", () => {
     expect(group).toContain("Together");
     expect(group).toContain("custody-ledger");
     expect(group).toContain(
-      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="money-centavos">.00</span></span>',
+      '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="sr-only">.</span><span class="money-centavos">00</span></span>',
     );
   });
 });
 
 describe("UI simplification layout regressions", () => {
   it.each(["en", "taglish", "tl"] as const)(
-    "keeps History filters compact and printing after every list in %s",
+    "lets History filters wrap and keeps printing after every list in %s",
     (lang) => {
       setLang(lang);
       const data = v2Snapshot();
@@ -1200,7 +1200,7 @@ describe("UI simplification layout regressions", () => {
       );
       const css = readFileSync("src/style.css", "utf8");
       expect(css).toMatch(
-        /\.history-filters \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/,
+        /\.history-filters \{[^}]*grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, 190px\), 1fr\)\)/,
       );
       expect(css).toMatch(/\.history-filters select \{[^}]*min-height: 44px/);
       expect(css).not.toContain(".history-filters .row > label");
@@ -1221,7 +1221,7 @@ describe("UI simplification layout regressions", () => {
       )?.[1];
       expect(card).toBeDefined();
       expect(card).toContain(
-        '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="money-centavos">.00</span></span>',
+        '<span class="money"><span class="money-sign">₱</span><span class="money-whole">3,750</span><span class="sr-only">.</span><span class="money-centavos">00</span></span>',
       );
       for (const wallet of data.wallets!) {
         expect(card!.split(`>${wallet.label}<`)).toHaveLength(2);
@@ -1344,7 +1344,7 @@ describe("hero money", () => {
       expect(markup.replace(/<[^>]+>/g, "")).toBe(value);
       expect(markup).toMatch(/<span class="money-sign">[^<]*₱<\/span>/);
       expect(markup).toMatch(/<span class="money-whole">[\d,]+<\/span>/);
-      expect(markup).toMatch(/<span class="money-centavos">\.\d{2}<\/span>/);
+      expect(markup).toMatch(/<span class="sr-only">\.<\/span><span class="money-centavos">\d{2}<\/span>/);
     },
   );
 });
