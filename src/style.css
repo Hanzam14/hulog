@@ -3210,7 +3210,13 @@ textarea {
   flex: none;
 }
 /* The notebook's solid bottom edge, flush with the device safe area. */
+.app:has(> nav) {
+  padding-bottom: 0;
+}
 .app > nav {
+  bottom: 0;
+  align-self: stretch;
+  width: 100%;
   margin: 0;
   padding: 10px 8px calc(6px + env(safe-area-inset-bottom));
   border: 0;
