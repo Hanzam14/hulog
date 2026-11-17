@@ -475,13 +475,14 @@ describe("Hulog v2 Tracker", () => {
       '<span class="member-name blue">Ben Santos</span>',
     );
     // Debtor 'a' sees Bayaran (Settle)
-    expect(debtorMarkup).toContain("Bayaran (Settle)");
-    expect(debtorMarkup).not.toContain("Natanggap ko (Record settlement)");
+    expect(debtorMarkup).toContain("Magbayad");
+    expect(debtorMarkup).not.toContain("→");
+    expect(debtorMarkup).not.toContain("Natanggap ko ang bayad");
 
     // Creditor 'b' sees Natanggap ko (Record settlement)
     const creditorMarkup = renderTrackerFor("b");
-    expect(creditorMarkup).toContain("Natanggap ko (Record settlement)");
-    expect(creditorMarkup).not.toContain("Bayaran (Settle)");
+    expect(creditorMarkup).toContain("Natanggap ko ang bayad");
+    expect(creditorMarkup).not.toContain("Magbayad");
   });
 
   it("renders All settled up when there is no active debt", () => {

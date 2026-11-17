@@ -513,27 +513,6 @@ export default function Tracker({ data, user, run, busy }: ViewProps) {
       <section className="abono-hero abono-sheet">
         {activeDebt ? (
           <div>
-            <div className="duo" style={{ margin: "8px 0" }}>
-              <figure>
-                <Avatar data={data} id={activeDebt.debtor_id} size="md" />
-                <figcaption>{name(data, activeDebt.debtor_id)}</figcaption>
-              </figure>
-              <span
-                style={{
-                  fontSize: "26px",
-                  alignSelf: "center",
-                  color: "var(--soft)",
-                }}
-                aria-hidden="true"
-              >
-                →
-              </span>
-              <figure>
-                <Avatar data={data} id={activeDebt.creditor_id} size="md" />
-                <figcaption>{name(data, activeDebt.creditor_id)}</figcaption>
-              </figure>
-            </div>
-
             <div
               style={{
                 textAlign: "center",

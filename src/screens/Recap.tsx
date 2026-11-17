@@ -140,7 +140,7 @@ export default function Recap({ data, user }: ViewProps) {
 
   return (
     <>
-      <div className="row">
+      <div className="page-head">
         <Link to="/history" className="back" aria-label={t("Back")}>
           <IconChevronLeft aria-hidden="true" />
         </Link>

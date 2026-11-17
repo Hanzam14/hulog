@@ -443,8 +443,8 @@ const taglish = {
   "All settled up": "Walang utang ang bawat isa",
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
-  "Bayaran (Settle)": "Bayaran (Settle)",
-  "Natanggap ko (Record settlement)": "Natanggap ko (Record settlement)",
+  "Bayaran (Settle)": "Magbayad",
+  "Natanggap ko (Record settlement)": "Natanggap ko ang bayad",
   "Add shared expense": "Magdagdag ng shared expense",
   "What was it for?": "Para saan ito?",
   "e.g. Meralco, Groceries, Dinner": "hal. Meralco, Groceries, Dinner",
@@ -1125,7 +1125,7 @@ const en = {
   "All settled up": "All settled up",
   "{debtor} owes {creditor} {amount}": "{debtor} owes {creditor} {amount}",
   "Bayaran (Settle)": "Settle balance",
-  "Natanggap ko (Record settlement)": "Received payment (Record settlement)",
+  "Natanggap ko (Record settlement)": "I received a payment",
   "Add shared expense": "Add shared expense",
   "What was it for?": "What was it for?",
   "e.g. Meralco, Groceries, Dinner": "e.g. Utilities, Groceries, Dinner",
@@ -1806,7 +1806,7 @@ const tl = {
   "{debtor} owes {creditor} {amount}":
     "May utang si {debtor} kay {creditor} na {amount}",
   "Bayaran (Settle)": "Bayaran",
-  "Natanggap ko (Record settlement)": "Natanggap ko (Itala ang bayad)",
+  "Natanggap ko (Record settlement)": "Natanggap ko ang bayad",
   "Add shared expense": "Magdagdag ng pinagsamang gastos",
   "What was it for?": "Para saan ito?",
   "e.g. Meralco, Groceries, Dinner": "hal. Meralco, Groceries, Dinner",

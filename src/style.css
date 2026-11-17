@@ -3536,3 +3536,23 @@ main > section + section {
     animation: none !important;
   }
 }
+
+/* Page heading: back button and title on one row, left aligned. */
+.page-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 16px;
+}
+.page-head h1 {
+  margin: 0;
+  min-width: 0;
+}
+.page-head .back {
+  flex: none;
+}
+
+/* Any back-button row: the title sits level with the button. */
+div:has(> .back) > h1 {
+  margin: 0;
+}
