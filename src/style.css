@@ -3556,3 +3556,8 @@ main > section + section {
 div:has(> .back) > h1 {
   margin: 0;
 }
+
+/* Wishlist: "paid from the goal?" choice, shown in place of the action row. */
+.wish-ask { display: grid; gap: 10px; margin-top: 4px; }
+.wish-ask p { margin: 0; font-weight: 600; }
+.wish-ask .actions { flex-wrap: wrap; }

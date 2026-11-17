@@ -15,6 +15,7 @@ import {
 import { t } from "../i18n";
 import Avatar from "./Avatar";
 import { useGoalCelebration } from "./useGoalCelebration";
+import { goalAvailable } from "../wishlist";
 import Tally from "./Tally";
 import { heldByText, name, tone } from "./shared";
 
@@ -88,10 +89,17 @@ export default function IponCard({
           </div>
           <div className="ipon-amounts">
             <strong>
-              <Money value={money(g.saved_centavos)} />
+              <Money value={money(goalAvailable(g))} />
             </strong>
             <span className="pot-target">
-              {t("of {amount}", { amount: money(g.target_amount_centavos) })}
+              {(g.spent_centavos ?? 0) > 0
+                ? t("{spent} spent · target {amount}", {
+                    spent: money(g.spent_centavos ?? 0),
+                    amount: money(g.target_amount_centavos),
+                  })
+                : t("of {amount}", {
+                    amount: money(g.target_amount_centavos),
+                  })}
             </span>
           </div>
         </div>

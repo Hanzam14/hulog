@@ -81,6 +81,18 @@ export interface Repayment {
   was_confirmed: boolean;
   deleted_at: string | null;
 }
+export interface SavingsSpend {
+  id: string;
+  group_id: string;
+  goal_id: string;
+  wishlist_item_id: string | null;
+  amount_centavos: number;
+  spend_date: string;
+  created_by: string;
+  created_at: string;
+  voided_by: string | null;
+  voided_at: string | null;
+}
 export interface PayoutWithdrawal {
   id: string;
   group_id: string;
@@ -157,6 +169,8 @@ export interface SavingsGoal {
   withdrawn_by: string | null;
   withdrawn_at: string | null;
   saved_centavos: number;
+  /** Active spends taken out of the goal (wishlist items bought with goal money). */
+  spent_centavos?: number;
   phase: string;
   days_left: number;
   expected_steps_today: number;
@@ -248,6 +262,7 @@ export interface Snapshot {
   personalEntries?: PersonalEntry[];
   personalHistory?: PersonalHistory[];
   wishlistItems?: WishlistItem[];
+  savingsSpends?: SavingsSpend[];
 }
 export interface WishlistItem {
   id: string;
@@ -378,6 +393,7 @@ export async function load(): Promise<Snapshot> {
     personalEntries,
     personalHistory,
     wishlistItems,
+    savingsSpends,
   ] = await Promise.all([
     rows<Profile>(
       "profiles",
@@ -405,6 +421,7 @@ export async function load(): Promise<Snapshot> {
     optionalRows<PersonalEntry>("personal_savings_entries", "id"),
     optionalRows<PersonalHistory>("personal_savings_history", "id"),
     optionalRows<WishlistItem>("wishlist_items", "created_at"),
+    optionalRows<SavingsSpend>("savings_spends", "created_at"),
   ]);
   return {
     profiles,
@@ -429,5 +446,6 @@ export async function load(): Promise<Snapshot> {
     personalEntries,
     personalHistory,
     wishlistItems,
+    savingsSpends,
   };
 }

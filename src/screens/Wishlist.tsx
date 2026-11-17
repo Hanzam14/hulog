@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   IconArrowBackUp,
@@ -20,6 +20,8 @@ import {
   WISHLIST_MAX_ITEMS,
   WISHLIST_NOTE_MAX,
   WISHLIST_TITLE_MAX,
+  canPayFromGoal,
+  itemSpend,
   linkableGoals,
   liveWishlist,
   manilaDay,
@@ -130,6 +132,28 @@ export function WishlistRow({
 }) {
   const bought = item.status === "bought";
   const progress = wishlistProgress(item, data.savingsGoals);
+  const [asking, setAsking] = useState(false);
+  const askFirst = useRef<HTMLButtonElement>(null);
+  // Move focus into the question so keyboard and screen-reader users land on it.
+  useEffect(() => {
+    if (asking) askFirst.current?.focus();
+  }, [asking]);
+  const spend = bought ? itemSpend(item, data.savingsSpends) : null;
+  const spendGoal = spend
+    ? (data.savingsGoals ?? []).find((g) => g.id === spend.goal_id)
+    : undefined;
+  const payable = canPayFromGoal(item, data.savingsGoals);
+  const mark = (fromGoal: boolean) => {
+    setAsking(false);
+    void run(() =>
+      rpc(
+        "set_wishlist_bought",
+        bought
+          ? { p_id: item.id, p_bought: false }
+          : { p_id: item.id, p_bought: true, p_from_goal: fromGoal },
+      ),
+    );
+  };
   return (
     <article
       className={bought ? "sticker wish-item bought" : "sticker wish-item"}
@@ -139,7 +163,15 @@ export function WishlistRow({
         <strong className="wish-price">{money(item.price_centavos)}</strong>
       </div>
       {item.note && <p className="meta wish-note">{item.note}</p>}
-      {bought && progress && (
+      {spend && (
+        <Link to={"/ipon/" + spend.goal_id} className="meta wish-spent">
+          {t("Deducted {amount} from {goal}", {
+            amount: money(spend.amount_centavos),
+            goal: spendGoal?.title ?? t("the goal"),
+          })}
+        </Link>
+      )}
+      {bought && !spend && progress && (
         <Link to={"/ipon/" + progress.goal.id} className="meta">
           {t("Goal: {title}", { title: progress.goal.title })}
         </Link>
@@ -180,56 +212,82 @@ export function WishlistRow({
             })
           : t("Added by {name}", { name: firstName(data, item.added_by) })}
       </p>
-      <div className="actions wish-actions">
-        <button
-          className={bought ? "secondary" : undefined}
-          disabled={busy}
-          onClick={() =>
-            void run(() =>
-              rpc("set_wishlist_bought", {
-                p_id: item.id,
-                p_bought: !bought,
-              }),
-            )
-          }
+      {asking && progress ? (
+        <div
+          className="wish-ask"
+          role="group"
+          aria-labelledby={"ask-" + item.id}
         >
-          {bought ? (
-            <>
-              <IconArrowBackUp size={18} aria-hidden="true" />{" "}
-              {t("Undo bought")}
-            </>
-          ) : (
-            <>
-              <IconCheck size={18} aria-hidden="true" /> {t("Mark as bought")}
-            </>
+          <p id={"ask-" + item.id}>
+            {t("Paid from {goal}?", { goal: progress.goal.title })}
+          </p>
+          <div className="actions">
+            <button ref={askFirst} disabled={busy} onClick={() => mark(true)}>
+              {t("Yes, deduct {amount}", {
+                amount: money(item.price_centavos),
+              })}
+            </button>
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() => mark(false)}
+            >
+              {t("No, other money")}
+            </button>
+            <button
+              className="quiet"
+              disabled={busy}
+              onClick={() => setAsking(false)}
+            >
+              {t("Cancel")}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="actions wish-actions">
+          <button
+            className={bought ? "secondary" : undefined}
+            disabled={busy}
+            onClick={() => (payable ? setAsking(true) : mark(false))}
+          >
+            {bought ? (
+              <>
+                <IconArrowBackUp size={18} aria-hidden="true" />{" "}
+                {t("Undo bought")}
+              </>
+            ) : (
+              <>
+                <IconCheck size={18} aria-hidden="true" /> {t("Mark as bought")}
+              </>
+            )}
+          </button>
+          {!bought && (
+            <button
+              className="quiet"
+              aria-label={t("Edit {title}", { title: item.title })}
+              disabled={busy}
+              onClick={edit}
+            >
+              <IconPencil size={18} aria-hidden="true" />
+            </button>
           )}
-        </button>
-        {!bought && (
           <button
             className="quiet"
-            aria-label={t("Edit {title}", { title: item.title })}
+            aria-label={t("Delete {title}", { title: item.title })}
             disabled={busy}
-            onClick={edit}
-          >
-            <IconPencil size={18} aria-hidden="true" />
-          </button>
-        )}
-        <button
-          className="quiet"
-          aria-label={t("Delete {title}", { title: item.title })}
-          disabled={busy}
-          onClick={() => {
-            if (
-              window.confirm(
-                t("Delete this wishlist item? The change stays in history."),
+            onClick={() => {
+              if (
+                window.confirm(
+                  t("Delete this wishlist item? The change stays in history."),
+                )
               )
-            )
-              void run(() => rpc("delete_wishlist_item", { p_id: item.id }));
-          }}
-        >
-          <IconTrash size={18} aria-hidden="true" />
-        </button>
-      </div>
+                void run(() => rpc("delete_wishlist_item", { p_id: item.id }));
+            }}
+          >
+            <IconTrash size={18} aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </article>
   );
 }
