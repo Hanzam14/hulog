@@ -115,7 +115,9 @@ export default function History({ data, user, run, busy }: ViewProps) {
             <span className="past-row-text">
               <strong>{money(c.pot_centavos)}</strong>
               <span className="meta">
-                {t("goes to")} {firstName(c.receiver_id)} ·{" "}
+                {t("goes to")} {firstName(c.receiver_id)}
+              </span>
+              <span className="meta">
                 {shortDate(c.start_date)} → {shortDate(c.end_date)}
               </span>
             </span>

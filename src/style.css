@@ -3593,5 +3593,8 @@ div:has(> .back) > h1 {
 .past-row-text { display: grid; gap: 2px; flex: 1 1 auto; min-width: 0; }
 .past-row-text strong { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .past-row-text .meta { font-size: var(--text-sm); color: var(--soft); }
-.past-row .chip { flex: none; max-width: 40%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.past-row .chip { flex: 0 1 auto; max-width: 42%; text-align: center; overflow-wrap: anywhere; }
 .past-row > svg:last-child { flex: none; color: var(--soft); }
+
+/* Print button stands apart from the last History row. */
+.history-summary ~ button.no-print, section + button.no-print { margin-top: 20px; }
